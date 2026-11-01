@@ -1,6 +1,7 @@
 extends Node2D
 
 const PlayerScript = preload("res://scripts/player.gd")
+const ForestScript = preload("res://scripts/forest_background.gd")
 const EnemyScript = preload("res://scripts/enemy.gd")
 const ProjectileScript = preload("res://scripts/projectile.gd")
 const WORLD_WIDTH := 1600
@@ -15,6 +16,8 @@ var enemies_label: Label
 var cooldown_label: Label
 var status_label: Label
 var equipment_label: Label
+var inventory_panel: PanelContainer
+var inventory_label: Label
 var overlay: ColorRect
 var overlay_title: Label
 var overlay_hint: Label
@@ -24,6 +27,9 @@ var touch_buttons: Array[Button] = []
 
 func _ready() -> void:
   _register_inputs()
+  var forest := ForestScript.new()
+  forest.name = "ForestBackground"
+  add_child(forest)
   _build_arena()
   _build_hud()
   _start_round()
@@ -98,6 +104,7 @@ func _start_round() -> void:
     camera.limit_bottom = 720
     add_child(camera)
     camera.make_current()
+  $ForestBackground.camera_ref = camera
   var slots := [Vector2(575, FLOOR_Y), Vector2(800, FLOOR_Y), Vector2(1020, FLOOR_Y), Vector2(1285, FLOOR_Y)]
   foes_left = slots.size()
   for i in range(slots.size()):
@@ -142,6 +149,7 @@ func _unhandled_input(event: InputEvent) -> void:
       KEY_1: player.cycle_equipment("weapon")
       KEY_2: player.cycle_equipment("armor")
       KEY_3: player.cycle_equipment("accessory")
+      KEY_I: _toggle_inventory()
 
 func _physics_process(_delta: float) -> void:
   if is_instance_valid(player):
@@ -170,6 +178,8 @@ func _refresh_hud() -> void:
       break
   status_label.text = "출혈 대상 있음! 화염 공격으로 폭발 가능" if bleeding else "검사 스킬로 출혈 → 화염술사로 교체 → 화염 공격"
   equipment_label.text = "1 무기: %s   2 방어구: %s   3 장신구: %s" % [player.equipment.name_for("weapon"), player.equipment.name_for("armor"), player.equipment.name_for("accessory")]
+  if is_instance_valid(inventory_label):
+    inventory_label.text = "장비 현황\\n\\n무기: %s\\n방어구: %s\\n장신구: %s\\n\\n공격력 %+d | 방어력 %d\\n최대 체력 %d | 속도 %.2fx\\n\\n1 / 2 / 3 키 또는 화면 버튼으로 교체" % [player.equipment.name_for("weapon"),player.equipment.name_for("armor"),player.equipment.name_for("accessory"),int(player.equipment.stat("attack")),int(player.equipment.stat("defense")),player.max_health,player.equipment.stat("speed")]
 
 func _label(text_value: String, xy: Vector2, size: int, tint: Color) -> Label:
   var label := Label.new()
@@ -198,6 +208,20 @@ func _build_hud() -> void:
     hud.add_child(item)
   equipment_label = _label("", Vector2(24, 117), 16, Color("d6e8b8"))
   hud.add_child(equipment_label)
+  inventory_panel = PanelContainer.new()
+  inventory_panel.position = Vector2(420,165)
+  inventory_panel.custom_minimum_size = Vector2(450,310)
+  inventory_panel.visible = false
+  hud.add_child(inventory_panel)
+  inventory_label = _label("",Vector2(20,16),20,Color("#e4eacd"))
+  inventory_label.custom_minimum_size = Vector2(400,270)
+  inventory_panel.add_child(inventory_label)
+  var inventory_button := Button.new()
+  inventory_button.text = "장비 정보 (I)"
+  inventory_button.position = Vector2(1080,155)
+  inventory_button.size = Vector2(165,44)
+  inventory_button.pressed.connect(_toggle_inventory)
+  hud.add_child(inventory_button)
   var controls := _label("A/D 이동   SPACE 점프   SHIFT 대시   J/Z 공격   K/X 스킬   L/C 교체   R 재시작", Vector2(26, 672), 17, Color("c7d7ee"))
   hud.add_child(controls)
   overlay = ColorRect.new()
@@ -246,6 +270,10 @@ func _build_hud() -> void:
     hud.add_child(button)
     touch_buttons.append(button)
 
+func _toggle_inventory() -> void:
+  if is_instance_valid(inventory_panel):
+    inventory_panel.visible = not inventory_panel.visible
+
 func _on_equip_button(slot: String) -> void:
   if is_instance_valid(player) and not ended:
     player.cycle_equipment(slot)
@@ -255,13 +283,11 @@ func _on_touch_action(action: String, state: bool) -> void:
     player.set_virtual(action, state)
 
 func _draw() -> void:
-  draw_rect(Rect2(0, 0, WORLD_WIDTH, 720), Color("121b32"))
-  for x in range(0, WORLD_WIDTH, 130):
-    draw_rect(Rect2(x + 30, 210 + (x % 170), 46, 400), Color("1b2942"))
-    draw_rect(Rect2(x + 15, 200 + (x % 170), 76, 15), Color("243550"))
+  # ForestBackground node renders the sky, trees and distant foliage.
+  # Keep stage decorations here, without hiding the forest with an opaque rectangle.
   for x in range(0, WORLD_WIDTH, 175):
-    draw_circle(Vector2(x + 55, 145 + x % 115), 3, Color("b5a6de"))
-  draw_rect(Rect2(0, FLOOR_Y, WORLD_WIDTH, 135), Color("27364c"))
-  draw_rect(Rect2(0, FLOOR_Y, WORLD_WIDTH, 8), Color("65718d"))
+    draw_circle(Vector2(x + 55, 145 + x % 115), 2, Color("#d6f2b2", 0.5))
+  draw_rect(Rect2(0, FLOOR_Y, WORLD_WIDTH, 135), Color("#2b4034"))
+  draw_rect(Rect2(0, FLOOR_Y, WORLD_WIDTH, 8), Color("#73995d"))
   for x in range(0, WORLD_WIDTH, 80):
     draw_line(Vector2(x, FLOOR_Y + 30), Vector2(x + 55, FLOOR_Y + 30), Color("334661"), 3)
