@@ -4,8 +4,11 @@ class_name EclipsePlayer
 signal health_changed(current: int, maximum: int)
 signal form_changed(form: int)
 signal projectile_requested(position_value: Vector2, direction_value: int, damage: int, skill: bool)
+signal equipment_changed
 signal defeated
 
+const EquipmentScript = preload("res://scripts/equipment.gd")
+var equipment = EquipmentScript.new()
 const MOVE_SPEED := 280.0
 const JUMP_SPEED := -475.0
 const GRAVITY := 1150.0
@@ -45,8 +48,10 @@ func _ready() -> void:
   shape.shape = rect
   shape.position = Vector2(0, -28)
   add_child(shape)
+  refresh_equipment_health()
   health_changed.emit(health, max_health)
   form_changed.emit(form)
+  equipment_changed.emit()
 
 func pressed(action: String) -> bool:
   return Input.is_action_pressed(action) or virtual_input.get(action, false)
@@ -102,10 +107,10 @@ func _physics_process(delta: float) -> void:
     dash_cooldown = 0.85
     invulnerable = maxf(invulnerable, DASH_DURATION)
   if dash_left > 0.0:
-    velocity.x = DASH_SPEED * facing
+    velocity.x = DASH_SPEED * facing * equipment.stat("speed")
     velocity.y = 0.0
   else:
-    velocity.x = axis * MOVE_SPEED
+    velocity.x = axis * MOVE_SPEED * equipment.stat("speed")
     velocity.y += GRAVITY * delta
     if jump_buffer > 0.0 and coyote > 0.0:
       velocity.y = JUMP_SPEED
@@ -125,21 +130,21 @@ func basic_attack() -> void:
   if form == 0:
     combo_index = (combo_index % 3) + 1 if combo_window > 0.0 else 1
     combo_window = 0.8
-    attack_cooldown = [0.0, 0.23, 0.25, 0.42][combo_index]
+    attack_cooldown = [0.0, 0.23, 0.25, 0.42][combo_index] / equipment.stat("speed")
     var power: int = [0, 12, 15, 23][combo_index]
-    melee_hit(power, combo_index == 3, 115.0 if combo_index == 3 else 96.0)
+    melee_hit(power + int(equipment.stat("attack")), combo_index == 3, (115.0 if combo_index == 3 else 96.0) * equipment.stat("range"))
   else:
     combo_index = 0
     attack_cooldown = 0.47
-    projectile_requested.emit(global_position + Vector2(facing * 27, -33), facing, 11, false)
+    projectile_requested.emit(global_position + Vector2(facing * 27, -33), facing, 11 + int(equipment.stat("attack")), false)
 
 func use_skill() -> void:
   skill_cooldown = 3.4 if form == 0 else 4.1
   attack_flash = 0.28
   if form == 0:
-    melee_hit(23, true)
+    melee_hit(23 + int(equipment.stat("attack")), true, 96.0 * equipment.stat("range"))
   else:
-    projectile_requested.emit(global_position + Vector2(facing * 27, -33), facing, 25, true)
+    projectile_requested.emit(global_position + Vector2(facing * 27, -33), facing, 25 + int(equipment.stat("attack")), true)
 
 func melee_hit(damage: int, inflict_bleed: bool, reach: float = 96.0) -> void:
   for enemy in get_tree().get_nodes_in_group("enemies"):
@@ -153,7 +158,7 @@ func melee_hit(damage: int, inflict_bleed: bool, reach: float = 96.0) -> void:
 func take_damage(amount: int) -> void:
   if invulnerable > 0.0 or health <= 0:
     return
-  health = maxi(health - amount, 0)
+  health = maxi(health - maxi(1, amount - int(equipment.stat("defense"))), 0)
   invulnerable = 0.7
   attack_flash = 0.28
   combo_index = 0
@@ -164,7 +169,19 @@ func take_damage(amount: int) -> void:
     defeated.emit()
   queue_redraw()
 
+func refresh_equipment_health() -> void:
+  var old_max := max_health
+  max_health = 100 + int(equipment.stat("hp"))
+  health = clampi(health + max_health - old_max, 1, max_health)
+
+func cycle_equipment(slot: String) -> void:
+  equipment.cycle(slot)
+  refresh_equipment_health()
+  health_changed.emit(health, max_health)
+  equipment_changed.emit()
+
 func reset_character() -> void:
+  max_health = 100 + int(equipment.stat("hp"))
   health = max_health
   form = 0
   facing = 1
