@@ -38,6 +38,7 @@ var swap_attack_timer := 0.0
 var virtual_input := {"left": false, "right": false, "jump": false, "attack": false, "skill": false, "swap": false, "dash": false}
 var previous_virtual := virtual_input.duplicate()
 var controls_active := true
+var sword_slash_sprite: Sprite2D
 
 func _ready() -> void:
 	add_to_group("player")
@@ -48,6 +49,19 @@ func _ready() -> void:
 		add_child(appearance)
 	else:
 		push_warning("Knight visual failed to load; procedural player remains usable.")
+	# Separate PNG sprite effect: the knight artwork contains no sword wave.
+	sword_slash_sprite = Sprite2D.new()
+	sword_slash_sprite.name = "SwordSlashEffect"
+	var slash_path := "res://assets/effects/sword_slash.png"
+	if ResourceLoader.exists(slash_path):
+		sword_slash_sprite.texture = load(slash_path)
+	else:
+		push_warning("Sword slash PNG missing: " + slash_path)
+	sword_slash_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	sword_slash_sprite.position = Vector2(44, -36)
+	sword_slash_sprite.scale = Vector2(2.0, 2.0)
+	sword_slash_sprite.visible = false
+	add_child(sword_slash_sprite)
 	collision_layer = 2
 	collision_mask = 1
 	var shape := CollisionShape2D.new()
@@ -128,6 +142,10 @@ func _physics_process(delta: float) -> void:
 		basic_attack()
 	if just_pressed("skill") and skill_cooldown <= 0.0:
 		use_skill()
+	if is_instance_valid(sword_slash_sprite):
+		sword_slash_sprite.flip_h = facing < 0
+		sword_slash_sprite.position.x = 44.0 * facing
+		sword_slash_sprite.visible = form == 0 and attack_flash > 0.0 and sword_slash_sprite.texture != null
 	move_and_slide()
 	position.x = clampf(position.x, 25.0, 1550.0)
 	previous_virtual = virtual_input.duplicate()
@@ -230,6 +248,6 @@ func _draw() -> void:
 		draw_circle(Vector2(facing * 22, -64), 7, Color("ffad5b"))
 	if swap_attack_timer > 0.0:
 		draw_arc(Vector2(0, -36), 44.0, 0.0, TAU, 24, Color("fff2b6"), 4.0)
-	if attack_flash > 0.0:
-		var effect_color := Color("a9f0ff") if form == 0 else Color("ff9d51")
-		draw_arc(Vector2(facing * 16, -36), 55, -1.1 if facing == 1 else 2.0, 1.15 if facing == 1 else 4.3, 18, effect_color, 6.0)
+	# Sword wave is drawn by SwordSlashEffect from its separate PNG.
+	if attack_flash > 0.0 and form != 0:
+		draw_arc(Vector2(facing * 16, -36), 55, -1.1 if facing == 1 else 2.0, 1.15 if facing == 1 else 4.3, 18, Color("ff9d51"), 6.0)
