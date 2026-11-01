@@ -5,6 +5,7 @@ const ForestScript = preload("res://scripts/forest_background.gd")
 const JoystickScript = preload("res://scripts/touch_joystick.gd")
 const PixelTheme = preload("res://scripts/pixel_theme.gd")
 const PixelIcon = preload("res://scripts/pixel_action_icon.gd")
+const PixelCombatHud = preload("res://scripts/pixel_combat_hud.gd")
 const DamageNumber = preload("res://scripts/pixel_damage_number.gd")
 const EnemyScript = preload("res://scripts/enemy.gd")
 const ProjectileScript = preload("res://scripts/projectile.gd")
@@ -31,6 +32,7 @@ var touch_buttons: Array[Button] = []
 var mobile_controls: Control
 var joystick_jump := false
 var profile_panel: PanelContainer
+var pixel_hud: Control
 
 func _ready() -> void:
 	_register_inputs()
@@ -185,6 +187,11 @@ func _update_form(_form: int) -> void:
 func _refresh_hud() -> void:
 	if not is_instance_valid(player) or not is_instance_valid(health_label):
 		return
+	pixel_hud.hp = player.health
+	pixel_hud.max_hp = player.max_health
+	pixel_hud.foes = maxi(foes_left, 0)
+	pixel_hud.skill_ratio = clampf(1.0 - player.skill_cooldown / 4.0, 0.0, 1.0)
+	pixel_hud.queue_redraw()
 	health_label.text = "HP  %d / %d" % [player.health, player.max_health]
 	form_label.text = "FORM  %s" % ("검사 / 출혈 베기" if player.form == 0 else "화염술사 / 화염 폭발")
 	enemies_label.text = "ENEMIES  %d" % maxi(foes_left, 0)
@@ -212,12 +219,12 @@ func _build_hud() -> void:
 	hud = CanvasLayer.new()
 	add_child(hud)
 	var header := ColorRect.new()
-	header.color = Color("#15232e", 0.97)
+	header.color = Color.TRANSPARENT
 	header.position = Vector2(0, 0)
 	header.size = Vector2(1280, 85)
 	header.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hud.add_child(header)
-	hud.add_child(_label("ECLIPSE", Vector2(235, 12), 18, Color("cfdaf9")))
+	# Reference layout deliberately has no top-left menu buttons or title.
 	health_label = _label("", Vector2(235, 39), 20, Color("ff9ca9"))
 	form_label = _label("", Vector2(448, 43), 18, Color("9ed7ff"))
 	enemies_label = _label("", Vector2(1050, 43), 18, Color("f5c58a"))
@@ -225,8 +232,13 @@ func _build_hud() -> void:
 	status_label = _label("", Vector2(235, 68), 12, Color("ffe19b"))
 	for item in [health_label, form_label, enemies_label, cooldown_label, status_label]:
 		hud.add_child(item)
+	for label_node in [health_label, form_label, enemies_label, cooldown_label, status_label]:
+		label_node.visible = false
 	equipment_label = _label("", Vector2(235, 91), 14, Color("d6e8b8"))
 	hud.add_child(equipment_label)
+	equipment_label.visible = false
+	pixel_hud = PixelCombatHud.new()
+	hud.add_child(pixel_hud)
 	inventory_panel = PanelContainer.new()
 	inventory_panel.position = Vector2(46,135)
 	inventory_panel.custom_minimum_size = Vector2(450,310)
@@ -236,13 +248,6 @@ func _build_hud() -> void:
 	inventory_label = _label("",Vector2(20,16),20,Color("#e4eacd"))
 	inventory_label.custom_minimum_size = Vector2(400,270)
 	inventory_panel.add_child(inventory_label)
-	var inventory_button := Button.new()
-	inventory_button.text = "장비"
-	inventory_button.position = Vector2(20,40)
-	inventory_button.size = Vector2(95,44)
-	inventory_button.pressed.connect(_toggle_inventory)
-	PixelTheme.button(inventory_button)
-	hud.add_child(inventory_button)
 	overlay = ColorRect.new()
 	overlay.color = Color("#111a28", 0.94)
 	overlay.position = Vector2(0, 0)
@@ -261,31 +266,6 @@ func _build_hud() -> void:
 	PixelTheme.button(retry)
 	overlay.add_child(retry)
 	# Sketch-based Android landscape layout. HUD lives in 1280x720 canvas coordinates.
-	var profile_btn := Button.new()
-	profile_btn.text = "프로필"
-	profile_btn.position = Vector2(20, 4)
-	profile_btn.size = Vector2(95, 34)
-	profile_btn.pressed.connect(_toggle_profile)
-	PixelTheme.button(profile_btn)
-	hud.add_child(profile_btn)
-	profile_panel = PanelContainer.new()
-	profile_panel.position = Vector2(120, 12)
-	profile_panel.custom_minimum_size = Vector2(245, 145)
-	profile_panel.visible = false
-	PixelTheme.panel(profile_panel)
-	hud.add_child(profile_panel)
-	var profile_text := Label.new()
-	profile_text.text = "ECLIPSE 기사\nHP / 전투 형태는 상단 HUD에 표시\n프로필 세부 기능: 추후 업데이트"
-	PixelTheme.label(profile_text)
-	profile_panel.add_child(profile_text)
-	var inv_btn := Button.new()
-	inv_btn.text = "인벤토리"
-	inv_btn.position = Vector2(120, 40)
-	inv_btn.size = Vector2(105, 44)
-	inv_btn.pressed.connect(_toggle_inventory)
-	PixelTheme.button(inv_btn)
-	hud.add_child(inv_btn)
-
 	mobile_controls = Control.new()
 	mobile_controls.name = "MobileControls"
 	mobile_controls.mouse_filter = Control.MOUSE_FILTER_IGNORE
