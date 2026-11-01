@@ -7,47 +7,41 @@ const PANEL := Color("#1c2a34")
 const LIGHT := Color("#d4e0d2")
 const SHADE := Color("#080d16")
 const GOLD := Color("#e3bd72")
-const ATTACK := Color("#813a46")
-const DASH := Color("#2b5970")
-const SKILL := Color("#574879")
-const SWAP := Color("#3d654d")
+const ATTACK := Color("#3d4244")
+const DASH := Color("#343f45")
+const SKILL := Color("#45424a")
+const SWAP := Color("#3b4541")
 
 # 48x48 sprite frame, nine-sliced so corners stay exactly 12x12 pixels.
 # Image pixels are drawn without AA; no web-style flat gradient/button border.
 static func _sprite_frame(base_color: Color, active: bool = false) -> StyleBoxTexture:
-  var img := Image.create(48, 48, false, Image.FORMAT_RGBA8)
-  img.fill(Color.TRANSPARENT)
-  var dark := base_color.darkened(0.52)
-  var mid := base_color.darkened(0.16)
-  var lit := base_color.lightened(0.30)
-  var center := base_color.lightened(0.08)
+  # 8x8 logical pixels, expanded x6 to exactly 48x48 physical pixels.
+  var image := Image.create(48, 48, false, Image.FORMAT_RGBA8)
+  image.fill(Color.TRANSPARENT)
+  var palette := [SHADE, Color("#656a6b"), Color("#c0c3bb"), base_color, base_color.darkened(0.22)]
   if active:
-    center = base_color.darkened(0.19)
-    lit = GOLD
-  img.fill_rect(Rect2i(8, 0, 32, 4), SHADE)
-  img.fill_rect(Rect2i(4, 4, 40, 4), SHADE)
-  img.fill_rect(Rect2i(0, 8, 48, 32), SHADE)
-  img.fill_rect(Rect2i(4, 40, 40, 4), SHADE)
-  img.fill_rect(Rect2i(8, 44, 32, 4), SHADE)
-  img.fill_rect(Rect2i(8, 4, 32, 4), lit)
-  img.fill_rect(Rect2i(4, 8, 40, 32), dark)
-  img.fill_rect(Rect2i(8, 8, 32, 32), mid)
-  img.fill_rect(Rect2i(12, 12, 24, 24), center)
-  img.fill_rect(Rect2i(8, 8, 32, 3), lit)
-  img.fill_rect(Rect2i(8, 11, 3, 25), lit)
-  img.fill_rect(Rect2i(8, 36, 32, 4), base_color.darkened(0.43))
-  img.fill_rect(Rect2i(37, 11, 3, 25), base_color.darkened(0.43))
-  # stepped metal corner rivets and carved pixel highlights
-  for xx in [9, 35]:
-    for yy in [9, 35]:
-      img.fill_rect(Rect2i(xx, yy, 4, 4), GOLD if active else LIGHT)
-      img.set_pixel(xx + 1, yy + 1, SHADE)
-  var texture := ImageTexture.create_from_image(img)
-  var style := StyleBoxTexture.new()
-  style.texture = texture
-  style.set_texture_margin_all(12.0)
-  style.set_content_margin_all(7.0)
-  return style
+    palette[2] = Color("#e1dfd0")
+    palette[3] = base_color.darkened(0.25)
+  var pattern := [
+    "00111100",
+    "01222210",
+    "12333321",
+    "12333321",
+    "12333321",
+    "12333321",
+    "01444410",
+    "00111100"
+  ]
+  for y in range(8):
+    for x in range(8):
+      var index := int(pattern[y].substr(x, 1))
+      image.fill_rect(Rect2i(x * 6, y * 6, 6, 6), palette[index])
+  var texture := ImageTexture.create_from_image(image)
+  var frame := StyleBoxTexture.new()
+  frame.texture = texture
+  frame.set_texture_margin_all(18.0)
+  frame.set_content_margin_all(6.0)
+  return frame
 
 static func box(bg: Color, edge: Color = LIGHT, border: int = 3) -> StyleBoxFlat:
   var frame := StyleBoxFlat.new()
