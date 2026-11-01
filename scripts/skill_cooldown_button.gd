@@ -24,9 +24,7 @@ func _remaining() -> float:
   return float(actor.skill_cooldowns[slot])
 
 func _draw() -> void:
-  var duration := float(actor.ULTIMATE_DURATION) if is_ultimate and is_instance_valid(actor) else 1.0
-  if is_instance_valid(actor) and not is_ultimate:
-    duration = float(actor.SKILL_DURATIONS[slot])
+  var duration := 22.0 if is_ultimate else [3.4, 5.0, 7.0][slot]
   var remaining := _remaining()
   var fill_fraction := clampf(1.0 - remaining / maxf(0.01, duration), 0.0, 1.0)
   var fill_height := floorf((size.y - 8.0) * fill_fraction / 4.0) * 4.0
