@@ -43,6 +43,45 @@ static func _sprite_frame(base_color: Color, active: bool = false) -> StyleBoxTe
 	frame.set_content_margin_all(6.0)
 	return frame
 
+# Pixel-round 16x16 buttons. Nearest-neighbor enlargement makes every pixel visible.
+static func _round_frame(active: bool = false) -> StyleBoxTexture:
+	var img := Image.create(32, 32, false, Image.FORMAT_RGBA8)
+	img.fill(Color.TRANSPARENT)
+	var outer := Color("#0e191d", 0.93)
+	var rim := Color("#92a09b", 0.94) if not active else Color("#e0e0d2")
+	var fill := Color("#26363b", 0.82) if not active else Color("#425157", 0.96)
+	var low := Color("#53615c", 0.92)
+	for y in range(32):
+		for x in range(32):
+			var dx := float(x) - 15.5
+			var dy := float(y) - 15.5
+			var d2 := dx * dx + dy * dy
+			var color := Color.TRANSPARENT
+			if d2 <= 245.0:
+				color = outer
+			if d2 <= 203.0:
+				color = rim
+			if d2 <= 167.0:
+				color = fill
+			if d2 <= 203.0 and y >= 24:
+				color = low
+			if d2 <= 167.0 and y >= 24:
+				color = fill
+			img.set_pixel(x, y, color)
+	var frame := StyleBoxTexture.new()
+	frame.texture = ImageTexture.create_from_image(img)
+	frame.set_content_margin_all(0.0)
+	return frame
+
+static func action_button(button_node: Button) -> void:
+	button_node.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	button_node.add_theme_stylebox_override("normal", _round_frame(false))
+	button_node.add_theme_stylebox_override("hover", _round_frame(false))
+	button_node.add_theme_stylebox_override("pressed", _round_frame(true))
+	button_node.add_theme_stylebox_override("disabled", _round_frame(false))
+	button_node.add_theme_stylebox_override("focus", box(Color.TRANSPARENT, Color.TRANSPARENT, 0))
+	button_node.focus_mode = Control.FOCUS_NONE
+
 static func box(bg: Color, edge: Color = LIGHT, border: int = 3) -> StyleBoxFlat:
 	var frame := StyleBoxFlat.new()
 	frame.bg_color = bg
