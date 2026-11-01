@@ -13,8 +13,8 @@ Status: **mandatory for new visual work**, adopted 2026-11-01.
 8. Accessibility: target practical touch sizes, preserve text contrast, and test simultaneous joystick + actions on Android landscape.
 
 ## Current implementation boundary
-- Implemented: shared square-corner style for current HUD buttons, inventory/profile panels, retry control, label shadows; rectangular pixel joystick.
-- Still pending: real Korean pixel font, pixel-art sprite icons, actual damage-number popup system, complete inventory item UI, pixelated HP bar, integer-scale viewport migration, and validation on Godot Android.
+- Implemented: shared square-corner style for current HUD buttons, inventory/profile panels, retry control, label shadows; rectangular pixel joystick; bitmap pixel damage popups for regular/fire/bleed hits.
+- Still pending: real Korean pixel font, pixel-art sprite icons, complete inventory item UI, pixelated HP bar, integer-scale viewport migration, and validation on Godot Android.
 - Do not describe pending features as shipped.
 
 ## QA
