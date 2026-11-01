@@ -34,8 +34,8 @@ func _frame(anim: String, frame_index: int, total: int) -> ImageTexture:
 	if anim == "idle":
 		bob = 1 if frame_index >= 3 else 0
 	elif anim == "run":
-		bob = (frame_index % 4) / 2
-		stride = [-4, -2, 2, 4, 4, 2, -2, -4][frame_index]
+		bob = int((frame_index % 4) / 2)
+		stride = int([-4, -2, 2, 4, 4, 2, -2, -4][frame_index])
 		lean = 2
 	elif anim == "jump":
 		bob = -3
@@ -58,9 +58,9 @@ func _frame(anim: String, frame_index: int, total: int) -> ImageTexture:
 	_rect(img, 31 + lean, 27 + y, 8, 17, BLUE_LIGHT)
 	_rect(img, 34 + lean, 45 + y, 8, 3, GOLD)
 	# Two distinctive, animated boots.
-	_part(img, 16 + stride / 2 + lean, 51 + y, 9, 9, LEATHER)
-	_part(img, 26 - stride / 2 + lean, 51 + y, 9, 9, LEATHER)
-	_rect(img, 14 + stride / 2 + lean, 59 + y, 11, 3, OUTLINE)
+	_part(img, 16 + int(stride / 2) + lean, 51 + y, 9, 9, LEATHER)
+	_part(img, 26 - int(stride / 2) + lean, 51 + y, 9, 9, LEATHER)
+	_rect(img, 14 + int(stride / 2) + lean, 59 + y, 11, 3, OUTLINE)
 	_rect(img, 26 - stride / 2 + lean, 59 + y, 11, 3, OUTLINE)
 	# Wide armor shoulders, narrow waist, gold emblem.
 	_part(img, 16 + lean, 26 + y, 18, 25, SHADOW)
