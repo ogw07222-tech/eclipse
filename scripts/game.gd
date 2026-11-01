@@ -306,7 +306,7 @@ func _build_hud() -> void:
 
 func _touch_action(caption: String, action: String, xy: Vector2, dimensions: Vector2) -> void:
   var button := Button.new()
-  button.text = ""
+  button.text = caption if action == "skill" else ""
   button.tooltip_text = caption
   button.position = xy
   button.size = dimensions
@@ -316,10 +316,11 @@ func _touch_action(caption: String, action: String, xy: Vector2, dimensions: Vec
   button.button_down.connect(_on_touch_action.bind(action, true))
   button.button_up.connect(_on_touch_action.bind(action, false))
   mobile_controls.add_child(button)
-  var icon_node: Control = PixelIcon.new()
-  icon_node.action = action
-  icon_node.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-  button.add_child(icon_node)
+  if action != "skill":
+    var icon_node: Control = PixelIcon.new()
+    icon_node.action = action
+    icon_node.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+    button.add_child(icon_node)
   touch_buttons.append(button)
 
 func _on_joystick(horizontal: float, jump_held: bool) -> void:
