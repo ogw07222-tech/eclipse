@@ -14,6 +14,7 @@ var form_label: Label
 var enemies_label: Label
 var cooldown_label: Label
 var status_label: Label
+var equipment_label: Label
 var overlay: ColorRect
 var overlay_title: Label
 var overlay_hint: Label
@@ -83,6 +84,7 @@ func _start_round() -> void:
   add_child(player)
   player.health_changed.connect(_update_health)
   player.form_changed.connect(_update_form)
+  player.equipment_changed.connect(_refresh_hud)
   player.projectile_requested.connect(_spawn_projectile)
   player.defeated.connect(_on_defeated)
   if not is_instance_valid(camera):
@@ -135,6 +137,11 @@ func _end_round(won: bool) -> void:
 func _unhandled_input(event: InputEvent) -> void:
   if event.is_action_pressed("restart"):
     _start_round()
+  if is_instance_valid(player) and not ended and event is InputEventKey and event.pressed and not event.echo:
+    match event.keycode:
+      KEY_1: player.cycle_equipment("weapon")
+      KEY_2: player.cycle_equipment("armor")
+      KEY_3: player.cycle_equipment("accessory")
 
 func _physics_process(_delta: float) -> void:
   if is_instance_valid(player):
@@ -162,6 +169,7 @@ func _refresh_hud() -> void:
       bleeding = true
       break
   status_label.text = "출혈 대상 있음! 화염 공격으로 폭발 가능" if bleeding else "검사 스킬로 출혈 → 화염술사로 교체 → 화염 공격"
+  equipment_label.text = "1 무기: %s   2 방어구: %s   3 장신구: %s" % [player.equipment.name_for("weapon"), player.equipment.name_for("armor"), player.equipment.name_for("accessory")]
 
 func _label(text_value: String, xy: Vector2, size: int, tint: Color) -> Label:
   var label := Label.new()
@@ -177,7 +185,7 @@ func _build_hud() -> void:
   var header := ColorRect.new()
   header.color = Color(0.035, 0.055, 0.1, 0.9)
   header.position = Vector2(0, 0)
-  header.size = Vector2(1280, 115)
+  header.size = Vector2(1280, 151)
   header.mouse_filter = Control.MOUSE_FILTER_IGNORE
   hud.add_child(header)
   hud.add_child(_label("E C L I P S E   |   COMBAT PROTOTYPE 0.1", Vector2(24, 10), 18, Color("cfdaf9")))
@@ -188,6 +196,8 @@ func _build_hud() -> void:
   status_label = _label("", Vector2(555, 85), 15, Color("ffe19b"))
   for item in [health_label, form_label, enemies_label, cooldown_label, status_label]:
     hud.add_child(item)
+  equipment_label = _label("", Vector2(24, 117), 16, Color("d6e8b8"))
+  hud.add_child(equipment_label)
   var controls := _label("A/D 이동   SPACE 점프   SHIFT 대시   J/Z 공격   K/X 스킬   L/C 교체   R 재시작", Vector2(26, 672), 17, Color("c7d7ee"))
   hud.add_child(controls)
   overlay = ColorRect.new()
@@ -216,6 +226,15 @@ func _build_hud() -> void:
     ["스킬", "skill", Vector2(1010, 568), Vector2(88, 68)],
     ["교체", "swap", Vector2(1110, 568), Vector2(88, 68)]
   ]
+  # Equipment switching touch controls above the combat action row.
+  for entry in [["무기", "weapon", 810.0], ["방어구", "armor", 940.0], ["장신구", "accessory", 1070.0]]:
+    var equip_button := Button.new()
+    equip_button.text = entry[0]
+    equip_button.position = Vector2(entry[2], 490)
+    equip_button.size = Vector2(120, 55)
+    equip_button.modulate.a = 0.75
+    equip_button.pressed.connect(_on_equip_button.bind(entry[1]))
+    hud.add_child(equip_button)
   for spec in button_specs:
     var button := Button.new()
     button.text = spec[0]
@@ -226,6 +245,10 @@ func _build_hud() -> void:
     button.button_up.connect(_on_touch_action.bind(spec[1], false))
     hud.add_child(button)
     touch_buttons.append(button)
+
+func _on_equip_button(slot: String) -> void:
+  if is_instance_valid(player) and not ended:
+    player.cycle_equipment(slot)
 
 func _on_touch_action(action: String, state: bool) -> void:
   if is_instance_valid(player):
