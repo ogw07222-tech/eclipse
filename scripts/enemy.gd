@@ -52,7 +52,7 @@ func _physics_process(delta: float) -> void:
     bleed_tick += delta
     if bleed_tick >= 0.75:
       bleed_tick = 0.0
-      apply_damage(3)
+      apply_damage(3, true)
   if burn_timer > 0.0:
     burn_timer = maxf(0.0, burn_timer - delta)
     burn_tick += delta
