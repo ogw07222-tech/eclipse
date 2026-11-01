@@ -7,8 +7,8 @@ signal projectile_requested(position_value: Vector2, direction_value: int, damag
 signal defeated
 
 const MOVE_SPEED := 280.0
-const JUMP_SPEED := -475.0
-const GRAVITY := 1150.0
+const JUMP_SPEED := -650.0 # approx 169 px apex (3x 56 px collider) at 1250 gravity
+const GRAVITY := 1250.0
 const DASH_SPEED := 780.0
 const DASH_DURATION := 0.15
 const COYOTE_TIME := 0.11
