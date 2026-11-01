@@ -5,7 +5,7 @@ const PIXELS := {
 	"attack": ["......WW",".....WWW","....WWW.","...WWW..","..WW....",".WWKK...","KKK.....","K......."],
 	"dash": ["........","...WW...","..WWWW..","WWWWWWWW","..WWWW..","...WW...","........","........"],
 	"swap": ["..WWWW..",".WW..WW.",".....WW.","....WW..","...WW...","WW......",".WW..WW.","..WWWW.."],
-	"jump": ["...WW...","..WWWW..",".WWWWWW.","...WW...","...WW...","...WW...","...WW...","........"]
+	"skill": ["...WW...","..WWWW..",".WW..WW.","WW.WW.WW","WW.WW.WW",".WW..WW.","..WWWW..","...WW..."]
 }
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -13,8 +13,8 @@ func _ready() -> void:
 
 func _draw() -> void:
 	var rows: Array = PIXELS.get(action, PIXELS["attack"])
-	var block := 6.0
-	var offset := ((size - Vector2(48.0, 48.0)) * 0.5).round()
+	var block := 7.0
+	var offset := ((size - Vector2(56.0, 56.0)) * 0.5).round()
 	for y in range(8):
 		var row: String = rows[y]
 		for x in range(8):
