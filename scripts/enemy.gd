@@ -2,6 +2,7 @@ extends CharacterBody2D
 class_name EclipseEnemy
 
 signal killed(enemy: EclipseEnemy)
+signal damage_taken(position_value: Vector2, amount: int, kind: String)
 
 var max_health := 55
 var health := 55
@@ -78,11 +79,12 @@ func receive_hit(amount: int, element: String, apply_bleed: bool = false) -> voi
     bleed_tick = 0.0
   if is_instance_valid(player):
     knockback_velocity = (1.0 if global_position.x >= player.global_position.x else -1.0) * (210.0 if reaction_flash > 0.0 else 135.0)
-  apply_damage(final_damage)
+  apply_damage(final_damage, "fire" if element == "fire" else "normal")
 
-func apply_damage(amount: int) -> void:
+func apply_damage(amount: int, kind: String = "bleed") -> void:
   if is_dead:
     return
+  damage_taken.emit(global_position, amount, kind)
   health = maxi(0, health - amount)
   hit_flash = 0.18
   if health <= 0:
