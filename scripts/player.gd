@@ -27,6 +27,10 @@ var invulnerable := 0.0
 var coyote := 0.0
 var jump_buffer := 0.0
 var attack_flash := 0.0
+var combo_index := 0
+var combo_window := 0.0
+var hit_stop := 0.0
+var swap_attack_timer := 0.0
 var virtual_input := {"left": false, "right": false, "jump": false, "attack": false, "skill": false, "swap": false, "dash": false}
 var previous_virtual := virtual_input.duplicate()
 var controls_active := true
@@ -63,6 +67,15 @@ func _physics_process(delta: float) -> void:
   swap_cooldown = maxf(0.0, swap_cooldown - delta)
   invulnerable = maxf(0.0, invulnerable - delta)
   attack_flash = maxf(0.0, attack_flash - delta)
+  combo_window = maxf(0.0, combo_window - delta)
+  swap_attack_timer = maxf(0.0, swap_attack_timer - delta)
+  if hit_stop > 0.0:
+    hit_stop = maxf(0.0, hit_stop - delta)
+    previous_virtual = virtual_input.duplicate()
+    queue_redraw()
+    return
+  if combo_window <= 0.0:
+    combo_index = 0
   coyote = COYOTE_TIME if is_on_floor() else maxf(0.0, coyote - delta)
   if just_pressed("jump"):
     jump_buffer = JUMP_BUFFER
@@ -75,6 +88,14 @@ func _physics_process(delta: float) -> void:
     form = 1 - form
     swap_cooldown = 1.0
     attack_flash = 0.22
+    combo_index = 0
+    combo_window = 0.0
+    swap_attack_timer = 0.24
+    # A swap triggers its own distinct entry attack, independent of basic attack cooldown.
+    if form == 0:
+      melee_hit(13, false, 112.0)
+    else:
+      projectile_requested.emit(global_position + Vector2(facing * 27, -33), facing, 14, false)
     form_changed.emit(form)
   if just_pressed("dash") and dash_cooldown <= 0.0:
     dash_left = DASH_DURATION
@@ -102,9 +123,13 @@ func _physics_process(delta: float) -> void:
 func basic_attack() -> void:
   attack_flash = 0.16
   if form == 0:
-    attack_cooldown = 0.3
-    melee_hit(15, false)
+    combo_index = (combo_index % 3) + 1 if combo_window > 0.0 else 1
+    combo_window = 0.8
+    attack_cooldown = [0.0, 0.23, 0.25, 0.42][combo_index]
+    var power: int = [0, 12, 15, 23][combo_index]
+    melee_hit(power, combo_index == 3, 115.0 if combo_index == 3 else 96.0)
   else:
+    combo_index = 0
     attack_cooldown = 0.47
     projectile_requested.emit(global_position + Vector2(facing * 27, -33), facing, 11, false)
 
@@ -116,19 +141,23 @@ func use_skill() -> void:
   else:
     projectile_requested.emit(global_position + Vector2(facing * 27, -33), facing, 25, true)
 
-func melee_hit(damage: int, inflict_bleed: bool) -> void:
+func melee_hit(damage: int, inflict_bleed: bool, reach: float = 96.0) -> void:
   for enemy in get_tree().get_nodes_in_group("enemies"):
     if not is_instance_valid(enemy) or enemy.is_dead:
       continue
     var displacement: Vector2 = enemy.global_position - global_position
-    if displacement.x * facing >= -9.0 and displacement.x * facing < 96.0 and absf(displacement.y) < 67.0:
+    if displacement.x * facing >= -9.0 and displacement.x * facing < reach and absf(displacement.y) < 67.0:
       enemy.receive_hit(damage, "blade", inflict_bleed)
+      hit_stop = maxf(hit_stop, 0.045 if damage < 20 else 0.075)
 
 func take_damage(amount: int) -> void:
   if invulnerable > 0.0 or health <= 0:
     return
   health = maxi(health - amount, 0)
   invulnerable = 0.7
+  attack_flash = 0.28
+  combo_index = 0
+  combo_window = 0.0
   health_changed.emit(health, max_health)
   if health == 0:
     controls_active = false
@@ -146,6 +175,10 @@ func reset_character() -> void:
   skill_cooldown = 0.0
   swap_cooldown = 0.0
   invulnerable = 0.0
+  combo_index = 0
+  combo_window = 0.0
+  hit_stop = 0.0
+  swap_attack_timer = 0.0
   controls_active = true
   health_changed.emit(health, max_health)
   form_changed.emit(form)
@@ -168,6 +201,8 @@ func _draw() -> void:
   else:
     draw_line(Vector2(facing * 15, -35), Vector2(facing * 22, -61), Color("8f6ad4"), 6)
     draw_circle(Vector2(facing * 22, -64), 7, Color("ffad5b"))
+  if swap_attack_timer > 0.0:
+    draw_arc(Vector2(0, -36), 44.0, 0.0, TAU, 24, Color("fff2b6"), 4.0)
   if attack_flash > 0.0:
     var effect_color := Color("a9f0ff") if form == 0 else Color("ff9d51")
     draw_arc(Vector2(facing * 16, -36), 55, -1.1 if facing == 1 else 2.0, 1.15 if facing == 1 else 4.3, 18, effect_color, 6.0)
