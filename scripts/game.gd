@@ -4,6 +4,7 @@ const PlayerScript = preload("res://scripts/player.gd")
 const ForestScript = preload("res://scripts/forest_background.gd")
 const JoystickScript = preload("res://scripts/touch_joystick.gd")
 const PixelTheme = preload("res://scripts/pixel_theme.gd")
+const CooldownButton = preload("res://scripts/skill_cooldown_button.gd")
 const DamageNumber = preload("res://scripts/pixel_damage_number.gd")
 const EnemyScript = preload("res://scripts/enemy.gd")
 const ProjectileScript = preload("res://scripts/projectile.gd")
@@ -29,6 +30,7 @@ var ended := false
 var touch_buttons: Array[Button] = []
 var mobile_controls: Control
 var joystick_jump := false
+var skill_buttons: Array[Button] = []
 var profile_panel: PanelContainer
 
 func _ready() -> void:
@@ -47,6 +49,9 @@ func _register_inputs() -> void:
     "jump": [KEY_SPACE, KEY_UP, KEY_W],
     "attack": [KEY_J, KEY_Z],
     "skill": [KEY_K, KEY_X],
+    "skill2": [KEY_E],
+    "skill3": [KEY_F],
+    "ultimate": [KEY_Q],
     "swap": [KEY_L, KEY_C, KEY_TAB],
     "dash": [KEY_SHIFT],
     "restart": [KEY_R]
@@ -98,6 +103,9 @@ func _start_round() -> void:
   player.form_changed.connect(_update_form)
   player.equipment_changed.connect(_refresh_hud)
   player.projectile_requested.connect(_spawn_projectile)
+  for i in range(skill_buttons.size()):
+    skill_buttons[i].actor = player
+    skill_buttons[i].previous_remaining = -1.0
   player.defeated.connect(_on_defeated)
   if not is_instance_valid(camera):
     camera = Camera2D.new()
@@ -299,9 +307,26 @@ func _build_hud() -> void:
   mobile_controls.add_child(joystick)
   _touch_action("⚔", "attack", Vector2(1110, 542), Vector2(118,118))
   _touch_action("돌진", "dash", Vector2(962, 569), Vector2(94,94))
-  _touch_action("스킬", "skill", Vector2(1096, 438), Vector2(90,90))
-  _touch_action("교체", "swap", Vector2(978, 451), Vector2(86,86))
+  _skill_button("I", 0, Vector2(1000, 418))
+  _skill_button("II", 1, Vector2(1097, 418))
+  _skill_button("III", 2, Vector2(1194, 418))
+  _skill_button("ULT", 3, Vector2(1164, 326))
+  _touch_action("교체", "swap", Vector2(904, 450), Vector2(86,86))
   _touch_action("점프", "jump", Vector2(225, 567), Vector2(85,85))
+
+func _skill_button(caption: String, index: int, xy: Vector2) -> void:
+  var btn: Button = CooldownButton.new()
+  btn.text = caption
+  btn.position = xy
+  btn.size = Vector2(86, 86)
+  btn.slot = mini(index, 2)
+  btn.is_ultimate = index == 3
+  PixelTheme.button(btn, "skill" if index < 3 else "attack")
+  var action := "ultimate" if index == 3 else ("skill" if index == 0 else "skill%d" % (index + 1))
+  btn.button_down.connect(_on_touch_action.bind(action, true))
+  btn.button_up.connect(_on_touch_action.bind(action, false))
+  mobile_controls.add_child(btn)
+  skill_buttons.append(btn)
 
 func _touch_action(caption: String, action: String, xy: Vector2, dimensions: Vector2) -> void:
   var button := Button.new()
