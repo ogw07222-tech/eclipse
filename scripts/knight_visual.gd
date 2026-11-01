@@ -16,6 +16,7 @@ func _ready() -> void:
 		visible = false
 		return
 	var texture: Texture2D = load(SHEET)
+	var source_image := texture.get_image()
 	var frames := SpriteFrames.new()
 	for key in frames.get_animation_names():
 		frames.remove_animation(key)
@@ -27,15 +28,17 @@ func _ready() -> void:
 		frames.set_animation_loop(anim, anim == "idle" or anim == "run" or anim == "fall")
 		for n in range(int(COUNTS[anim])):
 			var region := AtlasTexture.new()
-			region.atlas = texture
-			region.region = Rect2((idx % 8) * FRAME.x, (idx / 8) * FRAME.y, FRAME.x, FRAME.y)
-			frames.add_frame(anim, region)
+			var cell_image := source_image.get_region(Rect2i((idx % 8) * FRAME.x, int(idx / 8) * FRAME.y, FRAME.x, FRAME.y))
+			# Downsample each frame separately to avoid bleeding between animations.
+			cell_image.resize(24, 32, Image.INTERPOLATE_NEAREST)
+			cell_image.resize(FRAME.x, FRAME.y, Image.INTERPOLATE_NEAREST)
+			frames.add_frame(anim, ImageTexture.create_from_image(cell_image))
 			idx += 1
 	sprite_frames = frames
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	# 2x the original visual size, anchored at the actor feet. Collision unchanged.
-	scale = Vector2(2.0, 2.0)
-	position = Vector2(0, -128)
+	scale = Vector2(1.2, 1.2)
+	position = Vector2(0, -77)
 	play("idle")
 	previous_hp = int(actor.get("health"))
 func _physics_process(delta: float) -> void:
