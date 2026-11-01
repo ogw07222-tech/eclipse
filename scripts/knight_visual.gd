@@ -20,11 +20,12 @@ func _ready() -> void:
   for key in frames.get_animation_names():
     frames.remove_animation(key)
   var idx := 0
-  for anim in COUNTS:
+  for animation_key in COUNTS.keys():
+    var anim: String = str(animation_key)
     frames.add_animation(anim)
     frames.set_animation_speed(anim, 11.0)
     frames.set_animation_loop(anim, anim == "idle" or anim == "run" or anim == "fall")
-    for n in range(COUNTS[anim]):
+    for n in range(int(COUNTS[anim])):
       var region := AtlasTexture.new()
       region.atlas = texture
       region.region = Rect2((idx % 8) * FRAME.x, (idx / 8) * FRAME.y, FRAME.x, FRAME.y)
@@ -50,18 +51,18 @@ func _physics_process(delta: float) -> void:
   attack_time = maxf(0.0,attack_time - delta)
   visible = int(actor.get("form")) == 0
   flip_h = int(actor.get("facing")) < 0
-  var next := "idle"
+  var next_animation: String = "idle"
   if hp <= 0:
-    next = "death"
+    next_animation = "death"
   elif hurt_time > 0.0:
-    next = "hurt"
+    next_animation = "hurt"
   elif attack_time > 0.0:
-    next = "attack%d" % combo
+    next_animation = "attack%d" % combo
   elif float(actor.get("dash_left")) > 0:
-    next = "dash"
+    next_animation = "dash"
   elif not actor.is_on_floor():
-    next = "jump" if actor.velocity.y < 0 else "fall"
+    next_animation = "jump" if actor.velocity.y < 0 else "fall"
   elif absf(actor.velocity.x) > 20:
-    next = "run"
-  if animation != next:
-    play(next)
+    next_animation = "run"
+  if animation != next_animation:
+    play(next_animation)
