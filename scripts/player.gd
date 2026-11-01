@@ -26,6 +26,10 @@ var dash_left := 0.0
 var dash_cooldown := 0.0
 var attack_cooldown := 0.0
 var skill_cooldown := 0.0
+var skill_cooldowns := [0.0, 0.0, 0.0]
+const SKILL_DURATIONS := [3.4, 5.0, 7.0]
+var ultimate_cooldown := 0.0
+const ULTIMATE_DURATION := 22.0
 var swap_cooldown := 0.0
 var invulnerable := 0.0
 var coyote := 0.0
@@ -77,6 +81,9 @@ func _physics_process(delta: float) -> void:
   dash_cooldown = maxf(0.0, dash_cooldown - delta)
   attack_cooldown = maxf(0.0, attack_cooldown - delta)
   skill_cooldown = maxf(0.0, skill_cooldown - delta)
+  for i in range(3):
+    skill_cooldowns[i] = maxf(0.0, skill_cooldowns[i] - delta)
+  ultimate_cooldown = maxf(0.0, ultimate_cooldown - delta)
   swap_cooldown = maxf(0.0, swap_cooldown - delta)
   invulnerable = maxf(0.0, invulnerable - delta)
   attack_flash = maxf(0.0, attack_flash - delta)
@@ -126,8 +133,14 @@ func _physics_process(delta: float) -> void:
       jump_buffer = 0.0
   if just_pressed("attack") and attack_cooldown <= 0.0:
     basic_attack()
-  if just_pressed("skill") and skill_cooldown <= 0.0:
-    use_skill()
+  if just_pressed("skill"):
+    use_skill_slot(0)
+  if just_pressed("skill2"):
+    use_skill_slot(1)
+  if just_pressed("skill3"):
+    use_skill_slot(2)
+  if just_pressed("ultimate"):
+    use_ultimate()
   move_and_slide()
   position.x = clampf(position.x, 25.0, 1550.0)
   previous_virtual = virtual_input.duplicate()
@@ -147,12 +160,31 @@ func basic_attack() -> void:
     projectile_requested.emit(global_position + Vector2(facing * 27, -33), facing, 11 + int(equipment.stat("attack")), false)
 
 func use_skill() -> void:
-  skill_cooldown = 3.4 if form == 0 else 4.1
-  attack_flash = 0.28
+  use_skill_slot(0)
+
+func use_skill_slot(slot: int) -> void:
+  if slot < 0 or slot >= 3 or skill_cooldowns[slot] > 0.0:
+    return
+  skill_cooldowns[slot] = SKILL_DURATIONS[slot]
+  skill_cooldown = skill_cooldowns[0]
+  attack_flash = 0.28 + float(slot) * 0.06
   if form == 0:
-    melee_hit(23 + int(equipment.stat("attack")), true, 96.0 * equipment.stat("range"))
+    var powers := [23, 30, 40]
+    var reaches := [96.0, 120.0, 138.0]
+    melee_hit(powers[slot] + int(equipment.stat("attack")), true, reaches[slot] * equipment.stat("range"))
   else:
-    projectile_requested.emit(global_position + Vector2(facing * 27, -33), facing, 25 + int(equipment.stat("attack")), true)
+    var powers := [25, 34, 45]
+    projectile_requested.emit(global_position + Vector2(facing * 27, -33), facing, powers[slot] + int(equipment.stat("attack")), true)
+
+func use_ultimate() -> void:
+  if ultimate_cooldown > 0.0:
+    return
+  ultimate_cooldown = ULTIMATE_DURATION
+  attack_flash = 0.65
+  if form == 0:
+    melee_hit(80 + int(equipment.stat("attack")), true, 185.0 * equipment.stat("range"))
+  else:
+    projectile_requested.emit(global_position + Vector2(facing * 27, -33), facing, 80 + int(equipment.stat("attack")), true)
 
 func melee_hit(damage: int, inflict_bleed: bool, reach: float = 96.0) -> void:
   for enemy in get_tree().get_nodes_in_group("enemies"):
@@ -198,6 +230,8 @@ func reset_character() -> void:
   dash_cooldown = 0.0
   attack_cooldown = 0.0
   skill_cooldown = 0.0
+  skill_cooldowns = [0.0, 0.0, 0.0]
+  ultimate_cooldown = 0.0
   swap_cooldown = 0.0
   invulnerable = 0.0
   combo_index = 0
