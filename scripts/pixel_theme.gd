@@ -4,13 +4,13 @@ class_name EclipsePixelTheme
 # DESIGN_GUIDELINE_1: hard-edged, integer-grid UI with a limited palette.
 const INK := Color("#101923")
 const PANEL := Color("#1c2a34")
-const LIGHT := Color("#d4e0d2")
+const LIGHT := Color("#c6d0c5")
 const SHADE := Color("#080d16")
 const GOLD := Color("#e3bd72")
-const ATTACK := Color("#3d4244")
-const DASH := Color("#343f45")
-const SKILL := Color("#45424a")
-const SWAP := Color("#3b4541")
+const ATTACK := Color("#283d3c")
+const DASH := Color("#283b40")
+const SKILL := Color("#34383d")
+const SWAP := Color("#304039")
 
 # 48x48 sprite frame, nine-sliced so corners stay exactly 12x12 pixels.
 # Image pixels are drawn without AA; no web-style flat gradient/button border.
@@ -18,7 +18,7 @@ static func _sprite_frame(base_color: Color, active: bool = false) -> StyleBoxTe
 	# 8x8 logical pixels, expanded x6 to exactly 48x48 physical pixels.
 	var image := Image.create(48, 48, false, Image.FORMAT_RGBA8)
 	image.fill(Color.TRANSPARENT)
-	var palette := [SHADE, Color("#656a6b"), Color("#c0c3bb"), base_color, base_color.darkened(0.22)]
+	var palette := [Color.TRANSPARENT, Color("#142627", 0.83), Color("#89978b", 0.82), Color(base_color.r, base_color.g, base_color.b, 0.75), Color("#182a2b", 0.84)]
 	if active:
 		palette[2] = Color("#e1dfd0")
 		palette[3] = base_color.darkened(0.25)
