@@ -179,7 +179,7 @@ func _refresh_hud() -> void:
   status_label.text = "출혈 대상 있음! 화염 공격으로 폭발 가능" if bleeding else "검사 스킬로 출혈 → 화염술사로 교체 → 화염 공격"
   equipment_label.text = "1 무기: %s   2 방어구: %s   3 장신구: %s" % [player.equipment.name_for("weapon"), player.equipment.name_for("armor"), player.equipment.name_for("accessory")]
   if is_instance_valid(inventory_label):
-    inventory_label.text = "장비 현황\\n\\n무기: %s\\n방어구: %s\\n장신구: %s\\n\\n공격력 %+d | 방어력 %d\\n최대 체력 %d | 속도 %.2fx\\n\\n1 / 2 / 3 키 또는 화면 버튼으로 교체" % [player.equipment.name_for("weapon"),player.equipment.name_for("armor"),player.equipment.name_for("accessory"),int(player.equipment.stat("attack")),int(player.equipment.stat("defense")),player.max_health,player.equipment.stat("speed")]
+    inventory_label.text = "장비 현황\n\n무기: %s\n방어구: %s\n장신구: %s\n\n공격력 %+d | 방어력 %d\n최대 체력 %d | 속도 %.2fx\n\n1 / 2 / 3 키 또는 화면 버튼으로 교체" % [player.equipment.name_for("weapon"),player.equipment.name_for("armor"),player.equipment.name_for("accessory"),int(player.equipment.stat("attack")),int(player.equipment.stat("defense")),player.max_health,player.equipment.stat("speed")]
 
 func _label(text_value: String, xy: Vector2, size: int, tint: Color) -> Label:
   var label := Label.new()
