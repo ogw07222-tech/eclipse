@@ -10,6 +10,9 @@ var attack_damage := 9
 var attack_timer := 0.0
 var bleed_timer := 0.0
 var bleed_tick := 0.0
+var burn_timer := 0.0
+var burn_tick := 0.0
+var vfx_clock := 0.0
 var reaction_flash := 0.0
 var hit_flash := 0.0
 var knockback_velocity := 0.0
@@ -39,6 +42,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
   if is_dead:
     return
+  vfx_clock += delta
   attack_timer = maxf(0.0, attack_timer - delta)
   hit_flash = maxf(0.0, hit_flash - delta)
   knockback_velocity = move_toward(knockback_velocity, 0.0, 650.0 * delta)
@@ -49,6 +53,12 @@ func _physics_process(delta: float) -> void:
     if bleed_tick >= 0.75:
       bleed_tick = 0.0
       apply_damage(3)
+  if burn_timer > 0.0:
+    burn_timer = maxf(0.0, burn_timer - delta)
+    burn_tick += delta
+    if burn_tick >= 0.6:
+      burn_tick -= 0.6
+      apply_damage(2, true)
   if is_dead:
     return
   if is_instance_valid(player) and player.health > 0:
@@ -69,6 +79,9 @@ func receive_hit(amount: int, element: String, apply_bleed: bool = false) -> voi
   if is_dead:
     return
   var final_damage := amount
+  if element == "fire":
+    burn_timer = 3.0
+    burn_tick = 0.0
   if element == "fire" and bleed_timer > 0.0:
     final_damage += 22
     bleed_timer = 0.0
@@ -80,11 +93,12 @@ func receive_hit(amount: int, element: String, apply_bleed: bool = false) -> voi
     knockback_velocity = (1.0 if global_position.x >= player.global_position.x else -1.0) * (210.0 if reaction_flash > 0.0 else 135.0)
   apply_damage(final_damage)
 
-func apply_damage(amount: int) -> void:
+func apply_damage(amount: int, is_dot: bool = false) -> void:
   if is_dead:
     return
   health = maxi(0, health - amount)
-  hit_flash = 0.18
+  if not is_dot:
+    hit_flash = 0.18
   if health <= 0:
     is_dead = true
     killed.emit(self)
@@ -103,7 +117,23 @@ func _draw() -> void:
   draw_circle(Vector2(7, -h + 16), 4, Color("ffed9c"))
   draw_rect(Rect2(-21, -h - 15, 42, 5), Color("262435"))
   draw_rect(Rect2(-21, -h - 15, 42 * float(health) / float(max_health), 5), Color("f47777"))
+  # Integer-grid pixel particles attached to the body, not smooth circles.
+  # Bounded fixed counts: no per-frame allocations or new nodes.
   if bleed_timer > 0.0:
-    draw_circle(Vector2(0, -h - 26), 5, Color("ea4263"))
+    for i in range(6):
+      var phase := fposmod(vfx_clock * (17.0 + float(i % 3) * 4.0) + float(i * 11), h)
+      var px := snappedf(float((i * 13) % 29 - 14), 3.0)
+      var py := snappedf(-h + phase, 3.0)
+      draw_rect(Rect2(Vector2(px, py), Vector2(3, 6 if i % 2 == 0 else 3)), Color("#e34359") if i % 2 == 0 else Color("#8f183a"))
+  if burn_timer > 0.0:
+    for i in range(9):
+      var rise := fposmod(vfx_clock * (29.0 + float(i % 4) * 6.0) + float(i * 9), h + 18.0)
+      var px := snappedf(float((i * 17) % 35 - 17) + sin(vfx_clock * 5.0 + float(i)) * 3.0, 3.0)
+      var py := snappedf(4.0 - rise, 3.0)
+      var shade := Color("#ffb74b") if i % 3 == 0 else (Color("#f16b32") if i % 3 == 1 else Color("#bb3839"))
+      draw_rect(Rect2(Vector2(px, py), Vector2(6 if i % 3 == 0 else 3, 9 if i % 2 == 0 else 6)), shade)
   if reaction_flash > 0.0:
-    draw_arc(Vector2(0, -h * 0.5), 40.0, 0.0, TAU, 20, Color("ffb04b"), 5.0)
+    for i in range(8):
+      var x := snappedf(float((i % 4) * 17 - 26), 3.0)
+      var y := snappedf(-h * 0.5 + float(int(i / 4) * 18 - 9), 3.0)
+      draw_rect(Rect2(Vector2(x,y),Vector2(9,6)),Color("#ffbc57"))
