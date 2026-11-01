@@ -8,6 +8,7 @@ signal equipment_changed
 signal defeated
 
 const EquipmentScript = preload("res://scripts/equipment.gd")
+const KNIGHT_VISUAL_PATH := "res://scripts/knight_visual.gd"
 var equipment = EquipmentScript.new()
 const MOVE_SPEED := 280.0
 const JUMP_SPEED := -650.0 # approx 169 px apex (3x 56 px collider) at 1250 gravity
@@ -40,6 +41,13 @@ var controls_active := true
 
 func _ready() -> void:
   add_to_group("player")
+  var knight_script: Script = load(KNIGHT_VISUAL_PATH)
+  if knight_script != null:
+    var appearance: Node = knight_script.new()
+    appearance.name = "KnightVisual"
+    add_child(appearance)
+  else:
+    push_warning("Knight visual failed to load; procedural player remains usable.")
   collision_layer = 2
   collision_mask = 1
   var shape := CollisionShape2D.new()
@@ -201,6 +209,8 @@ func reset_character() -> void:
   form_changed.emit(form)
 
 func _draw() -> void:
+  if form == 0 and has_node("KnightVisual") and $KnightVisual is AnimatedSprite2D and $KnightVisual.sprite_frames != null and $KnightVisual.visible:
+    return
   var core_color := Color("80d6ff") if form == 0 else Color("f69a5c")
   var shadow := Color("19314d") if form == 0 else Color("5a2837")
   if invulnerable > 0.0 and Engine.get_physics_frames() % 6 < 3:
