@@ -298,29 +298,42 @@ func _build_hud() -> void:
 	joystick.size = Vector2(160, 160)
 	joystick.direction_changed.connect(_on_joystick)
 	mobile_controls.add_child(joystick)
-	_touch_action("⚔", "attack", Vector2(1110, 542), Vector2(118,118))
-	_touch_action("돌진", "dash", Vector2(962, 569), Vector2(94,94))
-	_touch_action("스킬", "skill", Vector2(1096, 438), Vector2(90,90))
-	_touch_action("교체", "swap", Vector2(978, 451), Vector2(86,86))
-	_touch_action("점프", "jump", Vector2(225, 567), Vector2(85,85))
+	_touch_action("공격", "attack", Vector2(1120, 545), Vector2(110, 110))
+	_touch_action("돌진", "dash", Vector2(1006, 568), Vector2(96, 96))
+	_touch_action("교체", "swap", Vector2(1010, 453), Vector2(88, 88))
+	_touch_action("점프", "jump", Vector2(233, 574), Vector2(90, 90))
+	# Existing skill logic remains; this placeholder is intentionally labeled.
+	_touch_action("스킬", "skill", Vector2(1120, 433), Vector2(94, 94))
 
 func _touch_action(caption: String, action: String, xy: Vector2, dimensions: Vector2) -> void:
 	var button := Button.new()
-	button.text = caption if action == "skill" else ""
+	button.text = ""
 	button.tooltip_text = caption
 	button.position = xy
 	button.size = dimensions
-	button.modulate.a = 1.0
 	PixelTheme.button(button, action)
-	button.add_theme_font_size_override("font_size", 20)
 	button.button_down.connect(_on_touch_action.bind(action, true))
 	button.button_up.connect(_on_touch_action.bind(action, false))
 	mobile_controls.add_child(button)
 	if action != "skill":
 		var icon_node: Control = PixelIcon.new()
 		icon_node.action = action
-		icon_node.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		icon_node.position = Vector2(0, -10)
+		icon_node.size = dimensions
 		button.add_child(icon_node)
+	var caption_node := Label.new()
+	caption_node.text = caption
+	caption_node.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	caption_node.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	caption_node.position = Vector2(4, dimensions.y - 31)
+	caption_node.size = Vector2(dimensions.x - 8, 24)
+	caption_node.add_theme_font_size_override("font_size", 17 if dimensions.x >= 95 else 15)
+	caption_node.add_theme_color_override("font_color", Color("#e8e6d7"))
+	caption_node.add_theme_color_override("font_shadow_color", Color("#0c151b"))
+	caption_node.add_theme_constant_override("shadow_offset_x", 1)
+	caption_node.add_theme_constant_override("shadow_offset_y", 2)
+	caption_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(caption_node)
 	touch_buttons.append(button)
 
 func _on_joystick(horizontal: float, jump_held: bool) -> void:
