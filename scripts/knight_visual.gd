@@ -32,7 +32,10 @@ func _ready() -> void:
 			frames.add_frame(anim, region)
 			idx += 1
 	sprite_frames = frames
-	position = Vector2(0,-58)
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	# 2x the original visual size, anchored at the actor feet. Collision unchanged.
+	scale = Vector2(2.0, 2.0)
+	position = Vector2(0, -128)
 	play("idle")
 	previous_hp = int(actor.get("health"))
 func _physics_process(delta: float) -> void:
