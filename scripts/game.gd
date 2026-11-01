@@ -261,7 +261,7 @@ func _build_hud() -> void:
   profile_panel.visible = false
   hud.add_child(profile_panel)
   var profile_text := Label.new()
-  profile_text.text = "ECLIPSE 기사\\nHP / 전투 형태는 상단 HUD에 표시\\n프로필 세부 기능: 추후 업데이트"
+  profile_text.text = "ECLIPSE 기사\nHP / 전투 형태는 상단 HUD에 표시\n프로필 세부 기능: 추후 업데이트"
   profile_panel.add_child(profile_text)
   var inv_btn := Button.new()
   inv_btn.text = "인벤토리"
