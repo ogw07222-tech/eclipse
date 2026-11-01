@@ -3,6 +3,7 @@ extends Node2D
 const PlayerScript = preload("res://scripts/player.gd")
 const ForestScript = preload("res://scripts/forest_background.gd")
 const JoystickScript = preload("res://scripts/touch_joystick.gd")
+const PixelTheme = preload("res://scripts/pixel_theme.gd")
 const EnemyScript = preload("res://scripts/enemy.gd")
 const ProjectileScript = preload("res://scripts/projectile.gd")
 const WORLD_WIDTH := 1600
@@ -195,13 +196,14 @@ func _label(text_value: String, xy: Vector2, size: int, tint: Color) -> Label:
   label.position = xy
   label.add_theme_font_size_override("font_size", size)
   label.add_theme_color_override("font_color", tint)
+  PixelTheme.label(label)
   return label
 
 func _build_hud() -> void:
   hud = CanvasLayer.new()
   add_child(hud)
   var header := ColorRect.new()
-  header.color = Color(0.035, 0.055, 0.1, 0.9)
+  header.color = Color("#15232e", 0.97)
   header.position = Vector2(0, 0)
   header.size = Vector2(1280, 85)
   header.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -220,6 +222,7 @@ func _build_hud() -> void:
   inventory_panel.position = Vector2(46,135)
   inventory_panel.custom_minimum_size = Vector2(450,310)
   inventory_panel.visible = false
+  PixelTheme.panel(inventory_panel)
   hud.add_child(inventory_panel)
   inventory_label = _label("",Vector2(20,16),20,Color("#e4eacd"))
   inventory_label.custom_minimum_size = Vector2(400,270)
@@ -229,11 +232,12 @@ func _build_hud() -> void:
   inventory_button.position = Vector2(20,40)
   inventory_button.size = Vector2(95,44)
   inventory_button.pressed.connect(_toggle_inventory)
+  PixelTheme.button(inventory_button)
   hud.add_child(inventory_button)
   var controls := _label("조이스틱 ↑ 점프   •   오른쪽 공격 / 돌진 / 스킬 / 교체", Vector2(315, 674), 13, Color("c7d7ee"))
   hud.add_child(controls)
   overlay = ColorRect.new()
-  overlay.color = Color(0.025, 0.035, 0.065, 0.88)
+  overlay.color = Color("#111a28", 0.94)
   overlay.position = Vector2(0, 0)
   overlay.size = Vector2(1280, 720)
   overlay.visible = false
@@ -247,6 +251,7 @@ func _build_hud() -> void:
   retry.position = Vector2(510, 412)
   retry.size = Vector2(260, 65)
   retry.pressed.connect(_start_round)
+  PixelTheme.button(retry)
   overlay.add_child(retry)
   # Sketch-based Android landscape layout. HUD lives in 1280x720 canvas coordinates.
   var profile_btn := Button.new()
@@ -254,20 +259,24 @@ func _build_hud() -> void:
   profile_btn.position = Vector2(20, 4)
   profile_btn.size = Vector2(95, 34)
   profile_btn.pressed.connect(_toggle_profile)
+  PixelTheme.button(profile_btn)
   hud.add_child(profile_btn)
   profile_panel = PanelContainer.new()
   profile_panel.position = Vector2(120, 12)
   profile_panel.custom_minimum_size = Vector2(245, 145)
   profile_panel.visible = false
+  PixelTheme.panel(profile_panel)
   hud.add_child(profile_panel)
   var profile_text := Label.new()
   profile_text.text = "ECLIPSE 기사\nHP / 전투 형태는 상단 HUD에 표시\n프로필 세부 기능: 추후 업데이트"
+  PixelTheme.label(profile_text)
   profile_panel.add_child(profile_text)
   var inv_btn := Button.new()
   inv_btn.text = "인벤토리"
   inv_btn.position = Vector2(120, 40)
   inv_btn.size = Vector2(105, 44)
   inv_btn.pressed.connect(_toggle_inventory)
+  PixelTheme.button(inv_btn)
   hud.add_child(inv_btn)
 
   mobile_controls = Control.new()
@@ -291,7 +300,8 @@ func _touch_action(caption: String, action: String, xy: Vector2, dimensions: Vec
   button.text = caption
   button.position = xy
   button.size = dimensions
-  button.modulate.a = 0.83
+  button.modulate.a = 1.0
+  PixelTheme.button(button, action)
   button.add_theme_font_size_override("font_size", 20)
   button.button_down.connect(_on_touch_action.bind(action, true))
   button.button_up.connect(_on_touch_action.bind(action, false))
