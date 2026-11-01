@@ -24,23 +24,23 @@ func _draw() -> void:
     draw_circle(Vector2(sx, sy), 1.5, Color("#c9e4ca", 0.45))
   for layer_index in range(LAYERS.size()):
     var data: Dictionary = LAYERS[layer_index]
-    var fac: float = data.factor
+    var fac: float = data["factor"]
     for i in range(25):
       var base_x := float(i * 83 + (layer_index * 37)) - 90.0
       var offset := 0.0
       if is_instance_valid(camera_ref):
         offset = (camera_ref.global_position.x - 640.0) * fac * 0.18
       var x := base_x - offset
-      var size_val: float = data.size
+      var size_val: float = data["size"]
       var variation := float((i * 17 + layer_index * 11) % 13)
       var ground_y := 590.0 + variation
       var top_y := ground_y - (220.0 + variation * 7.0) * size_val
       var w := (14.0 + variation * 0.5) * size_val
-      draw_rect(Rect2(x - w * 0.5, top_y, w, ground_y - top_y), data.trunk)
+      draw_rect(Rect2(x - w * 0.5, top_y, w, ground_y - top_y), data["trunk"])
       for n in range(3):
         var h := 80.0 * size_val
         var crown_y := top_y + n * 46.0 * size_val
-        draw_colored_polygon(PackedVector2Array([Vector2(x, crown_y - h), Vector2(x - 57.0 * size_val, crown_y + 22.0 * size_val), Vector2(x + 57.0 * size_val, crown_y + 22.0 * size_val)]), data.crown)
+        draw_colored_polygon(PackedVector2Array([Vector2(x, crown_y - h), Vector2(x - 57.0 * size_val, crown_y + 22.0 * size_val), Vector2(x + 57.0 * size_val, crown_y + 22.0 * size_val)]), data["crown"])
   draw_rect(Rect2(0, 580, 1600, 14), Color("#466d42"))
   for i in range(140):
     var x := float((i * 53) % 1600)
