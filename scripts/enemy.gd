@@ -12,6 +12,7 @@ var bleed_timer := 0.0
 var bleed_tick := 0.0
 var reaction_flash := 0.0
 var hit_flash := 0.0
+var knockback_velocity := 0.0
 var is_dead := false
 var type_id := 0
 var player: EclipsePlayer
@@ -40,6 +41,7 @@ func _physics_process(delta: float) -> void:
     return
   attack_timer = maxf(0.0, attack_timer - delta)
   hit_flash = maxf(0.0, hit_flash - delta)
+  knockback_velocity = move_toward(knockback_velocity, 0.0, 650.0 * delta)
   reaction_flash = maxf(0.0, reaction_flash - delta)
   if bleed_timer > 0.0:
     bleed_timer = maxf(0.0, bleed_timer - delta)
@@ -58,6 +60,7 @@ func _physics_process(delta: float) -> void:
       if attack_timer <= 0.0 and absf(player.global_position.y - global_position.y) < 70.0:
         player.take_damage(attack_damage)
         attack_timer = 1.3 if type_id == 0 else 1.8
+  velocity.x += knockback_velocity
   velocity.y += 1150.0 * delta
   move_and_slide()
   queue_redraw()
@@ -73,6 +76,8 @@ func receive_hit(amount: int, element: String, apply_bleed: bool = false) -> voi
   if apply_bleed:
     bleed_timer = 4.5
     bleed_tick = 0.0
+  if is_instance_valid(player):
+    knockback_velocity = (1.0 if global_position.x >= player.global_position.x else -1.0) * (210.0 if reaction_flash > 0.0 else 135.0)
   apply_damage(final_damage)
 
 func apply_damage(amount: int) -> void:

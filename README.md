@@ -1,4 +1,4 @@
-# ECLIPSE — Combat Prototype v0.1
+# ECLIPSE — Combat Prototype v0.2
 
 Godot 4.x / GDScript single-stage 2D roguelite combat vertical slice.
 
@@ -18,6 +18,9 @@ Godot 4.x / GDScript single-stage 2D roguelite combat vertical slice.
 - Screen buttons: touch/tablet control support (landscape 16:9)
 
 ## Combat
+- Sword basic attack now chains into a three-hit combo (0.8 s input window); third hit bleeds the enemy.
+- Swapping forms automatically triggers a distinct entry attack with a short ring effect.
+- Sword hits pause the attacker very briefly; enemies flash and recoil on hit.
 - Sword form: short-range sword; skill causes bleed.
 - Fire mage: ranged fireball; skill launches a stronger, larger fireball.
 - Fire damage against a bleeding enemy consumes bleed and triggers +22 reaction damage.
@@ -39,3 +42,10 @@ Godot 4.x / GDScript single-stage 2D roguelite combat vertical slice.
 
 ## Status
 This is a working-source prototype, not a professionally playtested build. Godot runtime was not installed in the packaging environment, so it was not executed locally. Verify Godot's first import and run on your device.
+
+## v0.2 validation checklist
+- In Godot, verify a three-hit sword combo within 0.8 s and combo reset after a pause.
+- Verify swapping in either direction triggers one entry hit and observes cooldown.
+- Verify enemies recoil from sword and fire hits, and that bleed + fire still works.
+- Verify touch button swap/attack input and R restart.
+- **Runtime testing is pending**: these changes were reviewed at source level but not executed in the Godot engine.
