@@ -4,6 +4,7 @@ const PlayerScript = preload("res://scripts/player.gd")
 const ForestScript = preload("res://scripts/forest_background.gd")
 const JoystickScript = preload("res://scripts/touch_joystick.gd")
 const PixelTheme = preload("res://scripts/pixel_theme.gd")
+const DamageNumber = preload("res://scripts/pixel_damage_number.gd")
 const EnemyScript = preload("res://scripts/enemy.gd")
 const ProjectileScript = preload("res://scripts/projectile.gd")
 const WORLD_WIDTH := 1600
@@ -119,6 +120,7 @@ func _start_round() -> void:
     enemy.player = player
     add_child(enemy)
     enemy.killed.connect(_on_enemy_killed)
+    enemy.damage_taken.connect(_on_enemy_damage)
   overlay.visible = false
   if is_instance_valid(mobile_controls):
     mobile_controls.visible = true
@@ -129,6 +131,12 @@ func _spawn_projectile(spawn_pos: Vector2, direction: int, power: int, is_skill:
   add_child(projectile)
   projectile.add_to_group("bullets")
   projectile.setup(spawn_pos, direction, power, is_skill)
+
+func _on_enemy_damage(world_pos: Vector2, amount: int, kind: String) -> void:
+  var popup := DamageNumber.new()
+  popup.position = world_pos + Vector2(0, -50)
+  popup.setup(amount, kind)
+  add_child(popup)
 
 func _on_enemy_killed(_enemy: EclipseEnemy) -> void:
   foes_left -= 1
