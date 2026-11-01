@@ -42,13 +42,20 @@ func _move(local_position: Vector2) -> void:
 	var x := 0.0 if absf(stick.x) < DEAD_ZONE else stick.x
 	direction_changed.emit(x, stick.y < -0.52)
 	queue_redraw()
+func _pixel_disk(center: Vector2, radius: float, color: Color) -> void:
+	var cell := 8.0
+	for yy in range(-10, 11):
+		for xx in range(-10, 11):
+			var p := Vector2(float(xx) * cell, float(yy) * cell)
+			if p.length_squared() <= radius * radius:
+				draw_rect(Rect2((center + p).round(), Vector2(cell, cell)), color)
+
 func _draw() -> void:
 	var center := (size * 0.5).round()
-	var base := Rect2(center - Vector2(70, 70), Vector2(140, 140))
-	draw_rect(base, Color("#0c1924", 0.84))
-	draw_rect(base, Color("#d4e0d2"), false, 4.0, false)
-	draw_rect(Rect2(center - Vector2(44, 44), Vector2(88, 88)), Color("#263d4c"), false, 4.0, false)
-	var knob := (center + stick * MAX_RADIUS).round()
-	draw_rect(Rect2(knob - Vector2(25, 25), Vector2(50, 50)), Color("#447593"))
-	draw_rect(Rect2(knob - Vector2(25, 25), Vector2(50, 50)), Color("#e2edf3"), false, 4.0, false)
-	draw_rect(Rect2(knob - Vector2(17, 17), Vector2(34, 6)), Color("#b3d6e8"))
+	_pixel_disk(center, 73.0, Color("#101b20", 0.82))
+	_pixel_disk(center, 65.0, Color("#84928b", 0.9))
+	_pixel_disk(center, 57.0, Color("#213137", 0.9))
+	var knob := (center + stick * MAX_RADIUS).snapped(Vector2(8, 8))
+	_pixel_disk(knob, 30.0, Color("#0d171d"))
+	_pixel_disk(knob, 23.0, Color("#c2c4b8"))
+	_pixel_disk(knob, 15.0, Color("#576d70"))
