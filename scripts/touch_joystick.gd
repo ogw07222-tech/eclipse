@@ -43,8 +43,12 @@ func _move(local_position: Vector2) -> void:
   direction_changed.emit(x, stick.y < -0.52)
   queue_redraw()
 func _draw() -> void:
-  var center := size * 0.5
-  draw_circle(center, 73.0, Color("#091728", 0.49))
-  draw_arc(center, 69.0, 0.0, TAU, 44, Color("#d5e4dd", 0.64), 3.0)
-  draw_circle(center + stick * MAX_RADIUS, 28.0, Color("#47739a", 0.8))
-  draw_arc(center + stick * MAX_RADIUS, 28.0, 0.0, TAU, 32, Color("#e1f1ff", 0.8), 2.0)
+  var center := (size * 0.5).round()
+  var base := Rect2(center - Vector2(70, 70), Vector2(140, 140))
+  draw_rect(base, Color("#0c1924", 0.84))
+  draw_rect(base, Color("#d4e0d2"), false, 4.0, false)
+  draw_rect(Rect2(center - Vector2(44, 44), Vector2(88, 88)), Color("#263d4c"), false, 4.0, false)
+  var knob := (center + stick * MAX_RADIUS).round()
+  draw_rect(Rect2(knob - Vector2(25, 25), Vector2(50, 50)), Color("#447593"))
+  draw_rect(Rect2(knob - Vector2(25, 25), Vector2(50, 50)), Color("#e2edf3"), false, 4.0, false)
+  draw_rect(Rect2(knob - Vector2(17, 17), Vector2(34, 6)), Color("#b3d6e8"))
