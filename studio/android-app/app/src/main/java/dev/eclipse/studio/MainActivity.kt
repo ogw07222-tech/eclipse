@@ -43,8 +43,8 @@ private fun StudioScreen() {
     var project by remember { mutableStateOf("Untitled") }
     val objects = remember { mutableStateListOf(SceneItem(1, "Camera", 0, 0), SceneItem(2, "Player", 120, 80)) }
     var selection by remember { mutableIntStateOf(2) }
-    var tab by remember { mutableStateOf("SCENE") }
-    var status by remember { mutableStateOf("편집 준비됨 · 메모리 전용 시안") }
+    var tab by remember { mutableStateOf("화면 꾸미기") }
+    var status by remember { mutableStateOf("1. 왼쪽에서 선택 → 2. 오른쪽에서 수정 · 저장 기능 개발 중") }
     var nextId by remember { mutableIntStateOf(3) }
     MaterialTheme(colorScheme = darkColorScheme(background = bg, surface = panel, onSurface = fg)) {
         Column(Modifier.fillMaxSize().background(bg).padding(8.dp)) {
@@ -52,7 +52,7 @@ private fun StudioScreen() {
                 Text("ECLIPSE STUDIO", fontWeight = FontWeight.Bold, color = fg)
                 Text(project, color = Color.LightGray, fontSize = 12.sp)
                 Spacer(Modifier.weight(1f))
-                SquareButton("새 프로젝트") {
+                SquareButton("처음부터 만들기") {
                     project = "Untitled"
                     objects.clear()
                     objects.add(SceneItem(1, "Camera", 0, 0))
@@ -60,19 +60,20 @@ private fun StudioScreen() {
                     selection = 1
                     status = "새 임시 프로젝트 생성"
                 }
-                SquareButton("저장 (준비 중)", enabled = false) {}
+                SquareButton("저장 · 준비 중", enabled = false) {}
             }
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                listOf("SCENE", "SPRITES", "ANIMATION", "COMBAT").forEach { name ->
+                listOf("화면 꾸미기", "그림 관리", "움직임 만들기", "공격 설정").forEach { name ->
                     SquareButton(name) { tab = name }
                 }
             }
+            Text("시작하기: 항목을 추가하고 → 목록에서 선택하고 → 위치를 바꿔보세요", color = Color(0xFFBBDDEA), fontSize = 12.sp)
             Spacer(Modifier.height(8.dp))
-            if (tab == "SCENE") {
+            if (tab == "화면 꾸미기") {
                 Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Column(Modifier.width(160.dp).fillMaxHeight().border(1.dp, edge).background(panel).padding(8.dp)) {
-                        Text("SCENE TREE", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        Text("화면에 있는 것", fontWeight = FontWeight.Bold, fontSize = 12.sp)
                         Spacer(Modifier.height(10.dp))
                         LazyColumn(Modifier.weight(1f)) {
                             items(objects, key = { it.id }) { item ->
@@ -83,32 +84,32 @@ private fun StudioScreen() {
                                 )
                             }
                         }
-                        SquareButton("+ 오브젝트") {
+                        SquareButton("+ 그림/물체 추가") {
                             objects.add(SceneItem(nextId, "Sprite ${nextId}", 0, 0))
                             selection = nextId
                             nextId++
-                            status = "오브젝트 추가됨"
+                            status = "새 항목을 추가했어요. 오른쪽에서 위치를 변경할 수 있어요."
                         }
                     }
                     Box(Modifier.weight(1f).fillMaxHeight().border(1.dp, edge).background(Color(0xFF101B24)), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("SCENE VIEW · 480 × 270", fontSize = 14.sp)
-                            Text("씬 캔버스 / 드래그 편집 후속 구현", color = Color.LightGray, fontSize = 12.sp)
+                            Text("게임 화면 미리보기 · 480 × 270", fontSize = 14.sp)
+                            Text("현재는 목록에서 선택하고 오른쪽에서 위치를 조정해요", color = Color.LightGray, fontSize = 12.sp)
                         }
                     }
                     Column(Modifier.width(165.dp).fillMaxHeight().border(1.dp, edge).background(panel).padding(8.dp)) {
-                        Text("INSPECTOR", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        Text("선택한 항목", fontWeight = FontWeight.Bold, fontSize = 12.sp)
                         Spacer(Modifier.height(12.dp))
                         val item = objects.find { it.id == selection }
                         Text(item?.name ?: "선택 없음")
                         Text("X: ${item?.x ?: 0}", fontSize = 12.sp)
                         Text("Y: ${item?.y ?: 0}", fontSize = 12.sp)
                         Spacer(Modifier.height(10.dp))
-                        SquareButton("X +10", enabled = item != null) {
+                        SquareButton("오른쪽으로 10", enabled = item != null) {
                             val index = objects.indexOfFirst { it.id == selection }
                             if (index >= 0) objects[index] = objects[index].copy(x = objects[index].x + 10)
                         }
-                        SquareButton("Y +10", enabled = item != null) {
+                        SquareButton("아래로 10", enabled = item != null) {
                             val index = objects.indexOfFirst { it.id == selection }
                             if (index >= 0) objects[index] = objects[index].copy(y = objects[index].y + 10)
                         }
@@ -116,7 +117,7 @@ private fun StudioScreen() {
                 }
             } else {
                 Box(Modifier.weight(1f).fillMaxWidth().border(1.dp, edge).background(panel), contentAlignment = Alignment.Center) {
-                    Text("${tab} 편집 기능 준비 중", color = fg)
+                    Text("${tab} 기능은 개발 중이에요", color = fg)
                 }
             }
             Spacer(Modifier.height(6.dp))
