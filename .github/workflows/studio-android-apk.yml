@@ -1,0 +1,50 @@
+name: ECLIPSE Studio Android APK
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build-studio-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: studio/android-app
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android platform using runner SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | head -n 1)
+          test -n "$SDKMANAGER" || { echo "sdkmanager is not installed"; exit 1; }
+          "$SDKMANAGER" --version
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Build debug APK
+        run: gradle :app:assembleDebug --no-daemon --stacktrace
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ECLIPSE-Studio-debug-apk
+          path: studio/android-app/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload diagnostic reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ECLIPSE-Studio-build-diagnostics
+          path: |
+            studio/android-app/app/build/reports/
+            studio/android-app/.gradle/
+          if-no-files-found: ignore
