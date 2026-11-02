@@ -1,0 +1,125 @@
+name: Native Android APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'native-engine/**'
+      - 'Assets/Resources/Eclipse/**'
+      - '.github/workflows/native-android-apk.yml'
+  pull_request:
+    paths:
+      - 'native-engine/**'
+      - 'Assets/Resources/Eclipse/**'
+      - '.github/workflows/native-android-apk.yml'
+permissions:
+  contents: read
+concurrency:
+  group: native-android-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
+      - name: Install pinned Android toolchains
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;27.2.12479018' 'cmake;3.31.6'
+      - name: Prepare official SDL Android bridge
+        run: python3 native-engine/tools/prepare_android.py
+      - name: Compile and test combat rules
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror native-engine/tests/core_tests.cpp -o /tmp/eclipse-combat-tests
+          /tmp/eclipse-combat-tests
+      - name: Build native ARM64 APK without Unity
+        run: gradle -p native-engine/android --no-daemon --stacktrace -PeclipseVersionCode=${{ github.run_number }} assembleDebug
+      - name: Validate APK contents and signature
+        run: |
+          mkdir -p native-engine/android/output
+          cp native-engine/android/app/build/outputs/apk/debug/app-debug.apk native-engine/android/output/ECLIPSE-Native.apk
+          python3 native-engine/tools/verify_apk.py native-engine/android/output/ECLIPSE-Native.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose native-engine/android/output/ECLIPSE-Native.apk
+      - name: Upload installable native APK
+        id: artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ECLIPSE-Native-ARM64-${{ github.run_number }}
+          path: |
+            native-engine/android/output/ECLIPSE-Native.apk
+            native-engine/android/output/ECLIPSE-Native.apk.sha256
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+      - name: Build summary
+        env:
+          ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
+        run: |
+          {
+            echo '## ECLIPSE Native APK'
+            echo "Download: $ARTIFACT_URL"
+            echo 'Extract the ZIP and install ECLIPSE-Native.apk on an ARM64 Android device (Android 8 or later).'
+            echo 'App: com.eclipse.nativegame — SDL/C++, no Unity license required.'
+            echo "Commit: $GITHUB_SHA"
+          } >> "$GITHUB_STEP_SUMMARY"
+  android-smoke:
+    name: Android emulator combat smoke
+    needs: apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+          cache-read-only: true
+      - name: Install native toolchains
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;27.2.12479018' 'cmake;3.31.6'
+      - name: Build emulator-only APK (not the downloadable ARM64 build)
+        run: |
+          python3 native-engine/tools/prepare_android.py
+          gradle -p native-engine/android --no-daemon --stacktrace -PeclipseAbis=x86_64 assembleDebug
+          python3 native-engine/tools/verify_apk.py native-engine/android/app/build/outputs/apk/debug/app-debug.apk --abi x86_64
+      - name: Enable KVM access
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          arch: x86_64
+          target: default
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 native-engine/tools/android_smoke.py
+      - name: Preserve Android smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ECLIPSE-Android-smoke-${{ github.run_number }}
+          path: native-engine/android/smoke/
+          if-no-files-found: ignore
+          retention-days: 7

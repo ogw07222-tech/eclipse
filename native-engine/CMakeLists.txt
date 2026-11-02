@@ -60,11 +60,13 @@ if(NOT ANDROID)
   if(NOT EXISTS "${ECLIPSE_ASSET_SOURCE}/knight_sheet_48x64_v2.png")
     message(FATAL_ERROR "ECLIPSE knight atlas is missing: ${ECLIPSE_ASSET_SOURCE}")
   endif()
-  add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${TARGET_NAME}>/assets"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      "${ECLIPSE_ASSET_SOURCE}/knight_sheet_48x64_v2.png"
-      "$<TARGET_FILE_DIR:${TARGET_NAME}>/assets/knight_sheet_48x64_v2.png")
+  set(ECLIPSE_GAME_ASSETS knight_sheet_48x64_v2.png ui/attack_states.png ui/dash_states.png ui/swap_skill_states.png ui/joystick_arrows_new.png)
+  foreach(asset IN LISTS ECLIPSE_GAME_ASSETS)
+    get_filename_component(directory "${asset}" DIRECTORY)
+    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${TARGET_NAME}>/assets/${directory}"
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ECLIPSE_ASSET_SOURCE}/${asset}" "$<TARGET_FILE_DIR:${TARGET_NAME}>/assets/${asset}")
+  endforeach()
   set_target_properties(${TARGET_NAME} PROPERTIES BUILD_RPATH "$ORIGIN")
   if(ECLIPSE_TESTS)
     enable_testing()
