@@ -39,15 +39,21 @@ void tick(eclipse::Actions action){
     if(action.restart){input.reset();keyState.fill(false);animation.reset();camera=640;}
     game.step(static_cast<float>(eclipse::fixedStep),action);animation.step(game.player,static_cast<float>(eclipse::fixedStep));
     if(action.inventory||action.swap||action.restart||action.weapon||action.armor||action.charm)
-        SDL_Log("ECLIPSE state form=%d inventory=%d hp=%d foes=%d restart=%d",game.player.form,game.inventory,game.player.health,game.foes(),action.restart);
+        SDL_Log("ECLIPSE state form=%d inventory=%d hp=%d foes=%d restart=%d weapon=%d armor=%d charm=%d",game.player.form,game.inventory,game.player.health,game.foes(),action.restart,game.player.gear.selected[0],game.player.gear.selected[1],game.player.gear.selected[2]);
     camera+=(std::clamp(game.player.x,640.f,960.f)-camera)*(1-std::exp(-5*static_cast<float>(eclipse::fixedStep)));
 }
 void cleanup(){if(renderer)SDL_DestroyRenderer(renderer);if(window)SDL_DestroyWindow(window);SDL_Quit();}
 }
 int main(int argc,char** argv){
     bool smoke=argc>1&&std::string(argv[1])=="--smoke-test";
+#ifdef SDL_PLATFORM_ANDROID
+    SDL_SetHint(SDL_HINT_ORIENTATIONS,"LandscapeLeft LandscapeRight");
+    const SDL_WindowFlags flags=SDL_WINDOW_FULLSCREEN;
+#else
+    const SDL_WindowFlags flags=SDL_WINDOW_RESIZABLE;
+#endif
     if(!SDL_Init(SDL_INIT_VIDEO|SDL_INIT_EVENTS)){SDL_Log("SDL init: %s",SDL_GetError());return 1;}
-    if(!SDL_CreateWindowAndRenderer("ECLIPSE Native",1280,720,SDL_WINDOW_RESIZABLE,&window,&renderer)){SDL_Log("Window: %s",SDL_GetError());cleanup();return 1;}
+    if(!SDL_CreateWindowAndRenderer("ECLIPSE Native",1280,720,flags,&window,&renderer)){SDL_Log("Window: %s",SDL_GetError());cleanup();return 1;}
     SDL_SetRenderLogicalPresentation(renderer,1280,720,SDL_LOGICAL_PRESENTATION_LETTERBOX);SDL_SetRenderVSync(renderer,1);
     auto view=std::make_unique<eclipse::Presentation>(renderer);
     if(!view->load()){SDL_Log("ECLIPSE asset load failed: %s",SDL_GetError());view.reset();cleanup();return 1;}
