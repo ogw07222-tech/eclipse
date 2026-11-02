@@ -1,0 +1,5 @@
+{
+  "name": "Eclipse.Core",
+  "rootNamespace": "Eclipse",
+  "noEngineReferences": true
+}

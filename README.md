@@ -1,51 +1,69 @@
-# ECLIPSE — Combat Prototype v0.2
+# ECLIPSE — Unity combat prototype
 
-Godot 4.x / GDScript single-stage 2D roguelite combat vertical slice.
+Unity 6.3 LTS C# port of Godot `main` at **b47cc494f27258a1f1343aa0beeadee612b7b5cf** (PR #17).
+The repository root is now a Unity project. The original Godot source and PNGs remain intact for comparison and rollback.
 
-## Launch
-1. Install Godot 4.3 or newer (4.x).
-2. Import the folder by opening `project.godot` in Godot Project Manager.
-3. Press F6/F5 (Play Project) or use the editor's Play button.
+## Open and play
+
+1. Install **Unity 6.3 LTS (6000.3.0f1)** through Unity Hub.
+2. Hub → **Add project from disk** → select this repository's root (the folder containing `Assets`, `Packages`, and `ProjectSettings`). Do not select `Assets` itself.
+3. Let Unity import packages and assets.
+4. Open **Assets/Scenes/Main.unity**, or use **ECLIPSE → Open Main Scene**.
+5. Press **Play**. The scene constructs its own UI, forest, player and four enemies; no Inspector wiring is needed.
+
+The 1280×720 view scales into the screen's safe area with black letterboxing. All source PNGs use point filtering, no mipmaps, no texture compression, and retain their exact original bytes.
 
 ## Controls
-- A/D or arrows: move
-- SPACE / W / Up: jump
-- SHIFT: dash (brief invulnerability)
-- J or Z: basic attack
-- K or X: character skill
-- L or C or TAB: swap character
-- R: restart stage
-- Screen buttons: touch/tablet control support (landscape 16:9)
 
-## Combat
-- Sword basic attack now chains into a three-hit combo (0.8 s input window); third hit bleeds the enemy.
-- Swapping forms automatically triggers a distinct entry attack with a short ring effect.
-- Sword hits pause the attacker very briefly; enemies flash and recoil on hit.
-- Sword form: short-range sword; skill causes bleed.
-- Fire mage: ranged fireball; skill launches a stronger, larger fireball.
-- Fire damage against a bleeding enemy consumes bleed and triggers +22 reaction damage.
-- Defeat all four enemies to clear the stage; dying shows game over.
+| Action | Keyboard | Touch |
+| --- | --- | --- |
+| Move | A/D or left/right | Left joystick |
+| Jump | Space / W / up | Push joystick upward |
+| Dash | Shift | Lightning button |
+| Basic attack | J / Z | Sword button |
+| Skill | K / X | Spark button |
+| Swap form | L / C / Tab | Circular arrows |
+| Equipment | I; 1/2/3 cycle slots | Tap HUD slots; tap equipment buttons |
+| Retry | R | Result screen's retry button |
 
-## Directory
-- `scripts/game.gd`: scene bootstrap, arena, camera, HUD, wave, input mapping
-- `scripts/player.gd`: character movement, forms, swapping, attack, skills
-- `scripts/enemy.gd`: simple chasing AI, damage and status effects
-- `scripts/projectile.gd`: ranged hit detection
+Sword three-hit combo, 0.8-second combo window, bleed finisher, mage projectiles, burn, +22 bleed/fire reaction, swap entry attacks, dash immunity, equipment stats, recoil, hit stop, damage popups, clear and defeat are ported from the baseline. Timings and pixel-space distances are retained. Touch controls have independent pointer ownership and release on focus loss/restart.
 
-## Next development milestones
-1. Move input map to editor settings, use Input abstraction with remapping.
-2. Build typed Resource definitions for character, weapon, skill and synergy; preserve stable IDs.
-3. Add AnimationTree, sprite assets, sound, audiovisual hit feedback.
-4. Introduce composition-based effects and Hitbox/Hurtbox nodes for combat.
-5. Add curated room pool + seeded run generator + rewards and save data.
-6. Write headless simulation tests, tune performance and exports.
+## Android tablet test
 
-## Status
-This is a working-source prototype, not a professionally playtested build. Godot runtime was not installed in the packaging environment, so it was not executed locally. Verify Godot's first import and run on your device.
+Build on a Windows/macOS/Linux computer; Unity Editor does not run on Android.
 
-## v0.2 validation checklist
-- In Godot, verify a three-hit sword combo within 0.8 s and combo reset after a pause.
-- Verify swapping in either direction triggers one entry hit and observes cooldown.
-- Verify enemies recoil from sword and fire hits, and that bleed + fire still works.
-- Verify touch button swap/attack input and R restart.
-- **Runtime testing is pending**: these changes were reviewed at source level but not executed in the Godot engine.
+1. Add **Android Build Support**, **SDK & NDK Tools**, and **OpenJDK** to this Unity installation in Hub.
+2. Open **File → Build Profiles**, choose **Android**, and switch to that platform.
+3. Use **ECLIPSE → Build Android APK**. Output: `Builds/Android/ECLIPSE.apk`.
+4. Copy the APK to the tablet and install it, or use Unity's Build And Run with USB debugging enabled.
+
+Android is configured for landscape, IL2CPP, ARM64, package `com.eclipse.combat`, minimum API 26. The menu produces a **development APK**, not a signed store release. No APK has been produced in the current environment.
+
+## Source map
+
+- `Assets/Eclipse/Core/CombatSimulation.cs`: engine-independent fixed-step gameplay and equipment rules.
+- `Assets/Eclipse/Runtime/EclipseGame.cs`: Unity scene composition, keyboard/touch adapters, atlas animation, viewport and round UI.
+- `Assets/Eclipse/Runtime/PixelWorldView.cs`: native uGUI mesh drawing for the original procedural forest, enemies and effects.
+- `Assets/Eclipse/Runtime/PixelHudView.cs`: original pixel hearts, cooldown meter and enemy indicator.
+- `Assets/Eclipse/Runtime/TouchControl.cs`: independent pointer capture for joystick and action buttons.
+- `Assets/Resources/Eclipse/`: byte-identical copies of all seven original PNGs.
+- `Assets/Eclipse/Editor/EclipseBuild.cs`: desktop/Android build entry points.
+- `Assets/Eclipse/Tests/EditMode/`: 15 shared gameplay scenarios and NUnit EditMode entry point.
+- `Tools/CombatChecks/`: standalone .NET runner against the actual gameplay model.
+- `Docs/AI/UnityProjectContext.md`: environment, architecture and evidence.
+- `Docs/UNITY_MIGRATION.md`: parity mapping, deliberate fixes and remaining checks.
+
+Original Godot entry: `Legacy/Godot/project.godot`; original instructions: [Legacy/Godot/README.md](Legacy/Godot/README.md). All original scripts, scenes, assets and tools are preserved there. This avoids case-only folder collisions on Windows.
+
+## Validation
+
+```sh
+python Tools/validate_unity_project.py
+dotnet run --project Tools/CombatChecks/CombatChecks.csproj --configuration Release
+```
+
+Both passed locally: 15/15 gameplay scenarios; GUIDs, scene references, resource paths and original PNG hashes checked. GitHub Actions repeats these checks.
+
+In Unity: **Window → General → Test Runner → EditMode → Run All**.
+
+**Unity Editor import/compilation, Play Mode, device multitouch, visual parity and Android/Windows builds remain unverified.** The environment had no Unity Editor/license/device. Standalone C# tests are not evidence of a successful Unity build. The Korean text uses OS font fallback because the baseline contains no licensed Korean pixel font.
