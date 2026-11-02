@@ -114,7 +114,7 @@ public:
         constexpr const char* files[]={"knight_motion.png","ui/attack_states.png","ui/dash_states.png","ui/swap_skill_states.png","ui/joystick_arrows_new.png"};
         for(int i=0;i<5;++i){const auto path=asset(files[i]);SDL_Surface* image=IMG_Load(path.c_str());
             if(!image){SDL_Log("Required PNG missing or invalid: %s (%s)",path.c_str(),SDL_GetError());return false;}
-            if(i==0&&(image->w!=motionCell*motionColumns||image->h!=motionCell*motionRows)){SDL_Log("Expected 768x576 motion atlas");SDL_DestroySurface(image);return false;}
+            if(i==0&&(image->w!=motionWidth*motionColumns||image->h!=motionHeight*motionRows)){SDL_Log("Expected 1024x576 motion atlas");SDL_DestroySurface(image);return false;}
             // Compact oversized button sheets once, keeping only 128px per state on the GPU.
             if(i>0){int cols=(i==1||i==2||i==3)?2:1,rows=i==3?2:1;auto* scaled=SDL_ScaleSurface(image,128*cols,128*rows,SDL_SCALEMODE_NEAREST);SDL_DestroySurface(image);image=scaled;if(!image)return false;}
             textures[i]=SDL_CreateTextureFromSurface(renderer,image);SDL_DestroySurface(image);
@@ -128,7 +128,7 @@ public:
         forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.clock);
         for(const auto& b:g.projectiles){disk(b.x-offset,b.y,b.empowered?14:8,0xf16b32);disk(b.x-offset,b.y,b.empowered?7:4,0xffe7a1);}
         const auto& p=g.player;
-        if(p.form==0){SDL_FRect source{static_cast<float>(a.frame%motionColumns*motionCell),static_cast<float>(a.frame/motionColumns*motionCell),motionCell,motionCell},dest{std::round(p.x-offset-72),std::round(p.y-132),144,144};
+        if(p.form==0){SDL_FRect source{static_cast<float>(a.frame%motionColumns*motionWidth),static_cast<float>(a.frame/motionColumns*motionHeight),motionWidth,motionHeight},dest{std::round(p.x-offset-(p.facing>0?motionPivotX:motionWidth-motionPivotX)*3),std::round(p.y-motionPivotY*3),motionWidth*3,motionHeight*3};
             SDL_RenderTextureRotated(renderer,textures[0],&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
         }else mage(p);
         if(p.swapFlash>0)ring(p.x-offset,p.y-36,44,0xe3bd72);
