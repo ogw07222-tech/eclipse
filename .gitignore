@@ -32,3 +32,5 @@ __pycache__/
 /native-engine/android/app/.cxx/
 /native-engine/android/output/
 /native-engine/android/local.properties
+
+/native-engine/review/

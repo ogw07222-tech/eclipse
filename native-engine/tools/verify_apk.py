@@ -12,7 +12,7 @@ parser.add_argument('apk', type=Path)
 parser.add_argument('--abi', default='arm64-v8a', choices=['arm64-v8a', 'x86_64'])
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[2]
-assets = ['knight_sheet_48x64_v2.png', 'ui/attack_states.png', 'ui/dash_states.png',
+assets = ['knight_motion.png', 'ui/attack_states.png', 'ui/dash_states.png',
           'ui/swap_skill_states.png', 'ui/joystick_arrows_new.png']
 with zipfile.ZipFile(args.apk) as apk:
     if apk.testzip():

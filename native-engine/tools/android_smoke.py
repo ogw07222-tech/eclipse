@@ -32,6 +32,13 @@ def tap(x, y):
     scale = min(w / 1280, h / 720)
     adb('shell', 'input', 'tap', str(round((w - 1280 * scale) / 2 + x * scale)),
         str(round((h - 720 * scale) / 2 + y * scale)))
+def gesture(x1, y1, x2, y2):
+    w, h = capture('latest')
+    scale = min(w / 1280, h / 720)
+    def point(x, y):
+        return str(round((w - 1280 * scale) / 2 + x * scale)), str(round((h - 720 * scale) / 2 + y * scale))
+    adb('shell', 'input', 'swipe', *point(x1, y1), *point(x2, y2), '400')
+
 def action_and_wait(action, message):
     history.append(logs())
     adb('logcat', '-c')
@@ -64,6 +71,15 @@ try:
     tap(640, 250)
     restart()
     capture('01-combat')
+    action_and_wait(lambda: gesture(99, 650, 150, 650), 'motion state=1')
+    restart()
+    action_and_wait(lambda: tap(1160, 590), 'motion state=4')
+    restart()
+    action_and_wait(lambda: tap(1035, 610), 'motion state=7')
+    restart()
+    action_and_wait(lambda: gesture(99, 650, 99, 605), 'motion state=2')
+    capture('01b-jump')
+    restart()
     action_and_wait(lambda: tap(800, 40), 'inventory=1')
     action_and_wait(lambda: tap(100, 435), 'weapon=1')
     capture('02-inventory')
@@ -80,7 +96,7 @@ try:
     assert adb('shell', 'pidof', 'com.eclipse.nativegame').strip(), 'App process exited'
     text = logs()
     assert 'FATAL EXCEPTION' not in text and 'Fatal signal' not in text, 'Android native crash'
-    print('PASS Android emulator: landscape/launch/textures/touch inventory/equip/swap/background/restart')
+    print('PASS Android emulator: landscape/launch/textures/run/attack/dash/jump/touch inventory/equip/swap/background/restart')
 finally:
     capture('final')
     (out / 'windows.txt').write_bytes(adb('shell', 'dumpsys', 'window', 'windows'))
