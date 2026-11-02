@@ -39,8 +39,33 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
+      - name: Restore stable signing key (main and manual builds)
+        if: github.event_name != 'pull_request'
+        env:
+          KEYSTORE_B64: ${{ secrets.ECLIPSE_STUDIO_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ECLIPSE_STUDIO_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ECLIPSE_STUDIO_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ECLIPSE_STUDIO_KEY_PASSWORD }}
+        run: |
+          if [[ -z "$KEYSTORE_B64" || -z "$STORE_PASSWORD" || -z "$KEY_ALIAS" || -z "$KEY_PASSWORD" ]]; then
+            echo "::error::Stable Studio signing secrets missing; configure all four ECLIPSE_STUDIO_* secrets. See studio/android-app/SIGNING.md."
+            exit 1
+          fi
+          umask 077
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/eclipse-studio-signing.jks"
+          test -s "$RUNNER_TEMP/eclipse-studio-signing.jks"
+          echo "ECLIPSE_STUDIO_KEYSTORE=$RUNNER_TEMP/eclipse-studio-signing.jks" >> "$GITHUB_ENV"
+          echo "ECLIPSE_STUDIO_STORE_PASSWORD=$STORE_PASSWORD" >> "$GITHUB_ENV"
+          echo "ECLIPSE_STUDIO_KEY_ALIAS=$KEY_ALIAS" >> "$GITHUB_ENV"
+          echo "ECLIPSE_STUDIO_KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
       - name: Build debug APK
         run: gradle :app:assembleDebug --no-daemon --stacktrace
+      - name: Verify debug APK signature
+        run: |
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs app/build/outputs/apk/debug/app-debug.apk
+      - name: Clean signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/eclipse-studio-signing.jks"
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
