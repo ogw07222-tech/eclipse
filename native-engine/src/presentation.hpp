@@ -111,10 +111,10 @@ public:
 #endif
     }
     bool load(){
-        constexpr const char* files[]={"knight_sheet_48x64_v2.png","ui/attack_states.png","ui/dash_states.png","ui/swap_skill_states.png","ui/joystick_arrows_new.png"};
+        constexpr const char* files[]={"knight_motion.png","ui/attack_states.png","ui/dash_states.png","ui/swap_skill_states.png","ui/joystick_arrows_new.png"};
         for(int i=0;i<5;++i){const auto path=asset(files[i]);SDL_Surface* image=IMG_Load(path.c_str());
             if(!image){SDL_Log("Required PNG missing or invalid: %s (%s)",path.c_str(),SDL_GetError());return false;}
-            if(i==0&&(image->w!=384||image->h!=448)){SDL_Log("Expected 384x448 knight atlas");SDL_DestroySurface(image);return false;}
+            if(i==0&&(image->w!=motionCell*motionColumns||image->h!=motionCell*motionRows)){SDL_Log("Expected 768x576 motion atlas");SDL_DestroySurface(image);return false;}
             // Compact oversized button sheets once, keeping only 128px per state on the GPU.
             if(i>0){int cols=(i==1||i==2||i==3)?2:1,rows=i==3?2:1;auto* scaled=SDL_ScaleSurface(image,128*cols,128*rows,SDL_SCALEMODE_NEAREST);SDL_DestroySurface(image);image=scaled;if(!image)return false;}
             textures[i]=SDL_CreateTextureFromSurface(renderer,image);SDL_DestroySurface(image);
@@ -123,17 +123,17 @@ public:
         }
         return true;
     }
-    void draw(const Combat& g,const Animation& a,float camera,Actions held,const char* capture=nullptr){
+    void draw(const Combat& g,const Animation& a,float camera,Actions held,const char* capture=nullptr,const char* reviewLabel=nullptr){
         offset=std::round(camera)-640;SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);SDL_SetRenderDrawColor(renderer,21,35,52,255);SDL_RenderClear(renderer);
         forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.clock);
         for(const auto& b:g.projectiles){disk(b.x-offset,b.y,b.empowered?14:8,0xf16b32);disk(b.x-offset,b.y,b.empowered?7:4,0xffe7a1);}
         const auto& p=g.player;
-        if(p.form==0){SDL_FRect source{static_cast<float>(a.frame%8*48),static_cast<float>(a.frame/8*64),48,64},dest{std::round(p.x-offset-48),std::round(p.y-128),96,128};
+        if(p.form==0){SDL_FRect source{static_cast<float>(a.frame%motionColumns*motionCell),static_cast<float>(a.frame/motionColumns*motionCell),motionCell,motionCell},dest{std::round(p.x-offset-72),std::round(p.y-132),144,144};
             SDL_RenderTextureRotated(renderer,textures[0],&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
         }else mage(p);
         if(p.swapFlash>0)ring(p.x-offset,p.y-36,44,0xe3bd72);
         for(const auto& popup:g.popups)number(popup.amount,popup.x-offset-12,popup.y,3,popup.kind==DamageKind::Fire?0xff9155:popup.kind==DamageKind::Bleed?0xe76878:0xf2d48c);
-        hud(g,held);
+        hud(g,held);if(reviewLabel)text(reviewLabel,470,120,3);
         if(g.ended){rect(0,0,1280,720,0x111a28,240);text(g.won?"STAGE CLEAR":"GAME OVER",390,260,7,g.won?0x8be4b5:0xff8d99);text("TAP RETRY OR PRESS R",410,350,3);
             rect(510,412,260,65,0xe3bd72);rect(514,416,252,57,0x304039);text("RETRY",548,433,4);
         }
