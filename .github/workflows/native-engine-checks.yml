@@ -1,0 +1,39 @@
+name: Native engine checks
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'native-engine/**'
+      - 'Assets/Resources/Eclipse/knight_sheet_48x64_v2.png'
+      - '.github/workflows/native-engine-checks.yml'
+  pull_request:
+    paths:
+      - 'native-engine/**'
+      - 'Assets/Resources/Eclipse/knight_sheet_48x64_v2.png'
+      - '.github/workflows/native-engine-checks.yml'
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Configure PNG-only native runtime
+        run: cmake -S native-engine -B native-engine/build -G Ninja -DECLIPSE_HEADLESS=ON -DCMAKE_BUILD_TYPE=Release
+      - name: Compile real SDL runtime
+        run: cmake --build native-engine/build --parallel 2
+      - name: Test controls, movement and actual PNG rendering
+        run: ctest --test-dir native-engine/build --output-on-failure
+      - name: Report native binary sizes (not APK size)
+        run: |
+          {
+            echo '## Native Release build (Linux headless CI)'
+            echo 'These are development binary sizes, not an Android APK or memory measurement.'
+            echo '```'
+            du -h native-engine/build/eclipse_engine native-engine/build/_deps/sdl3-build/libSDL3.so* native-engine/build/_deps/sdl3_image-build/libSDL3_image.so* native-engine/build/assets/knight_sheet_48x64_v2.png
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
