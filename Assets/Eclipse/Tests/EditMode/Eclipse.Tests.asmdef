@@ -1,0 +1,7 @@
+{
+  "name": "Eclipse.Tests",
+  "rootNamespace": "Eclipse.Tests",
+  "references": ["Eclipse.Core"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}
