@@ -45,6 +45,9 @@ try:
     # Fresh emulator images finish package/IME provisioning after boot_completed.
     time.sleep(20)
     adb('shell', 'wm', 'dismiss-keyguard')
+    # Android's first-use fullscreen tutorial owns input until acknowledged.
+    # Configure only the disposable emulator; the APK retains normal OS behavior.
+    adb('shell', 'settings', 'put', 'secure', 'immersive_mode_confirmations', 'confirmed')
     adb('install', '-r', str(apk))
     adb('logcat', '-c')
     adb('shell', 'am', 'start', '-W', '-n', 'com.eclipse.nativegame/.MainActivity')
@@ -57,7 +60,8 @@ try:
         if time.monotonic() > deadline:
             raise RuntimeError('Game did not enter landscape orientation')
         time.sleep(.5)
-    tap(640, 250)  # establish an initial real surface interaction before keyboard checks
+    assert 'ImmersiveModeConfirmation' not in adb('shell', 'dumpsys', 'window', 'windows').decode(), 'OS fullscreen tutorial owns input'
+    tap(640, 250)
     restart()
     capture('01-combat')
     action_and_wait(lambda: tap(800, 40), 'inventory=1')
