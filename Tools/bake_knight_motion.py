@@ -35,13 +35,13 @@ def foot(phase,stride,lift,contact=.5):
     return (24+lerp(-stride/2,stride/2,smooth(t)),43-lift*math.sin(math.pi*t))
 
 def pose(name,t):
-    hip=[24.,29.];lean=0.;twist=0.;wind=0.;sword=-35.;near=(29.,28.);far=(22.,26.)
+    hip=[24.,28.2];lean=0.;twist=0.;wind=0.;sword=-35.;near=(29.,28.);far=(22.,26.)
     feet=[(21.,43.),(27.,43.)]
     if name=='idle':hip[1]+=.25*math.sin(t*math.tau);wind=.5*math.sin(t*math.tau)
     elif name in ('run','walk'):
         run=name=='run';stride=16 if run else 12;contact=.4 if run else .5
         feet=[foot(t+.5,stride,6 if run else 2,contact),foot(t,stride,6 if run else 2,contact)]
-        hip[1]=(30.7 if run else 29.8)+.35*math.cos(t*math.tau*2)
+        hip[1]=(29.7 if run else 28.8)+.35*math.cos(t*math.tau*2)
         if run:hip[0]+=.6+1.5*math.sin(t*math.tau*2)
         lean=(12 if run else 4)+2*math.sin(t*math.tau*2);twist=.65*math.sin(t*math.tau);wind=6 if run else 1
         near=(29+2*math.sin(t*math.tau),29-1.5*math.cos(t*math.tau));far=(21-2*math.sin(t*math.tau),27+2*math.cos(t*math.tau));sword=-30+12*math.sin(t*math.tau)
