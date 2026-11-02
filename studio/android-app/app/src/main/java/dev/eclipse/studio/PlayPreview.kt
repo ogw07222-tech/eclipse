@@ -108,10 +108,6 @@ internal fun PlayPreview(objects: List<VisualObject>, onExit: () -> Unit) {
             }
         }
         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(6.dp)) {
-            @Composable fun Control(label:String, action:()->Unit) {
-                Button(onClick=action,shape=RectangleShape,colors=ButtonDefaults.buttonColors(containerColor=Color(0xFF364651)),
-                    contentPadding=PaddingValues(horizontal=13.dp,vertical=12.dp)) { Text(label,fontSize=16.sp) }
-            }
             Control("◀") { x=(x-14f).coerceIn(0f,480f-width) }
             Control("▶") { x=(x+14f).coerceIn(0f,480f-width) }
             Control("점프") { if(grounded) { vy=-10f; grounded=false } }
@@ -121,4 +117,10 @@ internal fun PlayPreview(objects: List<VisualObject>, onExit: () -> Unit) {
         Text("버튼을 누를 때마다 이동해요 · 점프/중력/바닥 충돌 지원 · 공격은 카운트 시연",
             color=Color.LightGray,fontSize=11.sp)
     }
+}
+
+@Composable
+private fun Control(label: String, action: () -> Unit) {
+    Button(onClick=action, shape=RectangleShape, colors=ButtonDefaults.buttonColors(containerColor=Color(0xFF364651)),
+        contentPadding=PaddingValues(horizontal=13.dp,vertical=12.dp)) { Text(label,fontSize=16.sp) }
 }
