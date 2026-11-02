@@ -70,7 +70,8 @@ int main(int argc,char** argv){
             if(scene==4){game.ended=true;game.player.health=0;}
             if(scene==5||scene==7)game.player.facing=-1;
             if(scene>=6){animation.state=5;animation.frame=134;}
-            else animation.step(game.player,1.f/60);const std::string capture=argc>2?std::string(argv[2])+"/scene-"+std::to_string(scene)+".bmp":"";
+            else{animation.step(game.player,1.f/60);}
+            const std::string capture=argc>2?std::string(argv[2])+"/scene-"+std::to_string(scene)+".bmp":"";
             view->draw(game,animation,camera,{},argc>2?capture.c_str():nullptr);
         }
         SDL_Log("PASS eight combat/UI/facing/trail scenes and all five PNG textures");view.reset();cleanup();return 0;
