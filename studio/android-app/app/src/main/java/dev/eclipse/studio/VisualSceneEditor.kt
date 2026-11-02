@@ -66,7 +66,7 @@ private fun Sharp(label: String, onClick: () -> Unit, enabled: Boolean = true) {
 }
 
 @Composable
-internal fun VisualSceneEditor() {
+internal fun VisualSceneEditor(githubPng: String? = null, onImported: () -> Unit = {}) {
     val context= LocalContext.current
     val objects=remember { mutableStateListOf<VisualObject>() }
     var selected by remember { mutableIntStateOf(-1) }
@@ -86,6 +86,17 @@ internal fun VisualSceneEditor() {
                 selected=nextId++
                 status="PNG가 추가됐어요. 그림을 드래그해서 이동해 보세요."
             } catch(e:Exception) { status="파일 불러오기 실패: ${e.message}" }
+        }
+    }
+    LaunchedEffect(githubPng) {
+        if (githubPng != null) {
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            context.contentResolver.openInputStream(Uri.parse(githubPng))?.use { BitmapFactory.decodeStream(it, null, bounds) }
+            objects.add(VisualObject(nextId, "GitHub PNG $nextId", githubPng, 100, 80,
+                bounds.outWidth.coerceIn(1,480), bounds.outHeight.coerceIn(1,270)))
+            selected = nextId++
+            status = "GitHub에서 그림을 가져왔어요. 화면에서 이동해 보세요."
+            onImported()
         }
     }
     LaunchedEffect(Unit) {
