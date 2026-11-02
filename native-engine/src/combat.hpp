@@ -159,7 +159,7 @@ struct Animation {
         bool retrigger=p.attackSerial!=attackSerial;
         float distance=initialized?std::abs(p.x-lastX):0;lastX=p.x;initialized=true;
         if(retrigger){attackSerial=p.attackSerial;combo=std::clamp(p.combo,1,3);
-            attackDuration=p.form==0&&p.combo>0?motionClips[3+combo].duration/p.gear.speed():.36f;attackTime=p.hitStop>0?attackDuration*.5f:attackDuration;}
+            attackDuration=p.form==0&&p.combo>0?motionClips[3+combo].duration/p.gear.speed():.36f;attackTime=p.hitStop>0?attackDuration*(1-motionClips[3+combo].contact):attackDuration;}
         if(p.hurtSerial!=hurtSerial){hurtSerial=p.hurtSerial;hurtTime=.23f;}
         if(!wasGrounded&&p.grounded&&p.health>0)landTime=std::abs(p.vx)>20?.06f:.12f;
         wasGrounded=p.grounded;
@@ -170,7 +170,7 @@ struct Animation {
         if(next!=state||retrigger){state=next;time=0;}else time+=visualDt;
         const auto clip=motionClips[next];int index=0;
         if(next==0)index=static_cast<int>(time/clip.duration*clip.count)%clip.count;
-        else if(next==1||next==11){travelPhase=std::fmod(travelPhase+distance/(next==1?96.f:72.f),1.f);index=static_cast<int>(travelPhase*clip.count);}
+        else if(next==1||next==11){travelPhase=std::fmod(travelPhase+distance/clip.stride,1.f);index=static_cast<int>(travelPhase*clip.count);}
         else if(next==2)index=static_cast<int>((1-std::clamp(-p.vy/650.f,0.f,1.f))*(clip.count-1));
         else if(next==3)index=static_cast<int>(std::clamp(p.vy/700.f,0.f,1.f)*(clip.count-1));
         else if(next>=4&&next<=6)index=static_cast<int>((1-attackTime/attackDuration)*clip.count);
