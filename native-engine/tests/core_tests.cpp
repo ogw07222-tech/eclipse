@@ -1,31 +1,33 @@
 #include "../src/core.hpp"
-#include <cmath>
 #include <cstdlib>
 #include <iostream>
-void check(bool value,const char* message) { if(!value) { std::cerr<<message<<'\n'; std::exit(1); } }
-int main() {
-    eclipse::Input input;
-    input.pointer(1,35,220,true); input.pointer(2,400,220,true);
-    auto a=input.sample(); check(a.left && a.attack,"Movement plus attack must coexist");
-    check(!input.sample().attack,"Holding attack must not auto-repeat");
-    input.pointer(2,0,0,false); check(input.sample().left,"Releasing attack must retain movement");
-    input.keys.right=true; input.pointer(1,0,0,false);
-    check(input.sample().right,"Touch release must not cancel keyboard");
-    input.pointer(3,230,220,true); check(input.sample().jump,"Jump press edge");
-    check(!input.sample().jump,"Holding jump must not repeat");
-    input.reset(); a=input.sample(); check(!a.left && !a.right && !a.jump && !a.attack,"Focus reset");
-    for(int i=0;i<16;++i) input.pointer(i,400,220,true);
-    input.reset(); check(!input.sample().attack,"Pointer capacity/reset");
-    eclipse::Actor p;
-    p.step(static_cast<float>(eclipse::fixedStep),{false,true,false,false});
-    check(std::abs(p.x-152.25f)<.01f && p.frame>=6 && p.frame<14,"Movement and run atlas range");
-    p.step(static_cast<float>(eclipse::fixedStep),{false,false,true,false});
-    check(!p.grounded && p.vy<0 && p.frame>=14 && p.frame<18,"Jump and atlas range");
-    for(int i=0;i<120;++i) p.step(static_cast<float>(eclipse::fixedStep),{});
-    check(p.grounded && p.y==eclipse::floorY-64,"Landing");
-    p.step(static_cast<float>(eclipse::fixedStep),{false,false,false,true});
-    check(p.frame>=21 && p.frame<27,"Attack uses actual attack atlas cells");
-    for(int i=0;i<1000;++i) p.step(static_cast<float>(eclipse::fixedStep),{true,false,false,false});
-    check(p.x==0,"World left clamp");
-    std::cout<<"PASS: input ownership/edges/reset/capacity and movement/jump/animation/walls\n";
+#include <stdexcept>
+using namespace eclipse;
+void check(bool b,const char* message){if(!b)throw std::runtime_error(message);}
+void near(float a,float b){check(std::abs(a-b)<.025f,"Numeric value differs");}
+void wait(Combat& g,int frames){for(int i=0;i<frames;++i)g.step(1.f/60,{});}
+Combat arena(){Combat g;for(auto& e:g.enemies){e.x=1500;e.attackTimer=1000;}return g;}
+int main(){int failed=0,total=0;
+    auto test=[&](const char* name,auto fn){++total;try{fn();std::cout<<"PASS "<<name<<'\n';}catch(const std::exception& e){++failed;std::cerr<<"FAIL "<<name<<": "<<e.what()<<'\n';}};
+    test("Initial four enemy wave",[]{Combat g;check(g.foes()==4&&g.player.health==100&&!g.ended,"Initial wave");check(g.enemies[0].health==55&&g.enemies[1].health==85,"Enemy types");near(g.enemies[3].x,1285);});
+    test("Movement facing walls",[]{auto g=arena();Actions a;a.right=true;g.step(1.f/60,a);near(g.player.x,140+280.f/60);g.player.x=1549;g.step(1.f/60,a);near(g.player.x,1550);a={};a.left=true;g.player.x=26;g.step(1.f/60,a);near(g.player.x,25);check(g.player.facing== -1,"Facing");});
+    test("Jump apex and landing",[]{auto g=arena();Actions a;a.jump=true;g.step(1.f/60,a);check(!g.player.grounded&&g.player.vy<0,"Jump");float highest=g.player.y;for(int i=0;i<90;++i){g.step(1.f/60,{});highest=std::min(highest,g.player.y);}check(floorY-highest>160&&floorY-highest<180,"Apex");check(g.player.grounded&&g.player.vy==0,"Landing");});
+    test("Dash immunity and cooldown",[]{auto g=arena();Actions a;a.dash=true;g.step(1.f/60,a);near(g.player.vx,780);g.damagePlayer(15);check(g.player.health==100,"Dash immunity");wait(g,12);float cooldown=g.player.dashCooldown;g.step(1.f/60,a);check(g.player.dashLeft==0&&g.player.dashCooldown<cooldown,"Cooldown");wait(g,60);g.step(1.f/60,a);check(g.player.dashLeft>0,"Reactivation");});
+    test("Three hit combo and finisher bleed",[]{auto g=arena();auto& e=g.enemies[0];Actions a;a.attack=true;e.x=200;g.step(1.f/60,a);check(e.health==43&&g.player.combo==1,"First hit");wait(g,16);e.x=200;g.step(1.f/60,a);check(e.health==28&&g.player.combo==2,"Second hit");wait(g,17);e.x=200;g.step(1.f/60,a);check(e.health==5&&g.player.combo==3&&e.bleed>4,"Finisher");});
+    test("Combo window timeout",[]{auto g=arena();Actions a;a.attack=true;g.step(1.f/60,a);wait(g,55);g.step(1.f/60,a);check(g.player.combo==1,"Reset combo");});
+    test("Bleed fire reaction consumes once",[]{auto g=arena();auto& e=g.enemies[0];g.hit(e,1,false,true);g.hit(e,11,true);check(e.health==21&&e.bleed==0&&e.burn>0&&e.reactionFlash>0,"Reaction +22");g.hit(e,1,true);check(e.health==20,"No repeat reaction");});
+    test("Bleed and burn ticks",[]{auto g=arena();g.hit(g.enemies[0],1,false,true);wait(g,46);check(g.enemies[0].health==51,"Bleed tick");g.hit(g.enemies[1],1,true);wait(g,37);check(g.enemies[1].health==82,"Burn tick");});
+    test("Both swap entry attacks cooldown",[]{auto g=arena();Actions a;a.swap=true;g.step(1.f/60,a);check(g.player.form==1&&g.projectiles.size()==1&&g.projectiles[0].damage==14,"Mage entry");g.step(1.f/60,a);check(g.player.form==1&&g.projectiles.size()==1,"Swap cooldown");wait(g,61);g.enemies[0].x=200;g.step(1.f/60,a);check(g.player.form==0&&g.enemies[0].health==42,"Sword entry");});
+    test("Mage empowered projectile collision",[]{auto g=arena();g.player.form=1;Actions a;a.skill=true;g.step(1.f/60,a);check(g.projectiles.size()==1&&g.projectiles[0].empowered,"Skill");near(g.player.skillCooldown,4.1f);g.enemies[0].x=230;wait(g,12);check(g.enemies[0].health==30&&g.enemies[0].burn>0,"Collision and burn");});
+    test("Nine item stats health adjustment",[]{Player p;p.equip(0);p.equip(1);check(p.gear.attack()==6&&p.gear.defense()==4&&p.maxHealth()==130&&p.health==130,"Armor weapon");near(p.gear.speed(),.792f);near(p.gear.range(),1.16f);p.equip(2);check(p.gear.attack()==9,"Flame charm");p.equip(1);check(p.health==110&&p.maxHealth()==110,"Health adjustment");p.equip(2);check(p.gear.defense()==3&&p.maxHealth()==125,"Guardian charm");});
+    test("Damage immunity defeat freeze",[]{auto g=arena();g.damagePlayer(9);g.damagePlayer(9);check(g.player.health==91,"Damage immunity");wait(g,45);g.damagePlayer(999);check(g.ended&&!g.won&&g.player.health==0,"Defeat");float x=g.player.x;Actions a;a.right=true;g.step(1.f/60,a);near(g.player.x,x);});
+    test("Stage clear",[]{auto g=arena();for(auto& e:g.enemies)g.hit(e,1000,false);g.step(1.f/60,{});check(g.ended&&g.won&&g.foes()==0,"Clear");});
+    test("Restart clears gear projectiles effects",[]{auto g=arena();g.player.form=1;g.player.equip(0);Actions a;a.attack=true;g.step(1.f/60,a);g.hit(g.enemies[0],1,true);a={};a.restart=true;g.step(1.f/60,a);check(g.foes()==4&&g.projectiles.empty()&&g.popups.empty()&&!g.ended&&g.player.form==0&&g.player.gear.selected[0]==0,"Restart state");});
+    test("Rear and vertical melee excluded",[]{auto g=arena();g.enemies[0].x=80;Actions a;a.attack=true;g.step(1.f/60,a);check(g.enemies[0].health==55,"Rear hit");wait(g,18);g.player.y=400;g.player.grounded=false;g.enemies[0].x=200;a={};a.skill=true;g.step(1.f/60,a);check(g.enemies[0].health==55,"Vertical hit");});
+    test("Multitouch independent keyboard ownership",[]{Input in;in.pointer(1,60,650,true);in.pointer(2,1160,590,true);auto a=in.sample();check(a.left&&a.attack,"Move plus attack");check(!in.sample().attack,"Held attack edge");in.pointer(2,0,0,false);check(in.sample().left,"Attack up retains movement");Actions k;k.right=true;in.keyboard(k);in.pointer(1,0,0,false);check(in.sample().right,"Keyboard retained");in.reset();check(!in.sample().right,"Reset");});
+    test("Fast tap buffered between simulation steps",[]{Input in;in.pointer(1,1160,590,true);in.pointer(1,0,0,false);check(in.sample().attack,"Fast touch lost");check(!in.sample().attack,"Single consume");});
+    test("Joystick upward jump and focus reset",[]{Input in;in.pointer(1,99,610,true);check(in.sample().jump,"Up jump");check(!in.sample().jump,"Held jump repeated");in.reset();check(!in.sample().jump,"Focus clear");});
+    test("Inventory equip and retry touch targets",[]{Input in;in.pointer(1,800,40,true);check(in.sample().inventory,"Inventory");in.reset();in.pointer(2,90,430,true,false,true);check(in.sample().weapon,"Weapon");in.reset();in.pointer(3,600,440,true,true,false);check(in.sample().restart,"Retry");});
+    test("Animation attack retrigger and death bounds",[]{Player p;Animation a;++p.attackSerial;p.combo=3;a.step(p,1.f/60);check(a.frame>=33&&a.frame<41,"Third attack atlas");p.health=0;for(int i=0;i<100;++i)a.step(p,1.f/60);check(a.frame==54,"Death last frame");});
+    std::cout<<total-failed<<'/'<<total<<" passed\n";return failed?1:0;
 }

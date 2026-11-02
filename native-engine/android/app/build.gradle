@@ -1,0 +1,50 @@
+plugins { id 'com.android.application' }
+
+def sdlSource = file('../vendor/SDL')
+if (!new File(sdlSource, 'android-project/app/src/main/java/org/libsdl/app/SDLActivity.java').exists()) {
+    throw new GradleException('SDL Android sources missing. Run python3 native-engine/tools/prepare_android.py first.')
+}
+def artSource = file('../../../Assets/Resources/Eclipse')
+def packagedArt = layout.buildDirectory.dir('generated/eclipseAssets')
+tasks.register('packageEclipseAssets', Sync) {
+    from artSource
+    include 'knight_sheet_48x64_v2.png', 'ui/attack_states.png', 'ui/dash_states.png', 'ui/swap_skill_states.png', 'ui/joystick_arrows_new.png'
+    into packagedArt
+}
+
+android {
+    namespace 'com.eclipse.nativegame'
+    compileSdk 35
+    ndkVersion '27.2.12479018'
+    defaultConfig {
+        applicationId 'com.eclipse.nativegame'
+        minSdk 26
+        targetSdk 35
+        versionCode Integer.parseInt(providers.gradleProperty('eclipseVersionCode').getOrElse('1'))
+        versionName '0.4.0'
+        ndk { abiFilters.addAll(providers.gradleProperty('eclipseAbis').getOrElse('arm64-v8a').split(',') as List) }
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_STL=c++_static', '-DECLIPSE_TESTS=OFF', '-DECLIPSE_HEADLESS=OFF',
+                    "-DFETCHCONTENT_SOURCE_DIR_SDL3=${sdlSource.absolutePath}", '-DCMAKE_BUILD_TYPE=Release'
+                targets 'main', 'SDL3-shared', 'SDL3_image-shared'
+            }
+        }
+    }
+    sourceSets {
+        main {
+            java.srcDirs += new File(sdlSource, 'android-project/app/src/main/java')
+            assets.srcDir packagedArt
+        }
+    }
+    externalNativeBuild {
+        cmake { path file('../../CMakeLists.txt'); version '3.31.6' }
+    }
+    buildTypes {
+        debug { debuggable true; jniDebuggable false }
+        release { minifyEnabled false }
+    }
+    androidResources { noCompress += ['png'] }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
+tasks.named('preBuild').configure { dependsOn 'packageEclipseAssets' }
