@@ -99,7 +99,7 @@ int main(int argc,char** argv) {
  if(e.type==SDL_EVENT_MOUSE_BUTTON_DOWN || (e.motion.state & SDL_BUTTON_LMASK)) {
  float mx=e.type==SDL_EVENT_MOUSE_BUTTON_DOWN?e.button.x:e.motion.x;
  float my=e.type==SDL_EVENT_MOUSE_BUTTON_DOWN?e.button.y:e.motion.y;
- float ww=0,hh=0; SDL_GetWindowSize(window,(int*)&ww,(int*)&hh);
+ int wi=0,hi=0; SDL_GetWindowSize(window,&wi,&hi); float ww=(float)wi,hh=(float)hi;
  if(ww>0&&hh>0)setPointer(mx*VW/ww,my*VH/hh,true);
  }break;
  case SDL_EVENT_MOUSE_BUTTON_UP:setPointer(0,0,false);break;
