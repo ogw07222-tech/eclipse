@@ -42,6 +42,9 @@ def restart():
     action_and_wait(lambda: adb('shell', 'input', 'keyevent', 'KEYCODE_R'), 'restart=1')
 
 try:
+    # Fresh emulator images finish package/IME provisioning after boot_completed.
+    time.sleep(20)
+    adb('shell', 'wm', 'dismiss-keyguard')
     adb('install', '-r', str(apk))
     adb('logcat', '-c')
     adb('shell', 'am', 'start', '-W', '-n', 'com.eclipse.nativegame/.MainActivity')
@@ -75,5 +78,8 @@ try:
     assert 'FATAL EXCEPTION' not in text and 'Fatal signal' not in text, 'Android native crash'
     print('PASS Android emulator: landscape/launch/textures/touch inventory/equip/swap/background/restart')
 finally:
+    capture('final')
+    (out / 'windows.txt').write_bytes(adb('shell', 'dumpsys', 'window', 'windows'))
+    (out / 'input.txt').write_bytes(adb('shell', 'dumpsys', 'input'))
     history.append(logs())
     (out / 'logcat.txt').write_text('\n--- ACTION BOUNDARY ---\n'.join(history))
