@@ -89,8 +89,8 @@ fun GitHubReader() {
         Text("공개 저장소를 읽는 기능입니다. 로그인이나 파일 수정은 지원하지 않아요.", color = Color.LightGray)
         OutlinedTextField(value=repo,onValueChange={repo=it},label={Text("저장소 (소유자/이름)")},singleLine=true,modifier=Modifier.fillMaxWidth())
         Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-            Button(onClick={load("")},shape=RectangleShape,enabled=!busy) {Text("저장소 열기")}
-            Button(onClick={load(folder.substringBeforeLast('/',""))},shape=RectangleShape,enabled=!busy) {Text("상위 폴더")}
+            Button(onClick={ load("") },shape=RectangleShape,enabled=!busy) {Text("저장소 열기")}
+            Button(onClick={ load(folder.substringBeforeLast('/',"")) },shape=RectangleShape,enabled=!busy) {Text("상위 폴더")}
         }
         Text(message, color = Color.LightGray)
         if(preview.isNotEmpty()) {
