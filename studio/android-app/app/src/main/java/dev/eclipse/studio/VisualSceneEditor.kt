@@ -73,6 +73,7 @@ internal fun VisualSceneEditor() {
     var nextId by remember { mutableIntStateOf(1) }
     var status by remember { mutableStateOf("PNG를 가져와서 화면에 배치해 보세요.") }
     var zoom by remember { mutableFloatStateOf(1f) }
+    var playing by remember { mutableStateOf(false) }
     val picker=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if(uri!=null) {
             try {
@@ -105,8 +106,13 @@ internal fun VisualSceneEditor() {
             }
         }
     }
+    if (playing) {
+        PlayPreview(objects.toList(), onExit = { playing = false })
+        return
+    }
     Column(Modifier.fillMaxSize().background(Color(0xFF14181D)).padding(6.dp)) {
         Row(horizontalArrangement=Arrangement.spacedBy(6.dp),verticalAlignment=Alignment.CenterVertically) {
+            Sharp("▶ 플레이", { playing = true })
             Sharp("+ PNG 추가",{picker.launch(arrayOf("image/png"))})
             Sharp("저장",{
                 try { saveScene(context,objects.toList());status="앱 내부에 씬을 저장했어요." }
