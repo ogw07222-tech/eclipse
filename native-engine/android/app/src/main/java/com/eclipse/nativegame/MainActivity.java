@@ -1,6 +1,7 @@
 package com.eclipse.nativegame;
 
 import android.view.KeyEvent;
+import android.util.Log;
 import org.libsdl.app.SDLActivity;
 
 public final class MainActivity extends SDLActivity {
@@ -16,6 +17,9 @@ public final class MainActivity extends SDLActivity {
     // Unmapped Android system keys retain SDL/Activity's normal handling.
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_R) {
+            Log.i("ECLIPSE", "Activity R action=" + event.getAction() + " focus=" + hasWindowFocus());
+        }
         if (!mBrokenLibraries
                 && (event.getAction() == KeyEvent.ACTION_DOWN || event.getAction() == KeyEvent.ACTION_UP)
                 && nativeOnGameKey(event.getKeyCode(), event.getAction() == KeyEvent.ACTION_DOWN)) {
