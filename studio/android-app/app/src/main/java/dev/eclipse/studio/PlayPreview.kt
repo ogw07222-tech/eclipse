@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -20,6 +21,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
@@ -49,6 +51,8 @@ internal fun PlayPreview(objects: List<VisualObject>, onExit: () -> Unit) {
     var hits by remember { mutableIntStateOf(0) }
     var targetHealth by remember { mutableIntStateOf(3) }
     var faceRight by remember { mutableStateOf(true) }
+    var holdLeft by remember { mutableStateOf(false) }
+    var holdRight by remember { mutableStateOf(false) }
     val targetX = 340f
     val targetY = 190f
     val width = (player?.width ?: 32).coerceIn(1,160).toFloat()
@@ -57,6 +61,8 @@ internal fun PlayPreview(objects: List<VisualObject>, onExit: () -> Unit) {
     LaunchedEffect(player?.id) {
         while (true) {
             delay(16)
+            if (holdLeft) { x=(x-3.4f).coerceIn(0f,480f-width);faceRight=false }
+            if (holdRight) { x=(x+3.4f).coerceIn(0f,480f-width);faceRight=true }
             vy = (vy + 0.44f).coerceAtMost(12f)
             y += vy
             val groundTop = groundY - height
@@ -116,8 +122,8 @@ internal fun PlayPreview(objects: List<VisualObject>, onExit: () -> Unit) {
             }
         }
         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(6.dp)) {
-            Control("◀") { faceRight=false; x=(x-14f).coerceIn(0f,480f-width) }
-            Control("▶") { faceRight=true; x=(x+14f).coerceIn(0f,480f-width) }
+            HoldControl("◀", { holdLeft=it })
+            HoldControl("▶", { holdRight=it })
             Control("점프") { if(grounded) { vy=-10f; grounded=false } }
             Control("공격") {
                 val closeEnough = if(faceRight) x+width <= targetX+26f && targetX-(x+width) <= 55f
@@ -129,7 +135,7 @@ internal fun PlayPreview(objects: List<VisualObject>, onExit: () -> Unit) {
             }
             Control("재시작") { x=(player?.x ?: 70).toFloat();y=(player?.y ?: 80).toFloat();vy=0f;hits=0;targetHealth=3 }
         }
-        Text("버튼을 누를 때마다 이동 · 표적에 가까이 가서 공격해 HP를 0으로 만들기",
+        Text("방향키는 길게 누르면 계속 이동 · 표적을 공격해서 HP 0 만들기",
             color=Color.LightGray,fontSize=11.sp)
     }
 }
@@ -138,4 +144,19 @@ internal fun PlayPreview(objects: List<VisualObject>, onExit: () -> Unit) {
 private fun Control(label: String, action: () -> Unit) {
     Button(onClick=action, shape=RectangleShape, colors=ButtonDefaults.buttonColors(containerColor=Color(0xFF364651)),
         contentPadding=PaddingValues(horizontal=13.dp,vertical=12.dp)) { Text(label,fontSize=16.sp) }
+}
+
+@Composable
+private fun HoldControl(label: String, onHold: (Boolean)->Unit) {
+    Box(
+        Modifier.border(1.dp,Color(0xFF80909D)).background(Color(0xFF364651))
+            .pointerInput(Unit) {
+                detectTapGestures(onPress = {
+                    onHold(true)
+                    try { tryAwaitRelease() } finally { onHold(false) }
+                })
+            }
+            .padding(horizontal=23.dp,vertical=13.dp),
+        contentAlignment=Alignment.Center
+    ) { Text(label,color=Color.White,fontSize=16.sp) }
 }
