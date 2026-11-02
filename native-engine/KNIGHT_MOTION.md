@@ -1,6 +1,6 @@
 # Coarse knight animation
 
-The runtime now uses `Assets/Resources/Eclipse/knight_motion.png`: 768×576 pixels, 16 columns × 12 rows, 48×48 cells. Each design pixel renders as a 3×3 world-pixel block. There are 104 playable frames; unused cells are transparent. The legacy Unity/Godot atlas is preserved.
+The runtime now uses `Assets/Resources/Eclipse/knight_motion.png`: 1024×576 pixels, 16 columns × 12 rows, 64×48 cells. Each design pixel renders as a 3×3 world-pixel block. There are 104 playable frames; unused cells are transparent. The legacy Unity/Godot atlas is preserved.
 
 | Row | Clip | Frames |
 | --- | --- | --- |
@@ -19,7 +19,7 @@ The runtime now uses `Assets/Resources/Eclipse/knight_motion.png`: 768×576 pixe
 
 The approved coarse concept supplied the helmet, torso, limb and boot pixels in `Art/knight/rig`. An offline rig assembles these parts with connected dark under-armor, two-bone joint constraints, eased attack poses and a secondary cape shape. One fixed sword PNG is attached to the foreground right hand in every pose, including death. There are no baked sword waves. Palette export retains transparent backgrounds and opaque dark cloth/armor.
 
-Runtime run/walk phase uses actual player travel (96/72 world pixels per cycle), including equipment speed. It stops advancing at walls. Rising, falling and landing have separate clips. Attack clips fit the existing cooldowns and finish all frames; confirmed hit-stop holds the contact pose. Combat damage, range, gear stats and cooldown values are unchanged.
+Runtime run/walk phase uses actual player travel (120/72 world pixels per cycle), including equipment speed. It stops advancing at walls. Rising, falling and landing have separate clips. Attack clips fit the existing cooldowns and finish all frames; confirmed hit-stop holds the contact pose. Combat damage, range, gear stats and cooldown values are unchanged.
 
 ## Development and review
 
@@ -38,3 +38,11 @@ ffmpeg -framerate 12 -i /tmp/eclipse-review/frame-%04d.bmp -c:v libx264 -pix_fmt
 ```
 
 This renders all clips using the production Animation adapter, then runs a live Combat replay with movement, jump, dash, attacks, skill, swap, defeat and restart. The Actions review artifact contains the video, atlas and constraint metrics. Native Android CI additionally tests real touch run, attack, dash and jump on its emulator.
+
+## Whole-body action revision
+
+Sprint has a 40% contact window per leg, an airborne interval, longer fixed leg bones, forward body pitch and counter-swing. Weak/strong cuts shift the pelvis and change shoulder orientation, with a short fast strike between preparation and recovery. Thrust spreads the feet to a 20-design-pixel lunge and extends the right arm. Dash lowers the torso close to horizontal. The same sword remains attached to the right hand at a fixed size.
+
+The wider 64×48 cell preserves the extended blade. The renderer uses the mirrored registration point when facing left, keeping the actor rooted instead of shifting it sideways. Hit-stop contact phases are per attack. Combat damage, cooldowns and world movement speeds remain unchanged.
+
+Motion review now runs actual jump/fall/landing and dash physics. Individual attacks execute once and recover; the final live-combat section still exercises the full action sequence. A local before/after comparison uses the previous main animation and the revised animation with the same review controls and camera crops.

@@ -2,6 +2,7 @@
 #include <SDL3/SDL_main.h>
 #include "presentation.hpp"
 #include <memory>
+#include <fstream>
 
 namespace {
 SDL_Window* window=nullptr;SDL_Renderer* renderer=nullptr;
@@ -63,34 +64,41 @@ int main(int argc,char** argv){
     if(!view->load()){SDL_Log("ECLIPSE asset load failed: %s",SDL_GetError());view.reset();cleanup();return 1;}
     SDL_Log("ECLIPSE ready: five PNG textures, combat scene, 1280x720");
     if(smoke){
-        for(int scene=0;scene<5;++scene){game.restart();if(scene==1){game.player.form=1;game.hit(game.enemies[0],1,false,true);game.hit(game.enemies[0],1,true);}
+        for(int scene=0;scene<6;++scene){game.restart();if(scene==1){game.player.form=1;game.hit(game.enemies[0],1,false,true);game.hit(game.enemies[0],1,true);}
             if(scene==2)game.inventory=true;
             if(scene==3){game.ended=true;game.won=true;}
             if(scene==4){game.ended=true;game.player.health=0;}
+            if(scene==5)game.player.facing=-1;
             animation.step(game.player,1.f/60);const std::string capture=argc>2?std::string(argv[2])+"/scene-"+std::to_string(scene)+".bmp":"";
             view->draw(game,animation,camera,{},argc>2?capture.c_str():nullptr);
         }
-        SDL_Log("PASS five combat/UI scenes and all five PNG textures");view.reset();cleanup();return 0;
+        SDL_Log("PASS six combat/UI/facing scenes and all five PNG textures");view.reset();cleanup();return 0;
     }
     if(argc>2&&std::string(argv[1])=="--motion-review"){
         constexpr const char* names[]={"IDLE","RUN","JUMP","FALL","WEAK SLASH","STRONG SLASH","THRUST","DASH","HURT","DEATH","LAND","WALK"};
-        int captureIndex=0;
+        int captureIndex=0;std::ofstream positions(std::string(argv[2])+"/positions.csv");positions<<"frame,x,y,motion\n";
         for(int motion=0;motion<12;++motion){
-            game.restart();animation.reset();float previousPhase=1;
+            game.restart();animation.reset();
             for(int n=0;n<90;++n){
-                auto& p=game.player;const float dt=1.f/60;float duration=eclipse::motionClips[motion].duration;
-                float phase=std::fmod(n*dt,duration)/duration;bool trigger=phase<previousPhase;previousPhase=phase;
+                auto& p=game.player;const float dt=1.f/60;
                 if(motion==1||motion==11){p.vx=motion==1?280:120;p.x+=p.vx*dt;}
-                if(motion==2||motion==3){p.grounded=false;p.vy=motion==2?-650*(1-phase):700*phase;}
-                if(motion>=4&&motion<=6){p.combo=motion-3;if(trigger)++p.attackSerial;}
-                if(motion==7){p.dashLeft=.15f*(1-phase);p.vx=780;p.x+=p.vx*dt;}
-                if(motion==8&&trigger)++p.hurtSerial;
-                if(motion==9)p.health=0;
-                if(motion==10&&trigger)animation.wasGrounded=false;
+                if(motion==2||motion==3||motion==7||motion==10){
+                    if(n==0&&(motion==3||motion==10)){p.y-=motion==3?165:20;p.grounded=false;p.vy=motion==3?0:200;}
+                    eclipse::Actions reviewAction{};reviewAction.jump=motion==2&&n==0;reviewAction.dash=motion==7&&(n==0||n==60);
+                    game.step(dt,reviewAction);
+                }
+                if(motion>=4&&motion<=6){
+                    if(n==0&&motion>4){p.combo=motion-4;p.comboWindow=1;}
+                    eclipse::Actions reviewAction{};reviewAction.attack=n==12;game.step(dt,reviewAction);
+                }
+                if(motion==8){if(n==12)game.damagePlayer(9);game.step(dt,{});}
+                if(motion==9&&n>=12)p.health=0;
                 animation.step(p,dt);if(n%5)continue;
                 char filename[64];std::snprintf(filename,sizeof(filename),"/frame-%04d.bmp",captureIndex++);
                 const auto capture=std::string(argv[2])+filename;
-                view->draw(game,animation,std::clamp(p.x,640.f,960.f),{},capture.c_str(),names[motion]);
+                const float reviewCamera=std::clamp(p.x,640.f,960.f);
+                positions<<captureIndex-1<<","<<p.x-reviewCamera+640<<","<<p.y<<","<<names[motion]<<"\n";
+                view->draw(game,animation,reviewCamera,{},capture.c_str(),names[motion]);
             }
             SDL_Log("REVIEW %s complete",names[motion]);
         }
@@ -102,6 +110,7 @@ int main(int argc,char** argv){
             tick(action);if(n%5)continue;
             char filename[64];std::snprintf(filename,sizeof(filename),"/frame-%04d.bmp",captureIndex++);
             const auto capture=std::string(argv[2])+filename;
+            positions<<captureIndex-1<<","<<game.player.x-camera+640<<","<<game.player.y<<",COMBAT REPLAY\n";
             view->draw(game,animation,camera,{},capture.c_str(),"COMBAT REPLAY");
         }
         SDL_Log("REVIEW live combat replay complete");
