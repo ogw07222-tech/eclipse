@@ -54,6 +54,7 @@ try:
         if time.monotonic() > deadline:
             raise RuntimeError('Game did not enter landscape orientation')
         time.sleep(.5)
+    tap(640, 250)  # establish an initial real surface interaction before keyboard checks
     restart()
     capture('01-combat')
     action_and_wait(lambda: tap(800, 40), 'inventory=1')
