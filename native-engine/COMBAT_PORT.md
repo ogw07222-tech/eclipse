@@ -26,3 +26,5 @@ The Native Android APK workflow builds ARM64 and separately tests the applicatio
 Install the ARM64 APK on the Galaxy Tab S10+ and verify simultaneous joystick+actions, Android16 safe areas/fullscreen, text/icon readability, background/resume, clear/defeat/retry, frame pacing, heat and memory. Android29 emulator results only cover that emulator/ABI. Full Android16/device performance is not established by a successful build.
 
 The first Android execution exposed SDL's resizable-window orientation override: the Activity manifest alone did not keep landscape. Native startup now explicitly restricts SDL orientations and uses Android fullscreen; the emulator asserts landscape before mapping taps. Independent smoke scenarios restart the live stage to avoid unrelated enemy damage expiring the test character.
+
+Android game-key dispatch is explicitly routed through SDLActivity.handleKeyEvent rather than depending on child-view focus after fullscreen changes. The unchanged emulator test requires the real R-key restart event; it is not replaced by a model reset or test-only invulnerability.
