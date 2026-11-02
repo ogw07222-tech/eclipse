@@ -1,0 +1,145 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+
+concurrency:
+  group: android-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  configuration:
+    name: Check Unity license configuration
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check required repository secrets without printing their values
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        shell: bash
+        run: |
+          missing=()
+          if [[ -z "$UNITY_LICENSE" && -z "$UNITY_SERIAL" ]]; then
+            missing+=("UNITY_LICENSE (Personal) or UNITY_SERIAL (Pro)")
+          fi
+          if [[ -z "$UNITY_EMAIL" ]]; then missing+=("UNITY_EMAIL"); fi
+          if [[ -z "$UNITY_PASSWORD" ]]; then missing+=("UNITY_PASSWORD"); fi
+          if (( ${#missing[@]} )); then
+            {
+              echo '## APK build needs Unity license setup'
+              echo 'No APK was built. Add these repository Actions secrets:'
+              for item in "${missing[@]}"; do printf -- '- `%s`\n' "$item"; done
+              echo
+              echo 'Setup: https://github.com/${{ github.repository }}/blob/main/Docs/ANDROID_CI.md'
+              echo 'Secrets: https://github.com/${{ github.repository }}/settings/secrets/actions'
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo '::error::Missing Unity license secrets. See the job summary and Docs/ANDROID_CI.md.'
+            exit 1
+          fi
+          echo 'Unity license secrets are configured. Their validity is checked during Unity activation.' >> "$GITHUB_STEP_SUMMARY"
+
+  apk:
+    name: Unity 6.3 - Android ARM64 APK
+    needs: configuration
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Validate scene and original assets
+        run: python3 Tools/validate_unity_project.py
+
+      - name: Free unused runner SDK space (Unity container supplies Android SDK)
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup
+          df -h .
+
+      - name: Cache Unity Android imports
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-Android-${{ runner.os }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Android-${{ runner.os }}-
+
+      - name: Build development APK
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: auto
+          targetPlatform: Android
+          buildMethod: Eclipse.Editor.EclipseBuild.AndroidApk
+          buildsPath: Builds
+          buildName: ECLIPSE
+          androidExportType: androidPackage
+          versioning: None
+
+      - name: Verify APK contents and write checksum
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile
+          apk = Path('Builds/Android/ECLIPSE.apk')
+          if not apk.is_file() or apk.stat().st_size == 0:
+              raise SystemExit('Expected APK not found: ' + str(apk))
+          with zipfile.ZipFile(apk) as archive:
+              names = archive.namelist()
+              if archive.testzip() is not None:
+                  raise SystemExit('APK ZIP integrity failed')
+              if 'AndroidManifest.xml' not in names:
+                  raise SystemExit('APK AndroidManifest.xml missing')
+              if not any(name.startswith('lib/arm64-v8a/') for name in names):
+                  raise SystemExit('ARM64 native libraries missing')
+          print('Verified Android ARM64 APK:', apk.stat().st_size, 'bytes')
+          PY
+          cd Builds/Android
+          sha256sum ECLIPSE.apk > ECLIPSE.apk.sha256
+
+      - name: Upload installable APK
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ECLIPSE-Android-APK-${{ github.run_number }}
+          path: |
+            Builds/Android/ECLIPSE.apk
+            Builds/Android/ECLIPSE.apk.sha256
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
+      - name: Download instructions
+        env:
+          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+        run: |
+          {
+            echo '## ECLIPSE Android APK'
+            echo "Download: $ARTIFACT_URL"
+            echo 'Extract the artifact ZIP and install ECLIPSE.apk on your Android tablet.'
+            echo 'Unity 6000.3.0f1 / ARM64 / IL2CPP / landscape / development build.'
+            echo "Source commit: $GITHUB_SHA"
+            echo 'This is a device-test APK, not a Play Store release.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Preserve build log files when available
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ECLIPSE-Android-logs-${{ github.run_number }}
+          path: |
+            artifacts/**/*.log
+            Builds/**/*.log
+            Logs/Editor.log
+          if-no-files-found: ignore
+          retention-days: 7

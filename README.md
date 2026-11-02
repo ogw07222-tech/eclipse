@@ -39,6 +39,10 @@ Build on a Windows/macOS/Linux computer; Unity Editor does not run on Android.
 
 Android is configured for landscape, IL2CPP, ARM64, package `com.eclipse.combat`, minimum API 26. The menu produces a **development APK**, not a signed store release. No APK has been produced in the current environment.
 
+## Build APK with GitHub Actions
+
+Open [Actions → Build Android APK](https://github.com/ogw07222-tech/eclipse/actions/workflows/android-apk.yml) and choose **Run workflow**. Main changes to Unity source/settings also trigger it. Download the APK from the successful run’s **Artifacts**. One-time Unity license Secrets are required; see [Docs/ANDROID_CI.md](Docs/ANDROID_CI.md). Missing configuration is reported before downloading Unity.
+
 ## Source map
 
 - `Assets/Eclipse/Core/CombatSimulation.cs`: engine-independent fixed-step gameplay and equipment rules.
