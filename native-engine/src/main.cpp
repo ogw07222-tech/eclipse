@@ -2,9 +2,6 @@
 #include <SDL3/SDL_main.h>
 #include "presentation.hpp"
 #include <memory>
-#ifdef SDL_PLATFORM_ANDROID
-#include <jni.h>
-#endif
 
 namespace {
 SDL_Window* window=nullptr;SDL_Renderer* renderer=nullptr;
@@ -49,27 +46,6 @@ void tick(eclipse::Actions action){
 }
 void cleanup(){if(renderer)SDL_DestroyRenderer(renderer);if(window)SDL_DestroyWindow(window);SDL_Quit();}
 }
-#ifdef SDL_PLATFORM_ANDROID
-// Android KeyEvent constants mapped to the same scancodes used on desktop.
-// SDL_PushEvent is thread-safe; the simulation is still mutated only on its thread.
-extern "C" JNIEXPORT jboolean JNICALL
-Java_com_eclipse_nativegame_MainActivity_nativeOnGameKey(JNIEnv*,jclass,jint key,jboolean down){
-    SDL_Scancode scan=SDL_SCANCODE_UNKNOWN;
-    switch(key){
-        case 29:scan=SDL_SCANCODE_A;break;case 32:scan=SDL_SCANCODE_D;break;case 51:scan=SDL_SCANCODE_W;break;
-        case 38:scan=SDL_SCANCODE_J;break;case 54:scan=SDL_SCANCODE_Z;break;case 39:scan=SDL_SCANCODE_K;break;
-        case 52:scan=SDL_SCANCODE_X;break;case 40:scan=SDL_SCANCODE_L;break;case 31:scan=SDL_SCANCODE_C;break;
-        case 37:scan=SDL_SCANCODE_I;break;case 46:scan=SDL_SCANCODE_R;break;
-        case 8:scan=SDL_SCANCODE_1;break;case 9:scan=SDL_SCANCODE_2;break;case 10:scan=SDL_SCANCODE_3;break;
-        case 62:scan=SDL_SCANCODE_SPACE;break;case 61:scan=SDL_SCANCODE_TAB;break;
-        case 59:scan=SDL_SCANCODE_LSHIFT;break;case 60:scan=SDL_SCANCODE_RSHIFT;break;
-        case 21:scan=SDL_SCANCODE_LEFT;break;case 22:scan=SDL_SCANCODE_RIGHT;break;case 19:scan=SDL_SCANCODE_UP;break;
-        case 111:scan=SDL_SCANCODE_ESCAPE;break;default:return JNI_FALSE;
-    }
-    SDL_Event e{};e.type=down?SDL_EVENT_KEY_DOWN:SDL_EVENT_KEY_UP;e.key.scancode=scan;e.key.down=down;
-    return SDL_PushEvent(&e)?JNI_TRUE:JNI_FALSE;
-}
-#endif
 int main(int argc,char** argv){
     bool smoke=argc>1&&std::string(argv[1])=="--smoke-test";
 #ifdef SDL_PLATFORM_ANDROID
