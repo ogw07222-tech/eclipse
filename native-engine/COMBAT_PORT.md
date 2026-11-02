@@ -27,4 +27,4 @@ Install the ARM64 APK on the Galaxy Tab S10+ and verify simultaneous joystick+ac
 
 The first Android execution exposed SDL's resizable-window orientation override: the Activity manifest alone did not keep landscape. Native startup now explicitly restricts SDL orientations and uses Android fullscreen; the emulator asserts landscape before mapping taps. Independent smoke scenarios restart the live stage to avoid unrelated enemy damage expiring the test character.
 
-Android game-key dispatch is explicitly routed through SDLActivity.handleKeyEvent rather than depending on child-view focus after fullscreen changes. The unchanged emulator test requires the real R-key restart event; it is not replaced by a model reset or test-only invulnerability.
+Android game-key dispatch uses a small JNI adapter that pushes scancodes into the same SDL event queue as desktop input, independently of virtual keyboard/native-focus translation. System keys keep their normal Android handling. The unchanged emulator test requires the real R-key restart event; it is not replaced by a model reset or test-only invulnerability.
