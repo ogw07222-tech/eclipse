@@ -57,11 +57,12 @@ endif()
 # SDL_MAIN_USE_CALLBACKS=0 still enables callbacks, so do not define it at all.
 if(NOT ANDROID)
   set(ECLIPSE_ASSET_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/../Assets/Resources/Eclipse")
-  if(NOT EXISTS "${ECLIPSE_ASSET_SOURCE}/knight_sheet_48x64_v2.png")
+  if(NOT EXISTS "${ECLIPSE_ASSET_SOURCE}/knight_motion.png")
     message(FATAL_ERROR "ECLIPSE knight atlas is missing: ${ECLIPSE_ASSET_SOURCE}")
   endif()
-  set(ECLIPSE_GAME_ASSETS knight_sheet_48x64_v2.png ui/attack_states.png ui/dash_states.png ui/swap_skill_states.png ui/joystick_arrows_new.png)
+  set(ECLIPSE_GAME_ASSETS knight_motion.png ui/attack_states.png ui/dash_states.png ui/swap_skill_states.png ui/joystick_arrows_new.png)
   foreach(asset IN LISTS ECLIPSE_GAME_ASSETS)
+    set_property(TARGET ${TARGET_NAME} APPEND PROPERTY LINK_DEPENDS "${ECLIPSE_ASSET_SOURCE}/${asset}")
     get_filename_component(directory "${asset}" DIRECTORY)
     add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${TARGET_NAME}>/assets/${directory}"

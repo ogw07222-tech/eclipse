@@ -39,7 +39,9 @@ void events(){
 }
 void tick(eclipse::Actions action){
     if(action.restart){input.reset();keyState.fill(false);animation.reset();camera=640;}
+    const int previousMotion=animation.state;
     game.step(static_cast<float>(eclipse::fixedStep),action);animation.step(game.player,static_cast<float>(eclipse::fixedStep));
+    if(animation.state!=previousMotion)SDL_Log("ECLIPSE motion state=%d frame=%d",animation.state,animation.frame);
     if(action.inventory||action.swap||action.restart||action.weapon||action.armor||action.charm)
         SDL_Log("ECLIPSE state form=%d inventory=%d hp=%d foes=%d restart=%d weapon=%d armor=%d charm=%d",game.player.form,game.inventory,game.player.health,game.foes(),action.restart,game.player.gear.selected[0],game.player.gear.selected[1],game.player.gear.selected[2]);
     camera+=(std::clamp(game.player.x,640.f,960.f)-camera)*(1-std::exp(-5*static_cast<float>(eclipse::fixedStep)));
@@ -69,6 +71,41 @@ int main(int argc,char** argv){
             view->draw(game,animation,camera,{},argc>2?capture.c_str():nullptr);
         }
         SDL_Log("PASS five combat/UI scenes and all five PNG textures");view.reset();cleanup();return 0;
+    }
+    if(argc>2&&std::string(argv[1])=="--motion-review"){
+        constexpr const char* names[]={"IDLE","RUN","JUMP","FALL","WEAK SLASH","STRONG SLASH","THRUST","DASH","HURT","DEATH","LAND","WALK"};
+        int captureIndex=0;
+        for(int motion=0;motion<12;++motion){
+            game.restart();animation.reset();float previousPhase=1;
+            for(int n=0;n<90;++n){
+                auto& p=game.player;const float dt=1.f/60;float duration=eclipse::motionClips[motion].duration;
+                float phase=std::fmod(n*dt,duration)/duration;bool trigger=phase<previousPhase;previousPhase=phase;
+                if(motion==1||motion==11){p.vx=motion==1?280:120;p.x+=p.vx*dt;}
+                if(motion==2||motion==3){p.grounded=false;p.vy=motion==2?-650*(1-phase):700*phase;}
+                if(motion>=4&&motion<=6){p.combo=motion-3;if(trigger)++p.attackSerial;}
+                if(motion==7){p.dashLeft=.15f*(1-phase);p.vx=780;p.x+=p.vx*dt;}
+                if(motion==8&&trigger)++p.hurtSerial;
+                if(motion==9)p.health=0;
+                if(motion==10&&trigger)animation.wasGrounded=false;
+                animation.step(p,dt);if(n%5)continue;
+                char filename[64];std::snprintf(filename,sizeof(filename),"/frame-%04d.bmp",captureIndex++);
+                const auto capture=std::string(argv[2])+filename;
+                view->draw(game,animation,std::clamp(p.x,640.f,960.f),{},capture.c_str(),names[motion]);
+            }
+            SDL_Log("REVIEW %s complete",names[motion]);
+        }
+        game.restart();animation.reset();camera=640;game.player.x=450;game.enemies[0].x=520;
+        for(int n=0;n<420;++n){
+            eclipse::Actions action{};action.right=n<45;action.jump=n==15;action.dash=n==60;
+            action.attack=n==95||n==120||n==150;action.skill=n==190||n==285;action.swap=n==245;action.restart=n==390;
+            if(n==345)game.damagePlayer(999);
+            tick(action);if(n%5)continue;
+            char filename[64];std::snprintf(filename,sizeof(filename),"/frame-%04d.bmp",captureIndex++);
+            const auto capture=std::string(argv[2])+filename;
+            view->draw(game,animation,camera,{},capture.c_str(),"COMBAT REPLAY");
+        }
+        SDL_Log("REVIEW live combat replay complete");
+        view.reset();cleanup();return 0;
     }
     Uint64 last=SDL_GetTicksNS();double accumulator=0;
     while(running){Uint64 start=SDL_GetTicksNS();events();

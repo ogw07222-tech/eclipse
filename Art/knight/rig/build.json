@@ -1,0 +1,18 @@
+{
+  "inputs": {
+    "Tools/bake_knight_motion.py": "4f91627d429e94df0f993f5ee55b5a7b06e48c48a8c31b82b45a093995a7ef5c",
+    "Art/knight/rig/boot.png": "5f8aa529e9cf678933f6da54e0e088f152f8a205dc57cf58819b8249af32c48f",
+    "Art/knight/rig/forearm.png": "f3f32a05cd11b008f88ee4f2621793ee17df914d7c0afadc91738921ace43029",
+    "Art/knight/rig/helmet.png": "b550a0e4536b7c3960fea2ca8f5173e672af39c1a2286c6a64481b0826ce540a",
+    "Art/knight/rig/neutral.png": "455863bb2df665e4132350934869c015d27c3e524df67054a4b3b7b74b2dad7f",
+    "Art/knight/rig/shin.png": "45aae32267d552561eb1080622c39c43980718b4ca5d8703b704eb04449c75b2",
+    "Art/knight/rig/sword.png": "093a56e93bce21ee9a86c923eb74e26e4230f60ebcbc72dbc19d5b832b9df78f",
+    "Art/knight/rig/thigh.png": "37424f05ddd872ab1ac05f869ca63e06f2ca80c2f4552544661a7dbbf35ec2df",
+    "Art/knight/rig/torso.png": "81ad153ea529eb41cb8b6084e52f324b9b136848118f402076cba865ab836029",
+    "Art/knight/rig/upper_arm.png": "a552f57e39945499edc7e5641a7b047f8142b4ead28e1c6f2720726dd9ae6882"
+  },
+  "outputs": {
+    "Assets/Resources/Eclipse/knight_motion.png": "40c3d2adb1fbf75c933fe83cd9f767f6f67f42c0751194b09f54f0c0256d85f4",
+    "native-engine/src/motion.hpp": "165a499f4ebe8ec7b658d6b24aed105fc764e5a33579804877fdbcc0def3590c"
+  }
+}

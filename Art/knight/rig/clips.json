@@ -1,0 +1,86 @@
+[
+  {
+    "name": "idle",
+    "start": 0,
+    "count": 8,
+    "duration": 0.96,
+    "loop": true
+  },
+  {
+    "name": "walk",
+    "start": 16,
+    "count": 8,
+    "duration": 0.6,
+    "loop": true
+  },
+  {
+    "name": "run",
+    "start": 32,
+    "count": 16,
+    "duration": 0.343,
+    "loop": true
+  },
+  {
+    "name": "jump",
+    "start": 48,
+    "count": 6,
+    "duration": 0.52,
+    "loop": false
+  },
+  {
+    "name": "fall",
+    "start": 64,
+    "count": 6,
+    "duration": 0.65,
+    "loop": false
+  },
+  {
+    "name": "land",
+    "start": 80,
+    "count": 6,
+    "duration": 0.12,
+    "loop": false
+  },
+  {
+    "name": "dash",
+    "start": 96,
+    "count": 8,
+    "duration": 0.15,
+    "loop": false
+  },
+  {
+    "name": "weak_slash",
+    "start": 112,
+    "count": 8,
+    "duration": 0.23,
+    "loop": false
+  },
+  {
+    "name": "strong_slash",
+    "start": 128,
+    "count": 10,
+    "duration": 0.25,
+    "loop": false
+  },
+  {
+    "name": "thrust",
+    "start": 144,
+    "count": 10,
+    "duration": 0.42,
+    "loop": false
+  },
+  {
+    "name": "hurt",
+    "start": 160,
+    "count": 6,
+    "duration": 0.23,
+    "loop": false
+  },
+  {
+    "name": "death",
+    "start": 176,
+    "count": 12,
+    "duration": 0.9,
+    "loop": false
+  }
+]

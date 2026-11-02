@@ -53,3 +53,7 @@ Desktop CMake packages exactly five original PNGs beside the executable. Source 
 PNG decoding only, no image encoders; fixed-size touch storage; fixed60Hz simulation, approximately60fps presentation cap; suspend in background. During active combat the procedural forest, enemies, projectiles and UI require redraws. This extends the earlier foundation's static-scene redraw rule deliberately.
 
 [Combat port validation](COMBAT_PORT.md) documents model and render checks, APK/Android results and remaining real-device QA. [SCOPE.md](SCOPE.md) keeps engine responsibilities limited to actual game requirements. The prior foundation size snapshot in VALIDATION.md is historical and must not be used as the new APK size.
+
+## Coarse knight motion update
+
+The current native knight uses the 104-frame coarse motion sheet described in [KNIGHT_MOTION.md](KNIGHT_MOTION.md), replacing the original knight atlas in native packaging. Run/walk phase follows distance, attacks have separate full clips, and Actions uploads a renderer replay video. Earlier original-atlas descriptions above document the previous port baseline.
