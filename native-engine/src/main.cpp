@@ -64,15 +64,16 @@ int main(int argc,char** argv){
     if(!view->load()){SDL_Log("ECLIPSE asset load failed: %s",SDL_GetError());view.reset();cleanup();return 1;}
     SDL_Log("ECLIPSE ready: five PNG textures, combat scene, 1280x720");
     if(smoke){
-        for(int scene=0;scene<6;++scene){game.restart();if(scene==1){game.player.form=1;game.hit(game.enemies[0],1,false,true);game.hit(game.enemies[0],1,true);}
+        for(int scene=0;scene<8;++scene){game.restart();if(scene==1){game.player.form=1;game.hit(game.enemies[0],1,false,true);game.hit(game.enemies[0],1,true);}
             if(scene==2)game.inventory=true;
             if(scene==3){game.ended=true;game.won=true;}
             if(scene==4){game.ended=true;game.player.health=0;}
-            if(scene==5)game.player.facing=-1;
-            animation.step(game.player,1.f/60);const std::string capture=argc>2?std::string(argv[2])+"/scene-"+std::to_string(scene)+".bmp":"";
+            if(scene==5||scene==7)game.player.facing=-1;
+            if(scene>=6){animation.state=5;animation.frame=134;}
+            else animation.step(game.player,1.f/60);const std::string capture=argc>2?std::string(argv[2])+"/scene-"+std::to_string(scene)+".bmp":"";
             view->draw(game,animation,camera,{},argc>2?capture.c_str():nullptr);
         }
-        SDL_Log("PASS six combat/UI/facing scenes and all five PNG textures");view.reset();cleanup();return 0;
+        SDL_Log("PASS eight combat/UI/facing/trail scenes and all five PNG textures");view.reset();cleanup();return 0;
     }
     if(argc>2&&std::string(argv[1])=="--motion-review"){
         constexpr const char* names[]={"IDLE","RUN","JUMP","FALL","WEAK SLASH","STRONG SLASH","THRUST","DASH","HURT","DEATH","LAND","WALK"};

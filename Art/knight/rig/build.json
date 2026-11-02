@@ -1,6 +1,6 @@
 {
   "inputs": {
-    "Tools/bake_knight_motion.py": "04ade7d4a94866d5775ed0eb33e1a1d842dda4aab02b60930ca69376b92df558",
+    "Tools/bake_knight_motion.py": "7fad888f041717cd2dcb95f654d40ff777512132f2e972dc8ae7d24f01b78c3b",
     "Art/knight/rig/boot.png": "5f8aa529e9cf678933f6da54e0e088f152f8a205dc57cf58819b8249af32c48f",
     "Art/knight/rig/forearm.png": "f3f32a05cd11b008f88ee4f2621793ee17df914d7c0afadc91738921ace43029",
     "Art/knight/rig/helmet.png": "b550a0e4536b7c3960fea2ca8f5173e672af39c1a2286c6a64481b0826ce540a",
@@ -12,7 +12,8 @@
     "Art/knight/rig/upper_arm.png": "a552f57e39945499edc7e5641a7b047f8142b4ead28e1c6f2720726dd9ae6882"
   },
   "outputs": {
-    "Assets/Resources/Eclipse/knight_motion.png": "68818e184cfed0718bf0d9771687abb12293350d48e1fa2ce07fc2124a3c728a",
-    "native-engine/src/motion.hpp": "ccc90a3f53f566fdff205c9cd95c519f4d9323a8e4f5381baaa8fc31754d9e16"
+    "Assets/Resources/Eclipse/knight_motion.png": "15da5f1e54e9537924fd7af99ac8270c7720cc0797974c5cb6ab9f54b8b4ec21",
+    "native-engine/src/motion.hpp": "ccc90a3f53f566fdff205c9cd95c519f4d9323a8e4f5381baaa8fc31754d9e16",
+    "native-engine/src/sword_trails.hpp": "7d2f82854bec15180269ff7db2c413d27be1283a93e6e02fd63644d79c85b505"
   }
 }
