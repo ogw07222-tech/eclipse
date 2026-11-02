@@ -13,6 +13,28 @@ android {
         versionCode = 1
         versionName = "0.1"
     }
+    val storePath = System.getenv("ECLIPSE_STUDIO_KEYSTORE")
+    val storePass = System.getenv("ECLIPSE_STUDIO_STORE_PASSWORD")
+    val keyAlias = System.getenv("ECLIPSE_STUDIO_KEY_ALIAS")
+    val keyPass = System.getenv("ECLIPSE_STUDIO_KEY_PASSWORD")
+    val hasStableSigning = listOf(storePath, storePass, keyAlias, keyPass).all { !it.isNullOrBlank() }
+    if (hasStableSigning) {
+        signingConfigs {
+            create("studioStable") {
+                storeFile = file(storePath!!)
+                storePassword = storePass
+                this.keyAlias = keyAlias
+                keyPassword = keyPass
+            }
+        }
+    }
+    buildTypes {
+        getByName("debug") {
+            if (hasStableSigning) {
+                signingConfig = signingConfigs.getByName("studioStable")
+            }
+        }
+    }
     buildFeatures { compose = true }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
