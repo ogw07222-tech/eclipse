@@ -98,7 +98,7 @@ def svg_frame(p):
     parts.append(segment('torso',c,h,6.5));parts.append(f'<line x1="{c[0]}" y1="{c[1]}" x2="{hd[0]}" y2="{hd[1]}" stroke="#23272b" stroke-width="3"/>');parts.append(image('helmet',hd[0]-3,hd[1]-3,6,6,p['lean']*.3))
     parts.append(leg(1));elbow=ik(p['shoulder'],p['near'],5,5,-1)
     parts.append(joint(p['shoulder'])+segment('upper_arm',p['shoulder'],elbow,3)+joint(elbow)+segment('forearm',elbow,p['near'],3))
-    x,y=p['near'];parts.append(f'<g transform="translate({x:.4f} {y:.4f}) rotate({p["sword"]:.4f})">'+image('sword',-2,-1.5,11,3)+'</g>')
+    x,y=p['near'];parts.append(f'<g transform="translate({x:.4f} {y:.4f}) rotate({p["sword"]:.4f})">'+image('sword',-2,-2,11,4)+'</g>')
     parts.append(f'<rect x="{x-1:.3f}" y="{y-1:.3f}" width="2" height="2" fill="#737b80"/>')
     return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="48" height="48" viewBox="0 0 48 48">'+''.join(parts).replace('href=','xlink:href=')+'</svg>'
 
