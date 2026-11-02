@@ -44,6 +44,7 @@ private fun StudioScreen() {
     val objects = remember { mutableStateListOf(SceneItem(1, "Camera", 0, 0), SceneItem(2, "Player", 120, 80)) }
     var selection by remember { mutableIntStateOf(2) }
     var tab by remember { mutableStateOf("화면 꾸미기") }
+    var githubPng by remember { mutableStateOf<String?>(null) }
     var status by remember { mutableStateOf("1. 왼쪽에서 선택 → 2. 오른쪽에서 수정 · 저장 기능 개발 중") }
     var nextId by remember { mutableIntStateOf(3) }
     MaterialTheme(colorScheme = darkColorScheme(background = bg, surface = panel, onSurface = fg)) {
@@ -71,9 +72,9 @@ private fun StudioScreen() {
             Text("시작하기: 항목을 추가하고 → 목록에서 선택하고 → 위치를 바꿔보세요", color = Color(0xFFBBDDEA), fontSize = 12.sp)
             Spacer(Modifier.height(8.dp))
             if (tab == "GitHub") {
-                Box(Modifier.weight(1f)) { GitHubReader() }
+                Box(Modifier.weight(1f)) { GitHubReader(onImportPng = { png -> githubPng = png; tab = "화면 꾸미기" }) }
             } else if (tab == "화면 꾸미기") {
-                Box(Modifier.weight(1f)) { VisualSceneEditor() }
+                Box(Modifier.weight(1f)) { VisualSceneEditor(githubPng = githubPng, onImported = { githubPng = null }) }
             } else {
                 Box(Modifier.weight(1f).fillMaxWidth().border(1.dp, edge).background(panel), contentAlignment = Alignment.Center) {
                     Text("${tab} 기능은 개발 중이에요", color = fg)
