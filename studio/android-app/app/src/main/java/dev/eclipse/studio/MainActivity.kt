@@ -64,13 +64,15 @@ private fun StudioScreen() {
             }
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                listOf("화면 꾸미기", "그림 관리", "움직임 만들기", "공격 설정").forEach { name ->
+                listOf("화면 꾸미기", "그림 관리", "움직임 만들기", "공격 설정", "GitHub").forEach { name ->
                     SquareButton(name) { tab = name }
                 }
             }
             Text("시작하기: 항목을 추가하고 → 목록에서 선택하고 → 위치를 바꿔보세요", color = Color(0xFFBBDDEA), fontSize = 12.sp)
             Spacer(Modifier.height(8.dp))
-            if (tab == "화면 꾸미기") {
+            if (tab == "GitHub") {
+                Box(Modifier.weight(1f)) { GitHubReader() }
+            } else if (tab == "화면 꾸미기") {
                 Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Column(Modifier.width(160.dp).fillMaxHeight().border(1.dp, edge).background(panel).padding(8.dp)) {
                         Text("화면에 있는 것", fontWeight = FontWeight.Bold, fontSize = 12.sp)
