@@ -5,12 +5,16 @@ on:
     branches: [main]
     paths:
       - 'native-engine/**'
-      - 'Assets/Resources/Eclipse/knight_sheet_48x64_v2.png'
+      - 'Assets/Resources/Eclipse/knight_motion.png'
+      - 'Tools/*knight*'
+      - 'Art/knight/**'
       - '.github/workflows/native-engine-checks.yml'
   pull_request:
     paths:
       - 'native-engine/**'
-      - 'Assets/Resources/Eclipse/knight_sheet_48x64_v2.png'
+      - 'Assets/Resources/Eclipse/knight_motion.png'
+      - 'Tools/*knight*'
+      - 'Art/knight/**'
       - '.github/workflows/native-engine-checks.yml'
 permissions:
   contents: read
@@ -22,6 +26,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - name: Check motion geometry and atlas
+        run: |
+          python -m pip install -r Tools/knight-art-requirements.txt
+          python native-engine/tools/check_motion.py
       - name: Configure PNG-only native runtime
         run: cmake -S native-engine -B native-engine/build -G Ninja -DECLIPSE_HEADLESS=ON -DCMAKE_BUILD_TYPE=Release
       - name: Compile real SDL runtime
@@ -34,6 +42,21 @@ jobs:
             echo '## Native Release build (Linux headless CI)'
             echo 'These are development binary sizes, not an Android APK or memory measurement.'
             echo '```'
-            du -h native-engine/build/eclipse_engine native-engine/build/_deps/sdl3-build/libSDL3.so* native-engine/build/_deps/sdl3_image-build/libSDL3_image.so* native-engine/build/assets/knight_sheet_48x64_v2.png
+            du -h native-engine/build/eclipse_engine native-engine/build/_deps/sdl3-build/libSDL3.so* native-engine/build/_deps/sdl3_image-build/libSDL3_image.so* native-engine/build/assets/knight_motion.png
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: Render production motion and combat replay
+        run: |
+          mkdir -p /tmp/eclipse-motion-review
+          SDL_VIDEODRIVER=dummy SDL_RENDER_DRIVER=software native-engine/build/eclipse_engine --motion-review /tmp/eclipse-motion-review
+          if ! command -v ffmpeg >/dev/null; then sudo apt-get update && sudo apt-get install -y ffmpeg; fi
+          ffmpeg -y -loglevel error -framerate 12 -i /tmp/eclipse-motion-review/frame-%04d.bmp -c:v libx264 -crf 22 -pix_fmt yuv420p -movflags +faststart native-engine/review/ECLIPSE-motion-review.mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ECLIPSE-knight-motion-review
+          path: |
+            native-engine/review/ECLIPSE-motion-review.mp4
+            native-engine/review/metrics.json
+            Assets/Resources/Eclipse/knight_motion.png
+          retention-days: 14
+          if-no-files-found: error

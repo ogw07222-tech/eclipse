@@ -3,6 +3,7 @@
 #include <array>
 #include <cmath>
 #include <vector>
+#include "motion.hpp"
 
 namespace eclipse {
 constexpr double fixedStep=1.0/60.0;
@@ -151,18 +152,33 @@ public:
 };
 struct Animation {
     int state=-1,frame=0,attackSerial=0,hurtSerial=0,combo=1;
-    float time=0,attackTime=0,hurtTime=0;
+    float time=0,attackTime=0,attackDuration=.36f,hurtTime=0,landTime=0,travelPhase=0,lastX=140;
+    bool wasGrounded=true,initialized=false;
     void reset(){*this=Animation{};}
     void step(const Player& p,float dt){
         bool retrigger=p.attackSerial!=attackSerial;
-        if(retrigger){attackSerial=p.attackSerial;attackTime=.36f;combo=std::clamp(p.combo,1,3);}
+        float distance=initialized?std::abs(p.x-lastX):0;lastX=p.x;initialized=true;
+        if(retrigger){attackSerial=p.attackSerial;combo=std::clamp(p.combo,1,3);
+            attackDuration=p.form==0&&p.combo>0?motionClips[3+combo].duration/p.gear.speed():.36f;attackTime=p.hitStop>0?attackDuration*.5f:attackDuration;}
         if(p.hurtSerial!=hurtSerial){hurtSerial=p.hurtSerial;hurtTime=.23f;}
-        attackTime=std::max(0.f,attackTime-dt);hurtTime=std::max(0.f,hurtTime-dt);
-        int next=p.health<=0?9:hurtTime>0?8:attackTime>0?3+combo:p.dashLeft>0?7:!p.grounded?(p.vy<0?2:3):std::abs(p.vx)>20?1:0;
-        if(next!=state||retrigger){state=next;time=0;}else time+=dt;
-        constexpr int starts[]={0,6,14,18,21,27,33,41,46,49},counts[]={6,8,4,3,6,6,8,5,3,6};
-        int index=static_cast<int>(time*12);bool loop=next==0||next==1||next==3;
-        frame=starts[next]+(loop?index%counts[next]:std::min(index,counts[next]-1));
+        if(!wasGrounded&&p.grounded&&p.health>0)landTime=std::abs(p.vx)>20?.06f:.12f;
+        wasGrounded=p.grounded;
+        // Freeze visual action during a gameplay hit-stop, except death/hurt feedback.
+        float visualDt=p.hitStop>0&&p.health>0&&hurtTime<=0?0:dt;
+        attackTime=std::max(0.f,attackTime-visualDt);hurtTime=std::max(0.f,hurtTime-dt);landTime=std::max(0.f,landTime-dt);
+        int next=p.health<=0?9:hurtTime>0?8:p.dashLeft>0?7:attackTime>0?3+combo:!p.grounded?(p.vy<0?2:3):landTime>0?10:std::abs(p.vx)>20?(std::abs(p.vx)<180?11:1):0;
+        if(next!=state||retrigger){state=next;time=0;}else time+=visualDt;
+        const auto clip=motionClips[next];int index=0;
+        if(next==0)index=static_cast<int>(time/clip.duration*clip.count)%clip.count;
+        else if(next==1||next==11){travelPhase=std::fmod(travelPhase+distance/(next==1?96.f:72.f),1.f);index=static_cast<int>(travelPhase*clip.count);}
+        else if(next==2)index=static_cast<int>((1-std::clamp(-p.vy/650.f,0.f,1.f))*(clip.count-1));
+        else if(next==3)index=static_cast<int>(std::clamp(p.vy/700.f,0.f,1.f)*(clip.count-1));
+        else if(next>=4&&next<=6)index=static_cast<int>((1-attackTime/attackDuration)*clip.count);
+        else if(next==7)index=static_cast<int>((1-std::clamp(p.dashLeft/.15f,0.f,1.f))*clip.count);
+        else if(next==8)index=static_cast<int>((1-hurtTime/.23f)*clip.count);
+        else if(next==10)index=static_cast<int>((1-landTime/.12f)*clip.count);
+        else index=static_cast<int>(time/clip.duration*clip.count);
+        frame=clip.start+std::clamp(index,0,clip.count-1);
     }
 };
 }
