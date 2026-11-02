@@ -19,7 +19,7 @@ The runtime now uses `Assets/Resources/Eclipse/knight_motion.png`: 1024×576 pix
 
 The approved coarse concept supplied the helmet, torso, limb and boot pixels in `Art/knight/rig`. An offline rig assembles these parts with connected dark under-armor, two-bone joint constraints, eased attack poses and a secondary cape shape. One fixed sword PNG is attached to the foreground right hand in every pose, including death. There are no baked sword waves. Palette export retains transparent backgrounds and opaque dark cloth/armor.
 
-Runtime run/walk phase uses actual player travel (120/72 world pixels per cycle), including equipment speed. It stops advancing at walls. Rising, falling and landing have separate clips. Attack clips fit the existing cooldowns and finish all frames; confirmed hit-stop holds the contact pose. Combat damage, range, gear stats and cooldown values are unchanged.
+Runtime run/walk phase uses actual player travel (120/72 world pixels per cycle), including equipment speed. It stops advancing at walls. Rising, falling and landing have separate clips. Attack clips finish their recovery when uninterrupted; the next combo can interrupt recovery after the existing cooldown. Confirmed hit-stop holds the contact pose. Damage amounts, range, gear stats and cooldown values are unchanged.
 
 ## Development and review
 
@@ -46,3 +46,11 @@ Sprint has a 40% contact window per leg, an airborne interval, longer fixed leg 
 The wider 64×48 cell preserves the extended blade. The renderer uses the mirrored registration point when facing left, keeping the actor rooted instead of shifting it sideways. Hit-stop contact phases are per attack. Combat damage, cooldowns and world movement speeds remain unchanged.
 
 Motion review now runs actual jump/fall/landing and dash physics. Individual attacks execute once and recover; the final live-combat section still exercises the full action sequence. A local before/after comparison uses the previous main animation and the revised animation with the same review controls and camera crops.
+
+## Upright action silhouettes and visible wind-up
+
+Ready stance, running, landing and dash now keep the torso and helmet aligned. Active poses stay within 26 degrees of vertical; lower stances come from the knees and hips. At the jump apex the trailing leg stays long while only the leading knee lifts. Falling continues the same apex silhouette and opens into the landing stance.
+
+Weak cut uses a compact high guard and horizontal finish; strong cut raises the blade overhead and cuts diagonally down, with a 0.34-second visual clip and a longer confirmed-hit pause. Basic sword attacks now resolve damage at each clip's contact phase instead of at button-down. This preserves visible anticipation against real targets, which previously jumped directly to the contact frame. Range is checked at contact. Dash, swap, injury, skill and restart cancel a pending basic strike. Damage values and attack cooldowns remain the same; contact timing is intentionally later.
+
+Core regressions cover delayed contact for all three combos, equipment speed, one hit per swing, targets moving into/out of reach, and cancellation without a delayed ghost hit. The previous and revised runtime are rendered with the same review inputs.
