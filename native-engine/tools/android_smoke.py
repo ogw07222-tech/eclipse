@@ -7,6 +7,7 @@ import time
 
 out = Path('native-engine/android/smoke')
 out.mkdir(parents=True, exist_ok=True)
+history = []
 apk = Path('native-engine/android/app/build/outputs/apk/debug/app-debug.apk')
 def adb(*args):
     return subprocess.check_output(['adb', *args], stderr=subprocess.STDOUT)
@@ -31,32 +32,47 @@ def tap(x, y):
     scale = min(w / 1280, h / 720)
     adb('shell', 'input', 'tap', str(round((w - 1280 * scale) / 2 + x * scale)),
         str(round((h - 720 * scale) / 2 + y * scale)))
+def action_and_wait(action, message):
+    history.append(logs())
+    adb('logcat', '-c')
+    action()
+    wait_for(message)
+
+def restart():
+    action_and_wait(lambda: adb('shell', 'input', 'keyevent', 'KEYCODE_R'), 'restart=1')
+
 try:
     adb('install', '-r', str(apk))
     adb('logcat', '-c')
     adb('shell', 'am', 'start', '-W', '-n', 'com.eclipse.nativegame/.MainActivity')
     wait_for('ECLIPSE ready:')
+    deadline = time.monotonic() + 10
+    while True:
+        width, height = capture('latest')
+        if width > height:
+            break
+        if time.monotonic() > deadline:
+            raise RuntimeError('Game did not enter landscape orientation')
+        time.sleep(.5)
+    restart()
     capture('01-combat')
-    tap(800, 40)
-    wait_for('inventory=1')
+    action_and_wait(lambda: tap(800, 40), 'inventory=1')
+    action_and_wait(lambda: tap(100, 435), 'weapon=1')
     capture('02-inventory')
-    tap(100, 435)  # cycle weapon
-    tap(800, 40)  # close inventory
-    tap(1035, 490)  # swap to mage
-    wait_for('form=1')
+    # Isolate scenarios while retaining the production enemy AI and damage rules.
+    restart()
+    action_and_wait(lambda: tap(1035, 490), 'form=1')
     capture('03-mage')
     adb('shell', 'input', 'keyevent', 'KEYCODE_HOME')
     time.sleep(1)
     adb('shell', 'am', 'start', '-W', '-n', 'com.eclipse.nativegame/.MainActivity')
     time.sleep(1)
-    tap(600, 440)  # does nothing unless result overlay is visible
-    # Retry keyboard event exercises the actual SDL event adapter.
-    adb('shell', 'input', 'keyevent', 'KEYCODE_R')
-    wait_for('restart=1')
+    restart()
     capture('04-restarted')
     assert adb('shell', 'pidof', 'com.eclipse.nativegame').strip(), 'App process exited'
     text = logs()
     assert 'FATAL EXCEPTION' not in text and 'Fatal signal' not in text, 'Android native crash'
-    print('PASS Android emulator: launch/textures/touch inventory/equip/swap/background/restart')
+    print('PASS Android emulator: landscape/launch/textures/touch inventory/equip/swap/background/restart')
 finally:
-    (out / 'logcat.txt').write_text(logs())
+    history.append(logs())
+    (out / 'logcat.txt').write_text('\n--- ACTION BOUNDARY ---\n'.join(history))
