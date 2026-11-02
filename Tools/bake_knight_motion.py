@@ -13,7 +13,7 @@ import tempfile
 ROOT=Path(__file__).resolve().parents[1]
 ART=ROOT/'Art/knight/rig'
 OUT=ROOT/'Assets/Resources/Eclipse/knight_motion.png'
-CLIPS=[('idle',0,8,.96),('walk',16,8,.60),('run',32,16,.428571),('jump',48,6,.52),('fall',64,6,.65),('land',80,6,.12),('dash',96,8,.15),('weak_slash',112,8,.23),('strong_slash',128,10,.25),('thrust',144,10,.42),('hurt',160,6,.23),('death',176,12,.90)]
+CLIPS=[('idle',0,8,.96),('walk',16,8,.60),('run',32,16,.428571),('jump',48,6,.52),('fall',64,6,.65),('land',80,6,.12),('dash',96,8,.15),('weak_slash',112,8,.23),('strong_slash',128,10,.34),('thrust',144,10,.42),('hurt',160,6,.23),('death',176,12,.90)]
 PALETTE=['#101318','#23272b','#444a4e','#737b80','#a8afb0','#d0d2c8','#111b30','#20314a','#32465c','#49301d','#75512c','#a17b40']
 def lerp(a,b,t):return a+(b-a)*t
 def smooth(t):return t*t*(3-2*t)
@@ -34,7 +34,7 @@ def foot(phase,stride,lift,contact=.5):
     return (24+lerp(-stride/2,stride/2,smooth(t)),43-lift*math.sin(math.pi*t))
 
 def pose(name,t):
-    hip=[24.,30.];lean=5.;twist=0.;wind=0.;sword=12.;near=(30.,27.);far=(20.,28.)
+    hip=[24.,30.];lean=0.;twist=0.;wind=0.;sword=-35.;near=(29.,29.);far=(22.,27.)
     feet=[(21.,43.),(27.,43.)]
     if name=='idle':hip[1]+=.25*math.sin(t*math.tau);wind=.5*math.sin(t*math.tau)
     elif name in ('run','walk'):
@@ -42,46 +42,53 @@ def pose(name,t):
         feet=[foot(t+.5,stride,6 if run else 2,contact),foot(t,stride,6 if run else 2,contact)]
         hip[1]=(31.7 if run else 30.8)+.35*math.cos(t*math.tau*2)
         if run:hip[0]+=.6+1.5*math.sin(t*math.tau*2)
-        lean=(28 if run else 9)+2*math.sin(t*math.tau*2);twist=.65*math.sin(t*math.tau);wind=6 if run else 1
-        near=(29+3*math.sin(t*math.tau),28.5-2*math.cos(t*math.tau));far=(20-3*math.sin(t*math.tau),27+3*math.cos(t*math.tau));sword=-8+18*math.sin(t*math.tau)
+        lean=(12 if run else 4)+2*math.sin(t*math.tau*2);twist=.65*math.sin(t*math.tau);wind=6 if run else 1
+        near=(29+2*math.sin(t*math.tau),29-1.5*math.cos(t*math.tau));far=(21-2*math.sin(t*math.tau),27+2*math.cos(t*math.tau));sword=-30+12*math.sin(t*math.tau)
     elif name in ('jump','fall'):
-        u=t if name=='jump' else 1-t
-        feet=[(21-3*u,43-9*u),(27+4*u,43-8*u)];lean=lerp(12,26,u);wind=3+u*3;near=(32,26-u*2);far=(19,28-u*2);sword=-30
+        if name=='jump':
+            # Push off with the trailing leg long; only the leading knee lifts.
+            hip[1]=lerp(32,30,t);feet=[(lerp(18,19,t),43),(lerp(29,31,t),lerp(43,37,t))]
+            lean=lerp(12,5,t);near=(30,lerp(26,25,t));sword=lerp(-65,-45,t)
+        else:
+            # Continue the apex silhouette, then reach for a wide landing.
+            feet=[(lerp(19,20,t),43),(lerp(31,30,t),lerp(37,43,t))]
+            lean=lerp(5,10,t);near=(30,lerp(25,29,t));sword=lerp(-45,-30,t)
+        wind=4;far=(22,27)
     elif name=='land':
-        squash=math.sin(math.pi*t);hip[1]+=4*squash;lean=5+28*squash;wind=3*(1-t);near=(30,27+2*squash)
-        feet=[(21-2*squash,43),(27+3*squash,43)];sword=12+12*squash
+        squash=math.sin(math.pi*t);hip[1]+=3*squash;lean=10*squash;wind=3*(1-t);near=(29,29+squash)
+        feet=[(lerp(20,21,smooth(t))-squash,43),(lerp(30,27,smooth(t))+squash,43)];sword=-35+10*squash
     elif name=='dash':
         drive=sample([(0,.75),(.16,1),(.72,1),(1,.3)],t)
-        hip=[24-drive,30+5*drive];lean=78*drive;wind=11*drive
-        feet=[(lerp(21,13,drive),42),(lerp(27,32,drive),43)];near=(37,34);far=(20,33);sword=-5
+        hip=[24+2*drive,30+4*drive];lean=24*drive;wind=11*drive
+        feet=[(lerp(21,16,drive),43),(lerp(27,34,drive),43)];near=(35,29);far=(24,29);sword=-12
     elif name in ('weak_slash','strong_slash','thrust'):
         if name=='weak_slash':
             weight=sample([(0,0),(.2,1),(.65,1),(1,0)],t)
             hip[0]+=sample([(0,0),(.18,-1),(.43,3),(.68,2),(1,0)],t)
             hip[1]+=sample([(0,0),(.18,2),(.43,4),(.68,3),(1,0)],t)
-            lean=sample([(0,5),(.18,-25),(.43,42),(.68,27),(1,5)],t)
-            twist=sample([(0,0),(.18,-1),(.43,1.1),(.68,.6),(1,0)],t)
-            near=(sample([(0,30),(.18,25),(.43,43),(.68,37),(1,30)],t),sample([(0,27),(.18,22),(.43,30),(.68,36),(1,27)],t))
-            sword=sample([(0,12),(.18,-145),(.43,55),(.68,35),(1,12)],t)
+            lean=sample([(0,0),(.18,-8),(.43,18),(.68,10),(1,0)],t)
+            twist=sample([(0,0),(.18,-1.3),(.43,1.5),(.68,.8),(1,0)],t)
+            near=(sample([(0,29),(.18,23),(.43,40),(.68,36),(1,29)],t),sample([(0,29),(.18,21),(.43,25),(.68,30),(1,29)],t))
+            sword=sample([(0,-35),(.18,-155),(.43,12),(.68,35),(1,-35)],t)
             feet=[(lerp(21,17,weight),43),(lerp(27,32,weight),43)]
         elif name=='strong_slash':
             weight=sample([(0,0),(.22,1),(.8,1),(1,0)],t)
             hip[0]+=sample([(0,0),(.30,-1),(.61,4),(.8,3),(1,0)],t)
             hip[1]+=sample([(0,0),(.30,3),(.61,5),(.8,4),(1,0)],t)
-            lean=sample([(0,5),(.30,-28),(.42,-26),(.61,55),(.8,35),(1,5)],t)
-            twist=sample([(0,0),(.30,-1.1),(.61,1.2),(.8,.8),(1,0)],t)
-            near=(sample([(0,30),(.30,23),(.42,23),(.61,44),(.8,39),(1,30)],t),sample([(0,27),(.30,17),(.42,17),(.61,34),(.8,36),(1,27)],t))
-            sword=sample([(0,12),(.30,-145),(.42,-150),(.61,70),(.8,50),(1,12)],t)
+            lean=sample([(0,0),(.30,-10),(.42,-10),(.61,24),(.8,14),(1,0)],t)
+            twist=sample([(0,0),(.30,-1.4),(.61,1.6),(.8,1),(1,0)],t)
+            near=(sample([(0,29),(.30,24),(.42,24),(.61,41),(.8,37),(1,29)],t),sample([(0,29),(.30,15),(.42,15),(.61,31),(.8,33),(1,29)],t))
+            sword=sample([(0,-35),(.30,-145),(.42,-155),(.61,75),(.8,55),(1,-35)],t)
             feet=[(lerp(21,16,weight),43),(lerp(27,33,weight),43)]
         else:
             drive=sample([(0,0),(.24,0),(.52,1),(.72,1),(1,0)],t)
             hip[0]+=sample([(0,0),(.24,-1),(.52,3),(.72,3),(1,0)],t)
-            hip[1]+=5*drive;lean=5+41*drive;twist=.7*drive
-            near=(sample([(0,30),(.24,25),(.52,44.5),(.72,44.5),(1,30)],t),sample([(0,27),(.24,31),(.52,30),(.72,30),(1,27)],t));sword=0
+            hip[1]+=5*drive;lean=18*drive;twist=.7*drive
+            near=(sample([(0,29),(.24,25),(.52,44.5),(.72,44.5),(1,29)],t),sample([(0,29),(.24,27),(.52,26),(.72,26),(1,29)],t));sword=sample([(0,-35),(.24,0),(.52,0),(.72,0),(1,-35)],t)
             feet=[(lerp(21,15,drive),43),(lerp(27,35,drive),43)]
-        wind=3+3*max(0,twist);far=(hip[0]-4,hip[1]-5)
+        wind=3+3*max(0,twist);far=(hip[0]-2-twist*.5,hip[1]-3)
     elif name=='hurt':
-        recoil=math.sin(math.pi*t);hip[0]-=3*recoil;lean=5-28*recoil;near=(30-3*recoil,27);sword=12-45*recoil
+        recoil=math.sin(math.pi*t);hip[0]-=3*recoil;lean=-18*recoil;near=(29-3*recoil,29);sword=-35-30*recoil
     elif name=='death':
         d=smooth(t);hip=[24-3*d,30+11*d];lean=90*d;feet=[(lerp(21,10,d),43),(lerp(27,17,d),43)]
         near=(lerp(30,37,d),lerp(27,42,d));far=(lerp(20,32,d),lerp(28,42,d));wind=1-d;sword=12*(1-d)
@@ -93,7 +100,7 @@ def pose(name,t):
     far_shoulder=(chest[0]-2,chest[1]+1)
     dx,dy=far[0]-far_shoulder[0],far[1]-far_shoulder[1];d=math.hypot(dx,dy)
     if d>9.8:far=(far_shoulder[0]+dx/d*9.8,far_shoulder[1]+dy/d*9.8)
-    return dict(hip=tuple(hip),chest=chest,head=head,shoulder=shoulder,near=near,far=far,feet=feet,lean=lean,twist=twist,wind=wind,sword=sword,head_roll=lean*(.85 if name=='death' else .3),phase=t)
+    return dict(hip=tuple(hip),chest=chest,head=head,shoulder=shoulder,near=near,far=far,feet=feet,lean=lean,twist=twist,wind=wind,sword=sword,head_roll=lean*.85,phase=t)
 
 PARTS={}
 def image(name,x,y,w,h,rotation=0):

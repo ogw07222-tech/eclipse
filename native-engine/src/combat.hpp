@@ -32,6 +32,7 @@ struct Player {
     bool grounded=true;
     float dashLeft=0,dashCooldown=0,attackCooldown=0,skillCooldown=0,swapCooldown=0;
     float invulnerable=0,coyote=0,jumpBuffer=0,attackFlash=0,comboWindow=0,hitStop=0,swapFlash=0;
+    float meleeLeft=0,meleeReach=0;int meleeDamage=0;bool meleeBleed=false;
     int maxHealth()const{return 100+gear.hp();}
     void equip(int slot){int before=maxHealth();gear.cycle(slot);health=std::clamp(health+maxHealth()-before,1,maxHealth());}
 };
@@ -63,11 +64,12 @@ class Combat {
         auto& p=player;p.attackFlash=.16f;++p.attackSerial;
         if(p.form==0){p.combo=p.comboWindow>0?p.combo%3+1:1;p.comboWindow=.8f;
             p.attackCooldown=(p.combo==1?.23f:p.combo==2?.25f:.42f)/p.gear.speed();
-            melee((p.combo==1?12:p.combo==2?15:23)+p.gear.attack(),p.combo==3,(p.combo==3?115:96)*p.gear.range());
+            const auto clip=motionClips[3+p.combo];p.meleeLeft=clip.duration*clip.contact/p.gear.speed();
+            p.meleeDamage=(p.combo==1?12:p.combo==2?15:23)+p.gear.attack();p.meleeBleed=p.combo==3;p.meleeReach=(p.combo==3?115:96)*p.gear.range();
         }else{p.combo=0;p.attackCooldown=.47f;projectile(11+p.gear.attack(),false);}
     }
     void skill(){
-        auto& p=player;p.skillCooldown=p.form==0?3.4f:4.1f;p.attackFlash=.28f;++p.attackSerial;
+        auto& p=player;p.meleeLeft=0;p.skillCooldown=p.form==0?3.4f:4.1f;p.attackFlash=.28f;++p.attackSerial;
         if(p.form==0)melee(23+p.gear.attack(),true,96*p.gear.range());else projectile(25+p.gear.attack(),true);
     }
     void stepPlayer(float dt,Actions a){
@@ -80,18 +82,19 @@ class Combat {
         p.coyote=p.grounded?.11f:down(p.coyote,dt);p.jumpBuffer=a.jump?.13f:down(p.jumpBuffer,dt);
         float axis=static_cast<float>(a.right)-static_cast<float>(a.left);
         if(axis!=0)p.facing=axis>0?1:-1;
-        if(a.swap&&p.swapCooldown<=0){p.form=1-p.form;p.swapCooldown=1;p.attackFlash=.22f;p.combo=0;p.comboWindow=0;p.swapFlash=.24f;++p.attackSerial;
+        if(a.swap&&p.swapCooldown<=0){p.meleeLeft=0;p.form=1-p.form;p.swapCooldown=1;p.attackFlash=.22f;p.combo=0;p.comboWindow=0;p.swapFlash=.24f;++p.attackSerial;
             if(p.form==0)melee(13,false,112);else projectile(14,false);
         }
-        if(a.dash&&p.dashCooldown<=0){p.dashLeft=.15f;p.dashCooldown=.85f;p.invulnerable=std::max(p.invulnerable,.15f);}
+        if(a.dash&&p.dashCooldown<=0){p.meleeLeft=0;p.dashLeft=.15f;p.dashCooldown=.85f;p.invulnerable=std::max(p.invulnerable,.15f);}
         if(p.dashLeft>0){p.vx=780*p.facing*p.gear.speed();p.vy=0;}
         else{p.vx=axis*280*p.gear.speed();p.vy+=1250*dt;
             if(p.jumpBuffer>0&&p.coyote>0){p.vy=-650;p.coyote=p.jumpBuffer=0;}
         }
-        if(a.attack&&p.attackCooldown<=0)basic();
+        if(a.attack&&p.attackCooldown<=0&&p.dashLeft<=0)basic();
         if(a.skill&&p.skillCooldown<=0)skill();
         p.x=std::clamp(p.x+p.vx*dt,25.f,1550.f);p.y+=p.vy*dt;p.grounded=p.y>=floorY;
         if(p.grounded){p.y=floorY;p.vy=0;}
+        if(p.meleeLeft>0){p.meleeLeft=down(p.meleeLeft,dt);if(p.meleeLeft==0){melee(p.meleeDamage,p.meleeBleed,p.meleeReach);if(p.combo==2&&p.hitStop>0)p.hitStop=std::max(p.hitStop,.065f);}}
     }
     void stepEnemy(Enemy& e,float dt){
         if(e.dead())return;
@@ -132,7 +135,7 @@ public:
     }
     void damagePlayer(int amount){
         auto& p=player;if(ended||p.invulnerable>0||p.health<=0)return;
-        p.health=std::max(0,p.health-std::max(1,amount-p.gear.defense()));p.invulnerable=.7f;p.attackFlash=.28f;++p.hurtSerial;p.combo=0;p.comboWindow=0;
+        p.health=std::max(0,p.health-std::max(1,amount-p.gear.defense()));p.meleeLeft=0;p.invulnerable=.7f;p.attackFlash=.28f;++p.hurtSerial;p.combo=0;p.comboWindow=0;
         if(p.health==0){ended=true;won=false;inventory=false;}
     }
     void step(float dt,Actions a){
@@ -153,7 +156,7 @@ public:
 struct Animation {
     int state=-1,frame=0,attackSerial=0,hurtSerial=0,combo=1;
     float time=0,attackTime=0,attackDuration=.36f,hurtTime=0,landTime=0,travelPhase=0,lastX=140;
-    bool wasGrounded=true,initialized=false;
+    bool wasGrounded=true,initialized=false,wasHitStopped=false;
     void reset(){*this=Animation{};}
     void step(const Player& p,float dt){
         bool retrigger=p.attackSerial!=attackSerial;
@@ -161,6 +164,9 @@ struct Animation {
         if(retrigger){attackSerial=p.attackSerial;combo=std::clamp(p.combo,1,3);
             attackDuration=p.form==0&&p.combo>0?motionClips[3+combo].duration/p.gear.speed():.36f;attackTime=p.hitStop>0?attackDuration*(1-motionClips[3+combo].contact):attackDuration;}
         if(p.hurtSerial!=hurtSerial){hurtSerial=p.hurtSerial;hurtTime=.23f;}
+        if(p.dashLeft>0||hurtTime>0)attackTime=0;
+        if(p.hitStop>0&&!wasHitStopped&&attackTime>0)attackTime=attackDuration*(1-motionClips[3+combo].contact);
+        wasHitStopped=p.hitStop>0;
         if(!wasGrounded&&p.grounded&&p.health>0)landTime=std::abs(p.vx)>20?.06f:.12f;
         wasGrounded=p.grounded;
         // Freeze visual action during a gameplay hit-stop, except death/hurt feedback.

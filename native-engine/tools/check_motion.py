@@ -45,7 +45,18 @@ assert max(p['hip'][0] for p in heavy)-min(p['hip'][0] for p in heavy)>=4,'Heavy
 thrust=[b.pose('thrust',i/1000) for i in range(1001)]
 assert max(p['feet'][1][0]-p['feet'][0][0] for p in thrust)>=19,'Thrust lacks a deep lunge'
 assert max(math.dist(p['shoulder'],p['near']) for p in thrust)>=9.5,'Thrust arm never extends'
-assert max(b.pose('dash',i/1000)['lean'] for i in range(1001))>=70,'Dash remains upright'
+for clip,_,count,_ in b.CLIPS:
+    if clip=='death':continue
+    poses=[b.pose(clip,i/1000) for i in range(1001)]
+    assert max(abs(p['lean']) for p in poses)<=26,'Active knight folds excessively at waist: '+clip
+    assert max(abs(p['head_roll']-p['lean']) for p in poses)<=4,'Neck breaks the torso line: '+clip
+for clip in ('jump','fall'):
+    p=b.pose(clip,1 if clip=='jump' else 0)
+    assert abs(p['feet'][0][1]-p['feet'][1][1])>=5,'Apex tucks both knees together'
+    assert math.dist((p['hip'][0]-1,p['hip'][1]),p['feet'][0])>=13,'Apex lacks a long trailing leg'
+for clip in ('weak_slash','strong_slash'):
+    arc=[b.pose(clip,i/1000)['sword'] for i in range(1001)]
+    assert max(arc)-min(arc)>=160,'Slash lacks a clear wind-up and follow-through: '+clip
 results['sprint_airborne_fraction']=round(flight,3)
 results['heavy_cut_weight_transfer_design_px']=round(max(p['hip'][0] for p in heavy)-min(p['hip'][0] for p in heavy),3)
 results['thrust_stance_design_px']=round(max(p['feet'][1][0]-p['feet'][0][0] for p in thrust),3)
