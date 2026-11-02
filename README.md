@@ -3,6 +3,10 @@
 Unity 6.3 LTS C# port of Godot `main` at **b47cc494f27258a1f1343aa0beeadee612b7b5cf** (PR #17).
 The repository root is now a Unity project. The original Godot source and PNGs remain intact for comparison and rollback.
 
+## Native engine development
+
+ECLIPSE’s game-specific C++/SDL3 runtime is under [native-engine](native-engine/README.md). Its [scope](native-engine/SCOPE.md) is limited to the actual 2D game requirements. Native compilation/PNG smoke tests and [validation evidence](native-engine/VALIDATION.md) are separate from Unity. The native Android APK bootstrap is still pending; the APK workflow below currently builds Unity.
+
 ## Open and play
 
 1. Install **Unity 6.3 LTS (6000.3.0f1)** through Unity Hub.
