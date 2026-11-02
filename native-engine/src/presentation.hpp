@@ -4,6 +4,7 @@
 #include <string>
 #include <cstdio>
 #include "core.hpp"
+#include "sword_trails.hpp"
 
 namespace eclipse {
 class Presentation {
@@ -81,6 +82,15 @@ class Presentation {
         disk(x+p.facing*22-offset,y-64,7,0xffb74b,3);
         if(p.attackFlash>0)ring(x+p.facing*16-offset,y-36,40,0xffb74b);
     }
+    void swordTrail(const Player& p,const Animation& a){
+        if(p.health<=0||a.state<4||a.state>6)return;
+        const auto frame=swordTrailFrames[a.frame];
+        constexpr unsigned colors[]={0,0x365d70,0x7ba4ad,0xdce7db};constexpr int alpha[]={0,95,165,235};
+        for(int i=frame.start;i<frame.start+frame.count;++i){const auto s=swordTrailSpans[i];
+            float x=p.facing>0?p.x+(s.x-motionPivotX)*3:p.x-(s.x+s.width-motionPivotX)*3;
+            rect(x-offset,p.y+(s.y-motionPivotY)*3,s.width*3,3,colors[s.shade],static_cast<Uint8>(alpha[s.shade]*frame.alpha/255));
+        }
+    }
     void icon(int texture,int col,int row,float x,float y,float size,bool down){
         SDL_FRect source{col*128.f,row*128.f,128,128},target{x,y,size,size};
         SDL_SetTextureColorMod(textures[texture],down?180:255,down?180:255,down?180:255);SDL_RenderTexture(renderer,textures[texture],&source,&target);
@@ -128,6 +138,7 @@ public:
         forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.clock);
         for(const auto& b:g.projectiles){disk(b.x-offset,b.y,b.empowered?14:8,0xf16b32);disk(b.x-offset,b.y,b.empowered?7:4,0xffe7a1);}
         const auto& p=g.player;
+        if(p.form==0)swordTrail(p,a);
         if(p.form==0){SDL_FRect source{static_cast<float>(a.frame%motionColumns*motionWidth),static_cast<float>(a.frame/motionColumns*motionHeight),motionWidth,motionHeight},dest{std::round(p.x-offset-(p.facing>0?motionPivotX:motionWidth-motionPivotX)*3),std::round(p.y-motionPivotY*3),motionWidth*3,motionHeight*3};
             SDL_RenderTextureRotated(renderer,textures[0],&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
         }else mage(p);

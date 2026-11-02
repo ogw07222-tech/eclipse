@@ -25,12 +25,15 @@ for clip,stride in [('run',120),('walk',72)]:
         p=b.pose(clip,i/1000)
         for index,foot in enumerate(p['feet']):
             hip=(p['hip'][0]+(-1 if index==0 else 1),p['hip'][1])
-            assert math.dist(hip,foot)<=14.01,(clip,i,'leg overextension')
+            assert math.dist(hip,foot)<=2*b.LEG_BONE+.01,(clip,i,'leg overextension')
 for clip,start,count,duration in b.CLIPS:
     for i in range(count):
         p=b.pose(clip,i/(count if clip in ('idle','walk','run') else count-1))
         assert math.dist(p['shoulder'],p['near'])<=9.801,(clip,i,'right arm overextension')
         assert math.dist((p['chest'][0]-2,p['chest'][1]+1),p['far'])<=9.801,(clip,i,'off-hand arm overextension')
+        for index,foot in enumerate(p['feet']):
+            hip=(p['hip'][0]+(-1 if index==0 else 1),p['hip'][1])
+            assert math.dist(hip,foot)<=2*b.LEG_BONE+.01,(clip,i,'leg overextension')
         # The entire shared sword, including its guard, stays inside its cell.
         angle=math.radians(p['sword'])
         for sx,sy in [(-2,-2),(9,-2),(9,2),(-2,2)]:
@@ -52,14 +55,22 @@ for clip,_,count,_ in b.CLIPS:
     assert max(abs(p['head_roll']-p['lean']) for p in poses)<=4,'Neck breaks the torso line: '+clip
 for clip in ('jump','fall'):
     p=b.pose(clip,1 if clip=='jump' else 0)
-    assert abs(p['feet'][0][1]-p['feet'][1][1])>=5,'Apex tucks both knees together'
-    assert math.dist((p['hip'][0]-1,p['hip'][1]),p['feet'][0])>=13,'Apex lacks a long trailing leg'
+    assert abs(p['feet'][0][1]-p['feet'][1][1])>=3,'Apex tucks both knees together'
+    assert math.dist((p['hip'][0]-1,p['hip'][1]),p['feet'][0])>=14,'Apex lacks a long trailing leg'
 for clip in ('weak_slash','strong_slash'):
     arc=[b.pose(clip,i/1000)['sword'] for i in range(1001)]
     assert max(arc)-min(arc)>=160,'Slash lacks a clear wind-up and follow-through: '+clip
 results['sprint_airborne_fraction']=round(flight,3)
 results['heavy_cut_weight_transfer_design_px']=round(max(p['hip'][0] for p in heavy)-min(p['hip'][0] for p in heavy),3)
 results['thrust_stance_design_px']=round(max(p['feet'][1][0]-p['feet'][0][0] for p in thrust),3)
+for clip,contact in [('weak_slash',.43),('strong_slash',.61),('thrust',.52)]:
+    count=next(c[2] for c in b.CLIPS if c[0]==clip);t=int(count*contact)/(count-1)
+    mask,alpha=b.trail_mask(clip,t);assert mask.getbbox() and alpha>0,(clip,'contact trail missing')
+    p=b.pose(clip,t);angle=math.radians(p['sword']);tip=(32+p['near'][0]+9*math.cos(angle),24+p['near'][1]+9*math.sin(angle))
+    pixels=[(x,y) for y in range(mask.height) for x in range(mask.width) if mask.getpixel((x,y))]
+    assert min(math.dist(tip,pixel) for pixel in pixels)<=2.5,(clip,'trail detached from blade')
+    assert not b.trail_mask(clip,0)[0].getbbox() and not b.trail_mask(clip,1)[0].getbbox(),(clip,'trail remains outside strike')
+results['separate_sword_trails']='3 combos; pixel ribbons follow blade, no extra PNG texture'
 im=Image.open(ROOT/'Assets/Resources/Eclipse/knight_motion.png').convert('RGBA')
 assert im.size==(1024,576),'Atlas dimensions'
 assert set(im.getchannel('A').get_flattened_data())=={0,255},'Soft or missing transparency'

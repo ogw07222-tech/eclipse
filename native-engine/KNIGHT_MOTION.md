@@ -17,7 +17,7 @@ The runtime now uses `Assets/Resources/Eclipse/knight_motion.png`: 1024×576 pix
 | 10 | Hurt | 6 |
 | 11 | Death | 12 |
 
-The approved coarse concept supplied the helmet, torso, limb and boot pixels in `Art/knight/rig`. An offline rig assembles these parts with connected dark under-armor, two-bone joint constraints, eased attack poses and a secondary cape shape. One fixed sword PNG is attached to the foreground right hand in every pose, including death. There are no baked sword waves. Palette export retains transparent backgrounds and opaque dark cloth/armor.
+The approved coarse concept supplied the helmet, torso, limb and boot pixels in `Art/knight/rig`. An offline rig assembles these parts with connected dark under-armor, two-bone joint constraints, eased attack poses and a secondary cape shape. One fixed sword PNG is attached to the foreground right hand in every pose, including death. The actor PNG contains no baked sword effects; separate runtime trails are described below. Palette export retains transparent backgrounds and opaque dark cloth/armor.
 
 Runtime run/walk phase uses actual player travel (120/72 world pixels per cycle), including equipment speed. It stops advancing at walls. Rising, falling and landing have separate clips. Attack clips finish their recovery when uninterrupted; the next combo can interrupt recovery after the existing cooldown. Confirmed hit-stop holds the contact pose. Damage amounts, range, gear stats and cooldown values are unchanged.
 
@@ -54,3 +54,11 @@ Ready stance, running, landing and dash now keep the torso and helmet aligned. A
 Weak cut uses a compact high guard and horizontal finish; strong cut raises the blade overhead and cuts diagonally down, with a 0.34-second visual clip and a longer confirmed-hit pause. Basic sword attacks now resolve damage at each clip's contact phase instead of at button-down. This preserves visible anticipation against real targets, which previously jumped directly to the contact frame. Range is checked at contact. Dash, swap, injury, skill and restart cancel a pending basic strike. Damage values and attack cooldowns remain the same; contact timing is intentionally later.
 
 Core regressions cover delayed contact for all three combos, equipment speed, one hit per swing, targets moving into/out of reach, and cancellation without a delayed ghost hit. The previous and revised runtime are rendered with the same review inputs.
+
+## Straighter legs and separate sword trails
+
+Fixed leg bones are now 7.5 design pixels each. Raised hips and less knee compression make idle, locomotion, landing, dash and attacks stand taller. The pelvis only lowers when a planted wide stance would otherwise exceed leg reach. The jump keeps one long trailing leg and a smaller leading-knee lift.
+
+`Tools/bake_knight_motion.py` samples the same wrist positions and sword angles used by each actor frame, then bakes a separate pixel ribbon into `native-engine/src/sword_trails.hpp`. Weak slash has a narrow arc, strong slash a wider overhead-to-downward arc, and thrust a short forward point. Muted steel-blue tails fade behind a pale edge. Rendering uses 3px world cells, mirrors around the same foot pivot as the actor, and draws behind the real sword. The contact frame holds during hit-stop; trails vanish with attack end, cancel, hurt, death or form change.
+
+This adds no PNG texture, shader, projectile, damage or hitbox. Existing five PNG assets are unchanged in count. Geometry checks verify contact-to-blade registration, blank effect frames outside strikes and fixed leg reach. SDL smoke includes left/right heavy-cut trail scenes.
