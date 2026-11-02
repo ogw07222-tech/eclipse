@@ -33,3 +33,7 @@ The engine owns frame timing, input, asset lifetime, drawing and collision helpe
 4. Measure APK size/RAM/frame time on the tablet; optimize the observed bottleneck.
 
 Foundation tests are source/runtime checks only. Complete game parity and Android readiness remain pending.
+
+## Combat/Android update
+
+The combat port now implements the previously remaining gameplay/UI and SDL Android packaging. See COMBAT_PORT.md for current evidence and android/README.md for the independent native APK workflow. Device performance, sound assets, Korean typography and actual tablet QA remain separate work. The delivery-order table above records the original foundation plan.

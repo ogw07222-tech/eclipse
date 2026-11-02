@@ -1,22 +1,34 @@
-# ECLIPSE Native — small game-specific runtime
+# ECLIPSE Native — game-specific 2D runtime
 
-C++17 + SDL3 3.2.22 + SDL3_image 3.2.4, scoped to ECLIPSE's 2D pixel combat. Current stage: native runtime foundation, not a full gameplay port or Android APK.
+C++17 + SDL3 3.2.22 + SDL3_image 3.2.4. The native runtime now contains ECLIPSE's combat and an independent Android APK project.
 
-## Current implementation
+## Play on Android
 
-- 480×270 logical viewport and nearest-filtered original 48×64 PNG atlas.
-- Fixed 60 Hz simulation; render pacing capped near 60 fps, with VSync where supported. The scene is redrawn only when visible actor state changes or the window needs repainting. Background/focus loss clears controls and suspends simulation/rendering.
-- Walking, jump/gravity/floor/walls, basic attack animation, correct sequential idle/run/jump/fall/attack1 atlas ranges.
-- Keyboard plus eight fixed touch slots; movement and attack can be held by different pointers. Jump/attack use press edges.
-- Letterbox/high-DPI-aware pointer conversion, texture loaded once at startup, executable-relative assets, explicit failure if the required image is missing.
-- PNG-only image decoder build, no image encoders/sample programs. Unused SDL audio, camera, sensors, haptics, joystick and GPU API modules are disabled. SDL's 2D renderer remains enabled.
-- Core input/movement checks and a dummy-video PNG decode/render smoke test.
+[Native Android APK workflow](https://github.com/ogw07222-tech/eclipse/actions/workflows/native-android-apk.yml) → **Run workflow** → successful run → **Artifacts → ECLIPSE-Native-ARM64**. Extract and install `ECLIPSE-Native.apk`. No Unity license is used. See [android/README.md](android/README.md) for setup and CI details.
 
-The authoritative scope and next steps are in [SCOPE.md](SCOPE.md). Existing Unity/Godot projects stay available; this branch does not remove them.
+## Gameplay port
 
-## Build on desktop
+- Original 1280×720 logical viewport, 1600px arena, floor y585, player x140 and original four enemy spawns/types.
+- Sword three-hit combo12/15/23, 0.8s combo window, third-hit bleed; sword skill; mage basic/empowered projectiles, burn, +22 reaction consuming bleed.
+- Both form-swap entry attacks, dash immunity/cooldowns, hit stop, recoil, floating damage and pixel status effects.
+- Nine original equipment stat sets across weapon/armor/charm; max-health adjustment; inventory, clear, defeat and retry.
+- Original knight atlas with correct idle/run/jump/fall/three attacks/dash/hurt/death ranges; procedural pixel forest, mage, enemies, HUD and original PNG button artwork.
+- Keyboard and independently owned touch pointers; upward joystick jump, simultaneous actions, fast press-edge buffering, focus release and restart cleanup.
 
-Install CMake >=3.24, a C++17 compiler and SDL's normal platform prerequisites, then:
+| Action | Keyboard | Touch |
+| --- | --- | --- |
+| Move | A/D, arrows | Joystick |
+| Jump | Space/W/up | Push joystick upward |
+| Attack | J/Z | Sword |
+| Skill | K/X | Spark |
+| Dash | Shift | Lightning |
+| Swap | L/C/Tab | Circular arrows |
+| Inventory/equipment | I, 1/2/3 | HUD GEAR slots, equipment buttons |
+| Restart | R | Retry button after clear/defeat |
+
+Inventory item labels are English bitmap text to keep the runtime free of a font engine; original item stat values/slot identities are preserved. Korean pixel typography remains future UI work. No sound assets were present in the baseline, so audio remains disabled.
+
+## Desktop build and tests
 
 ```sh
 cmake -S native-engine -B native-engine/build -DCMAKE_BUILD_TYPE=Release
@@ -24,31 +36,20 @@ cmake --build native-engine/build --parallel 4
 ./native-engine/build/eclipse_engine
 ```
 
-First configure downloads the pinned SDL sources. On Windows use the Release executable under the selected build configuration. Runtime SDL shared libraries must remain available beside the app or on the loader path; the build tree supplies a development loader path on Linux. Desktop distribution packaging is not implemented.
-
-CMake copies **only the knight PNG currently used** from `Assets/Resources/Eclipse` to the executable's `assets` directory. The same source image is reused without modifying its bytes. Start the executable from any working directory.
-
-## Headless checks
+Requires CMake3.24+, C++17 compiler and SDL platform prerequisites. For CI software rendering without X11/Wayland:
 
 ```sh
 cmake -S native-engine -B native-engine/build -DECLIPSE_HEADLESS=ON -DCMAKE_BUILD_TYPE=Release
-cmake --build native-engine/build --parallel 4
+cmake --build native-engine/build --parallel 2
 ctest --test-dir native-engine/build --output-on-failure
 ```
 
-Headless mode disables desktop X11/Wayland dependencies and uses SDL's software renderer/dummy video for the smoke test. It is only for CI; use the normal build for an interactive window. The smoke test opens the packaged PNG and actually renders one frame; it is not device/visual QA.
+Core checks also run without SDL: `c++ -std=c++17 native-engine/tests/core_tests.cpp -o /tmp/eclipse-tests && /tmp/eclipse-tests`.
 
-The native CI workflow compiles the C++ runtime and runs both tests. Tests can also compile without SDL:
+Desktop CMake packages exactly five original PNGs beside the executable. Source image bytes are untouched. UI sheets are reduced once at startup to 128px per state for compact GPU textures. SDL shared libraries must remain available for a standalone desktop distribution.
 
-```sh
-c++ -std=c++17 native-engine/tests/core_tests.cpp -o /tmp/eclipse-core-tests
-/tmp/eclipse-core-tests
-```
+## Resource and validation boundary
 
-## Current limits and validation boundary
+PNG decoding only, no image encoders; fixed-size touch storage; fixed60Hz simulation, approximately60fps presentation cap; suspend in background. During active combat the procedural forest, enemies, projectiles and UI require redraws. This extends the earlier foundation's static-scene redraw rule deliberately.
 
-Enemy AI, three-hit combo, bleed/fire reaction, mage/swap, equipment/HUD and full forest visuals still require porting from ECLIPSE. Sprite alpha defects are not repaired by the engine. Korean font/text UI and audio can be added when real game assets require them.
-
-**Android bootstrap/Gradle/NDK packaging and an APK have not been implemented or tested.** Existing `.github/workflows/android-apk.yml` builds the Unity project; it does not build this native runtime. The native runtime does not require a Unity license, but the Unity workflow still does.
-
-Native Android packaging should use [SDL's official Android project](https://wiki.libsdl.org/SDL3/README-android), the existing shared `main` CMake target, and only the game's referenced PNG assets. That is the next platform task, separate from completing game parity.
+[Combat port validation](COMBAT_PORT.md) documents model and render checks, APK/Android results and remaining real-device QA. [SCOPE.md](SCOPE.md) keeps engine responsibilities limited to actual game requirements. The prior foundation size snapshot in VALIDATION.md is historical and must not be used as the new APK size.

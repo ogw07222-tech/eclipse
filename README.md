@@ -5,7 +5,7 @@ The repository root is now a Unity project. The original Godot source and PNGs r
 
 ## Native engine development
 
-ECLIPSE’s game-specific C++/SDL3 runtime is under [native-engine](native-engine/README.md). Its [scope](native-engine/SCOPE.md) is limited to the actual 2D game requirements. Native compilation/PNG smoke tests and [validation evidence](native-engine/VALIDATION.md) are separate from Unity. The native Android APK bootstrap is still pending; the APK workflow below currently builds Unity.
+ECLIPSE’s game-specific C++/SDL3 runtime is under [native-engine](native-engine/README.md). Its [scope](native-engine/SCOPE.md) is limited to the actual 2D game requirements. Native compilation/PNG smoke tests and [validation evidence](native-engine/VALIDATION.md) are separate from Unity. The native combat port and [native Android APK workflow](https://github.com/ogw07222-tech/eclipse/actions/workflows/native-android-apk.yml) use SDL/C++ without a Unity license. The older APK workflow below builds the preserved Unity project.
 
 ## Open and play
 

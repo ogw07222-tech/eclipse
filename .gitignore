@@ -26,3 +26,9 @@
 __pycache__/
 /TestResults/
 /native-engine/build*/
+/native-engine/android/.gradle/
+/native-engine/android/vendor/
+/native-engine/android/app/build/
+/native-engine/android/app/.cxx/
+/native-engine/android/output/
+/native-engine/android/local.properties
