@@ -30,7 +30,7 @@ button:hover{background:#41775a}.buttons{display:flex;flex-wrap:wrap;gap:9px;ali
 <button id="random">시드 변경</button><button id="reset">기본값</button><button id="shot">PNG 저장</button>
 <span id="status" class="small" aria-live="polite">PNG 로딩 중…</span>
 </div>
-<p>기본 에셋: 메인 나무 1종(tree_large_01), 서브 나무 1종(tree_mid_01), 덤불 2종·풀 2종·바위 1종·소형 장식 2종. 원경 코드 나무는 제거했고, 나무는 PNG 2종만 사용해.</p>
+<p>기본 에셋: 메인 나무 1종(tree_large_01), 서브 나무 1종(tree_mid_01), 덤불 2종·풀 2종·바위 1종·소형 장식 2종. 원경 코드 나무는 제거했어. 지면은 진한 갈색 흙과 픽셀 자갈·흙결로 구성하고 풀은 얇은 경계에만 남겼어.</p>
 </main>
 <script>
 "use strict";
@@ -116,20 +116,33 @@ function render(){
    } // No low-quality procedural substitute if a PNG fails to load.
  }
  for(const s of sprites)if(s.layer<4)obj(s);
- rect(0,578,1280,12,"#527b45");
- rect(0,585,1280,135,"#2b4034");
- rect(0,585,1280,8,"#73995d");
- for(let i=0;i<74;i++){
-   const h=(Math.imul(i,2654435761)+20261103)>>>0;
-   const x=((h^(h>>>13))>>>0)%1650-(o.camera-640);
-   const y=594+((h>>>11)%18)*6;
-   rect(x,y,18+(h%6)*6,6,i%4===0?"#344b3b":"#304638");
+ function soilHash(x,y,salt) {
+   let h=(Math.imul(x,374761393)+Math.imul(y,668265263)+Math.imul(salt,2246822519))>>>0;
+   h=Math.imul(h^(h>>>13),1274126177)>>>0;
+   return (h^(h>>>16))>>>0;
  }
- for(let i=0;i<50;i++){
-   const h=(Math.imul(i,2246822519)+9137)>>>0;
-   const x=((h^(h>>>15))>>>0)%1650-(o.camera-640);
-   const y=577-(h%3)*3;
-   rect(x,y,9+(h%4)*6,3,i%5===0?"#7b985d":"#658450");
+ function wr(x,y,w,h,c){
+   rect(x-(o.camera-640),y,w,h,c);
+ }
+ wr(0,583,1600,137,"#32241e");
+ wr(0,617,1600,103,"#29201c");
+ wr(0,672,1600,48,"#211b1a");
+ for(let x=0;x<1600;x+=24){
+   const h=soilHash(x/24,0,7),top=588+(h%6)*3;
+   wr(x,top,24,12,h%3===0?"#564034":h%3===1?"#48352b":"#49382f");
+   wr(x,top+12,24,6,h%4===0?"#614a39":"#3c2b25");
+   const deep=626+((h>>>8)%9)*6;
+   wr(x+((h>>>15)%3)*3,deep,12+((h>>>17)%4)*3,6,h%5===0?"#594033":"#382a25");
+ }
+ for(let i=0;i<215;i++){
+   const h=soilHash(i,1,29);
+   wr(h%1588,603+((h>>>9)%35)*3,3+((h>>>17)%4)*3,h%7===0?6:3,
+     h%11===0?"#927358":h%4===0?"#5e4739":h%4===1?"#47352c":"#221b19");
+ }
+ for(let x=0;x<1600;x+=12){
+   const h=soilHash(x/12,2,41),y=582+(h%3)*3;
+   wr(x,y,12,3,h%4===0?"#628352":h%4===1?"#547448":"#46653f");
+   if(h%5===0)wr(x+3,y-6,3,6,"#648750");
  }
  for(const s of sprites)if(s.layer>=4)obj(s);
  // Reference knight height (~192 px in the native game), no gameplay simulation.

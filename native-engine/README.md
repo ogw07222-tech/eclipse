@@ -99,3 +99,9 @@ The low-fidelity procedural distant trees have been removed from both the native
 ## Cropped forest sprite repair
 
 A revised image patch, `eclipse_forest_cropping_fix.zip`, re-extracts the **main tree**, **secondary tree**, and **two bushes** from wider original source-sheet regions, leaving transparent margins and updating the manifest dimensions. Extract its `Assets/Resources/Eclipse/forest/` paths into the repository and commit the changed PNGs plus manifest. The native SDL renderer and browser preview normalize the sprites' visual height to the original footprint so restored source boundaries do not make objects unexpectedly bigger; trees are constrained not to clip against the top of the viewport. PNG edges cannot be fixed by changing camera culling alone.
+
+## Ground art and PNG audit (November 2026)
+
+The playable surface remains y=585 and collision is unchanged. The original continuous green ground slab has been replaced by layered dark brown soil, strata, low-contrast rocky pixels, deterministic clods and a sparse, thin irregular grass fringe. Both the SDL renderer and browser preview use the same coordinate-based hash and color palette, and the ground remains static during scroll.
+
+The original concept-sheet pack includes several edge-touching art fragments and seven opaque backgrounds/terrain tiles that are **not seamless**. Four active foreground sprites (two trees and two bushes) have a separately prepared wider re-extraction pack. Until that pack is imported, the repository still contains the older crops. Non-active reference sprites remain in the archive for future art production, not active gameplay. Do not infer a fully restored sprite solely from added alpha margins.

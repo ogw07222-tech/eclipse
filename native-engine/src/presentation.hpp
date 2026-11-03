@@ -101,24 +101,49 @@ class Presentation {
         // Missing PNG: skip this decoration instead of drawing mismatched low-res trees.
         // The original sprite library is shipped with the APK and desktop assets.
     }
-    void forestGround(float camera) {
-        // Deterministic low-contrast patches, consistent with the browser preview.
-        // Draw behind sprite props so the character remains legible.
-        for(int i=0;i<74;++i) {
-            const unsigned h=static_cast<unsigned>(i)*2654435761u + 20261103u;
-            const float x=static_cast<float>((h^(h>>13))%1650u);
-            const float y=594.f+static_cast<float>((h>>11)%18u)*6.f;
-            world(x,y,18.f+static_cast<float>(h%6u)*6.f,6.f,
-                i%4==0?0x344b3b:0x304638,6);
+    static unsigned soilHash(unsigned x,unsigned y,unsigned salt) {
+        unsigned h=x*374761393u+y*668265263u+salt*2246822519u;
+        h=(h^(h>>13))*1274126177u;
+        return h^(h>>16);
+    }
+    void forestGround() {
+        // Soil is the ground mass: grass is a thin, irregular surface only.
+        // Every patch is generated from world coordinates, so scrolling is stable.
+        world(0,583,1600,137,0x32241e,3);
+        world(0,617,1600,103,0x29201c,3);
+        world(0,672,1600,48,0x211b1a,3);
+        // Pixelated soil strata: warm brown variations without a repeating tile seam.
+        for(int x=0;x<1600;x+=24) {
+            const unsigned h=soilHash(static_cast<unsigned>(x/24),0,7);
+            const float top=588.f+static_cast<float>(h%6u)*3.f;
+            world(static_cast<float>(x),top,24,12,
+                h%3u==0?0x564034:h%3u==1?0x48352b:0x49382f,3);
+            world(static_cast<float>(x),top+12,24,6,
+                h%4u==0?0x614a39:0x3c2b25,3);
+            const float deep=626.f+static_cast<float>((h>>8)%9u)*6.f;
+            world(static_cast<float>(x)+static_cast<float>((h>>15)%3u)*3.f,
+                  deep,12+static_cast<float>((h>>17)%4u)*3.f,6,
+                  h%5u==0?0x594033:0x382a25,3);
         }
-        for(int i=0;i<50;++i) {
-            const unsigned h=static_cast<unsigned>(i)*2246822519u + 9137u;
-            const float x=static_cast<float>((h^(h>>15))%1650u);
-            const float y=577.f-static_cast<float>(h%3u)*3.f;
-            world(x,y,9.f+static_cast<float>(h%4u)*6.f,3.f,
-                i%5==0?0x7b985d:0x658450,3);
+        // Pebbles, dark clods, and occasional root-like pixels beneath the grass.
+        for(int i=0;i<215;++i) {
+            const unsigned h=soilHash(static_cast<unsigned>(i),1,29);
+            const float x=static_cast<float>(h%1588u);
+            const float y=603.f+static_cast<float>((h>>9)%35u)*3.f;
+            world(x,y,3.f+static_cast<float>((h>>17)%4u)*3.f,
+                  (h%7u==0)?6.f:3.f,
+                  h%11u==0?0x927358:h%4u==0?0x5e4739:
+                  h%4u==1?0x47352c:0x221b19,3);
         }
-        (void)camera;
+        // Small grass fringe along the walkable y=585 surface, never a green slab.
+        for(int x=0;x<1600;x+=12) {
+            const unsigned h=soilHash(static_cast<unsigned>(x/12),2,41);
+            const float y=582.f+static_cast<float>(h%3u)*3.f;
+            world(static_cast<float>(x),y,12,3,
+                  h%4u==0?0x628352:h%4u==1?0x547448:0x46653f,3);
+            if(h%5u==0)
+                world(static_cast<float>(x)+3, y-6,3,6,0x648750,3);
+        }
     }
     void forest(const Combat& g,float camera) {
         rect(0,0,viewWidth,viewHeight,0x152334);
@@ -134,10 +159,7 @@ class Presentation {
             if(instance.layer>=4)break;
             forestObject(instance,camera,g.clock);
         }
-        world(0,578,1600,12,0x527b45);
-        world(0,585,1600,135,0x2b4034);
-        world(0,585,1600,8,0x73995d);
-        forestGround(camera);
+        forestGround();
         for(const auto& instance:instances) {
             if(instance.layer<4)continue;
             forestObject(instance,camera,g.clock);
