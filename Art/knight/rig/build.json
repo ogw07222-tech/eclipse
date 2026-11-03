@@ -1,19 +1,13 @@
 {
   "inputs": {
-    "Tools/bake_knight_motion.py": "ca03f7537638baf4d784841b5366707b741889348057f79e987f4049a2f41e03",
-    "Art/knight/rig/boot.png": "5f8aa529e9cf678933f6da54e0e088f152f8a205dc57cf58819b8249af32c48f",
-    "Art/knight/rig/forearm.png": "f3f32a05cd11b008f88ee4f2621793ee17df914d7c0afadc91738921ace43029",
-    "Art/knight/rig/helmet.png": "b550a0e4536b7c3960fea2ca8f5173e672af39c1a2286c6a64481b0826ce540a",
-    "Art/knight/rig/neutral.png": "455863bb2df665e4132350934869c015d27c3e524df67054a4b3b7b74b2dad7f",
-    "Art/knight/rig/shin.png": "45aae32267d552561eb1080622c39c43980718b4ca5d8703b704eb04449c75b2",
-    "Art/knight/rig/sword.png": "093a56e93bce21ee9a86c923eb74e26e4230f60ebcbc72dbc19d5b832b9df78f",
-    "Art/knight/rig/thigh.png": "37424f05ddd872ab1ac05f869ca63e06f2ca80c2f4552544661a7dbbf35ec2df",
-    "Art/knight/rig/torso.png": "81ad153ea529eb41cb8b6084e52f324b9b136848118f402076cba865ab836029",
-    "Art/knight/rig/upper_arm.png": "a552f57e39945499edc7e5641a7b047f8142b4ead28e1c6f2720726dd9ae6882"
+    "Art/knight/redesign/blade_paths.json": "da7c9127fcdf721fb2d48bfd35fd3a666ad5d45d13f12b865b9da1ffe19609fe",
+    "Art/knight/redesign/knight_64x94_master.png": "8cbc25c543a845a4a9fc65676d5db18b7159acbf91fb8de0014a9ff7d7ee62ef",
+    "Tools/bake_knight_motion.py": "d49c0d38f811a4cdf2ba043064038040f698cc5d433d61bd6d348f66ee616504",
+    "Art/knight/rig/clips.json": "e40cd90d919a9a2121bbff87f76f6d98624f27eb8e0cc8c56917affde356fc21"
   },
   "outputs": {
-    "Assets/Resources/Eclipse/knight_motion.png": "235286059dbca83db4d2efc98ad10426c326f9a952502d999aa7b39369ebf3e3",
-    "native-engine/src/motion.hpp": "ccc90a3f53f566fdff205c9cd95c519f4d9323a8e4f5381baaa8fc31754d9e16",
-    "native-engine/src/sword_trails.hpp": "7d2f82854bec15180269ff7db2c413d27be1283a93e6e02fd63644d79c85b505"
+    "Assets/Resources/Eclipse/knight_motion.png": "23d0b197313b0d416041533e49232e924615bc5c94c4bc67cb69acc644663997",
+    "native-engine/src/motion.hpp": "19c5460a61832f20c8cad6290f8bca8509e3f7e128ab0722c836b01c211e4abb",
+    "native-engine/src/sword_trails.hpp": "f165fe6a328e98daec07591aa85ed0a1421f23c3eccdf11e93617ff9eacdda57"
   }
 }
