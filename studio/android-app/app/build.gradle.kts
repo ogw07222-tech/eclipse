@@ -17,6 +17,7 @@ val packageEclipseAssets by tasks.registering(Sync::class) {
     from(gameArt) {
         include("knight_motion.png", "ui/attack_states.png", "ui/dash_states.png",
             "ui/swap_skill_states.png", "ui/joystick_arrows_new.png",
+            "ui/settings_gear.png", "ui/settings_menu_panel.png",
             "forest/**/*.png", "forest_v2/**/*.png", "forest_v3/**/*.png")
     }
     into(packagedArt)
