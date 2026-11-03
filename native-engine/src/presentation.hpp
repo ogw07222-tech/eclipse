@@ -13,7 +13,9 @@ class Presentation {
     SDL_Renderer* renderer;
     std::array<SDL_Texture*,5> textures{};
     std::array<SDL_Texture*,3> slimeTextures_{};
-    float offset=0;\n    SDL_Texture* settingsGear_=nullptr;\n    SDL_Texture* settingsPanel_=nullptr;
+    float offset=0;
+    SDL_Texture* settingsGear_=nullptr;
+    SDL_Texture* settingsPanel_=nullptr;
     ForestGenerator forestGenerator_{};
     std::array<SDL_Texture*,40> forestTextures_{};
     std::array<SDL_Texture*,4> forestLayerTextures_{};
