@@ -109,3 +109,7 @@ The original concept-sheet pack includes several edge-touching art fragments and
 ## Soil art pass v2
 
 The ground uses a restrained earthy palette and purposeful material layers: broken thin moss fringe (surface), dark humus (top), warm clay bands (middle), dark compressed stone (bottom), horizontal sediment veins, embedded pebble highlights, sparse roots, and clustered crumbs. No green-filled ground. The C++ runtime and APK-free browser preview use matching coordinate hash + seed. Layout does not change every frame, and collision remains at y=585.
+
+## Active sprite repair committed
+
+At commit `6e6a466`, the current two tree PNGs and two bush PNGs were replaced directly on `main` with wider source crops and updated manifest dimensions. The images use indexed PNG palette optimization to keep the GitHub and Android artifact compact. Older ZIP manual-import instructions above are now **historical** and no longer needed. Browser preview warns when local files are stale. Run `git pull --ff-only origin main` before evaluating the new soil and sprite edges.
