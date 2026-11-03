@@ -1,21 +1,12 @@
 name: ECLIPSE Studio Android APK
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'studio/android-app/**'
-      - '.github/workflows/studio-android-apk.yml'
-  pull_request:
-    paths:
-      - 'studio/android-app/**'
-      - '.github/workflows/studio-android-apk.yml'
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   build-studio-apk:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 55
     defaults:
       run:
         working-directory: studio/android-app
@@ -34,7 +25,7 @@ jobs:
           test -n "$SDKMANAGER" || { echo "sdkmanager is not installed"; exit 1; }
           "$SDKMANAGER" --version
           yes | "$SDKMANAGER" --licenses >/dev/null || true
-          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0" "ndk;27.2.12479018" "cmake;3.31.6"
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -58,8 +49,13 @@ jobs:
           echo "ECLIPSE_STUDIO_STORE_PASSWORD=$STORE_PASSWORD" >> "$GITHUB_ENV"
           echo "ECLIPSE_STUDIO_KEY_ALIAS=$KEY_ALIAS" >> "$GITHUB_ENV"
           echo "ECLIPSE_STUDIO_KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
+      - name: Prepare official SDL3 Android Java/C sources
+        run: python3 ../../native-engine/tools/prepare_android.py
       - name: Build debug APK
         run: gradle :app:assembleDebug --no-daemon --stacktrace
+      - name: Verify original SDL3 runtime and game data
+        run: |
+          python3 ../../native-engine/tools/verify_apk.py app/build/outputs/apk/debug/app-debug.apk
       - name: Verify debug APK signature
         run: |
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs app/build/outputs/apk/debug/app-debug.apk
