@@ -13,6 +13,16 @@ struct ForestLayerScene {
     static constexpr int worldWidth=1600;
     static constexpr int viewportWidth=1280;
     static constexpr int floorY=585;
+    // v3 layers are artwork-only. No random world positions or new collisions.
+    static constexpr std::array<ForestLayer,6> layersV3{{
+        {"forest_v3/sky/sky_gradient_moon_01.png",0.f,false},
+        {"forest_v3/clouds/clouds_01.png",.06f,false},
+        {"forest_v3/far/mountain_far_01.png",.14f,false},
+        {"forest_v3/mid/forest_mid_01.png",.40f,false},
+        {"forest_v3/near/ground_fixed_01.png",1.f,true},
+        {"forest_v3/near/near_props_fixed_01.png",1.f,true}
+    }};
+    // Keep v2 available as a complete fallback if a v3 file is missing.
     static constexpr std::array<ForestLayer,4> layers{{
         {"forest_v2/sky/sky_01.png",0.f,false},
         {"forest_v2/far/forest_far_01.png",.12f,false},
