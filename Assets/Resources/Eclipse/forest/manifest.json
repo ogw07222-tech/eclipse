@@ -36,8 +36,8 @@
     {
       "name": "tree_large_01",
       "path": "trees_large/tree_large_01.png",
-      "width": 188,
-      "height": 148,
+      "width": 233,
+      "height": 180,
       "transparent": true,
       "pivot": "bottom_center",
       "group": "trees_large"
@@ -81,8 +81,8 @@
     {
       "name": "tree_mid_01",
       "path": "trees_medium/tree_mid_01.png",
-      "width": 122,
-      "height": 106,
+      "width": 164,
+      "height": 144,
       "transparent": true,
       "pivot": "bottom_center",
       "group": "trees_medium"
@@ -117,8 +117,8 @@
     {
       "name": "bush_01",
       "path": "bushes/bush_01.png",
-      "width": 110,
-      "height": 62,
+      "width": 187,
+      "height": 106,
       "transparent": true,
       "pivot": "bottom_center",
       "group": "bushes"
@@ -126,8 +126,8 @@
     {
       "name": "bush_02",
       "path": "bushes/bush_02.png",
-      "width": 134,
-      "height": 86,
+      "width": 179,
+      "height": 142,
       "transparent": true,
       "pivot": "bottom_center",
       "group": "bushes"
