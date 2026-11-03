@@ -1,15 +1,15 @@
 # ECLIPSE — SDL3 game and separate developer Studio
 
-This repository currently contains **two different Android applications**. They share game source code and artwork, but **must never be treated as a single APK or the same installation**.
+The production ECLIPSE Game remains in this repository. **ECLIPSE Studio has been extracted to its own repository:** [ogw07222-tech/eclipse-studio](https://github.com/ogw07222-tech/eclipse-studio). The legacy `studio/` directory remains temporarily for migration safety and should not be treated as the active Studio source.
 
 | | ECLIPSE Game | ECLIPSE Studio |
 | --- | --- | --- |
 | Purpose | Normal playable game for players | Developer-only launcher, local testing and diagnostics |
 | Android application ID | `com.eclipse.nativegame` | `dev.eclipse.studio` |
-| Project | [native-engine/android/](native-engine/android/README.md) | [studio/android-app/](studio/android-app/README.md) |
+| Project | [native-engine/android/](native-engine/android/README.md) | [eclipse-studio](https://github.com/ogw07222-tech/eclipse-studio) |
 | Game implementation | [native-engine/](native-engine/README.md) (C++17 / SDL3) | Reuses the original game source, but Studio's test runner is separately built |
 | APK | `ECLIPSE-Native.apk` | `ECLIPSE-Studio.apk` |
-| Workflow | [Native Android APK](.github/workflows/native-android-apk.yml) | [Studio Android APK](.github/workflows/studio-android-apk.yml) |
+| Workflow | [Native Android APK](.github/workflows/native-android-apk.yml) | [Studio APK (separate repository)](https://github.com/ogw07222-tech/eclipse-studio/actions/workflows/studio-android-apk.yml) |
 | Local game-code testing | Not applicable to the public app | Termux compilation / native module import (experimental, PR #40) |
 
 ## Development boundaries
@@ -29,3 +29,7 @@ A shared repository is **not a shared application**. If independent repository a
 - [Legacy/Godot/](Legacy/Godot/README.md) — archived Godot game
 
 The currently active game is SDL3, not the archived Unity or Godot versions.
+
+## Migration note (2026-11-04)
+
+Studio development belongs in [eclipse-studio](https://github.com/ogw07222-tech/eclipse-studio). The standalone Game remains `com.eclipse.nativegame` and its code and game build are unchanged. Studio Android signing secrets must be manually recreated in the new repository; encrypted GitHub Actions secrets cannot be exported by the API. The old `studio/` directory is retained until the new repository's Studio build and APK update signing are verified, then it can be removed through a separate reviewed change.
