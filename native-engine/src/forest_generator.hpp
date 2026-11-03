@@ -17,9 +17,9 @@ struct ForestSprite {
 };
 struct ForestSettings {
     uint32_t seed = 20261103u;
-    float density = .65f;       // 0 .. 1
+    float density = .74f;       // 0 .. 1
     float size = 1.f;          // .6 .. 1.5
-    float variation = .3f;     // 0 .. 1
+    float variation = .18f;     // 0 .. 1
     float motion = .08f;       // 0 .. .2, effects only
     float width = 1600.f;
     float groundY = 585.f;
@@ -57,7 +57,7 @@ class ForestGenerator {
             const float x=-180.f + (i+.5f)*spacing + jitter;
             if(x-previous<minimum)continue;
             const float s=clamp(baseScale*settings_.size*
-                (1.f + (unit(salt,i,2)-.5f)*.45f*settings_.variation),.28f,2.0f);
+                (1.f + (unit(salt,i,2)-.5f)*.45f*settings_.variation),.28f,5.0f);
             uint8_t variation=static_cast<uint8_t>(random(salt,i,3)%varieties);
             sprites_.push_back({kind,variation,layer,
                 std::round(x/3.f)*3.f,baseline,s,random(salt,i,4)});
@@ -70,7 +70,7 @@ public:
     const std::vector<ForestSprite>& sprites() const {return sprites_;}
     void regenerate(ForestSettings settings) {
         settings.density=clamp(settings.density,0.f,1.f);
-        settings.size=clamp(settings.size,.6f,1.5f);
+        settings.size=clamp(settings.size,.6f,1.8f);
         settings.variation=clamp(settings.variation,0.f,1.f);
         settings.motion=clamp(settings.motion,0.f,.2f);
         settings.width=clamp(settings.width,640.f,100000.f);
@@ -78,15 +78,15 @@ public:
         sprites_.clear();
         // Distances reflect silhouettes and not mere sprite anchor spacing.
         // The layer numbers are sorted back-to-front for alpha compositing.
-        distribute(ForestKind::Far,0,3,260,170,.95f,560,11);
-        distribute(ForestKind::LargeTree,1,5,205,130,1.15f,584,17);
-        distribute(ForestKind::MidTree,2,4,145,83,.92f,582,23);
-        distribute(ForestKind::Bush,3,5,92,56,.82f,584,29);
-        distribute(ForestKind::Rock,3,3,175,88,.83f,583,31);
-        distribute(ForestKind::Plant,3,3,125,68,.75f,584,37);
-        distribute(ForestKind::Detail,3,6,220,105,.75f,583,41);
-        distribute(ForestKind::Grass,4,4,43,23,.7f,583,43);
-        distribute(ForestKind::Effect,5,3,310,145,.65f,520,47);
+        // Cohesive woodland: one main tree and one secondary, sparse static props.
+        // Larger crowns fill the sky instead of crowding the floor.
+        distribute(ForestKind::Far,0,1,265,180,1.25f,558,11);
+        distribute(ForestKind::LargeTree,1,1,185,150,3.32f,584,17);
+        distribute(ForestKind::MidTree,2,1,425,315,2.72f,582,23);
+        distribute(ForestKind::Bush,3,2,195,115,1.15f,584,29);
+        distribute(ForestKind::Rock,3,1,385,215,.88f,583,31);
+        distribute(ForestKind::Detail,3,2,440,290,.85f,583,41);
+        distribute(ForestKind::Grass,4,2,115,70,.77f,583,43);
         std::stable_sort(sprites_.begin(),sprites_.end(),
             [](const ForestSprite& a,const ForestSprite& b) {
                 return a.layer<b.layer;
