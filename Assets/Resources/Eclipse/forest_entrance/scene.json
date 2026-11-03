@@ -1,0 +1,62 @@
+{
+  "id": "forest_entrance",
+  "name": "숲 입구",
+  "assetVersion": 4,
+  "width": 1600,
+  "viewport": 1280,
+  "height": 720,
+  "groundY": 585,
+  "fixedNpcReservedWorldX": [
+    [
+      260,
+      425
+    ],
+    [
+      710,
+      900
+    ],
+    [
+      1180,
+      1360
+    ]
+  ],
+  "layers": [
+    {
+      "file": "sky/sky.png",
+      "parallax": 0,
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "file": "clouds/clouds.png",
+      "parallax": 0.06,
+      "width": 1600,
+      "height": 720
+    },
+    {
+      "file": "far/mountains.png",
+      "parallax": 0.14,
+      "width": 1600,
+      "height": 720
+    },
+    {
+      "file": "mid/trees.png",
+      "parallax": 0.4,
+      "width": 1600,
+      "height": 720
+    },
+    {
+      "file": "near/ground.png",
+      "parallax": 1,
+      "width": 1600,
+      "height": 720
+    },
+    {
+      "file": "near/props.png",
+      "parallax": 1,
+      "width": 1600,
+      "height": 720
+    }
+  ],
+  "notes": "Real authored pixel-art raster layers, no procedural art generation during gameplay. Keep fixed NPC and collision coordinates."
+}
