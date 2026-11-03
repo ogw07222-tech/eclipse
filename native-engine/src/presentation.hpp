@@ -128,14 +128,19 @@ class Presentation {
         const float sx=forestGenerator_.drawX(sprite,camera);
         if(sx < -330 || sx > viewWidth+330)return;
         const size_t index=forestIndex(sprite);
-        SDL_Texture* image=forestTextures_[index];
+        // Far silhouettes in pack v1 have opaque rectangular backgrounds.
+        // Use the seamless procedural fallback until cleaned transparent strips ship.
+        SDL_Texture* image=sprite.kind==ForestKind::Far ? nullptr : forestTextures_[index];
         if(image) {
             float w=0,h=0;
             if(SDL_GetTextureSize(image,&w,&h)) {
                 const float scale=sprite.scale;
                 const float py=sprite.groundY+forestGenerator_.microMotion(sprite,clock);
+                // Hanging vines anchor high above the ground; all other props use bottom pivot.
+                const float top=sprite.kind==ForestKind::Detail && sprite.variant==2
+                    ? 355.f : py-h*scale;
                 SDL_FRect target{std::round(sx-w*scale*.5f),
-                    std::round(py-h*scale),std::round(w*scale),std::round(h*scale)};
+                    std::round(top),std::round(w*scale),std::round(h*scale)};
                 SDL_RenderTexture(renderer,image,nullptr,&target);
                 return;
             }

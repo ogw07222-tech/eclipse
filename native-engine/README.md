@@ -63,3 +63,17 @@ The current native knight uses the 104-frame coarse motion sheet described in [K
 `src/forest_generator.hpp` is the pure C++17 deterministic layout subsystem; `Presentation::setForestSettings` changes seed, density (0–1), size (0.6–1.5), variation (0–1), and micro-motion (0–0.2). The scene is generated once at initialization or when settings change, not regenerated every frame. Spatial slots and minimum separation prevent unconstrained overlap, and layer-specific parallax is camera-relative. Trees, shrubs, and grasses do **not** sway; effects alone may move less than ~2px.
 
 The PNG catalog expects up to 40 optional files under `Assets/Resources/Eclipse/forest/`, preserving the `background/`, `trees_large/`, `trees_medium/`, `bushes/`, `grass/`, `rocks/`, `terrain/`, `details/`, `plants/`, and `effects/` subdirectories. Sprite PNGs load once at startup with nearest-neighbor sampling; missing images fall back to simple procedural shapes. Place the independently produced asset package there to enable sprite rendering. Gameplay collision and combat are not modified. Headless tests check deterministic seeds, density, layer order, motion, and parallax.
+
+### Importing the 40 PNG concept pack
+
+Download `eclipse_forest_png_40.zip` from the ECLIPSE asset delivery and run:
+
+```sh
+python3 native-engine/tools/import_forest_pack.py eclipse_forest_png_40.zip --check-only
+python3 native-engine/tools/import_forest_pack.py eclipse_forest_png_40.zip
+git add Assets/Resources/Eclipse/forest
+git commit -m "Add ECLIPSE forest sprites"
+git push
+```
+
+The importer validates exact sprite filenames, PNG signatures and dimensions against the packaged manifest. The current optional loader has procedural fallback until those files are added. **Known v1 limitations:** three far-background images are opaque and intentionally use procedural fallback to avoid rectangular sky seams; four ground tile samples are reference assets and are not tiled because their borders do not yet form a seamless tileset. Some decorative sprites have clipped edges from the concept-sheet extraction. Mainline gameplay does not depend on these assets until import.
