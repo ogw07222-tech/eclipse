@@ -1,5 +1,6 @@
 #include "../src/core.hpp"
 #include "../src/forest_generator.hpp"
+#include "../src/forest_layers.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
@@ -44,6 +45,26 @@ int main(){int failed=0,total=0;
     test("Run cycle follows actual world travel without wall skating",[]{Player p;p.vx=280;Animation a;a.step(p,1.f/60);int first=a.frame;for(int i=0;i<16;++i){p.x+=7.5f;a.step(p,1.f/60);}check(a.frame==first,"Stride distance mismatch");for(int i=0;i<30;++i)a.step(p,1.f/60);check(a.frame==first,"Stationary feet animated");});
     test("Jump apex fall and landing use distinct clips",[]{Player p;Animation a;p.grounded=false;p.vy=-650;a.step(p,1.f/60);check(a.state==2&&a.frame==48,"Takeoff");p.vy=350;a.step(p,1.f/60);check(a.state==3&&a.frame>=64,"Fall");p.grounded=true;p.vy=0;a.step(p,1.f/60);check(a.state==10,"Landing missing");for(int i=0;i<12;++i)a.step(p,1.f/60);check(a.state==0,"Landing stuck");});
     test("Hit-stop holds the contact pose then resumes",[]{Player p;p.combo=2;++p.attackSerial;p.hitStop=.075f;Animation a;a.step(p,1.f/60);const int contact=a.frame;check(contact>=133,"Hit froze before contact");a.step(p,1.f/60);check(a.frame==contact,"Hit-stop pose advanced");p.hitStop=0;a.step(p,.05f);check(a.frame>contact,"Contact did not resume");});
+    test("Layered forest keeps ground and NPC regions deterministic",[]{
+        check(ForestLayerScene::floorY==585,"Collision floor moved");
+        check(ForestLayerScene::worldWidth==1600,"World boundaries changed");
+        check(ForestLayerScene::layers.size()==4,"Four layer contract");
+        check(ForestLayerScene::layers[0].parallax==0.f,"Sky must stay stationary");
+        check(ForestLayerScene::layers[3].parallax==1.f,"Ground must follow world");
+        for(auto zone:ForestLayerScene::npcZones){
+            check(zone.x1>zone.x0,"Invalid NPC zone");
+            for(int x=zone.x0;x<=zone.x1;++x){
+                check(ForestLayerScene::npcSafe(x),"NPC reservation failed");
+                check(!ForestLayerScene::canPlaceForegroundProp(x),"Prop in NPC reserved area");
+            }
+        }
+        for(uint32_t seed=0;seed<100;seed++){
+            check(ForestLayerScene::farTint(seed)>=239u &&
+                  ForestLayerScene::farTint(seed)<=255u,"Too much far layer variation");
+        }
+        check(ForestLayerScene::canPlaceForegroundProp(60),"Everything reserved");
+        check(!ForestLayerScene::canPlaceForegroundProp(260),"Quest corridor blocked");
+    });
     test("Forest seed replay and isolation",[]{
         ForestSettings s;s.seed=22;ForestGenerator a(s),b(s);
         check(a.sprites().size()==b.sprites().size(),"Unstable count");
