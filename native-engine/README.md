@@ -57,3 +57,9 @@ PNG decoding only, no image encoders; fixed-size touch storage; fixed60Hz simula
 ## Coarse knight motion update
 
 The current native knight uses the 104-frame coarse motion sheet described in [KNIGHT_MOTION.md](KNIGHT_MOTION.md), replacing the original knight atlas in native packaging. Run/walk phase follows distance, attacks have separate full clips, and Actions uploads a renderer replay video. Earlier original-atlas descriptions above document the previous port baseline.
+
+## Seed-based forest placement engine
+
+`src/forest_generator.hpp` is the pure C++17 deterministic layout subsystem; `Presentation::setForestSettings` changes seed, density (0–1), size (0.6–1.5), variation (0–1), and micro-motion (0–0.2). The scene is generated once at initialization or when settings change, not regenerated every frame. Spatial slots and minimum separation prevent unconstrained overlap, and layer-specific parallax is camera-relative. Trees, shrubs, and grasses do **not** sway; effects alone may move less than ~2px.
+
+The PNG catalog expects up to 40 optional files under `Assets/Resources/Eclipse/forest/`, preserving the `background/`, `trees_large/`, `trees_medium/`, `bushes/`, `grass/`, `rocks/`, `terrain/`, `details/`, `plants/`, and `effects/` subdirectories. Sprite PNGs load once at startup with nearest-neighbor sampling; missing images fall back to simple procedural shapes. Place the independently produced asset package there to enable sprite rendering. Gameplay collision and combat are not modified. Headless tests check deterministic seeds, density, layer order, motion, and parallax.

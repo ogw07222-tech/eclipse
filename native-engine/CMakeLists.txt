@@ -68,6 +68,14 @@ if(NOT ANDROID)
       COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${TARGET_NAME}>/assets/${directory}"
       COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ECLIPSE_ASSET_SOURCE}/${asset}" "$<TARGET_FILE_DIR:${TARGET_NAME}>/assets/${asset}")
   endforeach()
+  # Optional forest PNG set; preserve folder layout and only copy files that exist.
+  file(GLOB_RECURSE ECLIPSE_FOREST_PNGS RELATIVE "${ECLIPSE_ASSET_SOURCE}" "${ECLIPSE_ASSET_SOURCE}/forest/*.png")
+  foreach(asset IN LISTS ECLIPSE_FOREST_PNGS)
+    get_filename_component(directory "${asset}" DIRECTORY)
+    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:${TARGET_NAME}>/assets/${directory}"
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ECLIPSE_ASSET_SOURCE}/${asset}" "$<TARGET_FILE_DIR:${TARGET_NAME}>/assets/${asset}")
+  endforeach()
   set_target_properties(${TARGET_NAME} PROPERTIES BUILD_RPATH "$ORIGIN")
   if(ECLIPSE_TESTS)
     enable_testing()

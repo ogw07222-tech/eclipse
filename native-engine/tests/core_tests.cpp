@@ -1,4 +1,5 @@
 #include "../src/core.hpp"
+#include "../src/forest_generator.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
@@ -43,5 +44,43 @@ int main(){int failed=0,total=0;
     test("Run cycle follows actual world travel without wall skating",[]{Player p;p.vx=280;Animation a;a.step(p,1.f/60);int first=a.frame;for(int i=0;i<16;++i){p.x+=7.5f;a.step(p,1.f/60);}check(a.frame==first,"Stride distance mismatch");for(int i=0;i<30;++i)a.step(p,1.f/60);check(a.frame==first,"Stationary feet animated");});
     test("Jump apex fall and landing use distinct clips",[]{Player p;Animation a;p.grounded=false;p.vy=-650;a.step(p,1.f/60);check(a.state==2&&a.frame==48,"Takeoff");p.vy=350;a.step(p,1.f/60);check(a.state==3&&a.frame>=64,"Fall");p.grounded=true;p.vy=0;a.step(p,1.f/60);check(a.state==10,"Landing missing");for(int i=0;i<12;++i)a.step(p,1.f/60);check(a.state==0,"Landing stuck");});
     test("Hit-stop holds the contact pose then resumes",[]{Player p;p.combo=2;++p.attackSerial;p.hitStop=.075f;Animation a;a.step(p,1.f/60);const int contact=a.frame;check(contact>=133,"Hit froze before contact");a.step(p,1.f/60);check(a.frame==contact,"Hit-stop pose advanced");p.hitStop=0;a.step(p,.05f);check(a.frame>contact,"Contact did not resume");});
+    test("Forest seed replay and isolation",[]{
+        ForestSettings s;s.seed=22;ForestGenerator a(s),b(s);
+        check(a.sprites().size()==b.sprites().size(),"Unstable count");
+        for(size_t i=0;i<a.sprites().size();++i) {
+            const auto& x=a.sprites()[i];const auto& y=b.sprites()[i];
+            check(x.kind==y.kind&&x.variant==y.variant&&x.x==y.x&&x.scale==y.scale,"Unstable sprite");
+        }
+        s.seed=23;ForestGenerator c(s);
+        bool different=c.sprites().size()!=a.sprites().size();
+        for(size_t i=0;i<std::min(c.sprites().size(),a.sprites().size());++i)
+            different|=c.sprites()[i].x!=a.sprites()[i].x;
+        check(different,"Seed ignored");
+    });
+    test("Forest bounded density and sorted layers",[]{
+        ForestSettings s;s.density=0;ForestGenerator empty(s);
+        check(empty.sprites().empty(),"Zero density spawns sprites");
+        s.density=1;ForestGenerator dense(s);
+        check(dense.sprites().size()>20,"Density ineffective");
+        for(size_t i=1;i<dense.sprites().size();++i)
+            check(dense.sprites()[i].layer>=dense.sprites()[i-1].layer,"Layer order");
+    });
+    test("Forest no global grass or tree animation",[]{
+        ForestGenerator g;ForestSprite trunk{ForestKind::LargeTree,0,1,100,585,1,0};
+        ForestSprite grass{ForestKind::Grass,0,4,100,585,1,0};
+        ForestSprite light{ForestKind::Effect,0,5,100,520,1,0};
+        check(g.microMotion(trunk,0)==g.microMotion(trunk,9),"Tree sways");
+        check(g.microMotion(grass,0)==g.microMotion(grass,9),"Grass sways");
+        check(std::abs(g.microMotion(light,3))<2,"Excessive ambient motion");
+    });
+    test("Forest param bounds and camera parallax",[]{
+        ForestSettings s;s.density=3;s.size=9;s.motion=9;
+        ForestGenerator g(s);
+        check(g.settings().density==1&&g.settings().size==1.5f&&g.settings().motion==.2f,"Clamps missing");
+        ForestSprite f{ForestKind::Far,0,0,600,560,1,0};
+        ForestSprite n{ForestKind::Grass,0,4,600,585,1,0};
+        check(g.drawX(f,740)>g.drawX(n,740),"Parallax reversed");
+        check(g.drawX(f,640)==600,"Default camera offset wrong");
+    });
     std::cout<<total-failed<<'/'<<total<<" passed\n";return failed?1:0;
 }
