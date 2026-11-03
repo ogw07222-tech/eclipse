@@ -4,10 +4,12 @@ on:
     branches: [main]
     paths:
       - 'studio/android-app/**'
+      - 'studio/bridge/**'
       - '.github/workflows/studio-android-apk.yml'
   pull_request:
     paths:
       - 'studio/android-app/**'
+      - 'studio/bridge/**'
       - '.github/workflows/studio-android-apk.yml'
   workflow_dispatch:
 permissions:
@@ -58,6 +60,8 @@ jobs:
           echo "ECLIPSE_STUDIO_STORE_PASSWORD=$STORE_PASSWORD" >> "$GITHUB_ENV"
           echo "ECLIPSE_STUDIO_KEY_ALIAS=$KEY_ALIAS" >> "$GITHUB_ENV"
           echo "ECLIPSE_STUDIO_KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
+      - name: Test AI command bridge
+        run: python3 -m unittest discover -s ../bridge -p 'test_*.py'
       - name: Build debug APK
         run: gradle :app:assembleDebug --no-daemon --stacktrace
       - name: Verify debug APK signature
