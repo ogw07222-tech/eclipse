@@ -1,47 +1,41 @@
-# Reference knight: 64x94 PNG animation
+# Unified 64x94 knight artwork
 
-The reference silver-armored, closed-helmet knight with a navy cape replaces the coarse procedural rig. The runtime keeps its existing 12 clip slots and 104 playable frames. Each cell is now **64x94**, in a 16-column by 12-row atlas (1024x1128). Registration is (28,88), mirrored around the same point when facing left. World scale is 1.85, so the taller canvas does not triple the character's on-screen height.
+All twelve animations now use the same attack-reference knight identity and detail level: silver full plate, closed helmet, navy cape and a longer right-hand sword. The old small multi-row locomotion extraction has been replaced with newly authored poses of the same quality as the attacks.
 
-| Row | Clip | Runtime frames | Authored PNG poses |
-| --- | --- | --- | --- |
-| 0 | Idle | 8 | 7 |
-| 1 | Walk | 8 | 7 |
-| 2 | Run | 16 | 14 |
-| 3 | Jump | 6 | 6 |
-| 4 | Fall | 6 | 6 |
-| 5 | Land | 6 | 6 |
-| 6 | Dash | 8 | 8 |
-| 7 | Weak slash | 8 | 8 |
-| 8 | Strong overhead slash | 10 | 10 |
-| 9 | Thrust | 10 | 10 |
-| 10 | Hurt | 6 | 6 |
-| 11 | Death | 12 | 11 |
+The atlas remains **1024x1128**, with 16 columns, 12 rows, **64x94 cells**, pivot (28,88) and 1.85 world scale. Ready poses share a 53-pixel silhouette height and all motions share one 96-color indexed palette with binary alpha and nearest sampling. The extended blade remains visible in every pose. Measured attack blade annotations are about 20-30% longer on average than the previous artwork; apparent length still varies with pose projection.
 
-The source has 99 distinct poses. Five repeated temporal samples preserve the existing 104-frame interface; they are not new interpolated drawings. All three attacks have distinct authored poses at every runtime frame. The weak cut's sequence was reordered so the high guard precedes contact and the down-right follow-through follows contact.
+| Row | Animation | Authored/runtime frames |
+| --- | --- | --- |
+| 0 | Idle | 8 |
+| 1 | Walk | 8 |
+| 2 | Run | 16 |
+| 3 | Jump | 6 |
+| 4 | Fall | 6 |
+| 5 | Land | 6 |
+| 6 | Dash | 8 |
+| 7 | Weak slash | 8 |
+| 8 | Overhead slash | 10 |
+| 9 | Thrust | 10 |
+| 10 | Hurt | 6 |
+| 11 | Death | 12 |
 
-The right-hand sword is visible in locomotion, aerial, dash, hurt and death poses, as well as attacks. The three attack sequences were regenerated separately to correct missing blades and broken swings. Armor and cloth retain opaque interiors. The final PNG uses an indexed muted palette, binary transparency, no filtering, and an empty margin around each cell. Sword effects remain separate runtime geometry, registered from the new blade paths; they are not baked into the actor PNG.
+There are **104 distinct authored poses**. No temporal duplicate frames are needed. Sprite cells reserve room around the silhouette and preserve the longer blade inside the 64-pixel frame width. Pose groups use a common normalization, with limited width fitting where a long blade and fully extended cape/lunge would exceed the fixed cell. Source normalization records are in `Art/knight/redesign/unified_style.json`.
 
-### Blade-registered sword effects
+## Sword effects
 
-Every attack's wrist and tip annotations now refer to the actual 64x94 PNG steel pixels, replacing the approximate coordinates that put some effects below the sword. The leading edge terminates at the current frame's blade tip. Cuts sweep an interpolated blade segment into a tapered ribbon; the heavy cut has a wider inner/outer radius. Thrust uses a small forward wake capped at 40% of blade length (6 source pixels maximum). Both actor and effect share the (28,88) registration and 1.85 world scale, including horizontal mirroring.
+Wrist/tip coordinates in `blade_paths.json` refer to the current master PNG. The leading effect edge ends at the current visible steel tip. Cuts form a tapered blade sweep; overhead cuts have a broader arc; thrust uses a compact forward wake. All effects share the actor's pivot, 1.85 scale and horizontal reflection. Weak/strong/thrust effects appear on frames 3-5 / 5-7 / 4-6 respectively. Contact has an effect; wind-up and late recovery do not. Hit-stop holds the same actor/effect frame. The character PNG contains no baked sword trails.
 
-Weak slash effects appear on frames 3-5, strong slash on 5-7, thrust on 4-6. Each contact frame has an effect; wind-up, late recovery, hurt, dash, death and non-attack states do not retain it. Hit-stop holds the matching animation/effect frame. The actor PNG and gameplay reach/damage/timing remain unchanged.
+## Rebuild and validation
 
-Validation checks all 28 annotated blade tips against visible steel (at most 2 source pixels of error), proportional effect reach, tip contact and empty non-strike frames. All 56 attack poses (28 poses, left and right) were rendered through the real SDL Presentation renderer. The six-panel replay is `Art/knight/redesign/sword_fx_preview.gif`. Current core regression tests: 40/40 passed.
-
-## Edit and validate
-
-Edit `Art/knight/redesign/knight_64x94_master.png` in its indexed palette, keeping the transparent color at index zero. Update `blade_paths.json` when attack wrist/tip positions change. Run:
+Edit the indexed master PNG, preserving transparency at palette index zero. Update the blade coordinates if a pose changes. Run:
 
 ```sh
 python Tools/bake_knight_motion.py
 python native-engine/tools/check_motion.py
 ```
 
-The baker packs the approved PNG poses and regenerates separate trail spans. It no longer rebuilds the character from the retired 64x48 body-part rig. Old rig PNGs remain historical assets, not current animation inputs. Checks validate source/output hashes, actual pixel dimensions, all populated cells, unused transparent cells, binary alpha, uncut silhouettes, clip counts and source-frame mappings. They do not claim to prove anatomical correctness or zero foot sliding from an unrelated analytical rig.
+Validation checks actual PNG dimensions, all 104 distinct occupied cells, transparent unused cells, binary alpha, shared palette, ready-pose height, uncut frame bounds, source mappings, steel-tip alignment, effect windows and proportional effect reach. It does not use the retired coarse rig's anatomical calculations as evidence for this PNG artwork.
 
-The existing 36 core tests and the real SDL PNG renderer smoke test pass locally. The full SDL replay was also captured. APK/device installation has not been tested for this art change. Movement, attack duration, contact timing, cooldowns and damage are retained.
+The prompt direction for every new motion was the same attack reference, matching helmet/armor/body detail, realistic adult proportions, navy cape and a blade about 40% of standing height. All approved poses were produced using built-in image generation and then normalized into exact game cells. The committed master is the reproducible authoring source; the runtime loads the packed PNG directly.
 
-## Art direction
-
-Reference-driven image generation, followed by exact pixel sizing and PNG packing: adult silver armor, closed pointed helmet, navy ragged cape, one short right-hand sword; visible sword in every pose. Weak cut: ready, high guard, hip-driven forward cut, down-right follow-through, recovery. Strong cut: raised overhead guard, loaded knees, diagonal downward cut, recovery. Thrust: chamber at hip, step/lunge, extend the short blade without stretching it, retract, ready. No character-baked slash effects or gray background matte.
+Previews: `Art/knight/redesign/unified_motion_preview.gif` and `sword_fx_preview.gif`. Local validation: 48 core tests, real SDL compilation, PNG render smoke and left/right attack rendering. Android installation is not covered by these art checks.

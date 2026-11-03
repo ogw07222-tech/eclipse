@@ -31,8 +31,13 @@ for i in range(192):
 header=(ROOT/'native-engine/src/motion.hpp').read_text()
 for key,value in [('motionWidth',64),('motionHeight',94),('motionColumns',16),('motionRows',12),('motionPivotX',28),('motionPivotY',88)]:
     assert re.search(r'\b'+key+r'\s*=\s*'+str(value)+r'\b',header),key
-assert len(occupied)==104 and len(unique)>=90
-results=dict(atlas_pixels=list(im.size),cell_pixels=[64,94],clips=12,frames=len(occupied),unique_poses=len(unique),alpha=[0,255],pivot=[28,88],world_scale=1.85,source='PNG art; nearest-frame temporal resampling')
+assert len(occupied)==104 and len(unique)==104
+assert all(c['source_count']==c['count'] for c in clips),'Every motion must retain authored detail at every runtime frame'
+assert len({p for p in im.get_flattened_data() if p[3]})<=95,'Motions must share the same pixel palette'
+for start in (0,16,96,112,128,144,160,176):
+    box=im.crop((0,start//16*94,64,(start//16+1)*94)).getchannel('A').getbbox()
+    assert 50<=box[3]-box[1]<=56,('Inconsistent ready-pose body height',start)
+results=dict(atlas_pixels=list(im.size),cell_pixels=[64,94],clips=12,frames=len(occupied),unique_poses=len(unique),alpha=[0,255],pivot=[28,88],world_scale=1.85,source='104 authored PNG poses; shared 96-color palette and ready-pose scale')
 # Blade annotations are checked against the ACTUAL steel pixels, not a retired rig.
 import importlib.util,math
 spec=importlib.util.spec_from_file_location('knight_bake',ROOT/'Tools/bake_knight_motion.py')
