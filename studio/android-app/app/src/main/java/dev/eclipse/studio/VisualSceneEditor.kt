@@ -70,8 +70,39 @@ internal fun VisualSceneEditor(githubPng: String? = null, onImported: () -> Unit
     val context= LocalContext.current
     val objects=remember { mutableStateListOf<VisualObject>() }
     var selected by remember { mutableIntStateOf(-1) }
-    var nextId by remember { mutableIntStateOf(1) }
     var status by remember { mutableStateOf("PNG를 가져와서 화면에 배치해 보세요.") }
+    val undoStack = remember { mutableStateListOf<List<VisualObject>>() }
+    var showCommands by remember { mutableStateOf(false) }
+    var commandText by remember { mutableStateOf("""{"action":"list_objects"}""") }
+    var commandReply by remember { mutableStateOf("") }
+    fun applyCommand(command: JSONObject, recordUndo: Boolean = true) {
+        try {
+            val previous = objects.toList()
+            val result = SceneCommands.execute(previous, command)
+            if (result.changed) {
+                if (recordUndo) {
+                    if (undoStack.size >= 40) undoStack.removeAt(0)
+                    undoStack.add(previous)
+                }
+                objects.clear()
+                objects.addAll(result.objects)
+                result.selectedId?.let { selected = it }
+                if (selected >= 0 && objects.none { it.id == selected }) selected = -1
+            }
+            commandReply = result.response().toString()
+            status = result.message
+        } catch (e: Exception) {
+            val error = JSONObject().put("ok", false).put("error", e.message ?: "Unknown error")
+            commandReply = error.toString()
+            status = "명령 오류: ${e.message}"
+        }
+    }
+    fun addImage(name: String, uri: String, width: Int, height: Int) {
+        applyCommand(JSONObject().put("action", "add_object").put("name", name)
+            .put("uri", uri).put("x", 100).put("y", 80)
+            .put("width", width).put("height", height))
+    }
+    var nextId by remember { mutableIntStateOf(1) }
     var zoom by remember { mutableFloatStateOf(1f) }
     var playing by remember { mutableStateOf(false) }
     val picker=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
@@ -82,8 +113,8 @@ internal fun VisualSceneEditor(githubPng: String? = null, onImported: () -> Unit
                 context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it,null,bounds) }
                 val width=bounds.outWidth.coerceIn(1,480)
                 val height=bounds.outHeight.coerceIn(1,270)
-                objects.add(VisualObject(nextId,"그림 $nextId",uri.toString(),100,80,width,height))
-                selected=nextId++
+                addImage("그림 $nextId", uri.toString(), width, height)
+                nextId = (objects.maxOfOrNull { it.id } ?: 0) + 1
                 status="PNG가 추가됐어요. 그림을 드래그해서 이동해 보세요."
             } catch(e:Exception) { status="파일 불러오기 실패: ${e.message}" }
         }
@@ -92,16 +123,18 @@ internal fun VisualSceneEditor(githubPng: String? = null, onImported: () -> Unit
         if (githubPng != null) {
             val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             context.contentResolver.openInputStream(Uri.parse(githubPng))?.use { BitmapFactory.decodeStream(it, null, bounds) }
-            objects.add(VisualObject(nextId, "GitHub PNG $nextId", githubPng, 100, 80,
-                bounds.outWidth.coerceIn(1,480), bounds.outHeight.coerceIn(1,270)))
-            selected = nextId++
+            addImage("GitHub PNG $nextId", githubPng,
+                bounds.outWidth.coerceIn(1,480), bounds.outHeight.coerceIn(1,270))
+            nextId = (objects.maxOfOrNull { it.id } ?: 0) + 1
             status = "GitHub에서 그림을 가져왔어요. 화면에서 이동해 보세요."
             onImported()
         }
     }
     LaunchedEffect(Unit) {
         try {
+            objects.clear()
             objects.addAll(loadScene(context))
+            undoStack.clear()
             nextId=(objects.maxOfOrNull { it.id } ?: 0)+1
             selected=objects.firstOrNull()?.id ?: -1
         } catch(e: Exception) { status="저장된 씬을 읽지 못했어요: ${e.message}" }
@@ -129,8 +162,41 @@ internal fun VisualSceneEditor(githubPng: String? = null, onImported: () -> Unit
                 try { saveScene(context,objects.toList());status="앱 내부에 씬을 저장했어요." }
                 catch(e:Exception) { status="저장 실패: ${e.message}" }
             })
-            Sharp("초기화", {objects.clear();selected=-1;nextId=1;status="씬을 비웠어요. 저장하면 반영됩니다."})
+            Sharp("초기화", { applyCommand(JSONObject().put("action", "clear_scene"));nextId=1 })
+            Sharp("실행 취소", {
+                if (undoStack.isNotEmpty()) {
+                    val restored = undoStack.removeAt(undoStack.lastIndex)
+                    objects.clear()
+                    objects.addAll(restored)
+                    selected = objects.firstOrNull()?.id ?: -1
+                    nextId = (objects.maxOfOrNull { it.id } ?: 0) + 1
+                    status = "이전 편집 상태로 복원했어요. 저장하면 반영됩니다."
+                }
+            }, undoStack.isNotEmpty())
+            Sharp("AI 명령", { showCommands = !showCommands })
             Text("확대: ${(zoom*100).roundToInt()}%",color=Color.White,fontSize=12.sp)
+        }
+        if (showCommands) {
+            OutlinedTextField(
+                value = commandText,
+                onValueChange = { commandText = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("JSON 편집 명령 (로컬 테스트)") },
+                maxLines = 3,
+                singleLine = false
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                Sharp("명령 실행", {
+                    try { applyCommand(JSONObject(commandText)) }
+                    catch (e: Exception) {
+                        commandReply = JSONObject().put("ok", false)
+                            .put("error", e.message ?: "Invalid JSON").toString()
+                    }
+                })
+                Text(commandReply, color = Color(0xFFBFDDE8),
+                    fontSize = 10.sp, maxLines = 2)
+            }
         }
         Row(Modifier.weight(1f),horizontalArrangement=Arrangement.spacedBy(6.dp)) {
             Column(Modifier.width(128.dp).fillMaxHeight().border(1.dp,borderColor).padding(5.dp)) {
@@ -153,6 +219,8 @@ internal fun VisualSceneEditor(githubPng: String? = null, onImported: () -> Unit
                 val offsetY=(canvasHeight-270f*scale)/2f
                 Box(Modifier.fillMaxSize().pointerInput(objects.toList(),scale,offsetX,offsetY) {
                     detectDragGestures(onDragStart={p->
+                        if (undoStack.size >= 40) undoStack.removeAt(0)
+                        undoStack.add(objects.toList())
                         selected=objects.lastOrNull { obj ->
                             val px=offsetX+obj.x*scale
                             val py=offsetY+obj.y*scale
@@ -163,7 +231,11 @@ internal fun VisualSceneEditor(githubPng: String? = null, onImported: () -> Unit
                         val index=objects.indexOfFirst { it.id==selected }
                         if(index>=0) {
                             val item=objects[index]
-                            objects[index]=item.copy(x=(item.x+amount.x/scale).roundToInt(),y=(item.y+amount.y/scale).roundToInt())
+                            applyCommand(JSONObject().put("action", "move_object")
+                                .put("id", item.id)
+                                .put("x", (item.x + amount.x / scale).roundToInt())
+                                .put("y", (item.y + amount.y / scale).roundToInt()),
+                                recordUndo = false)
                         }
                     })
                 }.pointerInput(Unit){
@@ -194,9 +266,17 @@ internal fun VisualSceneEditor(githubPng: String? = null, onImported: () -> Unit
                 Text(item?.name ?: "선택 없음",color=Color.Cyan,fontSize=12.sp)
                 Text("X: ${item?.x ?: "-"}",color=Color.White,fontSize=12.sp)
                 Text("Y: ${item?.y ?: "-"}",color=Color.White,fontSize=12.sp)
-                Sharp("오른쪽 +10",{ if(i>=0) objects[i]=objects[i].copy(x=objects[i].x+10) },i>=0)
-                Sharp("아래쪽 +10",{ if(i>=0) objects[i]=objects[i].copy(y=objects[i].y+10) },i>=0)
-                Sharp("선택 삭제",{if(i>=0) {objects.removeAt(i); selected=-1}},i>=0)
+                Sharp("오른쪽 +10",{
+                    item?.let { applyCommand(JSONObject().put("action", "move_object")
+                        .put("id", it.id).put("x", it.x + 10).put("y", it.y)) }
+                },i>=0)
+                Sharp("아래쪽 +10",{
+                    item?.let { applyCommand(JSONObject().put("action", "move_object")
+                        .put("id", it.id).put("x", it.x).put("y", it.y + 10)) }
+                },i>=0)
+                Sharp("선택 삭제",{
+                    item?.let { applyCommand(JSONObject().put("action", "delete_object").put("id", it.id)) }
+                },i>=0)
             }
         }
         Text(status,color=Color(0xFFBFDDE8),fontSize=11.sp)
