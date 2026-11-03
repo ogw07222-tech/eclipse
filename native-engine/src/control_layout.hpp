@@ -1,5 +1,4 @@
 #pragma once
-#include <SDL3/SDL.h>
 #include <array>
 #include <algorithm>
 #include <cmath>
@@ -12,6 +11,7 @@ class ControlLayout {
 public:
     enum {Stick,Attack,Dash,Swap,Skill,Count};
     std::array<ControlRect,Count> buttons{{{35,586,128},{1110,540,116},{985,560,100},{995,445,90},{1115,420,94}}};
+    std::string storagePath;
     bool editing=false;
     int selected=Stick;
     std::int64_t dragging=-999;
@@ -28,11 +28,7 @@ public:
         b.y=std::clamp(b.y,0.f,720.f-b.size);
     }
     void defaults(){buttons={{{35,586,128},{1110,540,116},{985,560,100},{995,445,90},{1115,420,94}}};selected=Stick;save();}
-    std::string path() const {
-        char* dir=SDL_GetPrefPath("ECLIPSE","Native");
-        if(!dir)return {};
-        std::string value=std::string(dir)+"controls.cfg";SDL_free(dir);return value;
-    }
+    std::string path() const {return storagePath;}
     void load(){
         auto file=path();if(file.empty())return;
         FILE* f=std::fopen(file.c_str(),"r");if(!f)return;
