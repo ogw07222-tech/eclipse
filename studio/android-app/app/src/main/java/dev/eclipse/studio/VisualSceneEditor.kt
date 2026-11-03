@@ -70,6 +70,7 @@ internal fun VisualSceneEditor(githubPng: String? = null, onImported: () -> Unit
     val context= LocalContext.current
     val objects=remember { mutableStateListOf<VisualObject>() }
     var selected by remember { mutableIntStateOf(-1) }
+    var status by remember { mutableStateOf("PNG를 가져와서 화면에 배치해 보세요.") }
     val undoStack = remember { mutableStateListOf<List<VisualObject>>() }
     var showCommands by remember { mutableStateOf(false) }
     var commandText by remember { mutableStateOf("""{"action":"list_objects"}""") }
@@ -102,7 +103,6 @@ internal fun VisualSceneEditor(githubPng: String? = null, onImported: () -> Unit
             .put("width", width).put("height", height))
     }
     var nextId by remember { mutableIntStateOf(1) }
-    var status by remember { mutableStateOf("PNG를 가져와서 화면에 배치해 보세요.") }
     var zoom by remember { mutableFloatStateOf(1f) }
     var playing by remember { mutableStateOf(false) }
     val picker=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
