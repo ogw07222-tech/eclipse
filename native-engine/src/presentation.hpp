@@ -10,6 +10,9 @@ namespace eclipse {
 class Presentation {
     SDL_Renderer* renderer;
     std::array<SDL_Texture*,5> textures{};
+    SDL_Texture* hitTexture=nullptr;
+    struct Ghost{Player pose;int frame=0;float born=-100;};
+    std::array<Ghost,6> ghosts{};int ghostIndex=0;float ghostClock=-1,lastGhost=-100;
     float offset=0;
     static SDL_Color color(unsigned rgb,Uint8 alpha=255){return {static_cast<Uint8>(rgb>>16),static_cast<Uint8>(rgb>>8),static_cast<Uint8>(rgb),alpha};}
     void rect(float x,float y,float w,float h,unsigned rgb,Uint8 alpha=255){
@@ -21,9 +24,9 @@ class Presentation {
         if(x-offset+w<0||x-offset>viewWidth)return;
         rect(x-offset,y,w,h,rgb);
     }
-    void disk(float x,float y,float radius,unsigned rgb,int cell=4){
+    void disk(float x,float y,float radius,unsigned rgb,int cell=4,Uint8 alpha=255){
         for(int yy=-static_cast<int>(radius);yy<=radius;yy+=cell)for(int xx=-static_cast<int>(radius);xx<=radius;xx+=cell)
-            if(xx*xx+yy*yy<=radius*radius)rect(x+xx,y+yy,cell,cell,rgb);
+            if(xx*xx+yy*yy<=radius*radius)rect(x+xx,y+yy,cell,cell,rgb,alpha);
     }
     void ring(float x,float y,float radius,unsigned rgb,int cell=4){
         for(int yy=-static_cast<int>(radius);yy<=radius;yy+=cell)for(int xx=-static_cast<int>(radius);xx<=radius;xx+=cell){int d=xx*xx+yy*yy;
@@ -41,6 +44,7 @@ class Presentation {
         for(;*s;++s){if(const char* g=glyph(*s)){bool digit=*s>='0'&&*s<='9';int cols=digit?3:5,rows=digit?5:7;
                 for(int row=0;row<rows;++row)for(int col=0;col<cols;++col)if(g[row*cols+col]=='1')rect(x+col*scale,y+row*scale,scale,scale,rgb);
             }else if(*s=='-')rect(x,y+3*scale,4*scale,scale,rgb);
+            else if(*s=='/')for(int k=0;k<5;++k)rect(x+(4-k)*scale,y+k*scale,scale,scale,rgb);
             x+=6*scale;
         }
     }
@@ -166,20 +170,44 @@ class Presentation {
         if(e.burn>0)for(int i=0;i<9;++i){float rise=std::fmod(clock*(29+i%4*6)+i*9,h+18);world(e.x+i*17%35-17+std::sin(clock*5+i)*3,e.y+4-rise,i%3==0?6:3,i%2==0?9:6,i%3==0?0xffb74b:i%3==1?0xf16b32:0xbb3839,3);}
         if(e.reactionFlash>0)for(int i=0;i<8;++i)world(e.x+i%4*17-26,e.y-h*.5f+i/4*18-9,9,6,0xffbc57,3);
     }
-    void mage(const Player& p){
-        float x=p.x,y=p.y;world(x-15,y-55,30,40,0x5a2837);world(x-12,y-52,24,30,0xf69a5c);disk(x-offset,y-60,15,0xf6d3b3,3);world(x-12,y-70,24,10,0x5a2837);
-        world(x+p.facing*7-2,y-62,4,4,0x151b2c);world(x-12,y-15,10,15,0x5a2837);world(x+2,y-15,10,15,0x5a2837);
-        for(int i=0;i<9;++i)world(x+p.facing*(15+i),y-35-i*3,6,6,0x8f6ad4,3);
-        disk(x+p.facing*22-offset,y-64,7,0xffb74b,3);
-        if(p.attackFlash>0)ring(x+p.facing*16-offset,y-36,40,0xffb74b);
+    void knight(const Player& p,int frame,SDL_Texture* texture,Uint8 alpha=255){
+        SDL_FRect source{static_cast<float>(frame%motionColumns*motionWidth),static_cast<float>(frame/motionColumns*motionHeight),motionWidth,motionHeight};
+        SDL_FRect dest{std::round(p.x-offset-(p.facing>0?motionPivotX:motionWidth-motionPivotX)*3),std::round(p.y-motionPivotY*3),motionWidth*3,motionHeight*3};
+        SDL_SetTextureAlphaMod(texture,alpha);
+        SDL_RenderTextureRotated(renderer,texture,&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
+        SDL_SetTextureAlphaMod(texture,255);
+    }
+    void mage(const Player& p,bool ghost=false,Uint8 alpha=255){
+        float x=p.x-offset,y=p.y;const bool flash=p.hitFlash>0;
+        auto c=[&](unsigned rgb){return ghost?0x758c9cu:flash?0xffffffu:rgb;};
+        rect(x-15,y-55,30,40,c(0x5a2837),alpha);rect(x-12,y-52,24,30,c(0xf69a5c),alpha);
+        disk(x,y-60,15,c(0xf6d3b3),3,alpha);rect(x-12,y-70,24,10,c(0x5a2837),alpha);
+        rect(x+p.facing*7-2,y-62,4,4,c(0x151b2c),alpha);rect(x-12,y-15,10,15,c(0x5a2837),alpha);rect(x+2,y-15,10,15,c(0x5a2837),alpha);
+        for(int i=0;i<9;++i)rect(x+p.facing*(15+i),y-35-i*3,6,6,c(0x8f6ad4),alpha);
+        disk(x+p.facing*22,y-64,7,c(0xffb74b),3,alpha);
+        if(!ghost&&p.attackFlash>0)ring(x+p.facing*16,y-36,40,flash?0xffffff:0xffb74b);
+    }
+    void dashGhosts(const Combat& g,const Animation& a){
+        if(g.clock<ghostClock||g.clock==0){ghosts={};lastGhost=-100;ghostIndex=0;}
+        ghostClock=g.clock;
+        if(!g.showAfterimages){ghosts={};return;}
+        if(g.player.dashLeft>0&&g.clock-lastGhost>=.025f){
+            ghosts[ghostIndex]={g.player,a.frame,g.clock};ghostIndex=(ghostIndex+1)%ghosts.size();lastGhost=g.clock;
+        }
+        for(std::size_t i=0;i<ghosts.size();++i){const auto& ghost=ghosts[(ghostIndex+i)%ghosts.size()];float age=g.clock-ghost.born;
+            if(age<0||age>=.18f||g.player.health<=0)continue;
+            Uint8 alpha=static_cast<Uint8>(100*(1-age/.18f));
+            if(ghost.pose.form==0){SDL_SetTextureColorMod(textures[0],115,145,165);knight(ghost.pose,ghost.frame,textures[0],alpha);SDL_SetTextureColorMod(textures[0],255,255,255);}
+            else mage(ghost.pose,true,alpha);
+        }
     }
     void swordTrail(const Player& p,const Animation& a){
         if(p.health<=0||a.state<4||a.state>6)return;
         const auto frame=swordTrailFrames[a.frame];
         constexpr unsigned colors[]={0,0x365d70,0x7ba4ad,0xdce7db};constexpr int alpha[]={0,95,165,235};
         for(int i=frame.start;i<frame.start+frame.count;++i){const auto s=swordTrailSpans[i];
-            float x=p.facing>0?p.x+(s.x-motionPivotX)*3:p.x-(s.x+s.width-motionPivotX)*3;
-            rect(x-offset,p.y+(s.y-motionPivotY)*3,s.width*3,3,colors[s.shade],static_cast<Uint8>(alpha[s.shade]*frame.alpha/255));
+            auto box=swordSpanBounds(s,p.x,p.y,p.facing,p.gear.range());
+            rect(box.x-offset,box.y,box.w,box.h,colors[s.shade],static_cast<Uint8>(alpha[s.shade]*frame.alpha/255));
         }
     }
     void icon(int texture,int col,int row,float x,float y,float size,bool down){
@@ -187,11 +215,15 @@ class Presentation {
         SDL_SetTextureColorMod(textures[texture],down?180:255,down?180:255,down?180:255);SDL_RenderTexture(renderer,textures[texture],&source,&target);
     }
     void hud(const Combat& g,Actions held){
-        const auto& p=g.player;constexpr const char* heart[]={"..XX.XX..",".XXXXXXX.","XXXXXXXXX","XXXXXXXXX",".XXXXXXX.","..XXXXX..","...XXX...","....X...."};
-        for(int i=0;i<7;++i)for(int y=0;y<8;++y)for(int x=0;x<9;++x)if(heart[y][x]=='X')rect(360+i*55+x*5,18+y*5,6,6,static_cast<float>(p.health)/p.maxHealth()>=(i+.5f)/7?0xf56b78:0x364451);
+        const auto& p=g.player;
+        rect(354,14,392,50,0x101923);rect(358,18,384,42,0x889598);rect(362,22,376,34,0x263039);
+        int fill=static_cast<int>(std::round(368.f*p.health/p.maxHealth()/4))*4;
+        if(fill>0){rect(366,26,fill,26,p.health*4<=p.maxHealth()?0x984853:0x658b72);rect(366,26,fill,4,0x95b49a);}
+        char hp[32];std::snprintf(hp,sizeof(hp),"HP %d / %d",p.health,p.maxHealth());text(hp,398,32,3,0x101923);text(hp,396,30,3,0xe4e7d8);
         for(int i=0;i<5;++i){rect(365+i*48,76,42,16,0x101923);rect(369+i*48,80,34,8,std::clamp(1-p.skillCooldown/4,0.f,1.f)>i/5.f?0xe3bd72:0x353a43);}
         for(int i=0;i<4;++i){rect(765+i*74,21,66,61,0x080d17);rect(771+i*74,27,54,49,0x667482);rect(777+i*74,33,42,37,0x222c3d);}
-        text("GEAR",780,44,2);text(p.form==0?"BLADE":"FIRE",235,48,3,0x9ed7ff);number(g.foes(),1180,43,5,0xece7d2);text("FOES",1090,25,2);
+        text("GEAR",780,44,2);text(p.form==0?"BLADE":"FIRE",235,48,3,0x9ed7ff);number(g.foes(),1145,44,4,0xece7d2);text("FOES",1080,25,2);
+        settingsGear(g.settings);
         icon(4,0,0,35,586,128,held.left||held.right||held.jump);icon(1,held.attack?1:0,0,1110,540,116,held.attack);
         icon(2,held.dash?1:0,0,985,560,100,held.dash);icon(3,0,0,995,445,90,held.swap);icon(3,0,1,1115,420,94,held.skill);
         if(p.skillCooldown>0)number(static_cast<int>(std::ceil(p.skillCooldown)),1150,450,4,0xffd277);
@@ -201,9 +233,24 @@ class Presentation {
             text("ATK",66,340,2);number(p.gear.attack(),120,340,2);text("DEF",200,340,2);number(p.gear.defense(),250,340,2);text("MAX HP",66,373,2);number(p.maxHealth(),160,373,2);
         }
     }
+    void settingsGear(bool active){
+        rect(1206,16,58,58,0x101923);rect(1210,20,50,50,active?0x536570:0x2c3843);
+        constexpr const char* pixels[]={"00011011000","00111111100","01110001110","11100000111","11000100011","11001110011","11000100011","11100000111","01110001110","00111111100","00011011000"};
+        for(int y=0;y<11;++y)for(int x=0;x<11;++x)if(pixels[y][x]=='1')rect(1213+x*4,23+y*4,4,4,0xc5ccc5);
+    }
+    void settingsPanel(const Combat& g){
+        rect(0,0,1280,720,0x080d17,210);rect(410,160,460,410,0x899899);rect(414,164,452,402,0x182430);
+        text("SETTINGS",448,192,4);text("PAUSED",698,204,2,0x93a99e);
+        const char* labels[]={"SCREEN SHAKE","DAMAGE NUMBERS","DASH AFTERIMAGE"};
+        bool enabled[]={g.screenShake,g.showDamage,g.showAfterimages};
+        for(int row=0;row<3;++row){int y=250+row*60;rect(450,y,380,44,0x2c3b45);text(labels[row],462,y+14,2);
+            rect(752,y+8,66,28,enabled[row]?0x597966:0x444c58);text(enabled[row]?"ON":"OFF",760,y+15,2,0xe4e7d8);}
+        rect(450,438,380,44,0x536d60);text("RESUME",584,452,2);
+        rect(450,500,380,44,0x65454e);text("RESTART",578,514,2);
+    }
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);}
+    ~Presentation(){for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);if(hitTexture)SDL_DestroyTexture(hitTexture);}
     static std::string asset(const char* name){
 #ifdef SDL_PLATFORM_ANDROID
         return name; // SDL 3.2 routes this through Android's AssetManager.
@@ -218,27 +265,40 @@ public:
             if(i==0&&(image->w!=motionWidth*motionColumns||image->h!=motionHeight*motionRows)){SDL_Log("Expected 1024x576 motion atlas");SDL_DestroySurface(image);return false;}
             // Compact oversized button sheets once, keeping only 128px per state on the GPU.
             if(i>0){int cols=(i==1||i==2||i==3)?2:1,rows=i==3?2:1;auto* scaled=SDL_ScaleSurface(image,128*cols,128*rows,SDL_SCALEMODE_NEAREST);SDL_DestroySurface(image);image=scaled;if(!image)return false;}
-            textures[i]=SDL_CreateTextureFromSurface(renderer,image);SDL_DestroySurface(image);
+            textures[i]=SDL_CreateTextureFromSurface(renderer,image);
+            if(i==0){
+                SDL_Surface* white=SDL_ConvertSurface(image,SDL_PIXELFORMAT_RGBA32);
+                if(!white){SDL_DestroySurface(image);return false;}
+                SDL_LockSurface(white);
+                for(int y=0;y<white->h;++y){auto* pixels=static_cast<Uint8*>(white->pixels)+y*white->pitch;
+                    for(int x=0;x<white->w;++x){pixels[x*4]=255;pixels[x*4+1]=255;pixels[x*4+2]=255;}}
+                SDL_UnlockSurface(white);hitTexture=SDL_CreateTextureFromSurface(renderer,white);SDL_DestroySurface(white);
+                if(!hitTexture){SDL_DestroySurface(image);return false;}
+                SDL_SetTextureScaleMode(hitTexture,SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(hitTexture,SDL_BLENDMODE_BLEND);
+            }
+            SDL_DestroySurface(image);
             if(!textures[i])return false;
             SDL_SetTextureScaleMode(textures[i],SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(textures[i],SDL_BLENDMODE_BLEND);
         }
         return true;
     }
     void draw(const Combat& g,const Animation& a,float camera,Actions held,const char* capture=nullptr,const char* reviewLabel=nullptr){
-        offset=std::round(camera)-640;SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);SDL_SetRenderDrawColor(renderer,21,35,52,255);SDL_RenderClear(renderer);
+        offset=std::round(camera)-640;
+        if(g.screenShake&&!g.settings&&g.player.hitFlash>0)offset+=static_cast<int>(g.clock*60)%2?3:-3;
+        SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);SDL_SetRenderDrawColor(renderer,21,35,52,255);SDL_RenderClear(renderer);
         forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.clock);
         for(const auto& b:g.projectiles){disk(b.x-offset,b.y,b.empowered?14:8,0xf16b32);disk(b.x-offset,b.y,b.empowered?7:4,0xffe7a1);}
         const auto& p=g.player;
-        if(p.form==0)swordTrail(p,a);
-        if(p.form==0){SDL_FRect source{static_cast<float>(a.frame%motionColumns*motionWidth),static_cast<float>(a.frame/motionColumns*motionHeight),motionWidth,motionHeight},dest{std::round(p.x-offset-(p.facing>0?motionPivotX:motionWidth-motionPivotX)*3),std::round(p.y-motionPivotY*3),motionWidth*3,motionHeight*3};
-            SDL_RenderTextureRotated(renderer,textures[0],&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
-        }else mage(p);
+        dashGhosts(g,a);
+        if(p.form==0){swordTrail(p,a);knight(p,a.frame,textures[0]);if(p.hitFlash>0)knight(p,a.frame,hitTexture,220);}
+        else mage(p);
         if(p.swapFlash>0)ring(p.x-offset,p.y-36,44,0xe3bd72);
-        for(const auto& popup:g.popups)number(popup.amount,popup.x-offset-12,popup.y,3,popup.kind==DamageKind::Fire?0xff9155:popup.kind==DamageKind::Bleed?0xe76878:0xf2d48c);
+        if(g.showDamage)for(const auto& popup:g.popups)number(popup.amount,popup.x-offset-12,popup.y,3,popup.kind==DamageKind::Fire?0xff9155:popup.kind==DamageKind::Bleed?0xe76878:0xf2d48c);
         hud(g,held);if(reviewLabel)text(reviewLabel,470,120,3);
         if(g.ended){rect(0,0,1280,720,0x111a28,240);text(g.won?"STAGE CLEAR":"GAME OVER",390,260,7,g.won?0x8be4b5:0xff8d99);text("TAP RETRY OR PRESS R",410,350,3);
             rect(510,412,260,65,0xe3bd72);rect(514,416,252,57,0x304039);text("RETRY",548,433,4);
         }
+        if(g.settings)settingsPanel(g);
         if(capture){auto* image=SDL_RenderReadPixels(renderer,nullptr);if(image){SDL_SaveBMP(image,capture);SDL_DestroySurface(image);}}
         SDL_RenderPresent(renderer);
     }
