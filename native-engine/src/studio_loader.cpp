@@ -35,7 +35,7 @@ int main(int argc,char** argv) {
     // Packaged library uses the Android linker search path. Imported library
     // must be an Android-compatible arm64 shared object with SDL dependencies.
     void* handle=dlopen(source.c_str(),RTLD_NOW|RTLD_LOCAL);
-    if(!handle){status("ERROR: dlopen "+source+"\n"+(dlerror()?dlerror():"unknown linker failure"));return 92;}
+    if(!handle){const char* err=dlerror();status("ERROR: dlopen "+source+"\n"+(err?err:"unknown linker failure"));return 92;}
     dlerror();
     auto game=reinterpret_cast<GameMain>(dlsym(handle,"SDL_main"));
     const char* err=dlerror();
