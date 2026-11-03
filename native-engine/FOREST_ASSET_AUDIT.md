@@ -2,7 +2,7 @@
 
 ## Scope and method
 
-Reviewed **all 40 sprites** from `eclipse_forest_repo_ready.zip`, substituting four newer candidates from `eclipse_forest_cropping_fix_v2.zip` for the comparison. The original repository still contains older crop versions until the patch is imported. PNG file decoding, dimensions, alpha channel extent, and count of nontransparent border pixels on each side were checked. **Border-touching pixels are a warning to compare with the source illustration, not proof that art was lost.** This is an automated edge audit, not manual proof of complete artwork.
+Reviewed **all 40 sprites** from `eclipse_forest_repo_ready.zip`, substituting four newer candidates from `eclipse_forest_cropping_fix_v2.zip` for the comparison. The four active sprites were replaced directly in `main` at commit `6e6a466` (PNG-8 palette-optimized copies of the wider v2 crops). PNG file decoding, dimensions, alpha channel extent, and count of nontransparent border pixels on each side were checked. **Border-touching pixels are a warning to compare with the source illustration, not proof that art was lost.** This is an automated edge audit, not manual proof of complete artwork.
 
 | Finding | Count | Interpretation |
 | --- | ---: | --- |
@@ -12,7 +12,7 @@ Reviewed **all 40 sprites** from `eclipse_forest_repo_ready.zip`, substituting f
 
 ## Asset risk groups
 
-- **Current visual baseline (4 candidate fixes):** `trees_large/tree_large_01.png`, `trees_medium/tree_mid_01.png`, `bushes/bush_01.png`, `bushes/bush_02.png` have re-extracted candidates with alpha margins. The ZIP needs to be applied to the repository.
+- **Current visual baseline (4 candidate fixes):** `trees_large/tree_large_01.png`, `trees_medium/tree_mid_01.png`, `bushes/bush_01.png`, `bushes/bush_02.png` have re-extracted candidates with alpha margins. These four replacements are now committed to the repository.
 - **Unused tree variations requiring source review (7):** `trees_large/tree_large_02..05` and `trees_medium/tree_mid_02..04`. Keep out of the active two-species distribution.
 - **Unused bush variations (3):** `bush_03..05`. `bush_03` has significant contact on both left and right; likely extraction risk.
 - **Detail/vegetation/effects edge review (19):** `details/` six, `effects/` three, `grass/` four, `plants/` three, `rocks/` three. A few grass and rock sprites intentionally contact their bottom edge; others such as hanging vines touch the entire right edge and need wider source cropping.
@@ -26,18 +26,6 @@ Reviewed **all 40 sprites** from `eclipse_forest_repo_ready.zip`, substituting f
 - Avoid treating alpha-padding alone as a fix for missing plant geometry: truly cut foliage must be redrawn or re-extracted from a wider source.
 - Re-check screenshot quality at camera X=640 and 960 and size=60%, 100%, 180%; do not infer SDL final performance from the browser preview.
 
-## Apply newer four-sprite patch
+## Verify your local copy
 
-Download `eclipse_forest_cropping_fix_v2.zip` from the related chat and from repository root:
-
-```sh
-cd ~/eclipse
-git pull --ff-only origin main
-unzip -o ~/storage/downloads/eclipse_forest_cropping_fix_v2.zip -d .
-git add Assets/Resources/Eclipse/forest
-git commit -m "Apply wider source crops for active forest sprites"
-git push origin main
-```
-
-The browser preview works without any Android build:
-`python -m http.server 8765 --bind 127.0.0.1` → `http://127.0.0.1:8765/native-engine/preview/forest.html`.
+The four active PNG replacements are already in `main`. On Termux run `cd ~/eclipse && git pull --ff-only origin main`, then refresh the browser preview; no ZIP import is necessary. The browser page warns if the PNG dimensions still match the earlier clipped set. No Android build is required for this preview.
