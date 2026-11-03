@@ -14,6 +14,7 @@ struct ForestSprite {
     uint8_t layer;
     float x, groundY, scale;
     uint32_t phase;
+    bool flipX = false;
 };
 struct ForestSettings {
     uint32_t seed = 20261103u;
@@ -60,7 +61,9 @@ class ForestGenerator {
                 (1.f + (unit(salt,i,2)-.5f)*.45f*settings_.variation),.28f,5.0f);
             uint8_t variation=static_cast<uint8_t>(random(salt,i,3)%varieties);
             sprites_.push_back({kind,variation,layer,
-                std::round(x/3.f)*3.f,baseline,s,random(salt,i,4)});
+                std::round(x/3.f)*3.f,baseline,s,random(salt,i,4),
+                (kind==ForestKind::LargeTree || kind==ForestKind::MidTree) &&
+                unit(salt,i,5)<(kind==ForestKind::LargeTree?.40f:.50f)});
             previous=x;
         }
     }
