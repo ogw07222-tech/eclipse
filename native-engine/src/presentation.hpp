@@ -101,48 +101,78 @@ class Presentation {
         // Missing PNG: skip this decoration instead of drawing mismatched low-res trees.
         // The original sprite library is shipped with the APK and desktop assets.
     }
+    // Deliberate pixel-dirt cross section. One deterministic material palette;
+    // structure first (humus / clay / bedrock), details second (roots / stones).
     static unsigned soilHash(unsigned x,unsigned y,unsigned salt) {
         unsigned h=x*374761393u+y*668265263u+salt*2246822519u;
         h=(h^(h>>13))*1274126177u;
         return h^(h>>16);
     }
     void forestGround() {
-        // Soil is the ground mass: grass is a thin, irregular surface only.
-        // Every patch is generated from world coordinates, so scrolling is stable.
-        world(0,583,1600,137,0x32241e,3);
-        world(0,617,1600,103,0x29201c,3);
-        world(0,672,1600,48,0x211b1a,3);
-        // Pixelated soil strata: warm brown variations without a repeating tile seam.
-        for(int x=0;x<1600;x+=24) {
-            const unsigned h=soilHash(static_cast<unsigned>(x/24),0,7);
-            const float top=588.f+static_cast<float>(h%6u)*3.f;
-            world(static_cast<float>(x),top,24,12,
-                h%3u==0?0x564034:h%3u==1?0x48352b:0x49382f,3);
-            world(static_cast<float>(x),top+12,24,6,
-                h%4u==0?0x614a39:0x3c2b25,3);
-            const float deep=626.f+static_cast<float>((h>>8)%9u)*6.f;
-            world(static_cast<float>(x)+static_cast<float>((h>>15)%3u)*3.f,
-                  deep,12+static_cast<float>((h>>17)%4u)*3.f,6,
-                  h%5u==0?0x594033:0x382a25,3);
+        const unsigned seed=forestGenerator_.settings().seed;
+        // No green ground plane. Surface grass occupies only 3-9px.
+        world(0,585,1600,135,0x332720,3);
+        world(0,662,1600,58,0x29211e,3);
+        // Natural-looking blocky horizons: staggered tiles conceal flat borders.
+        for(unsigned i=0;i<68;++i) {
+            const unsigned h=soilHash(i,1,seed);
+            const float x=static_cast<float>(i*24);
+            const float clay=618.f+static_cast<float>(h%5u)*6.f;
+            world(x,585,24,clay-585.f,
+                h%5u==0?0x463127:h%5u==1?0x493429:0x402e25,3);
+            const float stone=658.f+static_cast<float>((h>>5)%6u)*6.f;
+            world(x,clay,24,stone-clay,
+                h%4u==0?0x3c2b26:h%4u==1?0x412d27:0x382923,3);
+            world(x,stone,24,720.f-stone,
+                h%4u==0?0x302420:0x29211e,3);
         }
-        // Pebbles, dark clods, and occasional root-like pixels beneath the grass.
-        for(int i=0;i<215;++i) {
-            const unsigned h=soilHash(static_cast<unsigned>(i),1,29);
-            const float x=static_cast<float>(h%1588u);
-            const float y=603.f+static_cast<float>((h>>9)%35u)*3.f;
-            world(x,y,3.f+static_cast<float>((h>>17)%4u)*3.f,
-                  (h%7u==0)?6.f:3.f,
-                  h%11u==0?0x927358:h%4u==0?0x5e4739:
-                  h%4u==1?0x47352c:0x221b19,3);
+        // Long soft sediment veins. Wider bands read as geology, not random noise.
+        for(unsigned i=0;i<30;++i) {
+            const unsigned h=soilHash(i,2,seed);
+            const float x=static_cast<float>(h%1540u);
+            const float y=612.f+static_cast<float>((h>>10)%32u)*3.f;
+            const float length=27.f+static_cast<float>((h>>16)%12u)*6.f;
+            world(x,y,length,3,
+                i%5u==0?0x684b36:i%3u==0?0x514033:0x46352d,3);
+            if(i%3u==0)world(x+9,y+6,length*.55f,3,0x30251f,3);
         }
-        // Small grass fringe along the walkable y=585 surface, never a green slab.
-        for(int x=0;x<1600;x+=12) {
-            const unsigned h=soilHash(static_cast<unsigned>(x/12),2,41);
-            const float y=582.f+static_cast<float>(h%3u)*3.f;
-            world(static_cast<float>(x),y,12,3,
-                  h%4u==0?0x628352:h%4u==1?0x547448:0x46653f,3);
-            if(h%5u==0)
-                world(static_cast<float>(x)+3, y-6,3,6,0x648750,3);
+        // Inset pebbles with a dark lower rim and a muted top highlight.
+        for(unsigned i=0;i<26;++i) {
+            const unsigned h=soilHash(i,3,seed);
+            const float x=static_cast<float>(h%1560u);
+            const float y=605.f+static_cast<float>((h>>11)%33u)*3.f;
+            const float w=12.f+static_cast<float>((h>>20)%5u)*3.f;
+            world(x,y+3,w,9,0x261f1b,3);
+            world(x+3,y,w-6,6,h%3u==0?0x756550:0x5d5346,3);
+            world(x+6,y,6,3,0x93816a,3);
+        }
+        // Fine crumbs are small clusters rather than a field of isolated noise.
+        for(unsigned i=0;i<38;++i) {
+            const unsigned h=soilHash(i,4,seed);
+            const float x=static_cast<float>(h%1560u);
+            const float y=599.f+static_cast<float>((h>>10)%37u)*3.f;
+            world(x,y,6,3,i%3u==0?0x664938:0x241e1a,3);
+            world(x+9,y+3,3,3,i%4u==0?0x806149:0x4b382d,3);
+        }
+        // Roots emerge from the forest floor and split once underground.
+        for(unsigned i=0;i<13;++i) {
+            const unsigned h=soilHash(i,5,seed);
+            const float x=static_cast<float>(h%1550u);
+            const float y=588.f+static_cast<float>((h>>8)%4u)*3.f;
+            world(x,y,3,18+static_cast<float>((h>>12)%6u)*3.f,0x6c4932,3);
+            world(x+3,y+18,12,3,0x765138,3);
+            if(i%2u==0)world(x+12,y+21,3,9,0x63452f,3);
+        }
+        // Surface: thin broken grass/moss edge, never a bright green slab.
+        for(unsigned i=0;i<134;++i) {
+            const unsigned h=soilHash(i,6,seed);
+            const float x=static_cast<float>(i*12);
+            if(h%7u==0)continue;
+            world(x,582,12,3,h%4u==0?0x668354:h%4u==1?0x4d7147:0x42653e,3);
+            if(h%4u==0)
+                world(x+3,576.f-static_cast<float>((h>>7)%2u)*3.f,
+                      3,6,0x73965a,3);
+            if(h%9u==0)world(x+6,585,6,3,0x66513a,3);
         }
     }
     void forest(const Combat& g,float camera) {
