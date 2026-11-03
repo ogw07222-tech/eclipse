@@ -18,7 +18,7 @@ assets = ['knight_motion.png', 'ui/attack_states.png', 'ui/dash_states.png',
 # source PNG files instead of assuming the historical five-PNG baseline.
 art_root = root / 'Assets/Resources/Eclipse'
 forest_assets = []
-for forest_folder in ('forest', 'forest_v2', 'forest_v3'):
+for forest_folder in ('forest', 'forest_v2', 'forest_v3', 'forest_entrance'):
     forest_root = art_root / forest_folder
     if forest_root.is_dir():
         forest_assets.extend(sorted(
