@@ -13,7 +13,7 @@ class Presentation {
     SDL_Renderer* renderer;
     std::array<SDL_Texture*,5> textures{};
     std::array<SDL_Texture*,3> slimeTextures_{};
-    float offset=0;
+    float offset=0;\n    SDL_Texture* settingsGear_=nullptr;\n    SDL_Texture* settingsPanel_=nullptr;
     ForestGenerator forestGenerator_{};
     std::array<SDL_Texture*,40> forestTextures_{};
     std::array<SDL_Texture*,4> forestLayerTextures_{};
@@ -353,7 +353,7 @@ class Presentation {
     }
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -399,6 +399,17 @@ public:
             SDL_SetTextureScaleMode(slimeTextures_[i],SDL_SCALEMODE_NEAREST);
             SDL_SetTextureBlendMode(slimeTextures_[i],SDL_BLENDMODE_BLEND);
         }
+        // Optional standalone pixel PNGs for the native settings overlay.
+        auto loadSettingsTexture=[&](const char* name)->SDL_Texture* {
+            const auto path=asset(name);SDL_Surface* image=IMG_Load(path.c_str());
+            if(!image)return nullptr;
+            SDL_Texture* texture=SDL_CreateTextureFromSurface(renderer,image);
+            SDL_DestroySurface(image);
+            if(texture){SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(texture,SDL_BLENDMODE_BLEND);}
+            return texture;
+        };
+        settingsGear_=loadSettingsTexture("ui/settings_gear.png");
+        settingsPanel_=loadSettingsTexture("ui/settings_menu_panel.png");
         // Optional sprite library: the procedural renderer remains functional without it.
         // Only startup loads textures; no per-frame filesystem work.
         constexpr const char* forestFiles[40]={
@@ -527,27 +538,76 @@ public:
         static const ControlLayout defaultLayout{};
         const ControlLayout& layout=customLayout?*customLayout:defaultLayout;
         hud(g,held,layout,stick);
-        rect(ControlLayout::gearX,ControlLayout::gearY,ControlLayout::gearSize,ControlLayout::gearSize,0x142736,230);
-        text("CFG",1224,35,2,0xe3bd72);
+        // PNG-backed gothic gear and vertical menu. All actions use ControlLayout hitboxes.
+        if(settingsGear_){
+            SDL_FRect gear{ControlLayout::gearX,ControlLayout::gearY,ControlLayout::gearSize,ControlLayout::gearSize};
+            SDL_RenderTexture(renderer,settingsGear_,nullptr,&gear);
+        }else{rect(ControlLayout::gearX,ControlLayout::gearY,48,48,0x243746);text("CFG",1224,35,2);}
         if(layout.editing){
-            rect(0,0,1280,720,0x07101b,125);
-            const char* names[]={"JOYSTICK","ATTACK","DASH","SWAP","SKILL"};
-            text("CONTROL EDITOR",50,30,4,0xe3bd72);
-            text("DRAG TO MOVE",50,83,3);
-            text(names[layout.selected],50,125,3,0x9ed7ff);
-            for(int i=0;i<ControlLayout::Count;++i){const auto& button=layout.buttons[i];
-                if(i==layout.selected){
-                    rect(button.x-5,button.y-5,button.size+10,5,0xe3bd72);
-                    rect(button.x-5,button.y+button.size,button.size+10,5,0xe3bd72);
-                    rect(button.x-5,button.y,5,button.size,0xe3bd72);
-                    rect(button.x+button.size,button.y,5,button.size,0xe3bd72);
-                }
+            rect(0,0,1280,720,0x060b16,165);
+            // Main navigation is a separate reusable PNG, not a CSS-style rectangle.
+            if(settingsPanel_){SDL_FRect dst{12,90,280,550};SDL_RenderTexture(renderer,settingsPanel_,nullptr,&dst);}
+            else{rect(12,90,280,550,0x111923);rect(20,99,264,533,0x252b39);}
+            text("SETTINGS",48,145,3,0xe4e8ed);
+            const char* items[]={"SOUND","CONTROLS","GAME","EXIT"};
+            for(int i=0;i<4;++i){
+                const float y=210.f+i*82.f;
+                bool active=(i==0&&layout.page==ControlLayout::Sound)||(i==1&&layout.page==ControlLayout::Controls)||(i==2&&layout.page==ControlLayout::Game);
+                rect(28,y,241,68,active?0x87adbd:0x69727e);
+                rect(32,y+4,233,60,active?0x344e66:i==3?0x50363b:0x222b39);
+                text(items[i],i==1?51:71,y+20,3,active?0xeaf5ff:0xd9dce3);
             }
-            rect(1030,90,205,66,0x304039);text("SAVE",1075,110,3);
-            rect(1030,165,205,66,0x4c3536);text("RESET",1070,185,3);
-            rect(1030,245,94,80,0x304039);text("-",1063,267,5);
-            rect(1140,245,94,80,0x304039);text("+",1172,267,5);
-            text("SIZE",1074,342,2);
+            rect(328,86,888,549,0x697381);rect(335,93,874,535,0x101923);
+            rect(356,113,824,72,0x2d3646);rect(363,120,810,58,0x1b2838);
+            text("SETTINGS",570,131,4,0xe6e6ef);
+            rect(1120,103,90,65,0x4d586a);text("X",1155,124,4);
+            if(layout.page==ControlLayout::Controls){
+                text("CONTROLS",614,207,3,0xa9cede);
+                text("DRAG BUTTONS AND PINCH TO RESIZE",417,245,2);
+                rect(440,280,600,74,0x48637b);rect(445,285,590,64,0x24394b);
+                text("REPOSITION CONTROLS",475,302,3);
+                text("BUTTON SIZE",470,366,2);
+                rect(440,385,100,68,0x3c4b5a);text("-",473,405,4);
+                rect(550,385,390,68,0x293c4c);
+                text("SELECT IN EDIT MODE",575,404,2,0xb5cfdf);
+                rect(950,385,100,68,0x3c4b5a);text("+",983,405,4);
+                rect(445,485,285,68,0x3c4b5a);text("RESET",495,505,3);
+                rect(750,485,285,68,0x355a72);text("SAVE",821,505,3);
+                text("TOUCH TWO FINGERS ON THE SAME BUTTON",415,583,2);
+            }else if(layout.page==ControlLayout::Sound){
+                text("SOUND",660,207,3,0xa9cede);
+                text("BGM",400,275,3);
+                text("SFX",400,395,3);
+                for(int i=0;i<2;++i){
+                    int level=i==0?layout.bgm:layout.sfx;float y=i==0?270.f:390.f;
+                    rect(460,y,575,50,0x303744);rect(466,y+6,563,38,0x0f1927);
+                    rect(470,y+11,static_cast<float>(level)*5.55f,28,0x7296b3);
+                    number(level,1050,y+10,3,0xe9e7db);
+                }
+                text("AUDIO LEVELS ARE SAVED",470,535,2);
+            }else{
+                text("GAME",666,207,3,0xa9cede);
+                rect(440,285,600,75,0x2d4050);text("SCREEN SHAKE",462,309,3);
+                text(layout.screenShake?"ON":"OFF",940,309,3,0xbce0f2);
+                rect(440,385,600,75,0x2d4050);text("DAMAGE NUMBERS",462,410,3);
+                text(layout.showNumbers?"ON":"OFF",940,410,3,0xbce0f2);
+            }
+            if(layout.reposition){
+                rect(0,0,1280,720,0x07101b,90);
+                const char* names[]={"JOYSTICK","ATTACK","DASH","SWAP","SKILL"};
+                text("DRAG TO MOVE  PINCH TO RESIZE",180,30,3,0xe6d2a9);
+                text(names[layout.selected],55,89,3,0xa4d4e8);
+                for(int i=0;i<ControlLayout::Count;++i){
+                    const auto& button=layout.buttons[i];
+                    if(i==layout.selected){
+                        rect(button.x-5,button.y-5,button.size+10,5,0xe3bd72);
+                        rect(button.x-5,button.y+button.size,button.size+10,5,0xe3bd72);
+                        rect(button.x-5,button.y,5,button.size,0xe3bd72);
+                        rect(button.x+button.size,button.y,5,button.size,0xe3bd72);
+                    }
+                }
+                rect(1030,80,205,65,0x395b70);text("DONE",1061,101,3);
+            }
         }
         if(reviewLabel)text(reviewLabel,470,120,3);
         if(g.ended){rect(0,0,1280,720,0x111a28,240);text(g.won?"STAGE CLEAR":"GAME OVER",390,260,7,g.won?0x8be4b5:0xff8d99);text("TAP RETRY OR PRESS R",410,350,3);
