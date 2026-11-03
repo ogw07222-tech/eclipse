@@ -91,3 +91,7 @@ python -m http.server 8765 --bind 127.0.0.1
 ```
 
 Then open `http://127.0.0.1:8765/native-engine/preview/forest.html` in Samsung Internet or Chrome on the same tablet. Change seed, density, size, variation or camera without rebuilding anything. The PNG save button exports the currently displayed 1280×720 backdrop. Stop the server with Ctrl+C. No GitHub Actions, Android SDK, APK, or Unity is needed. The browser preview mirrors C++ seeded placement but cannot certify native SDL render quality or run combat.
+
+## Forest visual cleanup
+
+The low-fidelity procedural distant trees have been removed from both the native renderer and APK-free browser preview. Missing PNG sprites are skipped rather than replaced with rectangular trees. The floor now includes reproducible, subdued ground/shadow patches and short uneven grass-edge marks. Keep the current two large PNG tree species and sparse foreground props. Reload the browser page after pulling the latest commit; no APK rebuild is necessary for the preview.

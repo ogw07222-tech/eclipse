@@ -80,7 +80,7 @@ public:
         // The layer numbers are sorted back-to-front for alpha compositing.
         // Cohesive woodland: one main tree and one secondary, sparse static props.
         // Larger crowns fill the sky instead of crowding the floor.
-        distribute(ForestKind::Far,0,1,265,180,1.25f,558,11);
+        // No rectangle-based distant trees: use only verified transparent PNG species.
         distribute(ForestKind::LargeTree,1,1,185,150,3.32f,584,17);
         distribute(ForestKind::MidTree,2,1,425,315,2.72f,582,23);
         distribute(ForestKind::Bush,3,2,195,115,1.15f,584,29);
