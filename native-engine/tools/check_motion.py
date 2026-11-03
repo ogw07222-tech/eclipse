@@ -10,10 +10,10 @@ for section in stamp.values():
         assert hashlib.sha256((ROOT/name).read_bytes()).hexdigest()==digest,('Repack motion after changing',name)
 im=Image.open(ROOT/'Assets/Resources/Eclipse/knight_motion.png').convert('RGBA')
 master=Image.open(ROOT/'Art/knight/redesign/knight_64x94_master.png').convert('RGBA')
-assert im.size==(1024,1128)
+assert im.size==(1024,1222)
 assert set(im.getchannel('A').get_flattened_data())=={0,255},'Alpha must be binary'
 clips=json.loads((ROOT/'Art/knight/rig/clips.json').read_text())
-assert [c['count'] for c in clips]==[8,8,16,6,6,6,8,8,10,10,6,12]
+assert [c['count'] for c in clips]==[8,8,16,6,6,6,8,8,10,10,6,12,8]
 occupied=set();unique=set()
 for clip in clips:
     row=clip['start']//16
@@ -25,19 +25,19 @@ for clip in clips:
         box=cell.getchannel('A').getbbox();assert box,(clip['name'],i,'blank frame')
         assert box[0]>=1 and box[2]<=63 and box[1]>=1 and box[3]<=89,(clip['name'],i,'clipped silhouette')
         occupied.add(clip['start']+i);unique.add(cell.tobytes())
-for i in range(192):
+for i in range(208):
     if i not in occupied:
         assert not im.crop((i%16*64,i//16*94,(i%16+1)*64,(i//16+1)*94)).getchannel('A').getbbox(),('unused cell',i)
 header=(ROOT/'native-engine/src/motion.hpp').read_text()
-for key,value in [('motionWidth',64),('motionHeight',94),('motionColumns',16),('motionRows',12),('motionPivotX',28),('motionPivotY',88)]:
+for key,value in [('motionWidth',64),('motionHeight',94),('motionColumns',16),('motionRows',13),('motionPivotX',28),('motionPivotY',88)]:
     assert re.search(r'\b'+key+r'\s*=\s*'+str(value)+r'\b',header),key
-assert len(occupied)==104 and len(unique)==104
+assert len(occupied)==112 and len(unique)==112
 assert all(c['source_count']==c['count'] for c in clips),'Every motion must retain authored detail at every runtime frame'
 assert len({p for p in im.get_flattened_data() if p[3]})<=95,'Motions must share the same pixel palette'
 for start in (0,16,96,112,128,144,160,176):
     box=im.crop((0,start//16*94,64,(start//16+1)*94)).getchannel('A').getbbox()
     assert 50<=box[3]-box[1]<=56,('Inconsistent ready-pose body height',start)
-results=dict(atlas_pixels=list(im.size),cell_pixels=[64,94],clips=12,frames=len(occupied),unique_poses=len(unique),alpha=[0,255],pivot=[28,88],world_scale=1.85,source='104 authored PNG poses; shared 96-color palette and ready-pose scale')
+results=dict(atlas_pixels=list(im.size),cell_pixels=[64,94],clips=13,frames=len(occupied),unique_poses=len(unique),alpha=[0,255],pivot=[28,88],world_scale=1.85,source='112 authored PNG poses; shared 96-color palette and ready-pose scale')
 # Blade annotations are checked against the ACTUAL steel pixels, not a retired rig.
 import importlib.util,math
 spec=importlib.util.spec_from_file_location('knight_bake',ROOT/'Tools/bake_knight_motion.py')
@@ -49,7 +49,7 @@ for clip in clips:
     if name in paths:
         assert len(paths[name])==clip['source_count']
         for i,(wx,wy,tx,ty) in enumerate(paths[name]):
-            assert 5<=math.dist((wx,wy),(tx,ty))<=23,(name,i,'blade size outside reference proportions')
+            assert 5<=math.dist((wx,wy),(tx,ty))<=(30 if name=='air_slam' else 23),(name,i,'blade size outside reference proportions')
             distances=[]
             for y in range(max(0,ty-2),min(94,ty+3)):
                 for x in range(max(0,tx-2),min(64,tx+3)):
@@ -83,6 +83,7 @@ for clip in clips:
     if name in paths:
         contact=int(clip['count']*float(re.search(r'\{'+str(clip['start'])+r','+str(clip['count'])+r',[\d.]+f,([\d.]+)f',header).group(1)))
         assert bake.trail_mask(name,contact,clip['source_indices'],paths)[1]>0,(name,'contact has no effect')
+assert re.search(r'slamContactTipX='+str(paths['air_slam'][5][2])+r',slamContactTipY='+str(paths['air_slam'][5][3]),header),'Landing flash origin differs from sword tip'
 results.update(sword_effect_frames=trail_samples,maximum_blade_tip_annotation_error_px=maximum_tip_error,sword_effect_scale='derived from visible blade length; shared actor registration and world scale')
 
 review=ROOT/'native-engine/review';review.mkdir(exist_ok=True)

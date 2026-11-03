@@ -98,6 +98,69 @@ int main(){int failed=0,total=0;
         check(!enemyOverlaps(e,{500,floorY-20,700,floorY}),"Ground sword hit empty leap shadow");
     });
 
+    test("Air attack selects the downward slam rather than ground combo",[]{
+        auto g=arena();g.player.y=floorY-150;g.player.grounded=false;g.player.vy=0;
+        auto& e=g.enemies[0];e=Enemy(0,g.player.x+20);e.speed=0;e.attackTimer=1000;
+        Actions a;a.attack=true;g.step(1.f/60,a);
+        check(g.player.airSlam&&g.player.combo==0&&g.player.meleeLeft==0,"Air attack used grounded combo");
+        check(e.health==55&&g.player.slamImpact==0,"Slam damaged before landing");
+        Animation animation;animation.step(g.player,1.f/60);check(animation.state==12&&animation.frame>=192,"Air pose not selected");
+    });
+    test("Air slam accelerates down and deals damage once on actual landing",[]{
+        auto g=arena();g.player.y=floorY-180;g.player.grounded=false;g.player.vy=-100;
+        auto& e=g.enemies[0];e=Enemy(0,g.player.x+20);e.speed=0;e.attackTimer=1000;
+        Actions a;a.attack=true;g.step(1.f/60,a);bool fast=false;int frames=0;
+        while(g.player.airSlam&&frames++<60){g.step(1.f/60,{});fast|=g.player.vy>=airSlamDropSpeed;if(!g.player.grounded)check(e.health==55,"Damage before ground contact");}
+        check(fast&&frames<60&&g.player.grounded,"Downward physics failed");
+        check(e.health==31&&g.player.slamImpact>0&&g.player.slamRecover>0,"Landing strike missing");
+        wait(g,45);check(e.health==31,"Slam dealt repeated damage");
+    });
+    test("Very low air slams still land once without waiting for an air timer",[]{
+        auto g=arena();g.player.y=floorY-1;g.player.grounded=false;g.player.vy=80;
+        auto& e=g.enemies[0];e=Enemy(0,g.player.x+20);e.speed=0;e.attackTimer=1000;
+        Actions a;a.attack=true;g.step(1.f/60,a);check(!g.player.airSlam&&g.player.slamImpact>0&&e.health==31,"Low slam skipped actual landing");
+    });
+    test("Air slam cancels on dash swap skill damage and restart without ghost hit",[]{
+        for(int mode=0;mode<5;++mode){auto g=arena();g.player.y=floorY-220;g.player.grounded=false;g.player.vy=0;
+            auto& e=g.enemies[0];e=Enemy(0,g.player.x+20);e.speed=0;e.attackTimer=1000;
+            Actions a;a.attack=true;g.step(1.f/60,a);a={};
+            if(mode==0)a.dash=true;else if(mode==1)a.swap=true;else if(mode==2)a.skill=true;else if(mode==3)g.damagePlayer(1);else a.restart=true;
+            g.step(1.f/60,a);check(!g.player.airSlam,"Slam did not cancel");
+            if(mode==4){check(g.player.slamImpact==0&&g.player.slamRecover==0,"Restart retained slam");continue;}
+            wait(g,60);check(e.health==55&&g.player.slamImpact==0,"Cancelled slam left delayed damage");
+        }
+    });
+    test("Landing impact follows the blade tip for both facings and gear",[]{
+        for(int facing:{-1,1}){auto g=arena();g.player.x=640;g.player.y=floorY-100;g.player.grounded=false;g.player.facing=facing;g.player.gear.selected[0]=1;
+            auto& e=g.enemies[0];e=Enemy(0,640+facing*20);e.speed=0;e.attackTimer=1000;Actions a;a.attack=true;g.step(1.f/60,a);
+            for(int i=0;i<60&&g.player.airSlam;++i)g.step(1.f/60,{});
+            near(g.player.slamImpactX,g.player.x+facing*(slamContactTipX-motionPivotX)*motionScale);
+            near(g.player.slamImpactY,floorY+(slamContactTipY-motionPivotY)*motionScale);check(e.health==25,"Slam ignored weapon damage");
+        }
+    });
+    test("Ground slam wave misses airborne bodies and mage air attacks remain projectiles",[]{
+        auto g=arena();g.player.y=floorY-90;g.player.grounded=false;
+        auto& e=g.enemies[0];e=Enemy(0,g.player.x+20);e.y=floorY-130;e.speed=0;e.attackTimer=1000;
+        Actions a;a.attack=true;g.step(1.f/60,a);for(int i=0;i<60&&g.player.airSlam;++i)g.step(1.f/60,{});
+        check(e.health==55&&g.player.slamImpact>0,"Ground wave hit empty space under airborne enemy");
+        auto mage=arena();mage.player.form=1;mage.player.grounded=false;mage.player.y=floorY-100;mage.step(1.f/60,a);
+        check(!mage.player.airSlam&&mage.projectiles.size()==1,"Mage attack became a sword slam");
+    });
+    test("Repeated air attack input cannot restart the falling slam",[]{
+        auto g=arena();g.player.y=floorY-900;g.player.grounded=false;Actions a;a.attack=true;
+        g.step(1.f/60,a);const int serial=g.player.attackSerial;
+        for(int i=0;i<35;++i){g.step(1.f/60,a);check(g.player.attackSerial==serial,"Slam restarted while falling");}
+    });
+    test("Slam animation holds descent and contact then recovers without ghost combo",[]{
+        Player p;p.grounded=false;p.airSlam=true;p.slamAge=.5f;++p.attackSerial;Animation a;
+        for(int i=0;i<60;++i){a.step(p,1.f/60);}
+        check(a.state==12&&a.frame==196,"Descent did not hold");
+        p.airSlam=false;p.grounded=true;p.slamRecover=airSlamRecovery;p.hitStop=.065f;a.step(p,1.f/60);const int contact=a.frame;
+        a.step(p,1.f/60);check(contact==197&&a.frame==contact,"Slam hit-stop lost contact pose");
+        p.hitStop=0;p.slamRecover=.02f;a.step(p,1.f/60);check(a.frame==199,"Recovery frame missing");
+        p.slamRecover=0;for(int i=0;i<20;++i)a.step(p,1.f/60);check(a.state==0,"Phantom grounded attack after slam");
+    });
+
     test("Movement facing walls",[]{auto g=arena();Actions a;a.right=true;g.step(1.f/60,a);near(g.player.x,140+280.f/60);g.player.x=1549;g.step(1.f/60,a);near(g.player.x,1550);a={};a.left=true;g.player.x=26;g.step(1.f/60,a);near(g.player.x,25);check(g.player.facing== -1,"Facing");});
     test("Jump apex and landing",[]{auto g=arena();Actions a;a.jump=true;g.step(1.f/60,a);check(!g.player.grounded&&g.player.vy<0,"Jump");float highest=g.player.y;for(int i=0;i<90;++i){g.step(1.f/60,{});highest=std::min(highest,g.player.y);}check(floorY-highest>160&&floorY-highest<180,"Apex");check(g.player.grounded&&g.player.vy==0,"Landing");});
     test("Dash immunity and cooldown",[]{auto g=arena();Actions a;a.dash=true;g.step(1.f/60,a);near(g.player.vx,780);g.damagePlayer(15);check(g.player.health==100,"Dash immunity");wait(g,12);float cooldown=g.player.dashCooldown;g.step(1.f/60,a);check(g.player.dashLeft==0&&g.player.dashCooldown<cooldown,"Cooldown");wait(g,60);g.step(1.f/60,a);check(g.player.dashLeft>0,"Reactivation");});

@@ -116,9 +116,9 @@ int main(int argc,char** argv){
         SDL_Log("PASS eight combat/UI/facing/trail scenes and all five PNG textures");view.reset();cleanup();return 0;
     }
     if(argc>2&&std::string(argv[1])=="--motion-review"){
-        constexpr const char* names[]={"IDLE","RUN","JUMP","FALL","WEAK SLASH","STRONG SLASH","THRUST","DASH","HURT","DEATH","LAND","WALK"};
+        constexpr const char* names[]={"IDLE","RUN","JUMP","FALL","WEAK SLASH","STRONG SLASH","THRUST","DASH","HURT","DEATH","LAND","WALK","AIR SLAM"};
         int captureIndex=0;std::ofstream positions(std::string(argv[2])+"/positions.csv");positions<<"frame,x,y,motion\n";
-        for(int motion=0;motion<12;++motion){
+        for(int motion=0;motion<13;++motion){
             game.restart();animation.reset();
             for(int n=0;n<90;++n){
                 auto& p=game.player;const float dt=1.f/60;
@@ -132,6 +132,7 @@ int main(int argc,char** argv){
                     if(n==0&&motion>4){p.combo=motion-4;p.comboWindow=1;}
                     eclipse::Actions reviewAction{};reviewAction.attack=n==12;game.step(dt,reviewAction);
                 }
+                if(motion==12){eclipse::Actions action{};action.jump=n==0;action.attack=n==12;game.step(dt,action);}
                 if(motion==8){if(n==12)game.damagePlayer(9);game.step(dt,{});}
                 if(motion==9&&n>=12)p.health=0;
                 animation.step(p,dt);if(n%5)continue;
