@@ -11,6 +11,30 @@ void wait(Combat& g,int frames){for(int i=0;i<frames;++i)g.step(1.f/60,{});}
 Combat arena(){Combat g;for(auto& e:g.enemies){e.x=1500;e.attackTimer=1000;}return g;}
 int main(){int failed=0,total=0;
     auto test=[&](const char* name,auto fn){++total;try{fn();std::cout<<"PASS "<<name<<'\n';}catch(const std::exception& e){++failed;std::cerr<<"FAIL "<<name<<": "<<e.what()<<'\n';}};
+    test("Settings vertical navigation and controls persistence",[]{
+        ControlLayout ui;
+        check(ui.pointer(1,ControlLayout::gearX+8,ControlLayout::gearY+8,true),"Gear should open menu");
+        check(ui.editing,"Settings did not open");
+        ui.pointer(1,75,235,true);
+        check(ui.page==ControlLayout::Sound,"Sound category missing");
+        ui.pointer(1,850,290,true);
+        check(ui.bgm>=60,"BGM slider failed");
+        ui.pointer(1,76,322,true);
+        check(ui.page==ControlLayout::Controls,"Controls category missing");
+        ui.pointer(1,490,312,true);
+        check(ui.reposition,"Reposition should open");
+        ui.pointer(1,1080,585,true);
+        ui.pointer(1,1080,585,false);
+        ui.pointer(2,1120,585,true);
+        ui.pointer(3,1140,595,true);
+        ui.pointer(3,1190,595,true);
+        check(ui.buttons[ControlLayout::Attack].size>=116,"Pinch resize did not enlarge attack button");
+        ui.pointer(3,1190,595,false);ui.pointer(2,1120,585,false);
+        ui.pointer(1,1080,110,true);
+        check(!ui.reposition,"Reposition did not close");
+        ui.pointer(1,1145,130,true);
+        check(!ui.editing,"Settings did not close");
+    });
     test("Initial four enemy wave",[]{Combat g;check(g.foes()==4&&g.player.health==100&&!g.ended,"Initial wave");check(g.enemies[0].health==55&&g.enemies[1].health==85,"Enemy types");near(g.enemies[3].x,1285);});
     test("Slime strength increases green red purple",[]{Combat g;check(g.enemies[3].kind==2,"Purple elite missing");for(int i=0;i<2;++i){check(slimeSpecs[i].health<slimeSpecs[i+1].health&&slimeSpecs[i].damage<slimeSpecs[i+1].damage,"Tier order");}});
     test("Slime bite waits for contact and hits only once",[]{for(int kind=0;kind<3;++kind){auto g=arena();auto& e=g.enemies[0];e=Enemy(kind,g.player.x+40);g.step(1.f/60,{});check(e.attackAge==0&&g.player.health==100,"Instant bite");const float contact=slimeSpec(kind).attackDuration*slimeSpec(kind).contact;while(e.attackAge+1.f/60<contact)g.step(1.f/60,{});check(g.player.health==100,"Hit before contact");g.step(1.f/60,{});check(g.player.health==100-e.damage,"Missing contact hit");int hp=g.player.health;wait(g,35);check(g.player.health==hp,"Repeated contact");}});
