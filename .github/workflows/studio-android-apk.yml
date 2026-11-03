@@ -1,4 +1,4 @@
-name: ECLIPSE Studio Android APK
+name: LEGACY Studio APK (migrated to eclipse-studio)
 on:
   workflow_dispatch:
 permissions:
