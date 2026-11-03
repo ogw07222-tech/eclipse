@@ -33,7 +33,7 @@ button:hover{background:#41775a}.buttons{display:flex;flex-wrap:wrap;gap:9px;ali
 <button id="random">시드 변경</button><button id="reset">기본값</button><button id="shot">PNG 저장</button><label class="small"><input id="zones" type="checkbox"> NPC 고정 구역 보기</label>
 <span id="status" class="small" aria-live="polite">PNG 로딩 중…</span>
 </div>
-<p>PNG 레이어 4종이 준비되면 새 배경으로 자동 전환해. 근경·NPC 구역은 시드와 무관하게 고정되며, 원경만 약한 색조 차이를 적용해. 레이어가 누락되면 다음 기존 에셋 미리보기를 사용해.</p><p>기본 에셋: 메인 나무 1종(tree_large_01), 서브 나무 1종(tree_mid_01), 덤불 2종·풀 2종·바위 1종·소형 장식 2종. 원경 코드 나무는 제거했어. 지면은 진한 갈색 흙과 픽셀 자갈·흙결로 구성하고 풀은 얇은 경계에만 남겼어.</p>
+<p>PNG 레이어 4종(v2 교체본 권장)이 준비되면 새 배경으로 자동 전환해. 근경·NPC 구역은 시드와 무관하게 고정되며, 원경만 약한 색조 차이를 적용해. 달 주변의 네모난 경계와 삼각형 원경은 v2 PNG 교체로 수정돼. 레이어가 누락되면 다음 기존 에셋 미리보기를 사용해.</p><p>기본 에셋: 메인 나무 1종(tree_large_01), 서브 나무 1종(tree_mid_01), 덤불 2종·풀 2종·바위 1종·소형 장식 2종. 원경 코드 나무는 제거했어. 지면은 진한 갈색 흙과 픽셀 자갈·흙결로 구성하고 풀은 얇은 경계에만 남겼어.</p>
 </main>
 <script>
 "use strict";
@@ -303,7 +303,7 @@ for(let i=0;i<layerPaths.length;i++){
    render();
  };
  image.onerror=()=>{layerLoaded[i]=false;render()};
- image.src=layerPaths[i]+"?rev=forest-v2-1";
+ image.src=layerPaths[i]+"?rev=forest-v2-artfix-2";
 }
 render();
 </script></body></html>
