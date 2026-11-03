@@ -26,7 +26,7 @@ public:
     int pinchButton=-1;
     int bgm=80,sfx=90;
     bool screenShake=true,showNumbers=true;
-    static constexpr float gearX=1218,gearY=18,gearSize=48;
+    static constexpr float gearX=1194,gearY=16,gearSize=66;
     static bool inside(float x,float y,float bx,float by,float w,float h){return x>=bx&&x<bx+w&&y>=by&&y<by+h;}
     int hit(float x,float y) const {
         for(int i=Count-1;i>=0;--i)if(inside(x,y,buttons[i].x,buttons[i].y,buttons[i].size,buttons[i].size))return i;
