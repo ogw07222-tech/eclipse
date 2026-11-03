@@ -15,5 +15,6 @@ constexpr MotionClip motionClips[]={
     {80,6,0.120000f,0.500000f,0.000000f},
     {16,8,0.600000f,0.500000f,72.000000f},
 };
-constexpr int motionWidth=64,motionHeight=48,motionColumns=16,motionRows=12,motionPivotX=24,motionPivotY=44;
+constexpr int motionWidth=64,motionHeight=94,motionColumns=16,motionRows=12,motionPivotX=28,motionPivotY=88;
+constexpr float motionScale=1.85f;
 }
