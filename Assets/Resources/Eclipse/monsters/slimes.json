@@ -21,12 +21,46 @@
       "start": 8,
       "count": 8,
       "loop": false,
-      "contactFrame": 4
+      "contactFrame": 4,
+      "contactFramesBySpecies": {
+        "green": 4,
+        "red": 5,
+        "purple": 4
+      }
     }
   },
   "strength": [
     "green",
     "red",
     "purple"
-  ]
+  ],
+  "attackStyles": {
+    "green": {
+      "style": "low_forward_bite",
+      "duration": 0.72,
+      "contact": 0.5,
+      "reachFromOuterBody": 26
+    },
+    "red": {
+      "style": "forward_leap_slam",
+      "duration": 1.1,
+      "contact": 0.68,
+      "leapHeight": 120,
+      "flightStart": 0.22,
+      "flightEnd": 0.68,
+      "landingTargetLocked": true
+    },
+    "purple": {
+      "style": "heavy_maw_crush",
+      "duration": 1.16,
+      "contact": 0.61,
+      "reachFromOuterBody": 40
+    }
+  },
+  "collision": {
+    "source": "largest connected opaque body of each PNG frame",
+    "rows": 128,
+    "mirrorsWithSprite": true,
+    "detachedDroplets": false
+  }
 }

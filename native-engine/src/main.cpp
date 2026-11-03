@@ -81,18 +81,24 @@ int main(int argc,char** argv){
     if(!view->load()){SDL_Log("ECLIPSE asset load failed: %s",SDL_GetError());view.reset();cleanup();return 1;}
     SDL_Log("ECLIPSE ready: five UI/knight textures, three slime atlases, combat scene, 1280x720");
     if(argc>2&&std::string(argv[1])=="--slime-review"){
-        // Deterministic timeline through the production renderer, including flips.
-        for(int n=0;n<144;++n){
+        // Simulate the real AI/physics, including the red slime's leap arc.
+        std::array<eclipse::Combat,3> reviews;
+        for(int kind=0;kind<3;++kind){auto& simulation=reviews[kind];
+            for(auto& e:simulation.enemies)e.health=0;
+            const float base=260.f+kind*360;
+            simulation.enemies[0]=eclipse::Enemy(kind,base);
+            simulation.enemies[0].attackTimer=2.4f;
+            simulation.player.x=base-180;simulation.player.invulnerable=1000;
+        }
+        for(int n=0;n<210;++n){
             game.restart();game.player.x=1500;game.enemies[3].health=0;
             const float t=n/30.f;game.clock=t;
-            for(int kind=0;kind<3;++kind){
-                auto& e=game.enemies[kind];e= eclipse::Enemy(kind,260.f+kind*360);
-                e.facing=n>=120?1:-1;
-                e.travelPhase=std::fmod(t*e.speed/64.f,1.f);
-                if(n>=72)e.attackAge=std::min(eclipse::slimeSpec(kind).attackDuration-.001f,std::fmod(t-2.4f,1.6f));
+            for(int kind=0;kind<3;++kind){auto& simulation=reviews[kind];
+                if(n==150)simulation.player.x=440.f+kind*360;
+                simulation.step(1.f/30,{});game.enemies[kind]=simulation.enemies[0];
             }
             const std::string capture=std::string(argv[2])+"/slime-"+std::to_string(n)+".bmp";
-            view->draw(game,animation,640,{},capture.c_str(),n<72?"SLIME MOVE":"SLIME ATTACK");
+            view->draw(game,animation,640,{},capture.c_str(),n<72?"SLIME MOVE":"BITE LEAP AND CRUSH");
         }
         view.reset();cleanup();return 0;
     }
