@@ -29,6 +29,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.math.roundToInt
@@ -75,7 +77,13 @@ internal fun VisualSceneEditor(githubPng: String? = null, onImported: () -> Unit
     var showCommands by remember { mutableStateOf(false) }
     var commandText by remember { mutableStateOf("""{"action":"list_objects"}""") }
     var commandReply by remember { mutableStateOf("") }
-    fun applyCommand(command: JSONObject, recordUndo: Boolean = true) {
+    var remotePanel by remember { mutableStateOf(false) }
+    var remoteUrl by remember { mutableStateOf("") }
+    var remoteToken by remember { mutableStateOf("") }
+    var remoteConnected by remember { mutableStateOf(false) }
+    var remoteStatus by remember { mutableStateOf("연결되지 않음") }
+    val completedRemoteIds = remember { mutableStateMapOf<String, JSONObject>() }
+    fun applyCommand(command: JSONObject, recordUndo: Boolean = true): JSONObject {
         try {
             val previous = objects.toList()
             val result = SceneCommands.execute(previous, command)
@@ -91,10 +99,12 @@ internal fun VisualSceneEditor(githubPng: String? = null, onImported: () -> Unit
             }
             commandReply = result.response().toString()
             status = result.message
+            return result.response()
         } catch (e: Exception) {
             val error = JSONObject().put("ok", false).put("error", e.message ?: "Unknown error")
             commandReply = error.toString()
             status = "명령 오류: ${e.message}"
+            return error
         }
     }
     fun addImage(name: String, uri: String, width: Int, height: Int) {
@@ -105,6 +115,36 @@ internal fun VisualSceneEditor(githubPng: String? = null, onImported: () -> Unit
     var nextId by remember { mutableIntStateOf(1) }
     var zoom by remember { mutableFloatStateOf(1f) }
     var playing by remember { mutableStateOf(false) }
+    LaunchedEffect(remoteConnected, remoteUrl, remoteToken, playing) {
+        if (!remoteConnected || playing) return@LaunchedEffect
+        remoteStatus = "서버 명령 대기 중 (앱 화면이 열려 있는 동안)"
+        while (isActive) {
+            try {
+                val incoming = StudioRemoteBridge.fetchNext(remoteUrl, remoteToken)
+                if (incoming != null) {
+                    val id = incoming.getString("id")
+                    val command = incoming.getJSONObject("command")
+                    val action = command.optString("action")
+                    val result = completedRemoteIds[id] ?: run {
+                        // The server applies an allowlist too; re-check on device.
+                        val reply = if (action in setOf("list_objects", "move_object", "set_property")) {
+                            applyCommand(command)
+                        } else {
+                            JSONObject().put("ok", false).put("error", "원격 실행이 허용되지 않은 명령")
+                        }
+                        if (completedRemoteIds.size >= 100) completedRemoteIds.remove(completedRemoteIds.keys.first())
+                        completedRemoteIds[id] = reply
+                        reply
+                    }
+                    StudioRemoteBridge.sendResult(remoteUrl, remoteToken, id, result)
+                    remoteStatus = "최근 처리: $action (#${id.take(8)})"
+                }
+            } catch (e: Exception) {
+                remoteStatus = "연결 오류: ${e.message}"
+            }
+            delay(3000)
+        }
+    }
     val picker=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if(uri!=null) {
             try {
@@ -174,7 +214,40 @@ internal fun VisualSceneEditor(githubPng: String? = null, onImported: () -> Unit
                 }
             }, undoStack.isNotEmpty())
             Sharp("AI 명령", { showCommands = !showCommands })
+            Sharp("원격 연결", { remotePanel = !remotePanel })
             Text("확대: ${(zoom*100).roundToInt()}%",color=Color.White,fontSize=12.sp)
+        }
+        if (remotePanel) {
+            Text("외부 HTTPS 브리지 연결 · 이 화면에서만 명령 처리", color = Color.White, fontSize = 11.sp)
+            OutlinedTextField(
+                value = remoteUrl, onValueChange = {
+                    if (!remoteConnected) remoteUrl = it
+                }, enabled = !remoteConnected,
+                label = { Text("브리지 HTTPS 주소") },
+                singleLine = true, modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = remoteToken, onValueChange = {
+                    if (!remoteConnected) remoteToken = it
+                }, enabled = !remoteConnected,
+                label = { Text("기기 인증 토큰 (저장되지 않음)") },
+                visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                singleLine = true, modifier = Modifier.fillMaxWidth()
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                Sharp(if (remoteConnected) "연결 해제" else "연결", {
+                    if (remoteConnected) {
+                        remoteConnected = false
+                        remoteStatus = "연결 해제됨"
+                    } else if (!remoteUrl.startsWith("https://") || remoteToken.length < 24) {
+                        remoteStatus = "HTTPS 주소와 24자 이상 기기 토큰을 입력하세요."
+                    } else {
+                        remoteConnected = true
+                    }
+                })
+                Text(remoteStatus, color = Color(0xFFBFDDE8), fontSize = 10.sp, maxLines = 2)
+            }
         }
         if (showCommands) {
             OutlinedTextField(
