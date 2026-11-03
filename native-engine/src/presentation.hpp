@@ -12,6 +12,7 @@ namespace eclipse {
 class Presentation {
     SDL_Renderer* renderer;
     std::array<SDL_Texture*,5> textures{};
+    std::array<SDL_Texture*,3> slimeTextures_{};
     float offset=0;
     ForestGenerator forestGenerator_{};
     std::array<SDL_Texture*,40> forestTextures_{};
@@ -293,9 +294,14 @@ class Presentation {
         }
     }
     void enemy(const Enemy& e,float clock){
-        float half=e.kind?21:16,h=e.kind?62:48;
-        world(e.x-half,e.y-h,half*2,h,e.hitFlash>0?0xffffff:e.kind?0xba6c83:0x9d7abf);
-        disk(e.x-7-offset,e.y-h+16,4,0xffed9c,2);disk(e.x+7-offset,e.y-h+16,4,0xffed9c,2);
+        const float scale=slimeSpec(e.kind).scale,h=(e.kind==0?80:100)*scale;
+        const int frame=slimeFrame(e.travelPhase,e.attackAge,e.kind);
+        SDL_FRect source{float(frame%4*slimeCell),float(frame/4*slimeCell),slimeCell,slimeCell};
+        SDL_FRect target{std::round(e.x-offset-slimePivotX*scale),std::round(e.y-slimePivotY*scale),slimeCell*scale,slimeCell*scale};
+        auto* texture=slimeTextures_[e.kind];
+        SDL_SetTextureColorMod(texture,255,e.hitFlash>0?135:255,e.hitFlash>0?135:255);
+        SDL_RenderTextureRotated(renderer,texture,&source,&target,0,nullptr,e.facing>0?SDL_FLIP_HORIZONTAL:SDL_FLIP_NONE);
+        SDL_SetTextureColorMod(texture,255,255,255);
         world(e.x-21,e.y-h-15,42,5,0x262435);world(e.x-21,e.y-h-15,42.f*e.health/e.maxHealth,5,0xf47777);
         if(e.bleed>0)for(int i=0;i<6;++i){float phase=std::fmod(clock*(17+i%3*4)+i*11,h);world(e.x+i*13%29-14,e.y-h+phase,3,i%2==0?6:3,i%2==0?0xe34359:0x8f183a,3);}
         if(e.burn>0)for(int i=0;i<9;++i){float rise=std::fmod(clock*(29+i%4*6)+i*9,h+18);world(e.x+i*17%35-17+std::sin(clock*5+i)*3,e.y+4-rise,i%3==0?6:3,i%2==0?9:6,i%3==0?0xffb74b:i%3==1?0xf16b32:0xbb3839,3);}
@@ -348,6 +354,7 @@ class Presentation {
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
     ~Presentation(){for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+        for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestV3Textures_)if(texture)SDL_DestroyTexture(texture);}
@@ -370,6 +377,16 @@ public:
             textures[i]=SDL_CreateTextureFromSurface(renderer,image);SDL_DestroySurface(image);
             if(!textures[i])return false;
             SDL_SetTextureScaleMode(textures[i],SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(textures[i],SDL_BLENDMODE_BLEND);
+        }
+        constexpr const char* slimes[]={"monsters/slime_green.png","monsters/slime_red.png","monsters/slime_purple.png"};
+        for(int i=0;i<3;++i){
+            auto path=asset(slimes[i]);auto* image=IMG_Load(path.c_str());
+            if(!image){SDL_Log("Required slime atlas missing: %s",path.c_str());return false;}
+            if(image->w!=slimeCell*4||image->h!=slimeCell*4){SDL_DestroySurface(image);SDL_Log("Invalid slime atlas dimensions: %s",path.c_str());return false;}
+            slimeTextures_[i]=SDL_CreateTextureFromSurface(renderer,image);SDL_DestroySurface(image);
+            if(!slimeTextures_[i])return false;
+            SDL_SetTextureScaleMode(slimeTextures_[i],SDL_SCALEMODE_NEAREST);
+            SDL_SetTextureBlendMode(slimeTextures_[i],SDL_BLENDMODE_BLEND);
         }
         // Optional sprite library: the procedural renderer remains functional without it.
         // Only startup loads textures; no per-frame filesystem work.

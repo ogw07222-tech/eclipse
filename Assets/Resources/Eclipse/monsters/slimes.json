@@ -1,0 +1,32 @@
+{
+  "cell": [
+    128,
+    128
+  ],
+  "columns": 4,
+  "rows": 4,
+  "pivot": [
+    64,
+    116
+  ],
+  "facing": "left",
+  "clips": {
+    "move": {
+      "start": 0,
+      "count": 8,
+      "loop": true,
+      "stride": 64
+    },
+    "attack": {
+      "start": 8,
+      "count": 8,
+      "loop": false,
+      "contactFrame": 4
+    }
+  },
+  "strength": [
+    "green",
+    "red",
+    "purple"
+  ]
+}

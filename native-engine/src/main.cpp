@@ -79,7 +79,23 @@ int main(int argc,char** argv){
     }
     layout.load();input.setLayout(&layout);
     if(!view->load()){SDL_Log("ECLIPSE asset load failed: %s",SDL_GetError());view.reset();cleanup();return 1;}
-    SDL_Log("ECLIPSE ready: five PNG textures, combat scene, 1280x720");
+    SDL_Log("ECLIPSE ready: five UI/knight textures, three slime atlases, combat scene, 1280x720");
+    if(argc>2&&std::string(argv[1])=="--slime-review"){
+        // Deterministic timeline through the production renderer, including flips.
+        for(int n=0;n<144;++n){
+            game.restart();game.player.x=1500;game.enemies[3].health=0;
+            const float t=n/30.f;game.clock=t;
+            for(int kind=0;kind<3;++kind){
+                auto& e=game.enemies[kind];e= eclipse::Enemy(kind,260.f+kind*360);
+                e.facing=n>=120?1:-1;
+                e.travelPhase=std::fmod(t*e.speed/64.f,1.f);
+                if(n>=72)e.attackAge=std::min(eclipse::slimeSpec(kind).attackDuration-.001f,std::fmod(t-2.4f,1.6f));
+            }
+            const std::string capture=std::string(argv[2])+"/slime-"+std::to_string(n)+".bmp";
+            view->draw(game,animation,640,{},capture.c_str(),n<72?"SLIME MOVE":"SLIME ATTACK");
+        }
+        view.reset();cleanup();return 0;
+    }
     if(smoke){
         for(int scene=0;scene<8;++scene){game.restart();if(scene==1){game.player.form=1;game.hit(game.enemies[0],1,false,true);game.hit(game.enemies[0],1,true);}
             if(scene==2)game.inventory=true;
