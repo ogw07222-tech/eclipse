@@ -30,10 +30,10 @@ button:hover{background:#41775a}.buttons{display:flex;flex-wrap:wrap;gap:9px;ali
 <div class="control"><label for="camera">카메라 X <span id="cameraValue">640</span></label><input type="range" id="camera" min="640" max="960" value="640" step="10"></div>
 </div>
 <div class="buttons">
-<button id="random">시드 변경</button><button id="reset">기본값</button><button id="shot">PNG 저장</button>
+<button id="random">시드 변경</button><button id="reset">기본값</button><button id="shot">PNG 저장</button><label class="small"><input id="zones" type="checkbox"> NPC 고정 구역 보기</label>
 <span id="status" class="small" aria-live="polite">PNG 로딩 중…</span>
 </div>
-<p>기본 에셋: 메인 나무 1종(tree_large_01), 서브 나무 1종(tree_mid_01), 덤불 2종·풀 2종·바위 1종·소형 장식 2종. 원경 코드 나무는 제거했어. 지면은 진한 갈색 흙과 픽셀 자갈·흙결로 구성하고 풀은 얇은 경계에만 남겼어.</p>
+<p>PNG 레이어 4종이 준비되면 새 배경으로 자동 전환해. 근경·NPC 구역은 시드와 무관하게 고정되며, 원경만 약한 색조 차이를 적용해. 레이어가 누락되면 다음 기존 에셋 미리보기를 사용해.</p><p>기본 에셋: 메인 나무 1종(tree_large_01), 서브 나무 1종(tree_mid_01), 덤불 2종·풀 2종·바위 1종·소형 장식 2종. 원경 코드 나무는 제거했어. 지면은 진한 갈색 흙과 픽셀 자갈·흙결로 구성하고 풀은 얇은 경계에만 남겼어.</p>
 </main>
 <script>
 "use strict";
@@ -50,6 +50,42 @@ const files={
   "6/1":"grass/grass_02.png"
 };
 const imgs={};let loaded=0;
+// Composed 4-layer forest is opt-in when the complete PNG set is present.
+// Never display half a scene: the old art is the safe fallback.
+const layerPaths=[
+  "../../Assets/Resources/Eclipse/forest_v2/sky/sky_01.png",
+  "../../Assets/Resources/Eclipse/forest_v2/far/forest_far_01.png",
+  "../../Assets/Resources/Eclipse/forest_v2/mid/forest_mid_01.png",
+  "../../Assets/Resources/Eclipse/forest_v2/near/ground_fixed_01.png"
+];
+const layerImgs=[null,null,null,null],layerLoaded=[false,false,false,false];
+function layeredReady(){return layerLoaded.every(Boolean)}
+function drawLayered(o){
+  const factors=[0,.12,.40,1];
+  for(let i=0;i<layerImgs.length;i++){
+    const im=layerImgs[i];ctx.save();
+    if(i===1)ctx.filter="brightness("+((239+(o.seed%17))/255)+")";
+    ctx.drawImage(im,Math.round(-(o.camera-640)*factors[i]),0);
+    ctx.restore();
+  }
+  // NPC coordinates never vary by seed. The overlay is preview-only.
+  if(el("zones").checked){
+    for(const [a,b] of [[260,425],[710,900],[1180,1360]]){
+      const left=a-(o.camera-640),right=b-(o.camera-640);
+      ctx.fillStyle="rgba(92,196,180,0.16)";
+      ctx.fillRect(left,440,right-left,145);
+      ctx.strokeStyle="rgba(132,238,208,0.8)";
+      ctx.strokeRect(left+.5,440.5,right-left-1,144);
+      ctx.fillStyle="#c2f5e9";ctx.font="16px monospace";
+      ctx.fillText("NPC",left+8,462);
+    }
+  }
+  rect(129,393,23,184,"#202c3a");
+  rect(115,410,50,97,"#748d9c");
+  rect(120,385,40,40,"#d8c7a0");
+  rect(130,395,8,8,"#202c3a");
+  el("status").textContent="레이어 PNG 4/4 · 지형/NPC 위치 고정 · 원경만 미세 변형";
+}
 const expectedSize={
   "1/0":[233,180], "2/0":[164,144], "3/0":[187,106], "3/1":[179,142]
 };
@@ -130,6 +166,7 @@ function render(){
  el("sizeValue").textContent=Math.round(o.size*100)+"%";
  el("variationValue").textContent=Math.round(o.variation*100)+"%";
  el("cameraValue").textContent=o.camera;
+ if(layeredReady()) {drawLayered(o);return;}
  // Same stepped vertical palette and disk/glow geometry as the SDL renderer.
  function rgb(hex){return [(hex>>16)&255,(hex>>8)&255,hex&255]}
  const colors=[0x071326,0x10253f,0x23445b];
@@ -253,10 +290,20 @@ for(const [id,path] of Object.entries(files)){
  // Cache-bust PNG independently of HTML caching.
  im.src=root+path+"?rev="+assetRevision;
 }
-for(const id of ["seed","density","size","variation","camera"])
+for(const id of ["seed","density","size","variation","camera","zones"])
  el(id).addEventListener("input",render);
 el("random").onclick=()=>{el("seed").value=(Math.floor(Math.random()*4294967295)>>>0);render()};
 el("reset").onclick=()=>{el("seed").value="20261103";el("density").value=74;el("size").value=100;el("variation").value=18;el("camera").value=640;render()};
 el("shot").onclick=()=>{const a=document.createElement("a");a.href=el("scene").toDataURL("image/png");a.download="eclipse-forest-preview-"+cfg().seed+".png";a.click()};
+for(let i=0;i<layerPaths.length;i++){
+ const image=new Image();layerImgs[i]=image;
+ image.onload=()=>{
+   const expectedWidth=i===0?1280:1600;
+   layerLoaded[i]=image.naturalWidth===expectedWidth&&image.naturalHeight===720;
+   render();
+ };
+ image.onerror=()=>{layerLoaded[i]=false;render()};
+ image.src=layerPaths[i]+"?rev=forest-v2-1";
+}
 render();
 </script></body></html>
