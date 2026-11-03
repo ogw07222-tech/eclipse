@@ -45,26 +45,117 @@ class Presentation {
         }
     }
     void number(int n,float x,float y,int scale=3,unsigned rgb=0xf2d48c){char buffer[24];std::snprintf(buffer,sizeof(buffer),"%d",n);text(buffer,x,y,scale,rgb);}
-    void pine(float cx,float bottom,float height,int layer,int seed){
-        constexpr unsigned trunk[]={0x243c45,0x29433b,0x3b4934},leaf[]={0x244b48,0x2c5c49,0x3b744c},highlight[]={0x33575a,0x39705a,0x538859};
-        world(cx-9,bottom-height*.64f,18,height*.64f,trunk[layer],6);
-        for(int tier=0;tier<4;++tier){float width=38+(3-tier)*18,yy=bottom-height+tier*height*.19f;
-            for(int row=0;row<5;++row){float rw=std::max(12.f,width-(4-row)*12);world(cx-rw*.5f,yy+row*12,rw,12,leaf[layer],6);}
-            world(cx-width*.23f,yy+24,width*.3f,6,highlight[layer],6);
+
+    // Stable procedural variation; integer pixel blocks and independent layer motion.
+    static unsigned forestHash(int seed,int salt){
+        unsigned h=static_cast<unsigned>(seed)*374761393u+static_cast<unsigned>(salt)*668265263u;
+        h=(h^(h>>13))*1274126177u;
+        return (h^(h>>16))&0x7fffffffu;
+    }
+    void forestTree(float cx,float bottom,float height,int layer,int seed){
+        constexpr unsigned trunks[]={0x243c45,0x29433b,0x3b4934};
+        constexpr unsigned leaves[]={0x244b48,0x2c5c49,0x3b744c};
+        constexpr unsigned highlights[]={0x33575a,0x39705a,0x538859};
+        float trunk=12.f+forestHash(seed,6)%3*6;
+        float crownY=bottom-height*(.62f+(forestHash(seed,7)%9)*.025f);
+        world(cx-trunk*.5f,crownY,trunk,bottom-crownY,trunks[layer],6);
+        if(seed%4==0){
+            world(cx-24,crownY+24,30,6,trunks[layer],6);
+            world(cx+3,crownY+12,30,6,trunks[layer],6);
+        }else{
+            world(cx-30,crownY+36,33,6,trunks[layer],6);
+            world(cx+3,crownY+24,33,6,trunks[layer],6);
         }
-        world(cx-5,bottom-height+4,12,6,highlight[layer],6);if(seed%3==0)world(cx+16,bottom-height*.43f,6,6,highlight[layer],6);
+        float radius=38.f+forestHash(seed,10)%5*6+layer*5;
+        if(seed%7==0){
+            for(int tier=0;tier<3;++tier){
+                float y=bottom-height+tier*39,w=radius*(1.1f+tier*.15f);
+                for(int row=0;row<5;++row)
+                    world(cx-w*.5f+row*5,y+row*9,w-row*10,12,leaves[layer],6);
+            }
+        }else{
+            for(int clump=0;clump<7;++clump){
+                unsigned h=forestHash(seed,20+clump);
+                float x=cx+(static_cast<int>(h%17)-8)*6;
+                float y=bottom-height+((h/19)%9)*6+(clump%3)*15;
+                float r=radius*(.42f+((h/37)%5)*.08f);
+                for(int row=-3;row<=3;++row){
+                    float w=r*(1.f-std::abs(row)*.16f);
+                    world(x-w,y+row*9,w*2,12,leaves[layer],6);
+                }
+            }
+        }
+        for(int k=0;k<6;++k){
+            unsigned h=forestHash(seed,51+k);
+            float x=cx+(static_cast<int>(h%17)-8)*6;
+            float y=bottom-height+(h/23%11)*6;
+            world(x,y,12+h%3*6,6,highlights[layer],6);
+        }
+        if(layer==2&&seed%5==0){
+            world(cx-3,bottom-38,6,30,0x43604a,6);
+            world(cx+6,bottom-24,6,12,0x527b45,6);
+        }
+    }
+    void forestBush(float x,float bottom,float radius,int layer,int seed){
+        constexpr unsigned leaves[]={0x244b48,0x2c5c49,0x3b744c};
+        constexpr unsigned highlights[]={0x33575a,0x39705a,0x538859};
+        for(int n=0;n<4;++n){
+            unsigned h=forestHash(seed,70+n);
+            float bx=x+(n-2)*12+h%9,top=bottom-radius-h%13;
+            world(bx-12,top+9,30,radius*.65f,leaves[layer],6);
+            world(bx-6,top,18,12,leaves[layer],6);
+            if(n%2==0)world(bx,top+6,12,6,highlights[layer],6);
+        }
     }
     void forest(const Combat& g,float camera){
         rect(0,0,viewWidth,viewHeight,0x152334);
-        for(int row=0;row<11;++row){int half=2+std::min(row,10-row);world(1190-half*6,105+row*6,(half*2+1)*6,6,0xaebda3);}
+        for(int row=0;row<11;++row){
+            int half=2+std::min(row,10-row);
+            world(1190-half*6,105+row*6,(half*2+1)*6,6,0xaebda3);
+        }
         for(int i=0;i<62;++i)world((i*233+49)%1600,(i*97+59)%315,6,6,0x718d8c);
-        constexpr float factors[]={.12f,.28f,.48f};constexpr int steps[]={124,110,104},heights[]={172,210,242};
-        for(int layer=0;layer<3;++layer){float parallax=std::round((camera-640)*factors[layer]*.25f/6)*6;
-            for(int i=0;i<22;++i)pine(i*steps[layer]+layer*47-100-parallax,584,heights[layer]+(i*19+layer*7)%7*6,layer,i);
+        constexpr float factors[]={.12f,.28f,.48f};
+        constexpr int steps[]={124,110,104},heights[]={172,210,242};
+        for(int layer=0;layer<3;++layer){
+            // world() subtracts the full camera offset; add its complement.
+            float shift=std::round((camera-640)*(1.f-factors[layer])/6.f)*6.f;
+            for(int i=-3;i<22;++i){
+                int seed=i+layer*173;
+                float x=i*steps[layer]+(static_cast<int>(forestHash(seed,1)%65)-32)+shift;
+                float height=heights[layer]+(static_cast<int>(forestHash(seed,2)%12)-5)*6;
+                forestTree(x,584,height,layer,seed);
+            }
+            for(int i=-2;i<35;++i){
+                int seed=i+layer*391;
+                float x=i*61+forestHash(seed,9)%42+shift;
+                forestBush(x,579-layer*3,21+forestHash(seed,8)%23,layer,seed);
+            }
         }
         world(0,578,1600,12,0x527b45);
-        for(int i=0;i<210;++i){float breeze=static_cast<int>(std::sin(g.clock*1.7f+i)*1.5f)*6;world(i*47%1600+breeze,566-i%3*6,6,12,0x83a65a);}
-        world(0,585,1600,135,0x2b4034);world(0,585,1600,8,0x73995d);for(int x=0;x<1600;x+=80)world(x,615,55,3,0x334661);
+        world(0,585,1600,135,0x2b4034);
+        world(0,585,1600,8,0x73995d);
+        for(int i=0;i<115;++i){
+            int seed=i+861;
+            float x=i*15+forestHash(seed,3)%12;
+            if(x>1600)break;
+            float sway=std::round(std::sin(g.clock*1.5f+seed))*3;
+            world(x+sway,574-forestHash(seed,4)%3*6,6,6+forestHash(seed,5)%3*6,
+                i%7==0?0x83a65a:i%3==0?0x527b45:0x73995d,3);
+            if(i%11==0){
+                world(x-6,581,18,6,0x334661,3);
+                world(x,578,6,3,0x62736b,3);
+            }
+            if(i%19==0){
+                world(x,562,3,15,0x527b45,3);
+                world(x-3,556,9,6,0xb6aa88,3);
+            }
+        }
+        for(int i=0;i<45;++i){
+            int seed=1171+i;
+            float x=i*37+forestHash(seed,2)%20;
+            world(x,604+forestHash(seed,3)%15*6,6+forestHash(seed,4)%4*6,6,
+                i%4==0?0x334661:0x3a5141,6);
+        }
     }
     void enemy(const Enemy& e,float clock){
         float half=e.kind?21:16,h=e.kind?62:48;
