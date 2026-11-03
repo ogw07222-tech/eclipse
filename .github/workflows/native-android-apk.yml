@@ -63,6 +63,79 @@ jobs:
             echo 'App: com.eclipse.nativegame — SDL/C++, no Unity license required.'
             echo "Commit: $GITHUB_SHA"
           } >> "$GITHUB_STEP_SUMMARY"
+  signed-release:
+    name: Release-signed ARM64 APK
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.signed_release == true }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Install pinned Android toolchains
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;27.2.12479018' 'cmake;3.31.6'
+      - name: Validate signing secret configuration
+        env:
+          HAS_KEY: ${{ secrets.ECLIPSE_KEYSTORE_BASE64 != '' }}
+          HAS_STORE: ${{ secrets.ECLIPSE_KEYSTORE_PASSWORD != '' }}
+          HAS_ALIAS: ${{ secrets.ECLIPSE_KEY_ALIAS != '' }}
+          HAS_PASSWORD: ${{ secrets.ECLIPSE_KEY_PASSWORD != '' }}
+        run: |
+          test "$HAS_KEY" = true && test "$HAS_STORE" = true && test "$HAS_ALIAS" = true && test "$HAS_PASSWORD" = true || { echo '::error::Missing ECLIPSE release signing secrets'; exit 1; }
+      - name: Prepare SDL Android bridge
+        run: python3 native-engine/tools/prepare_android.py
+      - name: Compile native combat tests
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror native-engine/tests/core_tests.cpp -o /tmp/eclipse-combat-tests
+          /tmp/eclipse-combat-tests
+      - name: Build release-signed APK
+        env:
+          ECLIPSE_KEYSTORE_BASE64: ${{ secrets.ECLIPSE_KEYSTORE_BASE64 }}
+          ECLIPSE_KEYSTORE_PASSWORD: ${{ secrets.ECLIPSE_KEYSTORE_PASSWORD }}
+          ECLIPSE_KEY_ALIAS: ${{ secrets.ECLIPSE_KEY_ALIAS }}
+          ECLIPSE_KEY_PASSWORD: ${{ secrets.ECLIPSE_KEY_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          keydir="$(mktemp -d "${RUNNER_TEMP}/eclipse-signing-XXXXXXXX")"
+          chmod 700 "$keydir"
+          trap 'rm -rf "$keydir"' EXIT
+          export ECLIPSE_KEYSTORE_FILE="$keydir/release.jks"
+          umask 077
+          printf '%s' "$ECLIPSE_KEYSTORE_BASE64" | base64 --decode > "$ECLIPSE_KEYSTORE_FILE"
+          test -s "$ECLIPSE_KEYSTORE_FILE"
+          gradle -p native-engine/android --no-daemon -PeclipseSignedRelease=true -PeclipseVersionCode=${{ github.run_number }} assembleRelease
+          mkdir -p native-engine/android/output
+          cp native-engine/android/app/build/outputs/apk/release/app-release.apk native-engine/android/output/ECLIPSE-Native-Signed.apk
+      - name: Verify APK and signing certificate
+        run: |
+          set -euo pipefail
+          apk=native-engine/android/output/ECLIPSE-Native-Signed.apk
+          python3 native-engine/tools/verify_apk.py "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "$apk" | grep 'Signer #1 certificate SHA-256 digest'
+      - name: Upload release-signed APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ECLIPSE-Native-Signed-ARM64-${{ github.run_number }}
+          path: |
+            native-engine/android/output/ECLIPSE-Native-Signed.apk
+            native-engine/android/output/ECLIPSE-Native-Signed.apk.sha256
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
   android-smoke:
     if: ${{ inputs.run_emulator == true }}
     name: Android emulator combat smoke

@@ -32,3 +32,16 @@ Only the five referenced original PNGs are packaged. SDL3.2 Android loads assets
 - Build a separate x86_64 emulator APK; run on an Android29 emulator and exercise startup, textures, inventory touch, equipment cycling, mage swap, background/foreground and restart. Preserve logs and synthetic app screenshots for 7 days.
 
 Emulator checks do not replace tablet testing. Verify simultaneous joystick + attack/skill/dash, cutouts/navigation bars, Android16 lifecycle, pacing and heat on the actual device.
+
+
+## Persistent signing key for release APKs
+
+The default workflow still builds a debug-signed test APK. To build a release APK that keeps the same signing identity across builds, first create your own private PKCS12 keystore on a trusted device:
+
+~~~sh
+keytool -genkeypair -v -keystore eclipse-release.jks -storetype PKCS12 -alias eclipse-release -keyalg RSA -keysize 3072 -validity 10000
+~~~
+
+Keep the JKS file and the password in secure separate backups. Do not upload the keystore or passwords to source control or chat. In GitHub Settings > Secrets and variables > Actions, set four repository secrets: `ECLIPSE_KEYSTORE_BASE64` (the base64-encoded keystore file), `ECLIPSE_KEYSTORE_PASSWORD` (store password), `ECLIPSE_KEY_ALIAS` (`eclipse-release`), and `ECLIPSE_KEY_PASSWORD` (key password). Encode locally with `base64 -w 0 eclipse-release.jks`; transfer the output directly into GitHub Secrets, not via chat.
+
+Choose Actions > Native Android APK > Run workflow, branch `main`, and enable `signed_release`. It builds an APK with the persistent key and validates its signer certificate. The key file is created only in an ephemeral runner directory and deleted after the signing step. Debug-signed installs cannot be upgraded directly to release-signed APKs under the same package name; uninstall the old debug app first after saving any needed data. For Google Play App Signing, distinguish your upload key from Google's managed app-signing key.

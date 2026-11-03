@@ -12,7 +12,27 @@ tasks.register('packageEclipseAssets', Sync) {
     into packagedArt
 }
 
+def signedRelease = providers.gradleProperty('eclipseSignedRelease').map { it.toBoolean() }.getOrElse(false)
+if (signedRelease) {
+    def missing = ['ECLIPSE_KEYSTORE_FILE','ECLIPSE_KEYSTORE_PASSWORD','ECLIPSE_KEY_ALIAS','ECLIPSE_KEY_PASSWORD'].findAll { !System.getenv(it) }
+    if (!missing.isEmpty()) throw new GradleException('Missing signing environment variables: ' + missing.join(', '))
+    if (!file(System.getenv('ECLIPSE_KEYSTORE_FILE')).isFile())
+        throw new GradleException('Release keystore file missing')
+}
 android {
+    signingConfigs {
+        if (signedRelease) {
+            eclipseRelease {
+                storeFile file(System.getenv('ECLIPSE_KEYSTORE_FILE'))
+                storePassword System.getenv('ECLIPSE_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('ECLIPSE_KEY_ALIAS')
+                keyPassword System.getenv('ECLIPSE_KEY_PASSWORD')
+                enableV1Signing true
+                enableV2Signing true
+                enableV3Signing true
+            }
+        }
+    }
     namespace 'com.eclipse.nativegame'
     compileSdk 35
     ndkVersion '27.2.12479018'
@@ -42,7 +62,10 @@ android {
     }
     buildTypes {
         debug { debuggable true; jniDebuggable false }
-        release { minifyEnabled false }
+        release {
+            minifyEnabled false
+            if (signedRelease) signingConfig signingConfigs.eclipseRelease
+        }
     }
     androidResources { noCompress += ['png'] }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }

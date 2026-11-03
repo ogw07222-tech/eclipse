@@ -42,3 +42,9 @@ __pycache__/
 /Legacy/Unity/[Oo]bj/
 /Legacy/Unity/[Ll]ogs/
 /Legacy/Unity/UserSettings/
+
+# Private Android signing keys
+*.jks
+*.keystore
+*.p12
+*.pfx
