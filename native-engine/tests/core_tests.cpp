@@ -45,6 +45,20 @@ int main(){int failed=0,total=0;
     test("Run cycle follows actual world travel without wall skating",[]{Player p;p.vx=280;Animation a;a.step(p,1.f/60);int first=a.frame;for(int i=0;i<16;++i){p.x+=7.5f;a.step(p,1.f/60);}check(a.frame==first,"Stride distance mismatch");for(int i=0;i<30;++i)a.step(p,1.f/60);check(a.frame==first,"Stationary feet animated");});
     test("Jump apex fall and landing use distinct clips",[]{Player p;Animation a;p.grounded=false;p.vy=-650;a.step(p,1.f/60);check(a.state==2&&a.frame==48,"Takeoff");p.vy=350;a.step(p,1.f/60);check(a.state==3&&a.frame>=64,"Fall");p.grounded=true;p.vy=0;a.step(p,1.f/60);check(a.state==10,"Landing missing");for(int i=0;i<12;++i)a.step(p,1.f/60);check(a.state==0,"Landing stuck");});
     test("Hit-stop holds the contact pose then resumes",[]{Player p;p.combo=2;++p.attackSerial;p.hitStop=.075f;Animation a;a.step(p,1.f/60);const int contact=a.frame;check(contact>=133,"Hit froze before contact");a.step(p,1.f/60);check(a.frame==contact,"Hit-stop pose advanced");p.hitStop=0;a.step(p,.05f);check(a.frame>contact,"Contact did not resume");});
+    test("Forest entrance authored PNG contract",[]{
+        check(ForestLayerScene::layersEntrance.size()==6,"Entrance layer count");
+        constexpr float parallax[]={0.f,.06f,.14f,.40f,1.f,1.f};
+        for(size_t i=0;i<ForestLayerScene::layersEntrance.size();++i){
+            check(ForestLayerScene::layersEntrance[i].parallax==parallax[i],
+                  "Entrance layer parallax mismatch");
+            check(ForestLayerScene::layersEntrance[i].file!=nullptr,
+                  "Entrance file path missing");
+            if(i>=4)check(ForestLayerScene::layersEntrance[i].worldLocked,
+                          "Entrance collision-floor image moved");
+        }
+        check(ForestLayerScene::floorY==585,"Forest entrance gameplay floor changed");
+        check(ForestLayerScene::worldWidth==1600,"Entrance world width changed");
+    });
     test("Forest v3 keeps six distinct visual-only layers",[]{
         check(ForestLayerScene::layersV3.size()==6,"v3 PNG layer count");
         constexpr float expected[]={0.f,.06f,.14f,.40f,1.f,1.f};
