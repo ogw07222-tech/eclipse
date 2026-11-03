@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ECLIPSE — 숲 배경 미리보기</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,sans-serif;background:#0d1420;color:#eff4ed}
+*{box-sizing:border-box}body{margin:0}.header{padding:18px 20px 10px;max-width:1400px;margin:auto}
+h1{font-size:22px;margin:0 0 6px}p{color:#a9b8b3;margin:5px 0;font-size:13px}
+main{padding:8px 16px 26px;max-width:1400px;margin:auto}
+.stage{border:1px solid #41524d;border-radius:12px;overflow:hidden;background:#152334}
+canvas{display:block;width:100%;height:auto;image-rendering:pixelated;touch-action:pan-y}
+.panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;padding:17px;border:1px solid #293e3b;border-radius:12px;margin:14px 0;background:#17232b}
+.control label{display:flex;justify-content:space-between;gap:8px;font-size:13px;margin-bottom:7px}
+input[type=range]{width:100%;accent-color:#93c5a0}input[type=number]{background:#0e1b21;border:1px solid #53685c;color:#fff;border-radius:5px;padding:7px;width:100%}
+button{background:#305b48;border:1px solid #60866e;border-radius:7px;color:#fff;padding:10px 12px;cursor:pointer;font-weight:600}
+button:hover{background:#41775a}.buttons{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.small{font-size:12px;color:#adbbb7}#status{padding:0 2px;color:#b4d2bf}
+</style></head><body>
+<div class="header"><h1>ECLIPSE · Forest Preview</h1>
+<p>APK 빌드 없이 브라우저에서 숲의 PNG 배치·크기·밀도를 확인하는 도구. 전투 코드를 실행하는 건 아니고 배경 생성 규칙을 그대로 옮긴 시각 미리보기야.</p></div>
+<main>
+<div class="stage"><canvas id="scene" width="1280" height="720" aria-label="픽셀 숲 배경 미리보기"></canvas></div>
+<div class="panel">
+<div class="control"><label for="seed">시드 <span id="seedValue">20261103</span></label><input type="number" id="seed" min="0" max="4294967295" value="20261103"></div>
+<div class="control"><label for="density">밀도 <span id="densityValue">74%</span></label><input type="range" id="density" min="0" max="100" value="74"></div>
+<div class="control"><label for="size">나무 크기 <span id="sizeValue">100%</span></label><input type="range" id="size" min="60" max="180" value="100"></div>
+<div class="control"><label for="variation">배치 변화 <span id="variationValue">18%</span></label><input type="range" id="variation" min="0" max="100" value="18"></div>
+<div class="control"><label for="camera">카메라 X <span id="cameraValue">640</span></label><input type="range" id="camera" min="640" max="960" value="640" step="10"></div>
+</div>
+<div class="buttons">
+<button id="random">시드 변경</button><button id="reset">기본값</button><button id="shot">PNG 저장</button>
+<span id="status" class="small" aria-live="polite">PNG 로딩 중…</span>
+</div>
+<p>기본 에셋: 메인 나무 1종(tree_large_01), 서브 나무 1종(tree_mid_01), 덤불 2종·풀 2종·바위 1종·소형 장식 2종. 원경의 불투명 PNG는 실제 엔진과 동일하게 사용하지 않아.</p>
+</main>
+<script>
+"use strict";
+const root="../../Assets/Resources/Eclipse/forest/";
+const files={
+  "1/0":"trees_large/tree_large_01.png",
+  "2/0":"trees_medium/tree_mid_01.png",
+  "3/0":"bushes/bush_01.png",
+  "3/1":"bushes/bush_02.png",
+  "4/0":"rocks/rock_01.png",
+  "5/0":"details/fallen_log_01.png",
+  "5/1":"details/flower_01.png",
+  "6/0":"grass/grass_01.png",
+  "6/1":"grass/grass_02.png"
+};
+const imgs={};let loaded=0;
+const ctx=document.getElementById("scene").getContext("2d");
+ctx.imageSmoothingEnabled=false;
+const el=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const cfg=()=>({
+  seed:(Number(el("seed").value)>>>0),density:Number(el("density").value)/100,
+  size:Number(el("size").value)/100,variation:Number(el("variation").value)/100,
+  width:1600,groundY:585,motion:.08,camera:Number(el("camera").value)
+});
+const imul=Math.imul;
+function mix(v){v=(v^(v>>>16))>>>0;v=imul(v,0x7feb352d)>>>0;v=(v^(v>>>15))>>>0;v=imul(v,0x846ca68b)>>>0;return (v^(v>>>16))>>>0}
+function rand(seed,salt,i,c){return mix((seed^(imul(salt,0x9e3779b9))^(imul(i,0x85ebca6b))^(imul(c,0xc2b2ae35)))>>>0)}
+function unit(seed,salt,i,c){return (rand(seed,salt,i,c)&0xffffff)/16777216}
+const K={Far:0,LargeTree:1,MidTree:2,Bush:3,Rock:4,Detail:5,Grass:6};
+function generate(o){
+ let out=[];
+ function distribute(kind,layer,varieties,spacing,minGap,baseScale,baseline,salt){
+   let previous=-100000,slots=Math.ceil((o.width+400)/spacing);
+   let prob=clamp(o.density*(kind===K.Far?1.35:kind===K.Grass?1.15:1),0,1);
+   for(let i=0;i<slots;i++){
+     if(unit(o.seed,salt,i,0)>prob)continue;
+     let jitter=(unit(o.seed,salt,i,1)-.5)*spacing*o.variation;
+     let x=-180+(i+.5)*spacing+jitter;
+     if(x-previous<minGap)continue;
+     let scale=clamp(baseScale*o.size*(1+(unit(o.seed,salt,i,2)-.5)*.45*o.variation),.28,5);
+     let v=rand(o.seed,salt,i,3)%varieties;
+     out.push({kind,layer,v,x:Math.floor(x/3+.5)*3,y:baseline,scale,phase:rand(o.seed,salt,i,4)});
+     previous=x;
+   }
+ }
+ distribute(K.Far,0,1,265,180,1.25,558,11);
+ distribute(K.LargeTree,1,1,185,150,3.32,584,17);
+ distribute(K.MidTree,2,1,425,315,2.72,582,23);
+ distribute(K.Bush,3,2,195,115,1.15,584,29);
+ distribute(K.Rock,3,1,385,215,.88,583,31);
+ distribute(K.Detail,3,2,440,290,.85,583,41);
+ distribute(K.Grass,4,2,115,70,.77,583,43);
+ out.sort((a,b)=>a.layer-b.layer);
+ return out;
+}
+const parallax=[.10,.23,.44,.72,1,.82];
+function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)))}
+function proceduralTree(cx,ground,height,tint){
+ let top=ground-height;
+ rect(cx-8,top+height*.27,16,height*.73,tint===0?"#29433b":"#3b4934");
+ for(let row=0;row<8;row++){
+   let y=top+row*height*.073;
+   let wid=(70+Math.sin(row*.66)*22)*(tint===0?1:1.2);
+   rect(cx-wid,y,wid*2,17,tint===0?"#244b48":"#3b744c");
+   if(row%3===0)rect(cx-wid*.8,y+5,wid*.8,5,"#538859");
+ }
+}
+function render(){
+ const o=cfg(),sprites=generate(o);
+ el("seedValue").textContent=o.seed;
+ el("densityValue").textContent=Math.round(o.density*100)+"%";
+ el("sizeValue").textContent=Math.round(o.size*100)+"%";
+ el("variationValue").textContent=Math.round(o.variation*100)+"%";
+ el("cameraValue").textContent=o.camera;
+ ctx.fillStyle="#152334";ctx.fillRect(0,0,1280,720);
+ for(let row=0;row<11;row++){let half=2+Math.min(row,10-row);rect(1190-half*6,105+row*6,(half*2+1)*6,6,"#aebda3")}
+ for(let i=0;i<62;i++)rect((i*233+49)%1280,(i*97+59)%315,3,3,"#718d8c");
+ function obj(s){
+   let x=Math.floor((s.x-(o.camera-640)*parallax[s.layer])/3+.5)*3;
+   if(x < -700||x>1900)return;
+   if(s.kind===K.Far){proceduralTree(x,558,142*s.scale,0);return}
+   const image=imgs[s.kind+"/"+s.v];
+   if(image&&image.complete&&image.naturalWidth){
+     const w=image.naturalWidth*s.scale,h=image.naturalHeight*s.scale;
+     ctx.drawImage(image,Math.round(x-w/2),Math.round(s.y-h),Math.round(w),Math.round(h));
+   }else if(s.kind===K.LargeTree||s.kind===K.MidTree){
+     proceduralTree(x,s.y,(s.kind===K.LargeTree?148:128)*s.scale,1);
+   }else if(s.kind===K.Bush){rect(x-20,s.y-34,40,34,"#3b744c")}
+   else if(s.kind===K.Grass){rect(x,s.y-17,5,17,"#83a65a")}
+   else if(s.kind===K.Rock){rect(x-15,s.y-12,30,12,"#334661")}
+ }
+ for(const s of sprites)if(s.layer<4)obj(s);
+ rect(0,578,1280,12,"#527b45");
+ rect(0,585,1280,135,"#2b4034");
+ rect(0,585,1280,8,"#73995d");
+ for(const s of sprites)if(s.layer>=4)obj(s);
+ // Reference knight height (~192 px in the native game), no gameplay simulation.
+ rect(129,393,23,184,"#202c3a");rect(115,410,50,97,"#748d9c");
+ rect(120,385,40,40,"#d8c7a0");rect(130,395,8,8,"#202c3a");
+ el("status").textContent="배치 "+sprites.length+"개 · 메인 나무 "+sprites.filter(s=>s.kind===1).length+"개 · 서브 나무 "+sprites.filter(s=>s.kind===2).length+"개 · PNG "+loaded+"/"+Object.keys(files).length+" 로드";
+}
+for(const [id,path] of Object.entries(files)){
+ const im=new Image();
+ im.onload=()=>{loaded++;render()};
+ im.onerror=()=>{render()};
+ im.src=root+path;imgs[id]=im;
+}
+for(const id of ["seed","density","size","variation","camera"])
+ el(id).addEventListener("input",render);
+el("random").onclick=()=>{el("seed").value=(Math.floor(Math.random()*4294967295)>>>0);render()};
+el("reset").onclick=()=>{el("seed").value="20261103";el("density").value=74;el("size").value=100;el("variation").value=18;el("camera").value=640;render()};
+el("shot").onclick=()=>{const a=document.createElement("a");a.href=el("scene").toDataURL("image/png");a.download="eclipse-forest-preview-"+cfg().seed+".png";a.click()};
+render();
+</script></body></html>
