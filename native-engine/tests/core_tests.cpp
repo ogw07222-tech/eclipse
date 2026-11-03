@@ -45,6 +45,24 @@ int main(){int failed=0,total=0;
     test("Run cycle follows actual world travel without wall skating",[]{Player p;p.vx=280;Animation a;a.step(p,1.f/60);int first=a.frame;for(int i=0;i<16;++i){p.x+=7.5f;a.step(p,1.f/60);}check(a.frame==first,"Stride distance mismatch");for(int i=0;i<30;++i)a.step(p,1.f/60);check(a.frame==first,"Stationary feet animated");});
     test("Jump apex fall and landing use distinct clips",[]{Player p;Animation a;p.grounded=false;p.vy=-650;a.step(p,1.f/60);check(a.state==2&&a.frame==48,"Takeoff");p.vy=350;a.step(p,1.f/60);check(a.state==3&&a.frame>=64,"Fall");p.grounded=true;p.vy=0;a.step(p,1.f/60);check(a.state==10,"Landing missing");for(int i=0;i<12;++i)a.step(p,1.f/60);check(a.state==0,"Landing stuck");});
     test("Hit-stop holds the contact pose then resumes",[]{Player p;p.combo=2;++p.attackSerial;p.hitStop=.075f;Animation a;a.step(p,1.f/60);const int contact=a.frame;check(contact>=133,"Hit froze before contact");a.step(p,1.f/60);check(a.frame==contact,"Hit-stop pose advanced");p.hitStop=0;a.step(p,.05f);check(a.frame>contact,"Contact did not resume");});
+    test("Forest v3 keeps six distinct visual-only layers",[]{
+        check(ForestLayerScene::layersV3.size()==6,"v3 PNG layer count");
+        constexpr float expected[]={0.f,.06f,.14f,.40f,1.f,1.f};
+        for(size_t i=0;i<ForestLayerScene::layersV3.size();++i){
+            check(ForestLayerScene::layersV3[i].parallax==expected[i],
+                "Incorrect v3 parallax");
+            check(ForestLayerScene::layersV3[i].file!=nullptr,
+                "Missing v3 layer path");
+            if(i>=4)check(ForestLayerScene::layersV3[i].worldLocked,
+                "Foreground moved away from NPC coordinates");
+        }
+        check(ForestLayerScene::floorY==585 &&
+              ForestLayerScene::worldWidth==1600,"Changed gameplay geometry");
+        for(auto zone:ForestLayerScene::npcZones)
+            for(int x=zone.x0;x<=zone.x1;++x)
+                check(!ForestLayerScene::canPlaceForegroundProp(x),
+                    "Decor could occupy protected NPC corridor");
+    });
     test("Layered forest keeps ground and NPC regions deterministic",[]{
         check(ForestLayerScene::floorY==585,"Collision floor moved");
         check(ForestLayerScene::worldWidth==1600,"World boundaries changed");
