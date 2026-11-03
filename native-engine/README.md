@@ -95,3 +95,7 @@ Then open `http://127.0.0.1:8765/native-engine/preview/forest.html` in Samsung I
 ## Forest visual cleanup
 
 The low-fidelity procedural distant trees have been removed from both the native renderer and APK-free browser preview. Missing PNG sprites are skipped rather than replaced with rectangular trees. The floor now includes reproducible, subdued ground/shadow patches and short uneven grass-edge marks. Keep the current two large PNG tree species and sparse foreground props. Reload the browser page after pulling the latest commit; no APK rebuild is necessary for the preview.
+
+## Cropped forest sprite repair
+
+A revised image patch, `eclipse_forest_cropping_fix.zip`, re-extracts the **main tree**, **secondary tree**, and **two bushes** from wider original source-sheet regions, leaving transparent margins and updating the manifest dimensions. Extract its `Assets/Resources/Eclipse/forest/` paths into the repository and commit the changed PNGs plus manifest. The native SDL renderer and browser preview normalize the sprites' visual height to the original footprint so restored source boundaries do not make objects unexpectedly bigger; trees are constrained not to clip against the top of the viewport. PNG edges cannot be fixed by changing camera culling alone.
