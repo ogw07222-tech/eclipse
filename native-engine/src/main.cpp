@@ -74,6 +74,9 @@ int main(int argc,char** argv){
     if(!SDL_CreateWindowAndRenderer("ECLIPSE Native",1280,720,flags,&window,&renderer)){SDL_Log("Window: %s",SDL_GetError());cleanup();return 1;}
     SDL_SetRenderLogicalPresentation(renderer,1280,720,SDL_LOGICAL_PRESENTATION_LETTERBOX);SDL_SetRenderVSync(renderer,1);
     auto view=std::make_unique<eclipse::Presentation>(renderer);
+    if(char* pref=SDL_GetPrefPath("ECLIPSE","Native")){
+        layout.storagePath=std::string(pref)+"controls.cfg";SDL_free(pref);
+    }
     layout.load();input.setLayout(&layout);
     if(!view->load()){SDL_Log("ECLIPSE asset load failed: %s",SDL_GetError());view.reset();cleanup();return 1;}
     SDL_Log("ECLIPSE ready: five PNG textures, combat scene, 1280x720");
