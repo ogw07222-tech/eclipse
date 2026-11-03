@@ -74,7 +74,18 @@ class Presentation {
         if(image) {
             float w=0,h=0;
             if(SDL_GetTextureSize(image,&w,&h)) {
-                const float scale=sprite.scale;
+                // Normalize sprites to the original art footprint: repairing
+                // cropped PNG margins must not unexpectedly enlarge them.
+                float referenceHeight=h;
+                if(sprite.kind==ForestKind::LargeTree)referenceHeight=148.f;
+                if(sprite.kind==ForestKind::MidTree)referenceHeight=106.f;
+                if(sprite.kind==ForestKind::Bush)
+                    referenceHeight=sprite.variant==0?62.f:86.f;
+                float scale=sprite.scale*referenceHeight/h;
+                // Avoid upper-edge clipping as user increases the tree size.
+                if(sprite.kind==ForestKind::LargeTree ||
+                   sprite.kind==ForestKind::MidTree)
+                    scale=std::min(scale,(sprite.groundY-12.f)/h);
                 // Cull only after considering the scaled image width.
                 if(sx+w*scale*.5f<0 || sx-w*scale*.5f>viewWidth)return;
                 const float py=sprite.groundY+forestGenerator_.microMotion(sprite,clock);

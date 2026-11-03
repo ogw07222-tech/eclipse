@@ -105,7 +105,13 @@ function render(){
    if(s.kind===K.Far)return;
    const image=imgs[s.kind+"/"+s.v];
    if(image&&image.complete&&image.naturalWidth){
-     const w=image.naturalWidth*s.scale,h=image.naturalHeight*s.scale;
+     const sourceHeight=image.naturalHeight;
+     const referenceHeight=s.kind===K.LargeTree?148:
+       s.kind===K.MidTree?106:s.kind===K.Bush?(s.v===0?62:86):sourceHeight;
+     let scale=s.scale*referenceHeight/sourceHeight;
+     if(s.kind===K.LargeTree||s.kind===K.MidTree)
+       scale=Math.min(scale,(s.y-12)/sourceHeight);
+     const w=image.naturalWidth*scale,h=image.naturalHeight*scale;
      ctx.drawImage(image,Math.round(x-w/2),Math.round(s.y-h),Math.round(w),Math.round(h));
    } // No low-quality procedural substitute if a PNG fails to load.
  }
