@@ -73,10 +73,23 @@ int main(){int failed=0,total=0;
         check(g.microMotion(grass,0)==g.microMotion(grass,9),"Grass sways");
         check(std::abs(g.microMotion(light,3))<2,"Excessive ambient motion");
     });
+    test("Forest only two stable tree variants and fewer props",[]{
+        ForestGenerator g;
+        int main=0,secondary=0,bushes=0,details=0,grass=0;
+        for(const auto& s:g.sprites()){
+            if(s.kind==ForestKind::LargeTree){++main;check(s.variant==0,"Main variant");check(s.scale>2.8f,"Main too small");}
+            if(s.kind==ForestKind::MidTree){++secondary;check(s.variant==0,"Secondary variant");check(s.scale>2.2f,"Secondary too small");}
+            if(s.kind==ForestKind::Bush){++bushes;check(s.variant<2,"Too many bush types");}
+            if(s.kind==ForestKind::Detail){++details;check(s.variant<2,"Too many detail types");}
+            if(s.kind==ForestKind::Grass){++grass;check(s.variant<2,"Too many grass types");}
+        }
+        check(main>secondary,"Main trees should dominate");
+        check(bushes+details+grass<40,"Too many foreground props");
+    });
     test("Forest param bounds and camera parallax",[]{
         ForestSettings s;s.density=3;s.size=9;s.motion=9;
         ForestGenerator g(s);
-        check(g.settings().density==1&&g.settings().size==1.5f&&g.settings().motion==.2f,"Clamps missing");
+        check(g.settings().density==1&&g.settings().size==1.8f&&g.settings().motion==.2f,"Clamps missing");
         ForestSprite f{ForestKind::Far,0,0,600,560,1,0};
         ForestSprite n{ForestKind::Grass,0,4,600,585,1,0};
         check(g.drawX(f,740)>g.drawX(n,740),"Parallax reversed");
