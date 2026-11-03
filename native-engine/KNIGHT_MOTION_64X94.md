@@ -21,6 +21,14 @@ The source has 99 distinct poses. Five repeated temporal samples preserve the ex
 
 The right-hand sword is visible in locomotion, aerial, dash, hurt and death poses, as well as attacks. The three attack sequences were regenerated separately to correct missing blades and broken swings. Armor and cloth retain opaque interiors. The final PNG uses an indexed muted palette, binary transparency, no filtering, and an empty margin around each cell. Sword effects remain separate runtime geometry, registered from the new blade paths; they are not baked into the actor PNG.
 
+### Blade-registered sword effects
+
+Every attack's wrist and tip annotations now refer to the actual 64x94 PNG steel pixels, replacing the approximate coordinates that put some effects below the sword. The leading edge terminates at the current frame's blade tip. Cuts sweep an interpolated blade segment into a tapered ribbon; the heavy cut has a wider inner/outer radius. Thrust uses a small forward wake capped at 40% of blade length (6 source pixels maximum). Both actor and effect share the (28,88) registration and 1.85 world scale, including horizontal mirroring.
+
+Weak slash effects appear on frames 3-5, strong slash on 5-7, thrust on 4-6. Each contact frame has an effect; wind-up, late recovery, hurt, dash, death and non-attack states do not retain it. Hit-stop holds the matching animation/effect frame. The actor PNG and gameplay reach/damage/timing remain unchanged.
+
+Validation checks all 28 annotated blade tips against visible steel (at most 2 source pixels of error), proportional effect reach, tip contact and empty non-strike frames. All 56 attack poses (28 poses, left and right) were rendered through the real SDL Presentation renderer. The six-panel replay is `Art/knight/redesign/sword_fx_preview.gif`. Current core regression tests: 40/40 passed.
+
 ## Edit and validate
 
 Edit `Art/knight/redesign/knight_64x94_master.png` in its indexed palette, keeping the transparent color at index zero. Update `blade_paths.json` when attack wrist/tip positions change. Run:
