@@ -33,6 +33,54 @@ for key,value in [('motionWidth',64),('motionHeight',94),('motionColumns',16),('
     assert re.search(r'\b'+key+r'\s*=\s*'+str(value)+r'\b',header),key
 assert len(occupied)==104 and len(unique)>=90
 results=dict(atlas_pixels=list(im.size),cell_pixels=[64,94],clips=12,frames=len(occupied),unique_poses=len(unique),alpha=[0,255],pivot=[28,88],world_scale=1.85,source='PNG art; nearest-frame temporal resampling')
+# Blade annotations are checked against the ACTUAL steel pixels, not a retired rig.
+import importlib.util,math
+spec=importlib.util.spec_from_file_location('knight_bake',ROOT/'Tools/bake_knight_motion.py')
+bake=importlib.util.module_from_spec(spec);spec.loader.exec_module(bake)
+paths=json.loads((ROOT/'Art/knight/redesign/blade_paths.json').read_text())
+trail_samples=0;maximum_tip_error=0.
+for clip in clips:
+    name=clip['name'];row=clip['start']//16
+    if name in paths:
+        assert len(paths[name])==clip['source_count']
+        for i,(wx,wy,tx,ty) in enumerate(paths[name]):
+            assert 5<=math.dist((wx,wy),(tx,ty))<=23,(name,i,'blade size outside reference proportions')
+            distances=[]
+            for y in range(max(0,ty-2),min(94,ty+3)):
+                for x in range(max(0,tx-2),min(64,tx+3)):
+                    r,g,b,a=master.getpixel((i*64+x,row*94+y))
+                    if a and min(r,g,b)>95:distances.append(math.dist((tx,ty),(x,y)))
+            error=min(distances,default=999)
+            assert error<=2,(name,i,'annotated tip detached from visible blade')
+            maximum_tip_error=max(maximum_tip_error,error)
+    for i in range(clip['count']):
+        mask,alpha=bake.trail_mask(name,i,clip['source_indices'],paths)
+        window=bake.TRAIL_WINDOWS.get(name)
+        active=window and window[0]<=i<=window[1]
+        if not active:
+            assert not alpha and not mask.getbbox(),(name,i,'effect outside strike')
+            continue
+        assert alpha>0 and mask.getbbox(),(name,i,'missing strike effect')
+        current=paths[name][clip['source_indices'][i]]
+        previous=paths[name][clip['source_indices'][i-1]]
+        assert mask.getpixel(tuple(current[2:]))==3,(name,i,'leading edge misses current sword tip')
+        # A short sword must not produce a giant unrelated arc. Every effect
+        # pixel remains within blade reach of the moving wrist segment.
+        ax,ay=previous[:2];bx,by=current[:2];dx,dy=bx-ax,by-ay
+        max_radius=max(math.dist(previous[:2],previous[2:]),math.dist(current[:2],current[2:]))*1.5+1
+        box=mask.getbbox();assert box[0]>0 and box[1]>0 and box[2]<mask.width and box[3]<mask.height
+        for y in range(box[1],box[3]):
+            for x in range(box[0],box[2]):
+                if not mask.getpixel((x,y)):continue
+                t=max(0,min(1,((x-ax)*dx+(y-ay)*dy)/max(.001,dx*dx+dy*dy)))
+                assert math.dist((x,y),(ax+dx*t,ay+dy*t))<=max_radius,(name,i,'oversized sword effect')
+        trail_samples+=1
+    if name in paths:
+        contact=int(clip['count']*float(re.search(r'\{'+str(clip['start'])+r','+str(clip['count'])+r',[\d.]+f,([\d.]+)f',header).group(1)))
+        assert bake.trail_mask(name,contact,clip['source_indices'],paths)[1]>0,(name,'contact has no effect')
+results.update(sword_effect_frames=trail_samples,maximum_blade_tip_annotation_error_px=maximum_tip_error,sword_effect_scale='derived from visible blade length; shared actor registration and world scale')
+
 review=ROOT/'native-engine/review';review.mkdir(exist_ok=True)
 (review/'metrics.json').write_text(json.dumps(results,indent=2)+'\n')
 print(json.dumps(results,indent=2))
+
