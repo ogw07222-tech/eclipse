@@ -362,7 +362,18 @@ public:
     const ForestGenerator& forestGenerator() const {return forestGenerator_;}
     static std::string asset(const char* name){
 #ifdef SDL_PLATFORM_ANDROID
-        return name; // SDL 3.2 routes this through Android's AssetManager.
+        // Optional Studio asset overrides live in the application's private files.
+        // The path is fixed and comes from compiled asset names, not user input.
+        // Fall back to the APK AssetManager when an override is absent.
+        const char* storage = SDL_GetAndroidInternalStoragePath();
+        if (storage && *storage) {
+            const std::string overridePath = std::string(storage) + "/game_assets/" + name;
+            if (FILE* file = std::fopen(overridePath.c_str(), "rb")) {
+                std::fclose(file);
+                return overridePath;
+            }
+        }
+        return name;
 #else
         const char* base=SDL_GetBasePath();return std::string(base?base:"")+"assets/"+name;
 #endif
