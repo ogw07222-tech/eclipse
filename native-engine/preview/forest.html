@@ -20,7 +20,7 @@ button:hover{background:#41775a}.buttons{display:flex;flex-wrap:wrap;gap:9px;ali
 <p>APK 빌드 없이 브라우저에서 숲의 PNG 배치·크기·밀도를 확인하는 도구. 전투 코드를 실행하는 건 아니고 배경 생성 규칙을 그대로 옮긴 시각 미리보기야.</p></div>
 <main>
 <p id="assetWarning" class="warning" hidden>PNG 로딩 상태 확인 중…</p>
-<p class="small">우선순위: forest_v3 (6 layers) → forest_v2 (4 layers) → 기존 PNG 배경. NPC 및 지면 좌표는 고정.</p>
+<p class="small">우선순위: 숲 입구 (6개 원화 PNG) → forest_v3 (6 layers) → forest_v2 → 기존 배경. NPC 및 지면 좌표는 고정.</p>
 <div class="stage"><canvas id="scene" width="1280" height="720" aria-label="픽셀 숲 배경 미리보기"></canvas></div>
 <div class="panel">
 <div class="control"><label for="seed">시드 <span id="seedValue">20261103</span></label><input type="number" id="seed" min="0" max="4294967295" value="20261103"></div>
@@ -33,7 +33,7 @@ button:hover{background:#41775a}.buttons{display:flex;flex-wrap:wrap;gap:9px;ali
 <button id="random">시드 변경</button><button id="reset">기본값</button><button id="shot">PNG 저장</button><label class="small"><input id="zones" type="checkbox"> NPC 고정 구역 보기</label>
 <span id="status" class="small" aria-live="polite">PNG 로딩 중…</span>
 </div>
-<p>forest_v3 PNG 6종이 모두 준비되면 우선 적용해. v3가 없으면 v2 또는 기존 숲으로 대체해. 근경·NPC 구역은 시드와 무관하게 고정되며, 원경만 약한 색조 차이를 적용해. 달 주변의 네모난 경계와 삼각형 원경은 v2 PNG 교체로 수정돼. 레이어가 누락되면 다음 기존 에셋 미리보기를 사용해.</p><p>기본 에셋: 메인 나무 1종(tree_large_01), 서브 나무 1종(tree_mid_01), 덤불 2종·풀 2종·바위 1종·소형 장식 2종. 원경 코드 나무는 제거했어. 지면은 진한 갈색 흙과 픽셀 자갈·흙결로 구성하고 풀은 얇은 경계에만 남겼어.</p>
+<p>숲 입구 PNG 6종을 최우선 사용해. 빠진 파일이 있으면 기존 v3, v2 또는 옛 숲으로 돌아가. 근경·NPC 구역은 시드와 무관하게 고정되며, 원경만 약한 색조 차이를 적용해. 달 주변의 네모난 경계와 삼각형 원경은 v2 PNG 교체로 수정돼. 레이어가 누락되면 다음 기존 에셋 미리보기를 사용해.</p><p>기본 에셋: 메인 나무 1종(tree_large_01), 서브 나무 1종(tree_mid_01), 덤불 2종·풀 2종·바위 1종·소형 장식 2종. 원경 코드 나무는 제거했어. 지면은 진한 갈색 흙과 픽셀 자갈·흙결로 구성하고 풀은 얇은 경계에만 남겼어.</p>
 </main>
 <script>
 "use strict";
@@ -50,6 +50,25 @@ const files={
   "6/1":"grass/grass_02.png"
 };
 const imgs={};let loaded=0;
+// Authored forest entrance (latest): six original art PNGs, no procedural trees.
+const entranceFiles=[
+  "sky/sky.png","clouds/clouds.png","far/mountains.png",
+  "mid/trees.png","near/ground.png","near/props.png"
+];
+const entranceImgs=Array(6).fill(null),entranceLoaded=Array(6).fill(false);
+const entranceReady=()=>entranceLoaded.every(Boolean);
+function drawEntrance(o){
+  const parallax=[0,.06,.14,.40,1,1];
+  for(let i=0;i<entranceFiles.length;i++){
+    ctx.save();
+    if(i===2)ctx.filter="brightness("+((239+(o.seed%17))/255)+")";
+    ctx.drawImage(entranceImgs[i],Math.round(-(o.camera-640)*parallax[i]),0);
+    ctx.restore();
+  }
+  if(el("zones").checked)drawNpcZones(o);
+  drawReferenceKnight();
+  el("status").textContent="숲 입구 PNG 6/6 · 원화 레이어 · 지면/NPC 위치 고정";
+}
 // Forest v3 six-role PNG scene: fully deterministic, NPC-safe by construction.
 const v3Files=[
   "sky/sky_gradient_moon_01.png",
@@ -207,6 +226,7 @@ function render(){
  el("sizeValue").textContent=Math.round(o.size*100)+"%";
  el("variationValue").textContent=Math.round(o.variation*100)+"%";
  el("cameraValue").textContent=o.camera;
+ if(entranceReady()){drawEntrance(o);return;}
  if(v3Ready()){drawV3(o);return;}
  if(layeredReady()) {drawLayered(o);return;}
  // Same stepped vertical palette and disk/glow geometry as the SDL renderer.
@@ -337,6 +357,16 @@ for(const id of ["seed","density","size","variation","camera","zones"])
 el("random").onclick=()=>{el("seed").value=(Math.floor(Math.random()*4294967295)>>>0);render()};
 el("reset").onclick=()=>{el("seed").value="20261103";el("density").value=74;el("size").value=100;el("variation").value=18;el("camera").value=640;render()};
 el("shot").onclick=()=>{const a=document.createElement("a");a.href=el("scene").toDataURL("image/png");a.download="eclipse-forest-preview-"+cfg().seed+".png";a.click()};
+for(let i=0;i<entranceFiles.length;i++){
+ const image=new Image();entranceImgs[i]=image;
+ image.onload=()=>{
+   entranceLoaded[i]=image.naturalWidth===(i===0?1280:1600)&&image.naturalHeight===720;
+   render();
+ };
+ image.onerror=()=>{entranceLoaded[i]=false;render()};
+ image.src="../../Assets/Resources/Eclipse/forest_entrance/"+
+   entranceFiles[i]+"?rev=entrance-v4-20261104";
+}
 for(let i=0;i<v3Files.length;i++){
  const im=new Image();v3Imgs[i]=im;
  im.onload=()=>{
