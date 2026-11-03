@@ -35,6 +35,18 @@ int main(){int failed=0,total=0;
         ui.pointer(1,1145,130,true);
         check(!ui.editing,"Settings did not close");
     });
+    test("Actors share the inset forest collision floor",[]{
+        near(floorY,ForestLayerScene::floorY);
+        near(floorY,ForestLayerScene::surfaceY+12);
+        Combat g;near(g.player.y,floorY);
+        for(const auto& e:g.enemies)near(e.y,floorY);
+        g.player.y=floorY-1;g.player.vy=100;g.player.grounded=false;
+        g.step(1.f/60,{});
+        check(g.player.grounded,"Player did not land on inset floor");
+        near(g.player.y,floorY);near(g.player.vy,0);
+        g.restart();near(g.player.y,floorY);
+        for(const auto& e:g.enemies)near(e.y,floorY);
+    });
     test("Initial four enemy wave",[]{Combat g;check(g.foes()==4&&g.player.health==100&&!g.ended,"Initial wave");check(g.enemies[0].health==55&&g.enemies[1].health==85,"Enemy types");near(g.enemies[3].x,1285);});
     test("Slime strength increases green red purple",[]{Combat g;check(g.enemies[3].kind==2,"Purple elite missing");for(int i=0;i<2;++i){check(slimeSpecs[i].health<slimeSpecs[i+1].health&&slimeSpecs[i].damage<slimeSpecs[i+1].damage,"Tier order");}});
     test("Slime bite waits for contact and hits only once",[]{for(int kind=0;kind<3;++kind){auto g=arena();auto& e=g.enemies[0];e=Enemy(kind,g.player.x+40);g.step(1.f/60,{});check(e.attackAge==0&&g.player.health==100,"Instant bite");const float contact=slimeSpec(kind).attackDuration*slimeSpec(kind).contact;while(e.attackAge+1.f/60<contact)g.step(1.f/60,{});check(g.player.health==100,"Hit before contact");g.step(1.f/60,{});check(g.player.health==100-e.damage,"Missing contact hit");int hp=g.player.health;wait(g,35);check(g.player.health==hp,"Repeated contact");}});
@@ -205,7 +217,7 @@ int main(){int failed=0,total=0;
             if(i>=4)check(ForestLayerScene::layersEntrance[i].worldLocked,
                           "Entrance collision-floor image moved");
         }
-        check(ForestLayerScene::floorY==585,"Forest entrance gameplay floor changed");
+        check(ForestLayerScene::floorY==597,"Forest entrance gameplay floor changed");
         check(ForestLayerScene::worldWidth==1600,"Entrance world width changed");
     });
     test("Forest v3 keeps six distinct visual-only layers",[]{
@@ -219,7 +231,7 @@ int main(){int failed=0,total=0;
             if(i>=4)check(ForestLayerScene::layersV3[i].worldLocked,
                 "Foreground moved away from NPC coordinates");
         }
-        check(ForestLayerScene::floorY==585 &&
+        check(ForestLayerScene::floorY==597 &&
               ForestLayerScene::worldWidth==1600,"Changed gameplay geometry");
         for(auto zone:ForestLayerScene::npcZones)
             for(int x=zone.x0;x<=zone.x1;++x)
@@ -227,7 +239,7 @@ int main(){int failed=0,total=0;
                     "Decor could occupy protected NPC corridor");
     });
     test("Layered forest keeps ground and NPC regions deterministic",[]{
-        check(ForestLayerScene::floorY==585,"Collision floor moved");
+        check(ForestLayerScene::floorY==597,"Collision floor moved");
         check(ForestLayerScene::worldWidth==1600,"World boundaries changed");
         check(ForestLayerScene::layers.size()==4,"Four layer contract");
         check(ForestLayerScene::layers[0].parallax==0.f,"Sky must stay stationary");

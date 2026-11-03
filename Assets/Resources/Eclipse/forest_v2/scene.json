@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "collision_y": 585,
+  "collision_y": 597,
   "world_width": 1600,
   "viewport": [
     1280,
@@ -31,5 +31,6 @@
     "far/forest_far_01.png",
     "mid/forest_mid_01.png",
     "near/ground_fixed_01.png"
-  ]
+  ],
+  "artSurfaceY": 585
 }
