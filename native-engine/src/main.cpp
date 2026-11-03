@@ -6,7 +6,7 @@
 
 namespace {
 SDL_Window* window=nullptr;SDL_Renderer* renderer=nullptr;
-eclipse::Combat game;eclipse::Animation animation;eclipse::Input input;
+eclipse::Combat game;eclipse::Animation animation;eclipse::Input input;eclipse::ControlLayout layout;
 bool running=true,foreground=true;float camera=640;
 std::array<bool,SDL_SCANCODE_COUNT> keyState{};
 void updateKeyboard(){const auto& k=keyState;eclipse::Actions a;
@@ -28,12 +28,25 @@ void events(){
         if(e.type==SDL_EVENT_KEY_DOWN&&e.key.scancode==SDL_SCANCODE_ESCAPE){running=false;continue;}
         if(e.type==SDL_EVENT_FINGER_DOWN||e.type==SDL_EVENT_FINGER_MOTION||e.type==SDL_EVENT_FINGER_UP){
             if(e.tfinger.touchID==SDL_MOUSE_TOUCHID)continue;
-            if(SDL_ConvertEventToRenderCoordinates(renderer,&e))input.pointer(e.tfinger.fingerID,e.tfinger.x,e.tfinger.y,e.type!=SDL_EVENT_FINGER_UP,game.ended,game.inventory);
+            if(SDL_ConvertEventToRenderCoordinates(renderer,&e)){
+                bool wasEditing=layout.editing;
+                bool consumed=layout.pointer(e.tfinger.fingerID,e.tfinger.x,e.tfinger.y,e.type!=SDL_EVENT_FINGER_UP);
+                if(consumed){if(!wasEditing||!layout.editing)input.reset();}
+                else input.pointer(e.tfinger.fingerID,e.tfinger.x,e.tfinger.y,e.type!=SDL_EVENT_FINGER_UP,game.ended,game.inventory);
+            }
         }else if(e.type==SDL_EVENT_MOUSE_BUTTON_DOWN||e.type==SDL_EVENT_MOUSE_BUTTON_UP){
             if(e.button.which==SDL_TOUCH_MOUSEID||e.button.button!=SDL_BUTTON_LEFT)continue;
-            if(SDL_ConvertEventToRenderCoordinates(renderer,&e))input.pointer(-1,e.button.x,e.button.y,e.type==SDL_EVENT_MOUSE_BUTTON_DOWN,game.ended,game.inventory);
+            if(SDL_ConvertEventToRenderCoordinates(renderer,&e)){
+                bool wasEditing=layout.editing;
+                bool consumed=layout.pointer(-1,e.button.x,e.button.y,e.type==SDL_EVENT_MOUSE_BUTTON_DOWN);
+                if(consumed){if(!wasEditing||!layout.editing)input.reset();}
+                else input.pointer(-1,e.button.x,e.button.y,e.type==SDL_EVENT_MOUSE_BUTTON_DOWN,game.ended,game.inventory);
+            }
         }else if(e.type==SDL_EVENT_MOUSE_MOTION&&e.motion.which!=SDL_TOUCH_MOUSEID&&(e.motion.state&SDL_BUTTON_LMASK)){
-            if(SDL_ConvertEventToRenderCoordinates(renderer,&e))input.pointer(-1,e.motion.x,e.motion.y,true,game.ended,game.inventory);
+            if(SDL_ConvertEventToRenderCoordinates(renderer,&e)){
+                if(!layout.pointer(-1,e.motion.x,e.motion.y,true))
+                    input.pointer(-1,e.motion.x,e.motion.y,true,game.ended,game.inventory);
+            }
         }
     }
 
@@ -61,6 +74,7 @@ int main(int argc,char** argv){
     if(!SDL_CreateWindowAndRenderer("ECLIPSE Native",1280,720,flags,&window,&renderer)){SDL_Log("Window: %s",SDL_GetError());cleanup();return 1;}
     SDL_SetRenderLogicalPresentation(renderer,1280,720,SDL_LOGICAL_PRESENTATION_LETTERBOX);SDL_SetRenderVSync(renderer,1);
     auto view=std::make_unique<eclipse::Presentation>(renderer);
+    layout.load();input.setLayout(&layout);
     if(!view->load()){SDL_Log("ECLIPSE asset load failed: %s",SDL_GetError());view.reset();cleanup();return 1;}
     SDL_Log("ECLIPSE ready: five PNG textures, combat scene, 1280x720");
     if(smoke){
@@ -122,8 +136,8 @@ int main(int argc,char** argv){
     while(running){Uint64 start=SDL_GetTicksNS();events();
         if(!foreground){accumulator=0;SDL_Delay(50);last=SDL_GetTicksNS();continue;}
         accumulator+=std::min((start-last)/1e9,.1);last=start;
-        while(accumulator>=eclipse::fixedStep){tick(input.sample());accumulator-=eclipse::fixedStep;}
-        view->draw(game,animation,camera,input.held());
+        while(accumulator>=eclipse::fixedStep){if(!layout.editing)tick(input.sample());accumulator-=eclipse::fixedStep;}
+        view->draw(game,animation,camera,input.held(),nullptr,nullptr,&layout,input.stickOffset());
         double remaining=eclipse::fixedStep-(SDL_GetTicksNS()-start)/1e9;if(remaining>0)SDL_DelayNS(static_cast<Uint64>(remaining*1e9));
     }
     view.reset();cleanup();return 0;
