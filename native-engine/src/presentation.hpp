@@ -313,8 +313,8 @@ class Presentation {
         const auto frame=swordTrailFrames[a.frame];
         constexpr unsigned colors[]={0,0x365d70,0x7ba4ad,0xdce7db};constexpr int alpha[]={0,95,165,235};
         for(int i=frame.start;i<frame.start+frame.count;++i){const auto s=swordTrailSpans[i];
-            float x=p.facing>0?p.x+(s.x-motionPivotX)*3:p.x-(s.x+s.width-motionPivotX)*3;
-            rect(x-offset,p.y+(s.y-motionPivotY)*3,s.width*3,3,colors[s.shade],static_cast<Uint8>(alpha[s.shade]*frame.alpha/255));
+            float x=p.facing>0?p.x+(s.x-motionPivotX)*motionScale:p.x-(s.x+s.width-motionPivotX)*motionScale;
+            rect(x-offset,p.y+(s.y-motionPivotY)*motionScale,s.width*motionScale,motionScale,colors[s.shade],static_cast<Uint8>(alpha[s.shade]*frame.alpha/255));
         }
     }
     void icon(int texture,int col,int row,float x,float y,float size,bool down){
@@ -364,7 +364,7 @@ public:
         constexpr const char* files[]={"knight_motion.png","ui/attack_states.png","ui/dash_states.png","ui/swap_skill_states.png","ui/joystick_arrows_new.png"};
         for(int i=0;i<5;++i){const auto path=asset(files[i]);SDL_Surface* image=IMG_Load(path.c_str());
             if(!image){SDL_Log("Required PNG missing or invalid: %s (%s)",path.c_str(),SDL_GetError());return false;}
-            if(i==0&&(image->w!=motionWidth*motionColumns||image->h!=motionHeight*motionRows)){SDL_Log("Expected 1024x576 motion atlas");SDL_DestroySurface(image);return false;}
+            if(i==0&&(image->w!=motionWidth*motionColumns||image->h!=motionHeight*motionRows)){SDL_Log("Expected %dx%d motion atlas",motionWidth*motionColumns,motionHeight*motionRows);SDL_DestroySurface(image);return false;}
             // Compact oversized button sheets once, keeping only 128px per state on the GPU.
             if(i>0){int cols=(i==1||i==2||i==3)?2:1,rows=i==3?2:1;auto* scaled=SDL_ScaleSurface(image,128*cols,128*rows,SDL_SCALEMODE_NEAREST);SDL_DestroySurface(image);image=scaled;if(!image)return false;}
             textures[i]=SDL_CreateTextureFromSurface(renderer,image);SDL_DestroySurface(image);
@@ -491,7 +491,7 @@ public:
         for(const auto& b:g.projectiles){disk(b.x-offset,b.y,b.empowered?14:8,0xf16b32);disk(b.x-offset,b.y,b.empowered?7:4,0xffe7a1);}
         const auto& p=g.player;
         if(p.form==0)swordTrail(p,a);
-        if(p.form==0){SDL_FRect source{static_cast<float>(a.frame%motionColumns*motionWidth),static_cast<float>(a.frame/motionColumns*motionHeight),motionWidth,motionHeight},dest{std::round(p.x-offset-(p.facing>0?motionPivotX:motionWidth-motionPivotX)*3),std::round(p.y-motionPivotY*3),motionWidth*3,motionHeight*3};
+        if(p.form==0){SDL_FRect source{static_cast<float>(a.frame%motionColumns*motionWidth),static_cast<float>(a.frame/motionColumns*motionHeight),motionWidth,motionHeight},dest{std::round(p.x-offset-(p.facing>0?motionPivotX:motionWidth-motionPivotX)*motionScale),std::round(p.y-motionPivotY*motionScale),motionWidth*motionScale,motionHeight*motionScale};
             SDL_RenderTextureRotated(renderer,textures[0],&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
         }else mage(p);
         if(p.swapFlash>0)ring(p.x-offset,p.y-36,44,0xe3bd72);
@@ -530,3 +530,4 @@ public:
     }
 };
 }
+
