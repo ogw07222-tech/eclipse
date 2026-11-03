@@ -100,7 +100,9 @@ function generate(o){
      if(x-previous<minGap)continue;
      let scale=clamp(baseScale*o.size*(1+(unit(o.seed,salt,i,2)-.5)*.45*o.variation),.28,5);
      let v=rand(o.seed,salt,i,3)%varieties;
-     out.push({kind,layer,v,x:Math.floor(x/3+.5)*3,y:baseline,scale,phase:rand(o.seed,salt,i,4)});
+     const flipX=(kind===K.LargeTree||kind===K.MidTree) &&
+       unit(o.seed,salt,i,5)<(kind===K.LargeTree?.40:.50);
+     out.push({kind,layer,v,x:Math.floor(x/3+.5)*3,y:baseline,scale,phase:rand(o.seed,salt,i,4),flipX});
      previous=x;
    }
  }
@@ -123,9 +125,42 @@ function render(){
  el("sizeValue").textContent=Math.round(o.size*100)+"%";
  el("variationValue").textContent=Math.round(o.variation*100)+"%";
  el("cameraValue").textContent=o.camera;
- ctx.fillStyle="#152334";ctx.fillRect(0,0,1280,720);
- for(let row=0;row<11;row++){let half=2+Math.min(row,10-row);rect(1190-half*6,105+row*6,(half*2+1)*6,6,"#aebda3")}
- for(let i=0;i<62;i++)rect((i*233+49)%1280,(i*97+59)%315,3,3,"#718d8c");
+ // Same stepped vertical palette and disk/glow geometry as the SDL renderer.
+ function rgb(hex){return [(hex>>16)&255,(hex>>8)&255,hex&255]}
+ const colors=[0x071326,0x10253f,0x23445b];
+ for(let y=0;y<585;y+=6){
+   const t=y/585,a=t<.54?colors[0]:colors[1],b=t<.54?colors[1]:colors[2];
+   const q=t<.54?t/.54:(t-.54)/.46;
+   const A=rgb(a),B=rgb(b);
+   rect(0,y,1280,6,"rgb("+A.map((v,i)=>Math.floor(v*(1-q)+B[i]*q)).join(",")+")");
+ }
+ const cx=1160,cy=135;
+ for(let radius=124;radius>=42;radius-=8){
+   const k=(124-radius)/82,alpha=(2+k*k*5)/255;
+   for(let y=-radius;y<=radius;y+=8)for(let x=-radius;x<=radius;x+=8){
+     if(x*x+y*y>radius*radius)continue;
+     rect(cx+x,cy+y,8,8,"rgba(255,225,161,"+alpha+")");
+   }
+ }
+ for(let y=-30;y<=30;y+=3)for(let x=-30;x<=30;x+=3){
+   if(x*x+y*y>900)continue;
+   rect(cx+x,cy+y,3,3,x*x+y*y>625?"#e9d49e":"#ffebbd");
+ }
+ for(let i=0;i<9;i++){
+   const dx=(i*19)%39-19,dy=(i*23)%37-18;
+   if(dx*dx+dy*dy>484)continue;
+   const c=i%2===0?"190,176,139":"214,195,154";
+   rect(cx+dx,cy+dy,i%3===0?6:3,3,"rgba("+c+",0.392)");
+ }
+ // Sky stars don't change with the forest seed, matching SDL.
+ function skyHash(x,y,z){let h=(Math.imul(x,374761393)+Math.imul(y,668265263)+Math.imul(z,2246822519))>>>0;
+   h=Math.imul(h^(h>>>13),1274126177)>>>0;return (h^(h>>>16))>>>0}
+ for(let i=0;i<55;i++){
+   const h=skyHash(i,7,20261103),x=h%1280,y=(h>>>12)%330;
+   if((x-1160)**2+(y-135)**2<22500)continue;
+   rect(x,y,i%7===0?4:2,i%7===0?4:2,
+      i%4===0?"rgba(192,212,213,0.784)":"rgba(106,154,175,0.784)");
+ }
  function obj(s){
    let x=Math.floor((s.x-(o.camera-640)*parallax[s.layer])/3+.5)*3;
    if(x < -700||x>1900)return;
@@ -139,7 +174,14 @@ function render(){
      if(s.kind===K.LargeTree||s.kind===K.MidTree)
        scale=Math.min(scale,(s.y-12)/sourceHeight);
      const w=image.naturalWidth*scale,h=image.naturalHeight*scale;
-     ctx.drawImage(image,Math.round(x-w/2),Math.round(s.y-h),Math.round(w),Math.round(h));
+     // Source pixels below the alpha-visible roots must not float above the floor.
+     const rootPadding=s.kind===K.LargeTree?9:s.kind===K.MidTree?17:0;
+     const top=Math.round(s.y-h+rootPadding*scale);
+     const left=Math.round(x-w/2);
+     if(s.flipX){
+       ctx.save();ctx.translate(left+Math.round(w),0);ctx.scale(-1,1);
+       ctx.drawImage(image,0,top,Math.round(w),Math.round(h));ctx.restore();
+     }else ctx.drawImage(image,left,top,Math.round(w),Math.round(h));
    } // No low-quality procedural substitute if a PNG fails to load.
  }
  for(const s of sprites)if(s.layer<4)obj(s);
