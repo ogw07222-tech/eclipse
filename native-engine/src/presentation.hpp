@@ -318,16 +318,25 @@ class Presentation {
         SDL_FRect source{col*128.f,row*128.f,128,128},target{x,y,size,size};
         SDL_SetTextureColorMod(textures[texture],down?180:255,down?180:255,down?180:255);SDL_RenderTexture(renderer,textures[texture],&source,&target);
     }
-    void hud(const Combat& g,Actions held){
+    void hud(const Combat& g,Actions held,const ControlLayout& layout,std::array<float,2> stick){
         const auto& p=g.player;constexpr const char* heart[]={"..XX.XX..",".XXXXXXX.","XXXXXXXXX","XXXXXXXXX",".XXXXXXX.","..XXXXX..","...XXX...","....X...."};
         for(int i=0;i<7;++i)for(int y=0;y<8;++y)for(int x=0;x<9;++x)if(heart[y][x]=='X')rect(360+i*55+x*5,18+y*5,6,6,static_cast<float>(p.health)/p.maxHealth()>=(i+.5f)/7?0xf56b78:0x364451);
         for(int i=0;i<5;++i){rect(365+i*48,76,42,16,0x101923);rect(369+i*48,80,34,8,std::clamp(1-p.skillCooldown/4,0.f,1.f)>i/5.f?0xe3bd72:0x353a43);}
         for(int i=0;i<4;++i){rect(765+i*74,21,66,61,0x080d17);rect(771+i*74,27,54,49,0x667482);rect(777+i*74,33,42,37,0x222c3d);}
         text("GEAR",780,44,2);text(p.form==0?"BLADE":"FIRE",235,48,3,0x9ed7ff);number(g.foes(),1180,43,5,0xece7d2);text("FOES",1090,25,2);
-        icon(4,0,0,35,586,128,held.left||held.right||held.jump);icon(1,held.attack?1:0,0,1110,540,116,held.attack);
-        icon(2,held.dash?1:0,0,985,560,100,held.dash);icon(3,0,0,995,445,90,held.swap);icon(3,0,1,1115,420,94,held.skill);
-        if(p.skillCooldown>0)number(static_cast<int>(std::ceil(p.skillCooldown)),1150,450,4,0xffd277);
-        if(p.swapCooldown>0)number(static_cast<int>(std::ceil(p.swapCooldown)),1025,470,3,0xffd277);
+        const auto& c=layout.buttons;
+        const auto& js=c[ControlLayout::Stick];
+        icon(4,0,0,js.x,js.y,js.size,false);
+        float thumb=js.size*.36f,tx=js.x+(js.size-thumb)*.5f+stick[0],ty=js.y+(js.size-thumb)*.5f+stick[1];
+        rect(tx-3,ty-3,thumb+6,thumb+6,0x101923,210);
+        rect(tx,ty,thumb,thumb,held.left||held.right||held.jump?0xe3bd72:0x91b4bb,245);
+        rect(tx+thumb*.22f,ty+thumb*.22f,thumb*.56f,thumb*.56f,0x304f61,220);
+        icon(1,held.attack?1:0,0,c[ControlLayout::Attack].x,c[ControlLayout::Attack].y,c[ControlLayout::Attack].size,held.attack);
+        icon(2,held.dash?1:0,0,c[ControlLayout::Dash].x,c[ControlLayout::Dash].y,c[ControlLayout::Dash].size,held.dash);
+        icon(3,0,0,c[ControlLayout::Swap].x,c[ControlLayout::Swap].y,c[ControlLayout::Swap].size,held.swap);
+        icon(3,0,1,c[ControlLayout::Skill].x,c[ControlLayout::Skill].y,c[ControlLayout::Skill].size,held.skill);
+        if(p.skillCooldown>0)number(static_cast<int>(std::ceil(p.skillCooldown)),c[ControlLayout::Skill].x+20,c[ControlLayout::Skill].y+25,4,0xffd277);
+        if(p.swapCooldown>0)number(static_cast<int>(std::ceil(p.swapCooldown)),c[ControlLayout::Swap].x+20,c[ControlLayout::Swap].y+25,3,0xffd277);
         if(g.inventory){rect(46,135,460,340,0xe3bd72);rect(50,139,452,332,0x1c2a34);text("EQUIPMENT",66,153,3);
             for(int i=0;i<3;++i){text(p.gear.name(i),66,200+i*42,2);rect(66+i*143,413,132,45,0x304039);text(i==0?"WEAPON":i==1?"ARMOR":"CHARM",75+i*143,428,2);}
             text("ATK",66,340,2);number(p.gear.attack(),120,340,2);text("DEF",200,340,2);number(p.gear.defense(),250,340,2);text("MAX HP",66,373,2);number(p.maxHealth(),160,373,2);
@@ -463,7 +472,7 @@ public:
         }
         return true;
     }
-    void draw(const Combat& g,const Animation& a,float camera,Actions held,const char* capture=nullptr,const char* reviewLabel=nullptr){
+    void draw(const Combat& g,const Animation& a,float camera,Actions held,const char* capture=nullptr,const char* reviewLabel=nullptr,const ControlLayout* customLayout=nullptr,std::array<float,2> stick={}){
         offset=std::round(camera)-640;SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);SDL_SetRenderDrawColor(renderer,21,35,52,255);SDL_RenderClear(renderer);
         forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.clock);
         for(const auto& b:g.projectiles){disk(b.x-offset,b.y,b.empowered?14:8,0xf16b32);disk(b.x-offset,b.y,b.empowered?7:4,0xffe7a1);}
@@ -474,7 +483,32 @@ public:
         }else mage(p);
         if(p.swapFlash>0)ring(p.x-offset,p.y-36,44,0xe3bd72);
         for(const auto& popup:g.popups)number(popup.amount,popup.x-offset-12,popup.y,3,popup.kind==DamageKind::Fire?0xff9155:popup.kind==DamageKind::Bleed?0xe76878:0xf2d48c);
-        hud(g,held);if(reviewLabel)text(reviewLabel,470,120,3);
+        static const ControlLayout defaultLayout{};
+        const ControlLayout& layout=customLayout?*customLayout:defaultLayout;
+        hud(g,held,layout,stick);
+        rect(ControlLayout::gearX,ControlLayout::gearY,ControlLayout::gearSize,ControlLayout::gearSize,0x142736,230);
+        text("CFG",1224,35,2,0xe3bd72);
+        if(layout.editing){
+            rect(0,0,1280,720,0x07101b,125);
+            const char* names[]={"JOYSTICK","ATTACK","DASH","SWAP","SKILL"};
+            text("CONTROL EDITOR",50,30,4,0xe3bd72);
+            text("DRAG TO MOVE",50,83,3);
+            text(names[layout.selected],50,125,3,0x9ed7ff);
+            for(int i=0;i<ControlLayout::Count;++i){const auto& button=layout.buttons[i];
+                if(i==layout.selected){
+                    rect(button.x-5,button.y-5,button.size+10,5,0xe3bd72);
+                    rect(button.x-5,button.y+button.size,button.size+10,5,0xe3bd72);
+                    rect(button.x-5,button.y,5,button.size,0xe3bd72);
+                    rect(button.x+button.size,button.y,5,button.size,0xe3bd72);
+                }
+            }
+            rect(1030,90,205,66,0x304039);text("SAVE",1075,110,3);
+            rect(1030,165,205,66,0x4c3536);text("RESET",1070,185,3);
+            rect(1030,245,94,80,0x304039);text("-",1063,267,5);
+            rect(1140,245,94,80,0x304039);text("+",1172,267,5);
+            text("SIZE",1074,342,2);
+        }
+        if(reviewLabel)text(reviewLabel,470,120,3);
         if(g.ended){rect(0,0,1280,720,0x111a28,240);text(g.won?"STAGE CLEAR":"GAME OVER",390,260,7,g.won?0x8be4b5:0xff8d99);text("TAP RETRY OR PRESS R",410,350,3);
             rect(510,412,260,65,0xe3bd72);rect(514,416,252,57,0x304039);text("RETRY",548,433,4);
         }
