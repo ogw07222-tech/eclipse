@@ -10,6 +10,7 @@ class Input {
     std::array<Pointer,8> pointers{};
     Actions keys{},pending{};
     const ControlLayout* layout_=nullptr;
+    ControlLayout fallbackLayout_{};
     float stickX_=0,stickY_=0;
     static bool inside(float x,float y,float bx,float by,float w,float h){return x>=bx&&y>=by&&x<bx+w&&y<by+h;}
     Region region(float x,float y,bool ended,bool inventory) const {
@@ -19,8 +20,8 @@ class Input {
             return Region::None;
         }
         if(inside(x,y,765,21,288,61))return Region::Inventory;
-        if(layout_) {
-            const auto& b=layout_->buttons;
+        {
+            const auto& b=(layout_?layout_:&fallbackLayout_)->buttons;
             const Region regions[]={Region::Move,Region::Attack,Region::Dash,Region::Swap,Region::Skill};
             for(int i=ControlLayout::Count-1;i>=0;--i)
                 if(inside(x,y,b[i].x,b[i].y,b[i].size,b[i].size))return regions[i];
@@ -46,7 +47,7 @@ public:
         if(!down){if(slot){if(slot->region==Region::Move){stickX_=stickY_=0;}*slot={};}return;}
         if(!slot){for(auto& p:pointers)if(!p.used){slot=&p;break;}if(!slot)return;slot->used=true;slot->id=id;slot->region=region(x,y,ended,inventory);}
         Actions now{};
-        if(slot->region==Region::Move){const auto& b=layout_->buttons[ControlLayout::Stick];
+        if(slot->region==Region::Move){const auto& b=(layout_?layout_:&fallbackLayout_)->buttons[ControlLayout::Stick];
             float dx=x-(b.x+b.size*.5f),dy=y-(b.y+b.size*.5f),radius=b.size*.39f,length=std::sqrt(dx*dx+dy*dy);
             if(length>radius){dx*=radius/length;dy*=radius/length;}
             stickX_=dx;stickY_=dy;
