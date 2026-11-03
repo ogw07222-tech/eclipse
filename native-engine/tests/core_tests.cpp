@@ -49,13 +49,25 @@ int main(){int failed=0,total=0;
         check(a.sprites().size()==b.sprites().size(),"Unstable count");
         for(size_t i=0;i<a.sprites().size();++i) {
             const auto& x=a.sprites()[i];const auto& y=b.sprites()[i];
-            check(x.kind==y.kind&&x.variant==y.variant&&x.x==y.x&&x.scale==y.scale,"Unstable sprite");
+            check(x.kind==y.kind&&x.variant==y.variant&&x.x==y.x&&x.scale==y.scale&&x.flipX==y.flipX,"Unstable sprite");
         }
         s.seed=23;ForestGenerator c(s);
         bool different=c.sprites().size()!=a.sprites().size();
         for(size_t i=0;i<std::min(c.sprites().size(),a.sprites().size());++i)
             different|=c.sprites()[i].x!=a.sprites()[i].x;
         check(different,"Seed ignored");
+    });
+    test("Forest reflection is seeded and tree-only",[]{
+        ForestSettings s;s.seed=20261103;s.density=1;ForestGenerator a(s),b(s);
+        int mirrored=0,unmirrored=0;
+        for(size_t i=0;i<a.sprites().size();++i){
+            const auto& x=a.sprites()[i];
+            check(x.flipX==b.sprites()[i].flipX,"Unstable reflection");
+            if(x.kind==ForestKind::LargeTree||x.kind==ForestKind::MidTree){
+                if(x.flipX)++mirrored;else ++unmirrored;
+            }else check(!x.flipX,"Unexpected prop reflection");
+        }
+        check(mirrored>0&&unmirrored>0,"No visual variety");
     });
     test("Forest bounded density and sorted layers",[]{
         ForestSettings s;s.density=0;ForestGenerator empty(s);
