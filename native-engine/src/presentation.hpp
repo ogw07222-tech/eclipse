@@ -126,7 +126,8 @@ class Presentation {
     }
     void forestObject(const ForestSprite& sprite,float camera,float clock){
         const float sx=forestGenerator_.drawX(sprite,camera);
-        if(sx < -330 || sx > viewWidth+330)return;
+        // Tall canopies may extend far beyond their anchor; cull using sprite bounds below.
+        if(sx < -1000 || sx > viewWidth+1000)return;
         const size_t index=forestIndex(sprite);
         // Far silhouettes in pack v1 have opaque rectangular backgrounds.
         // Use the seamless procedural fallback until cleaned transparent strips ship.
@@ -135,6 +136,8 @@ class Presentation {
             float w=0,h=0;
             if(SDL_GetTextureSize(image,&w,&h)) {
                 const float scale=sprite.scale;
+                // Cull only after considering the scaled image width.
+                if(sx+w*scale*.5f<0 || sx-w*scale*.5f>viewWidth)return;
                 const float py=sprite.groundY+forestGenerator_.microMotion(sprite,clock);
                 // Hanging vines anchor high above the ground; all other props use bottom pivot.
                 const float top=sprite.kind==ForestKind::Detail && sprite.variant==2

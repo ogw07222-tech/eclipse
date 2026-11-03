@@ -77,3 +77,17 @@ git push
 ```
 
 The importer validates exact sprite filenames, PNG signatures and dimensions against the packaged manifest. The current optional loader has procedural fallback until those files are added. **Known v1 limitations:** three far-background images are opaque and intentionally use procedural fallback to avoid rectangular sky seams; four ground tile samples are reference assets and are not tiled because their borders do not yet form a seamless tileset. Some decorative sprites have clipped edges from the concept-sheet extraction. Mainline gameplay does not depend on these assets until import.
+
+## APK-free pixel forest visual preview
+
+A lightweight local browser page at `native-engine/preview/forest.html` displays the **real forest PNG sprites** with a JavaScript copy of the C++ seeded placement rules. It is intended for layout/art tuning, not a gameplay or frame-performance replacement for the native renderer. It uses the same defaults (seed 20261103, 74% density, 100% size, 18% variation), main tree asset `tree_large_01.png`, secondary tree asset `tree_mid_01.png`, and the intentionally restrained accessory selection. Tree crown sizes were increased; static props do not sway. Large opaque far-background sprites remain disabled and procedural silhouettes are used instead.
+
+From the repository root on Termux (requires Python):
+
+```sh
+cd ~/eclipse
+git pull --ff-only origin main
+python -m http.server 8765 --bind 127.0.0.1
+```
+
+Then open `http://127.0.0.1:8765/native-engine/preview/forest.html` in Samsung Internet or Chrome on the same tablet. Change seed, density, size, variation or camera without rebuilding anything. The PNG save button exports the currently displayed 1280×720 backdrop. Stop the server with Ctrl+C. No GitHub Actions, Android SDK, APK, or Unity is needed. The browser preview mirrors C++ seeded placement but cannot certify native SDL render quality or run combat.
