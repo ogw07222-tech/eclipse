@@ -8,6 +8,8 @@ concurrency:
   cancel-in-progress: true
 jobs:
   apk:
+    # Only build the development APK when release signing is not requested.
+    if: ${{ inputs.signed_release != true }}
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
@@ -137,7 +139,8 @@ jobs:
           retention-days: 14
           compression-level: 0
   android-smoke:
-    if: ${{ inputs.run_emulator == true }}
+    # The emulator smoke job is coupled to the debug APK pipeline.
+    if: ${{ inputs.run_emulator == true && inputs.signed_release != true }}
     name: Android emulator combat smoke
     needs: apk
     runs-on: ubuntu-latest
