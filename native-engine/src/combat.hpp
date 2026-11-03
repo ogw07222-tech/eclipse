@@ -4,6 +4,7 @@
 #include <cmath>
 #include <vector>
 #include "motion.hpp"
+#include "slime_motion.hpp"
 
 namespace eclipse {
 constexpr double fixedStep=1.0/60.0;
@@ -39,7 +40,9 @@ struct Player {
 struct Enemy {
     int kind=0,health=55,maxHealth=55,damage=9;
     float x=0,y=floorY,speed=95,attackTimer=0,bleed=0,bleedTick=0,burn=0,burnTick=0,hitFlash=0,reactionFlash=0,knockback=0;
-    Enemy(int type=0,float at=0):kind(type),health(type?85:55),maxHealth(health),damage(type?15:9),x(at),speed(type?63:95){}
+    float travelPhase=0,attackAge=-1;
+    int facing=-1;
+    Enemy(int type=0,float at=0):kind(std::clamp(type,0,2)),health(slimeSpec(kind).health),maxHealth(health),damage(slimeSpec(kind).damage),x(at),speed(slimeSpec(kind).speed){}
     bool dead()const{return health<=0;}
 };
 struct Projectile {float x,y;int facing,damage;bool empowered;float life=1.6f;};
@@ -103,8 +106,21 @@ class Combat {
         if(e.burn>0){e.burn=down(e.burn,dt);e.burnTick+=dt;if(e.burnTick>=.6f){e.burnTick-=.6f;damageEnemy(e,2,DamageKind::Fire,true);}}
         if(e.dead())return;
         float dx=player.x-e.x,vx=0;
-        if(std::abs(dx)>46)vx=(dx>0?1:-1)*e.speed;
-        else if(e.attackTimer<=0&&std::abs(player.y-e.y)<70){damagePlayer(e.damage);e.attackTimer=e.kind?1.8f:1.3f;}
+        const auto& spec=slimeSpec(e.kind);
+        if(e.attackAge>=0){
+            const float before=e.attackAge;e.attackAge+=dt;
+            // Atlas bite frame 4 is the contact: check current range once.
+            const float contact=spec.attackDuration*.5f;
+            if(before<contact&&e.attackAge>=contact&&dx*e.facing>=-9&&std::abs(dx)<74+e.kind*8&&std::abs(player.y-e.y)<70)
+                damagePlayer(e.damage);
+            if(e.attackAge>=spec.attackDuration)e.attackAge=-1;
+        }else{
+            if(std::abs(dx)>1)e.facing=dx>0?1:-1;
+            if(std::abs(dx)>46)vx=e.facing*e.speed;
+            else if(e.attackTimer<=0&&std::abs(player.y-e.y)<70){e.attackAge=0;e.attackTimer=spec.cooldown;}
+        }
+        // Advance only from intentional locomotion, never knockback or idle.
+        e.travelPhase=std::fmod(e.travelPhase+std::abs(vx)*dt/64.f,1.f);
         const float half=e.kind?23:18;e.x=std::clamp(e.x+(vx+e.knockback)*dt,half,worldWidth-half);
     }
     void stepProjectiles(float dt){
@@ -124,7 +140,7 @@ public:
     bool ended=false,won=false,inventory=false;
     float clock=0;
     Combat(){projectiles.reserve(16);popups.reserve(32);restart();}
-    void restart(){player={};enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(1,1285)};projectiles.clear();popups.clear();ended=won=inventory=false;clock=0;}
+    void restart(){player={};enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};projectiles.clear();popups.clear();ended=won=inventory=false;clock=0;}
     int foes()const{int count=0;for(const auto& e:enemies)if(!e.dead())++count;return count;}
     void hit(Enemy& e,int amount,bool fire,bool bleed=false){
         if(e.dead()||ended)return;
