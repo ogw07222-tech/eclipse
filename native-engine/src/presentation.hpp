@@ -89,12 +89,18 @@ class Presentation {
                 // Cull only after considering the scaled image width.
                 if(sx+w*scale*.5f<0 || sx-w*scale*.5f>viewWidth)return;
                 const float py=sprite.groundY+forestGenerator_.microMotion(sprite,clock);
+                // The alpha-trimmed root ends above the transparent canvas bottom:
+                // 9 source pixels for main tree and 17 for secondary PNG.
+                const float rootPadding=sprite.kind==ForestKind::LargeTree?9.f:
+                    sprite.kind==ForestKind::MidTree?17.f:0.f;
                 // Hanging vines anchor high above the ground; all other props use bottom pivot.
                 const float top=sprite.kind==ForestKind::Detail && sprite.variant==2
-                    ? 355.f : py-h*scale;
+                    ? 355.f : py-h*scale+rootPadding*scale;
                 SDL_FRect target{std::round(sx-w*scale*.5f),
                     std::round(top),std::round(w*scale),std::round(h*scale)};
-                SDL_RenderTexture(renderer,image,nullptr,&target);
+                if(sprite.flipX)
+                    SDL_RenderTextureRotated(renderer,image,nullptr,&target,0,nullptr,SDL_FLIP_HORIZONTAL);
+                else SDL_RenderTexture(renderer,image,nullptr,&target);
                 return;
             }
         }
@@ -175,15 +181,50 @@ class Presentation {
             if(h%9u==0)world(x+6,585,6,3,0x66513a,3);
         }
     }
-    void forest(const Combat& g,float camera) {
-        rect(0,0,viewWidth,viewHeight,0x152334);
-        // Sky and moon are stationary; no global foliage sway.
-        for(int row=0;row<11;++row) {
-            int half=2+std::min(row,10-row);
-            rect(1190-half*6,105+row*6,(half*2+1)*6,6,0xaebda3);
+    void forestSky() {
+        // Low-frequency stepped sky gradient in the moonlight palette.
+        constexpr unsigned colors[3]={0x071326,0x10253f,0x23445b};
+        for(int y=0;y<585;y+=6){
+            const float t=static_cast<float>(y)/585.f;
+            const unsigned a=t<.54f?colors[0]:colors[1];
+            const unsigned b=t<.54f?colors[1]:colors[2];
+            const float q=t<.54f?t/.54f:(t-.54f)/.46f;
+            const unsigned r=static_cast<unsigned>((a>>16&255)*(1-q)+(b>>16&255)*q);
+            const unsigned g=static_cast<unsigned>((a>>8&255)*(1-q)+(b>>8&255)*q);
+            const unsigned bl=static_cast<unsigned>((a&255)*(1-q)+(b&255)*q);
+            rect(0,static_cast<float>(y),viewWidth,6,(r<<16)|(g<<8)|bl);
         }
-        for(int i=0;i<62;++i)
-            rect((i*233+49)%1280,(i*97+59)%315,3,3,0x718d8c);
+        const float cx=1160.f,cy=135.f;
+        // Soft golden light is several translucent circles with decreasing coverage.
+        for(int radius=124;radius>=42;radius-=8) {
+            const float k=static_cast<float>(124-radius)/82.f;
+            const Uint8 alpha=static_cast<Uint8>(2+k*k*5);
+            for(int y=-radius;y<=radius;y+=8)for(int x=-radius;x<=radius;x+=8)
+                if(x*x+y*y<=radius*radius)
+                    rect(cx+x,cy+y,8,8,0xffe1a1,alpha);
+        }
+        // True circular body, block-pixel rim and a few subdued craters.
+        for(int y=-30;y<=30;y+=3)for(int x=-30;x<=30;x+=3){
+            if(x*x+y*y>900)continue;
+            rect(cx+x,cy+y,3,3,x*x+y*y>625?0xe9d49e:0xffebbd);
+        }
+        for(int i=0;i<9;++i){
+            const int dx=(i*19)%39-19,dy=(i*23)%37-18;
+            if(dx*dx+dy*dy>22*22)continue;
+            rect(cx+dx,cy+dy,i%3==0?6:3,3,i%2==0?0xbeb08b:0xd6c39a,100);
+        }
+        for(int i=0;i<55;++i){
+            const unsigned h=soilHash(static_cast<unsigned>(i),7,20261103);
+            const int x=static_cast<int>(h%1280u),y=static_cast<int>((h>>12)%330u);
+            const int dx=x-1160,dy=y-135;
+            if(dx*dx+dy*dy<22500)continue;
+            rect(static_cast<float>(x),static_cast<float>(y),
+                 i%7==0?4.f:2.f,i%7==0?4.f:2.f,
+                 i%4==0?0xc0d4d5:0x6a9aaf,200);
+        }
+    }
+    void forest(const Combat& g,float camera) {
+        forestSky();
         const auto& instances=forestGenerator_.sprites();
         for(const auto& instance:instances) {
             if(instance.layer>=4)break;
