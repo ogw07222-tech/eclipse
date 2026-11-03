@@ -7,7 +7,7 @@
   },
   "outputs": {
     "Assets/Resources/Eclipse/knight_motion.png": "23d0b197313b0d416041533e49232e924615bc5c94c4bc67cb69acc644663997",
-    "native-engine/src/motion.hpp": "ec9f29b61a4692ae1a46ee93201d24ad99d5e162ac86b27876f4db74bb450b6b",
+    "native-engine/src/motion.hpp": "19c5460a61832f20c8cad6290f8bca8509e3f7e128ab0722c836b01c211e4abb",
     "native-engine/src/sword_trails.hpp": "d7b65e470888eaf095d6e8f0363b03789c9b28641f4f5bd2525205de00e96540"
   }
 }
