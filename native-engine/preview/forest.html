@@ -19,7 +19,8 @@ button:hover{background:#41775a}.buttons{display:flex;flex-wrap:wrap;gap:9px;ali
 <div class="header"><h1>ECLIPSE · Forest Preview</h1>
 <p>APK 빌드 없이 브라우저에서 숲의 PNG 배치·크기·밀도를 확인하는 도구. 전투 코드를 실행하는 건 아니고 배경 생성 규칙을 그대로 옮긴 시각 미리보기야.</p></div>
 <main>
-<p id="assetWarning" class="warning" hidden>구버전 PNG가 로드됐어.</p>
+<p id="assetWarning" class="warning" hidden>PNG 로딩 상태 확인 중…</p>
+<p class="small">활성 PNG 수정본: <code>6e6a466</code> · 4종 · v3</p>
 <div class="stage"><canvas id="scene" width="1280" height="720" aria-label="픽셀 숲 배경 미리보기"></canvas></div>
 <div class="panel">
 <div class="control"><label for="seed">시드 <span id="seedValue">20261103</span></label><input type="number" id="seed" min="0" max="4294967295" value="20261103"></div>
@@ -52,15 +53,25 @@ const imgs={};let loaded=0;
 const expectedSize={
   "1/0":[233,180], "2/0":[164,144], "3/0":[187,106], "3/1":[179,142]
 };
+// Keep expected asset revisions explicit: filename alone is not an art version.
+const assetRevision="6e6a46603a45-v3";
+const assetLoaded={};
 function checkSpriteVersions(){
-  const mismatches=Object.entries(expectedSize)
-    .filter(([id,wh])=>{const im=imgs[id];return !im||!im.complete||im.naturalWidth!==wh[0]||im.naturalHeight!==wh[1]})
-    .map(([id])=>files[id]);
+  const required=Object.keys(expectedSize);
+  const pending=required.filter(id=>assetLoaded[id]===undefined);
   const warning=document.getElementById("assetWarning");
+  if(pending.length){
+    warning.hidden=true; // Do not classify in-flight images as obsolete.
+    return;
+  }
+  const mismatches=Object.entries(expectedSize)
+    .filter(([id,wh])=>{const im=imgs[id];return assetLoaded[id]===false||
+      !im||im.naturalWidth!==wh[0]||im.naturalHeight!==wh[1]})
+    .map(([id])=>files[id]);
   warning.hidden=mismatches.length===0;
-  if(mismatches.length)warning.textContent="구버전 또는 누락된 PNG "+mismatches.length+
-    "개: "+mismatches.join(", ")+
-    " — ZIP 수정본을 GitHub 저장소에 적용하고 새로고침해야 잘린 부분이 복구돼.";
+  if(mismatches.length)warning.textContent="PNG 로딩 실패 또는 크기 불일치 ("+mismatches.length+"개): "+
+    mismatches.join(", ")+
+    ". 로컬 파일이 최신인지 확인해줘. 주소를 새로고침해도 해결되지 않으면 터미널에서 git pull과 파일 크기를 확인해야 해.";
 }
 
 const ctx=document.getElementById("scene").getContext("2d");
@@ -184,9 +195,11 @@ function render(){
 }
 for(const [id,path] of Object.entries(files)){
  const im=new Image();
- im.onload=()=>{loaded++;checkSpriteVersions();render()};
- im.onerror=()=>{checkSpriteVersions();render()};
- im.src=root+path;imgs[id]=im;
+ imgs[id]=im;
+ im.onload=()=>{loaded++;assetLoaded[id]=true;checkSpriteVersions();render()};
+ im.onerror=()=>{assetLoaded[id]=false;checkSpriteVersions();render()};
+ // Cache-bust PNG independently of HTML caching.
+ im.src=root+path+"?rev="+assetRevision;
 }
 for(const id of ["seed","density","size","variation","camera"])
  el(id).addEventListener("input",render);
