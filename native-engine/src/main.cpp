@@ -9,10 +9,17 @@ SDL_Window* window=nullptr;SDL_Renderer* renderer=nullptr;
 eclipse::Combat game;eclipse::Animation animation;eclipse::Input input;
 bool running=true,foreground=true;float camera=640;
 std::array<bool,SDL_SCANCODE_COUNT> keyState{};
+std::string preferenceFile;
+void saveSettings(){if(!preferenceFile.empty()){std::ofstream file(preferenceFile);file<<game.screenShake<<' '<<game.showDamage<<' '<<game.showAfterimages<<'\n';}}
+void loadSettings(){char* directory=SDL_GetPrefPath("Eclipse","Native");if(!directory)return;
+    preferenceFile=std::string(directory)+"settings.txt";SDL_free(directory);
+    int shake=1,damage=1,trails=1;std::ifstream file(preferenceFile);
+    if(file>>shake>>damage>>trails){game.screenShake=shake!=0;game.showDamage=damage!=0;game.showAfterimages=trails!=0;}
+}
 void updateKeyboard(){const auto& k=keyState;eclipse::Actions a;
         a.left=k[SDL_SCANCODE_A]||k[SDL_SCANCODE_LEFT];a.right=k[SDL_SCANCODE_D]||k[SDL_SCANCODE_RIGHT];a.jump=k[SDL_SCANCODE_SPACE]||k[SDL_SCANCODE_W]||k[SDL_SCANCODE_UP];
         a.attack=k[SDL_SCANCODE_J]||k[SDL_SCANCODE_Z];a.skill=k[SDL_SCANCODE_K]||k[SDL_SCANCODE_X];a.swap=k[SDL_SCANCODE_L]||k[SDL_SCANCODE_C]||k[SDL_SCANCODE_TAB];
-        a.dash=k[SDL_SCANCODE_LSHIFT]||k[SDL_SCANCODE_RSHIFT];a.restart=k[SDL_SCANCODE_R];a.inventory=k[SDL_SCANCODE_I];a.weapon=k[SDL_SCANCODE_1];a.armor=k[SDL_SCANCODE_2];a.charm=k[SDL_SCANCODE_3];input.keyboard(a);
+        a.settings=k[SDL_SCANCODE_ESCAPE];a.dash=k[SDL_SCANCODE_LSHIFT]||k[SDL_SCANCODE_RSHIFT];a.restart=k[SDL_SCANCODE_R];a.inventory=k[SDL_SCANCODE_I];a.weapon=k[SDL_SCANCODE_1];a.armor=k[SDL_SCANCODE_2];a.charm=k[SDL_SCANCODE_3];input.keyboard(a);
 }
 void events(){
     SDL_Event e;
@@ -25,23 +32,27 @@ void events(){
         if(foreground&&(e.type==SDL_EVENT_KEY_DOWN||e.type==SDL_EVENT_KEY_UP)&&e.key.scancode>=0&&e.key.scancode<SDL_SCANCODE_COUNT){
             keyState[e.key.scancode]=e.type==SDL_EVENT_KEY_DOWN;updateKeyboard();
         }
-        if(e.type==SDL_EVENT_KEY_DOWN&&e.key.scancode==SDL_SCANCODE_ESCAPE){running=false;continue;}
         if(e.type==SDL_EVENT_FINGER_DOWN||e.type==SDL_EVENT_FINGER_MOTION||e.type==SDL_EVENT_FINGER_UP){
             if(e.tfinger.touchID==SDL_MOUSE_TOUCHID)continue;
-            if(SDL_ConvertEventToRenderCoordinates(renderer,&e))input.pointer(e.tfinger.fingerID,e.tfinger.x,e.tfinger.y,e.type!=SDL_EVENT_FINGER_UP,game.ended,game.inventory);
+            if(SDL_ConvertEventToRenderCoordinates(renderer,&e))input.pointer(e.tfinger.fingerID,e.tfinger.x,e.tfinger.y,e.type!=SDL_EVENT_FINGER_UP,game.ended,game.inventory,game.settings);
         }else if(e.type==SDL_EVENT_MOUSE_BUTTON_DOWN||e.type==SDL_EVENT_MOUSE_BUTTON_UP){
             if(e.button.which==SDL_TOUCH_MOUSEID||e.button.button!=SDL_BUTTON_LEFT)continue;
-            if(SDL_ConvertEventToRenderCoordinates(renderer,&e))input.pointer(-1,e.button.x,e.button.y,e.type==SDL_EVENT_MOUSE_BUTTON_DOWN,game.ended,game.inventory);
+            if(SDL_ConvertEventToRenderCoordinates(renderer,&e))input.pointer(-1,e.button.x,e.button.y,e.type==SDL_EVENT_MOUSE_BUTTON_DOWN,game.ended,game.inventory,game.settings);
         }else if(e.type==SDL_EVENT_MOUSE_MOTION&&e.motion.which!=SDL_TOUCH_MOUSEID&&(e.motion.state&SDL_BUTTON_LMASK)){
-            if(SDL_ConvertEventToRenderCoordinates(renderer,&e))input.pointer(-1,e.motion.x,e.motion.y,true,game.ended,game.inventory);
+            if(SDL_ConvertEventToRenderCoordinates(renderer,&e))input.pointer(-1,e.motion.x,e.motion.y,true,game.ended,game.inventory,game.settings);
         }
     }
 
 }
 void tick(eclipse::Actions action){
     if(action.restart){input.reset();keyState.fill(false);animation.reset();camera=640;}
+    const bool wasSettings=game.settings;
     const int previousMotion=animation.state;
-    game.step(static_cast<float>(eclipse::fixedStep),action);animation.step(game.player,static_cast<float>(eclipse::fixedStep));
+    game.step(static_cast<float>(eclipse::fixedStep),action);
+    if(wasSettings!=game.settings){input.reset();keyState.fill(false);}
+    if(action.shake||action.damageNumbers||action.afterimages)saveSettings();
+    if(game.settings||wasSettings)return;
+    animation.step(game.player,static_cast<float>(eclipse::fixedStep));
     if(animation.state!=previousMotion)SDL_Log("ECLIPSE motion state=%d frame=%d",animation.state,animation.frame);
     if(action.inventory||action.swap||action.restart||action.weapon||action.armor||action.charm)
         SDL_Log("ECLIPSE state form=%d inventory=%d hp=%d foes=%d restart=%d weapon=%d armor=%d charm=%d",game.player.form,game.inventory,game.player.health,game.foes(),action.restart,game.player.gear.selected[0],game.player.gear.selected[1],game.player.gear.selected[2]);
@@ -60,21 +71,28 @@ int main(int argc,char** argv){
     if(!SDL_Init(SDL_INIT_VIDEO|SDL_INIT_EVENTS)){SDL_Log("SDL init: %s",SDL_GetError());return 1;}
     if(!SDL_CreateWindowAndRenderer("ECLIPSE Native",1280,720,flags,&window,&renderer)){SDL_Log("Window: %s",SDL_GetError());cleanup();return 1;}
     SDL_SetRenderLogicalPresentation(renderer,1280,720,SDL_LOGICAL_PRESENTATION_LETTERBOX);SDL_SetRenderVSync(renderer,1);
+    if(!smoke)loadSettings();
     auto view=std::make_unique<eclipse::Presentation>(renderer);
     if(!view->load()){SDL_Log("ECLIPSE asset load failed: %s",SDL_GetError());view.reset();cleanup();return 1;}
     SDL_Log("ECLIPSE ready: five PNG textures, combat scene, 1280x720");
     if(smoke){
-        for(int scene=0;scene<8;++scene){game.restart();if(scene==1){game.player.form=1;game.hit(game.enemies[0],1,false,true);game.hit(game.enemies[0],1,true);}
+        for(int scene=0;scene<12;++scene){game.restart();if(scene==1){game.player.form=1;game.hit(game.enemies[0],1,false,true);game.hit(game.enemies[0],1,true);}
             if(scene==2)game.inventory=true;
             if(scene==3){game.ended=true;game.won=true;}
             if(scene==4){game.ended=true;game.player.health=0;}
             if(scene==5||scene==7)game.player.facing=-1;
-            if(scene>=6){animation.state=5;animation.frame=134;}
+            if(scene==6||scene==7){animation.state=5;animation.frame=134;}
             else{animation.step(game.player,1.f/60);}
+            if(scene==8)game.settings=true;
+            if(scene==9){game.damagePlayer(9);animation.step(game.player,1.f/60);}
+            if(scene==10){
+                for(int n=0;n<7;++n){eclipse::Actions action;action.dash=n==0;game.step(1.f/60,action);animation.step(game.player,1.f/60);view->draw(game,animation,camera,{});}
+            }
+            if(scene==11){game.player.health=17;game.player.gear.selected[1]=1;}
             const std::string capture=argc>2?std::string(argv[2])+"/scene-"+std::to_string(scene)+".bmp":"";
             view->draw(game,animation,camera,{},argc>2?capture.c_str():nullptr);
         }
-        SDL_Log("PASS eight combat/UI/facing/trail scenes and all five PNG textures");view.reset();cleanup();return 0;
+        SDL_Log("PASS twelve combat/UI/facing/trail/settings/health/dash/hurt scenes and all five PNG textures");view.reset();cleanup();return 0;
     }
     if(argc>2&&std::string(argv[1])=="--motion-review"){
         constexpr const char* names[]={"IDLE","RUN","JUMP","FALL","WEAK SLASH","STRONG SLASH","THRUST","DASH","HURT","DEATH","LAND","WALK"};
