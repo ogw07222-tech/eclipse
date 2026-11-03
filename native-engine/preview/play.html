@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>ECLIPSE · Live Play</title>
+<style>
+*{box-sizing:border-box;touch-action:none}html,body{margin:0;width:100%;height:100%;background:#080d19;color:#ecf3fa;font-family:system-ui,sans-serif;overflow:hidden}
+#stage{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+#hud{position:absolute;top:10px;left:12px;right:12px;display:flex;align-items:center;gap:9px;pointer-events:none;font-size:12px;text-shadow:0 2px 2px #000}
+#hp{height:14px;flex:1;max-width:230px;border:2px solid #bbc4d5;background:#311f29}#hpbar{height:100%;width:100%;background:linear-gradient(90deg,#bf3a49,#f67a69)}
+#controls{position:absolute;inset:0;pointer-events:none}button{font:700 15px system-ui;color:white;background:#253447d9;border:2px solid #899cb6;border-radius:0;min-width:52px;min-height:52px;pointer-events:auto;user-select:none;touch-action:none}
+#move{position:absolute;left:16px;bottom:23px;display:flex;gap:8px}#actions{position:absolute;right:16px;bottom:23px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+#top{position:absolute;right:12px;top:38px;display:flex;gap:5px}#top button{font-size:11px;min-width:56px;min-height:34px}
+#note{position:absolute;top:36px;left:12px;font-size:10px;color:#d4d9e2;pointer-events:none}
+@media(min-width:850px){#move{bottom:30px}#actions{bottom:30px}button{min-width:63px;min-height:60px}}
+</style></head><body>
+<canvas id="stage" aria-label="ECLIPSE playable prototype"></canvas>
+<div id="hud"><b>ECLIPSE</b><div id="hp"><div id="hpbar"></div></div><span id="health">100 / 100</span><span id="score"></span></div>
+<div id="note">GitHub 실시간 웹 플레이 · SDL 원본과 별도의 경량 프로토타입</div>
+<div id="controls"><div id="top"><button id="restart">재시작</button></div>
+<div id="move"><button data-hold="left">◀</button><button data-hold="right">▶</button><button data-hold="jump">▲</button></div>
+<div id="actions"><button data-act="attack">공격</button><button data-act="skill">스킬</button><button data-act="dash">대시</button></div></div>
+<script>
+(()=>{
+'use strict';
+const c=document.getElementById('stage'),g=c.getContext('2d',{alpha:false});
+const W=960,H=540,ground=439; c.width=W;c.height=H;g.imageSmoothingEnabled=false;
+const input={left:false,right:false,jump:false},p={x:100,y:350,vx:0,vy:0,hp:100,face:1,onGround:false,invul:0,dash:0,attack:0,skill:0,jumpLatch:false};
+let enemies=[],particles=[],camera=0,kills=0,frame=0,last=0,acc=0,ended=false;
+function reset(){Object.assign(p,{x:100,y:350,vx:0,vy:0,hp:100,face:1,onGround:false,invul:0,dash:0,attack:0,skill:0,jumpLatch:false});enemies=[];particles=[];camera=0;kills=0;frame=0;ended=false;for(let i=0;i<10;i++)enemies.push({x:420+i*180,y:ground-31,hp:i%4===3?5:3,cd:0,s:i%4===3?1.3:1});}
+function burst(x,y,color,n){for(let i=0;i<n;i++)particles.push({x,y,vx:(Math.random()-.5)*7,vy:(Math.random()-.8)*6,t:24,color});}
+function attack(){if(ended||p.attack>0)return;p.attack=17;let reach=81;enemies.forEach(e=>{if(e.hp>0&&((e.x-p.x)*p.face)>-10&&((e.x-p.x)*p.face)<reach&&Math.abs(e.y-p.y)<85){e.hp--;burst(e.x,e.y,'#e6fcf9',9);if(e.hp<=0){kills++;burst(e.x,e.y,'#af67e8',18)}}});}
+function skill(){if(ended||p.skill>0)return;p.skill=85;enemies.forEach(e=>{if(e.hp>0&&((e.x-p.x)*p.face)>-12&&((e.x-p.x)*p.face)<210&&Math.abs(e.y-p.y)<96){e.hp-=2;burst(e.x,e.y,'#72c8ff',16);if(e.hp<=0)kills++;}})}
+function dash(){if(ended||p.dash>0)return;p.dash=35;p.invul=16;p.x+=p.face*60;burst(p.x,p.y,'#8ed8ff',14)}
+function update(){
+frame++;if(ended)return;
+p.invul=Math.max(0,p.invul-1);p.dash=Math.max(0,p.dash-1);p.attack=Math.max(0,p.attack-1);p.skill=Math.max(0,p.skill-1);
+const dir=(input.right?1:0)-(input.left?1:0);if(dir)p.face=dir;
+p.vx=dir*3.8;p.x=Math.max(16,Math.min(2200,p.x+p.vx));
+if(input.jump&&p.onGround){p.vy=-10.6;p.onGround=false}
+p.vy=Math.min(13,p.vy+.48);p.y+=p.vy;
+if(p.y>=ground-53){p.y=ground-53;p.vy=0;p.onGround=true}
+enemies.forEach(e=>{if(e.hp<=0)return;e.cd=Math.max(0,e.cd-1);let dx=p.x-e.x;if(Math.abs(dx)<250&&Math.abs(dx)>35)e.x+=Math.sign(dx)*(.48/e.s);if(Math.abs(dx)<34&&Math.abs(p.y-e.y)<58&&e.cd===0&&p.invul===0){p.hp=Math.max(0,p.hp-9);p.invul=35;e.cd=45;burst(p.x,p.y,'#f47e79',11);if(p.hp===0)ended=true}});
+particles=particles.filter(z=>z.t-->0);particles.forEach(z=>{z.x+=z.vx;z.y+=z.vy;z.vy+=.16});
+camera+=(Math.max(0,Math.min(1250,p.x-250))-camera)*.12;
+document.getElementById('health').textContent=p.hp+' / 100';document.getElementById('hpbar').style.width=p.hp+'%';document.getElementById('score').textContent='격파 '+kills;
+}
+function rect(x,y,w,h,color){g.fillStyle=color;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
+function render(){g.clearRect(0,0,W,H);
+for(let y=0;y<ground;y+=4){const q=y/ground;rect(0,y,W,4,q<.45?'#0c1529':q<.7?'#11223a':'#1a2a3e')}
+g.save();g.translate(-camera*.12,0);rect(690,70,84,84,'#9faac6');rect(680,80,104,64,'#b6bad4');rect(689,68,86,86,'#c5c8d9');g.restore();
+for(let i=0;i<17;i++){let x=i*130-(camera*.28%130);rect(x,290+(i%3)*17,95,140,'#142538');rect(x+18,254+(i%3)*17,63,64,'#142538')}
+for(let i=0;i<20;i++){const x=i*118-camera*.59;rect(x,338+(i%3)*8,19,105,'#192d32');rect(x-35,301+(i%3)*8,89,66,'#233a3d');rect(x-19,278+(i%3)*8,62,51,'#2c4948')}
+rect(0,ground,W,H-ground,'#342d2c');rect(0,ground,W,7,'#53664a');rect(0,ground+21,W,14,'#46332e');rect(0,ground+62,W,12,'#4c3632');
+for(let i=0;i<48;i++){let x=(i*53-camera*.9)%W;if(x<0)x+=W;rect(x,ground+12+i%7*13,13,3,'#625044')}
+enemies.forEach(e=>{if(e.hp<=0)return;const x=e.x-camera;rect(x-19*e.s,e.y,38*e.s,30*e.s,'#384b46');rect(x-16*e.s,e.y-8,32*e.s,26*e.s,'#65a18b');rect(x-10,e.y+4,6,5,'#f4a39e');rect(x+5,e.y+4,6,5,'#f4a39e');rect(x-20,e.y-20,40*e.hp/(e.s>1?5:3),4,'#c45565')});
+let x=p.x-camera,y=p.y; if(!(p.invul>0&&frame%6<3)){rect(x-17,y+5,34,48,'#8496a6');rect(x-14,y-6,28,23,'#bec9ce');rect(x-14,y-12,28,8,'#5d6d80');rect(x+p.face*7,y+2,5,4,'#a6e9ff');rect(x-11,y+50,10,10,'#48556a');rect(x+3,y+50,10,10,'#48556a');rect(x+p.face*17,y+14,27*p.face,5,'#b4bcc4');if(p.attack>0){g.strokeStyle='#ccefff';g.lineWidth=7;g.beginPath();g.arc(x+p.face*25,y+18,53,p.face>0?-.95:2.2,p.face>0?1:4.1);g.stroke()}}
+particles.forEach(z=>rect(z.x-camera,z.y,5,5,z.color));
+if(ended){rect(255,175,450,130,'#09101de9');g.fillStyle='white';g.font='bold 33px sans-serif';g.fillText('전투 종료 · 재시작',320,255)}
+}
+function tick(t){if(!last)last=t;acc+=Math.min(80,t-last);last=t;let count=0;while(acc>=1000/60&&count<5){update();acc-=1000/60;count++}render();requestAnimationFrame(tick)}
+for(const b of document.querySelectorAll('[data-hold]')){const k=b.dataset.hold;b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);input[k]=true});for(const name of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(name,()=>input[k]=false)}
+for(const b of document.querySelectorAll('[data-act]'))b.addEventListener('pointerdown',e=>{e.preventDefault();({attack,skill,dash})[b.dataset.act]()});
+document.getElementById('restart').onclick=reset;
+const keys={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'jump',Space:'jump',KeyW:'jump'};
+window.addEventListener('keydown',e=>{if(keys[e.code]){e.preventDefault();input[keys[e.code]]=true}if(e.repeat)return;if(['KeyJ','KeyZ'].includes(e.code))attack();if(['KeyK','KeyX'].includes(e.code))skill();if(['ShiftLeft','ShiftRight'].includes(e.code))dash();if(e.code==='KeyR')reset()});
+window.addEventListener('keyup',e=>{if(keys[e.code])input[keys[e.code]]=false});
+window.addEventListener('blur',()=>{for(const k in input)input[k]=false});
+reset();requestAnimationFrame(tick);
+})();
+</script></body></html>
