@@ -5,7 +5,7 @@
     720
   ],
   "worldWidth": 1600,
-  "collisionFloorY": 585,
+  "collisionFloorY": 597,
   "npcReservedWorldX": [
     [
       260,
@@ -76,5 +76,6 @@
         720
       ]
     }
-  ]
+  ],
+  "artSurfaceY": 585
 }

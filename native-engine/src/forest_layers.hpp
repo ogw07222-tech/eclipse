@@ -12,7 +12,9 @@ struct ForestLayer {
 struct ForestLayerScene {
     static constexpr int worldWidth=1600;
     static constexpr int viewportWidth=1280;
-    static constexpr int floorY=585;
+    // Authored grass surface stays fixed; actors stand 12px inside its moss edge.
+    static constexpr int surfaceY=585;
+    static constexpr int floorY=surfaceY+12;
     // Forest entrance: authored pixel-art layers; default biome scene.
     // Foreground items are non-colliding visual decorations only.
     static constexpr std::array<ForestLayer,6> layersEntrance{{
