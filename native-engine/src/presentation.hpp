@@ -268,7 +268,7 @@ class Presentation {
         }
         if(forestLayersReady_){
             // Composed PNG layers: no random tree/log placement or varying collision.
-            // The ground layer has world-space parallax=1, preserving y=585.
+            // The art surface stays at y=585; shared collision is inset into its grass edge.
             for(size_t i=0;i<forestLayerTextures_.size();++i){
                 SDL_Texture* image=forestLayerTextures_[i];
                 const float shift=(camera-640.f)*ForestLayerScene::layers[i].parallax;

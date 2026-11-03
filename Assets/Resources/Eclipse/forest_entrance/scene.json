@@ -58,5 +58,7 @@
       "height": 720
     }
   ],
-  "notes": "Real authored pixel-art raster layers, no procedural art generation during gameplay. Keep fixed NPC and collision coordinates."
+  "notes": "Real authored pixel-art raster layers, no procedural art generation during gameplay. Keep fixed NPC and collision coordinates.",
+  "collisionFloorY": 597,
+  "artSurfaceY": 585
 }
