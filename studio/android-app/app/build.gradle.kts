@@ -39,10 +39,11 @@ android {
                     "-DANDROID_STL=c++_static",
                     "-DECLIPSE_TESTS=OFF",
                     "-DECLIPSE_HEADLESS=OFF",
+                    "-DECLIPSE_STUDIO_LOADER=ON",
                     "-DFETCHCONTENT_SOURCE_DIR_SDL3=${sdlSource.absolutePath}",
                     "-DCMAKE_BUILD_TYPE=Release"
                 )
-                targets += listOf("main", "SDL3-shared", "SDL3_image-shared")
+                targets += listOf("main", "eclipse_game", "SDL3-shared", "SDL3_image-shared")
             }
         }
     }
