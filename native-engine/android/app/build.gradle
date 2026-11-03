@@ -8,7 +8,7 @@ def artSource = file('../../../Assets/Resources/Eclipse')
 def packagedArt = layout.buildDirectory.dir('generated/eclipseAssets')
 tasks.register('packageEclipseAssets', Sync) {
     from artSource
-    include 'knight_motion.png', 'ui/attack_states.png', 'ui/dash_states.png', 'ui/swap_skill_states.png', 'ui/joystick_arrows_new.png', 'forest/**/*.png', 'forest_v2/**/*.png'
+    include 'knight_motion.png', 'ui/attack_states.png', 'ui/dash_states.png', 'ui/swap_skill_states.png', 'ui/joystick_arrows_new.png', 'forest/**/*.png', 'forest_v2/**/*.png', 'forest_v3/**/*.png'
     into packagedArt
 }
 
