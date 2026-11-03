@@ -38,9 +38,9 @@ internal fun GitHubLivePlay(onExit: () -> Unit) {
                 connection.readTimeout = 10000
                 connection.useCaches = false
                 try {
-                    if (connection.responseCode != 200) error("GitHub HTTP ${connection.responseCode}")
+                    if (connection.responseCode != 200) throw IllegalStateException("GitHub HTTP ${connection.responseCode}")
                     val text = connection.inputStream.bufferedReader().use { it.readText() }
-                    if (!text.contains("<canvas") || !text.contains("</html>")) error("잘못된 플레이 파일")
+                    if (!text.contains("<canvas") || !text.contains("</html>")) throw IllegalStateException("잘못된 플레이 파일")
                     text
                 } finally { connection.disconnect() }
             }
