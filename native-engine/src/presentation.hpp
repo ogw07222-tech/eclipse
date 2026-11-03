@@ -96,11 +96,18 @@ class Presentation {
                 // Hanging vines anchor high above the ground; all other props use bottom pivot.
                 const float top=sprite.kind==ForestKind::Detail && sprite.variant==2
                     ? 355.f : py-h*scale+rootPadding*scale;
-                SDL_FRect target{std::round(sx-w*scale*.5f),
-                    std::round(top),std::round(w*scale),std::round(h*scale)};
+                // Per-instance silhouette width and gentle shade variation.
+                // Position stays centered, roots remain anchored on the same ground.
+                const float rw=w*scale*sprite.widthFactor;
+                SDL_FRect target{std::round(sx-rw*.5f),
+                    std::round(top),std::round(rw),std::round(h*scale)};
+                constexpr Uint8 tones[3]={232,244,255};
+                const Uint8 tint=tones[std::min<size_t>(sprite.shade,2)];
+                SDL_SetTextureColorMod(image,tint,tint,tint);
                 if(sprite.flipX)
                     SDL_RenderTextureRotated(renderer,image,nullptr,&target,0,nullptr,SDL_FLIP_HORIZONTAL);
                 else SDL_RenderTexture(renderer,image,nullptr,&target);
+                SDL_SetTextureColorMod(image,255,255,255);
                 return;
             }
         }
