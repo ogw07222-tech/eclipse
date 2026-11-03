@@ -5,6 +5,7 @@
 #include <vector>
 #include "motion.hpp"
 #include "slime_motion.hpp"
+#include "monster_collision.hpp"
 
 namespace eclipse {
 constexpr double fixedStep=1.0/60.0;
@@ -40,7 +41,7 @@ struct Player {
 struct Enemy {
     int kind=0,health=55,maxHealth=55,damage=9;
     float x=0,y=floorY,speed=95,attackTimer=0,bleed=0,bleedTick=0,burn=0,burnTick=0,hitFlash=0,reactionFlash=0,knockback=0;
-    float travelPhase=0,attackAge=-1;
+    float travelPhase=0,attackAge=-1,attackFromX=0,attackToX=0;
     int facing=-1;
     Enemy(int type=0,float at=0):kind(std::clamp(type,0,2)),health(slimeSpec(kind).health),maxHealth(health),damage(slimeSpec(kind).damage),x(at),speed(slimeSpec(kind).speed){}
     bool dead()const{return health<=0;}
@@ -57,8 +58,10 @@ class Combat {
         popups.push_back({e.x,e.y-86,amount,kind});
     }
     void melee(int damage,bool bleed,float reach){
-        for(auto& e:enemies){float dx=(e.x-player.x)*player.facing;
-            if(e.dead()||dx< -9||dx>=reach||std::abs(e.y-player.y)>=67)continue;
+        const BodyRect strike=player.facing>0?BodyRect{player.x-9,player.y-102,player.x+reach,player.y+2}:
+            BodyRect{player.x-reach,player.y-102,player.x+9,player.y+2};
+        for(auto& e:enemies){
+            if(e.dead()||!enemyOverlaps(e,strike))continue;
             hit(e,damage,false,bleed);player.hitStop=std::max(player.hitStop,damage<20?.045f:.075f);
         }
     }
@@ -105,29 +108,48 @@ class Combat {
         if(e.bleed>0){e.bleed=down(e.bleed,dt);e.bleedTick+=dt;if(e.bleedTick>=.75f){e.bleedTick=0;damageEnemy(e,3,DamageKind::Bleed,true);}}
         if(e.burn>0){e.burn=down(e.burn,dt);e.burnTick+=dt;if(e.burnTick>=.6f){e.burnTick-=.6f;damageEnemy(e,2,DamageKind::Fire,true);}}
         if(e.dead())return;
-        float dx=player.x-e.x,vx=0;
+        const float dx=player.x-e.x;float vx=0;
         const auto& spec=slimeSpec(e.kind);
         if(e.attackAge>=0){
             const float before=e.attackAge;e.attackAge+=dt;
-            // Atlas bite frame 4 is the contact: check current range once.
-            const float contact=spec.attackDuration*.5f;
-            if(before<contact&&e.attackAge>=contact&&dx*e.facing>=-9&&std::abs(dx)<74+e.kind*8&&std::abs(player.y-e.y)<70)
-                damagePlayer(e.damage);
-            if(e.attackAge>=spec.attackDuration)e.attackAge=-1;
+            const float phase=std::min(1.f,e.attackAge/spec.attackDuration);
+            if(e.kind==1){
+                // Commit to a destination at takeoff; the player can dodge it.
+                const float t=std::clamp((phase-.22f)/(.68f-.22f),0.f,1.f);
+                const float eased=t*t*(3-2*t);
+                e.x=e.attackFromX+(e.attackToX-e.attackFromX)*eased;
+                e.y=floorY-4*t*(1-t)*120.f;
+            }else{
+                const float lunge=std::sin(phase*3.14159265f);
+                e.x=e.attackFromX+e.facing*(e.kind==0?18.f:30.f)*lunge*lunge;
+            }
+            const float contact=spec.attackDuration*spec.contact;
+            if(before<contact&&e.attackAge>=contact){
+                const BodyRect playerBody{player.x-14,player.y-86,player.x+14,player.y};
+                if(overlaps(enemyAttackBounds(e),playerBody))damagePlayer(e.damage);
+            }
+            if(e.attackAge>=spec.attackDuration){e.attackAge=-1;e.y=floorY;}
         }else{
             if(std::abs(dx)>1)e.facing=dx>0?1:-1;
-            if(std::abs(dx)>46)vx=e.facing*e.speed;
-            else if(e.attackTimer<=0&&std::abs(player.y-e.y)<70){e.attackAge=0;e.attackTimer=spec.cooldown;}
+            const float gap=enemyFrontGap(e,player);
+            if(gap>spec.engageGap)vx=e.facing*e.speed;
+            else if(e.attackTimer<=0&&std::abs(player.y-e.y)<100){
+                e.attackAge=0;e.attackTimer=spec.cooldown;e.attackFromX=e.x;
+                e.attackToX=e.x+e.facing*std::clamp(std::abs(dx),60.f,240.f);
+            }
         }
-        // Advance only from intentional locomotion, never knockback or idle.
         e.travelPhase=std::fmod(e.travelPhase+std::abs(vx)*dt/64.f,1.f);
-        const float half=e.kind?23:18;e.x=std::clamp(e.x+(vx+e.knockback)*dt,half,worldWidth-half);
+        e.x+=(vx+e.knockback)*dt;
+        // World clipping follows the same visible silhouette as hit detection.
+        const auto body=enemyBounds(e);
+        if(body.left<0)e.x-=body.left;
+        if(body.right>worldWidth)e.x-=body.right-worldWidth;
     }
     void stepProjectiles(float dt){
         for(int i=static_cast<int>(projectiles.size())-1;i>=0;--i){auto& b=projectiles[i];float old=b.x;b.x+=b.facing*(b.empowered?440:540)*dt;b.life-=dt;bool remove=b.life<=0;
             for(auto& e:enemies){if(remove||e.dead())continue;
-                float nx=std::clamp(e.x,std::min(old,b.x),std::max(old,b.x)),dx=nx-e.x,dy=b.y-(e.y-30),r=b.empowered?34:25;
-                if(dx*dx+dy*dy<r*r){hit(e,b.damage,true);remove=true;}
+                float r=b.empowered?14:8;
+                if(enemySweptDisc(e,old,b.x,b.y,r)){hit(e,b.damage,true);remove=true;}
             }
             if(remove)projectiles.erase(projectiles.begin()+i);
         }

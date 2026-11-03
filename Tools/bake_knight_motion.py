@@ -6,7 +6,7 @@ from PIL import Image,ImageDraw
 ROOT=Path(__file__).resolve().parents[1]
 MASTER=ROOT/'Art/knight/redesign/knight_64x94_master.png'
 OUT=ROOT/'Assets/Resources/Eclipse/knight_motion.png'
-CLIPS=[('idle',0,8,.96,7),('walk',16,8,.60,7),('run',32,16,.428571,14),('jump',48,6,.52,6),('fall',64,6,.65,6),('land',80,6,.12,6),('dash',96,8,.15,8),('weak_slash',112,8,.23,8),('strong_slash',128,10,.34,10),('thrust',144,10,.42,10),('hurt',160,6,.23,6),('death',176,12,.90,11)]
+CLIPS=[('idle',0,8,.96,8),('walk',16,8,.60,8),('run',32,16,.428571,16),('jump',48,6,.52,6),('fall',64,6,.65,6),('land',80,6,.12,6),('dash',96,8,.15,8),('weak_slash',112,8,.23,8),('strong_slash',128,10,.34,10),('thrust',144,10,.42,10),('hurt',160,6,.23,6),('death',176,12,.90,12)]
 TRAIL_WINDOWS={'weak_slash':(3,5),'strong_slash':(5,7),'thrust':(4,6)}
 
 def trail_mask(name,i,indices,paths):
@@ -110,6 +110,6 @@ def bake():
     digest=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
     stamp={'inputs':{str(p.relative_to(ROOT)):digest(p) for p in inputs},'outputs':{str(p.relative_to(ROOT)):digest(p) for p in outputs}}
     (ROOT/'Art/knight/rig/build.json').write_text(json.dumps(stamp,indent=2)+'\n')
-    print('Packed 104 playable frames from 99 authored PNG poses; 64x94 cells; 1024x1128 atlas.')
+    print('Packed 104 playable frames from 104 authored PNG poses; 64x94 cells; 1024x1128 atlas.')
 if __name__=='__main__':bake()
 

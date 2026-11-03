@@ -1,0 +1,74 @@
+{
+  "cell": [
+    64,
+    94
+  ],
+  "standing_height": 53,
+  "shared_palette": 96,
+  "sword_target_standing_height_ratio": 0.4,
+  "sources": [
+    {
+      "name": "idlewalk",
+      "source": "exec-d2ac7296-e1e7-457f-8f99-ce86ee6ee76e.png",
+      "frame_count": 16,
+      "scale_x": 0.22268907563025211,
+      "scale_y": 0.22268907563025211
+    },
+    {
+      "name": "run",
+      "source": "exec-73bd13a3-5475-472c-b708-b3fec5fa71eb.png",
+      "frame_count": 16,
+      "scale_x": 0.2145922746781116,
+      "scale_y": 0.2145922746781116
+    },
+    {
+      "name": "air",
+      "source": "exec-aa68e969-c531-4459-b1d9-af079316c549.png",
+      "frame_count": 18,
+      "scale_x": 0.25118483412322273,
+      "scale_y": 0.25118483412322273
+    },
+    {
+      "name": "dash",
+      "source": "exec-2cfada8a-2aec-4e40-ba93-d356fa53faa9.png",
+      "frame_count": 8,
+      "scale_x": 0.15803108808290156,
+      "scale_y": 0.18861209964412812
+    },
+    {
+      "name": "hurt",
+      "source": "exec-d3f59aee-1152-4639-bd70-0ffd5510c21d.png",
+      "frame_count": 6,
+      "scale_x": 0.1497175141242938,
+      "scale_y": 0.1497175141242938
+    },
+    {
+      "name": "death",
+      "source": "exec-c54bcb29-7eaf-4a40-8ea8-f65cc4f06f6c.png",
+      "frame_count": 12,
+      "scale_x": 0.18484848484848485,
+      "scale_y": 0.22362869198312235
+    },
+    {
+      "name": "weak_slash",
+      "source": "exec-5414370e-0c7a-48ec-b7b3-04f5d190412b.png",
+      "frame_count": 8,
+      "scale_x": 0.17478510028653296,
+      "scale_y": 0.19202898550724637
+    },
+    {
+      "name": "strong_slash",
+      "source": "exec-75b3f346-671e-449d-bc1d-b0e168badab4.png",
+      "frame_count": 10,
+      "scale_x": 0.19413919413919414,
+      "scale_y": 0.19413919413919414
+    },
+    {
+      "name": "thrust",
+      "source": "exec-7c7e4fb5-00ba-4db4-b200-13cc9544f0bb.png",
+      "frame_count": 10,
+      "scale_x": 0.16991643454038996,
+      "scale_y": 0.1840277777777778
+    }
+  ]
+}
