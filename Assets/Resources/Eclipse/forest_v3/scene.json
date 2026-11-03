@@ -1,0 +1,80 @@
+{
+  "version": 3,
+  "viewport": [
+    1280,
+    720
+  ],
+  "worldWidth": 1600,
+  "collisionFloorY": 585,
+  "npcReservedWorldX": [
+    [
+      260,
+      425
+    ],
+    [
+      710,
+      900
+    ],
+    [
+      1180,
+      1360
+    ]
+  ],
+  "strategy": "fixed-near-fixed-mid-mild-far",
+  "layerOrder": [
+    {
+      "id": "sky",
+      "file": "sky/sky_gradient_moon_01.png",
+      "parallax": 0,
+      "size": [
+        1280,
+        720
+      ]
+    },
+    {
+      "id": "clouds",
+      "file": "clouds/clouds_01.png",
+      "parallax": 0.06,
+      "size": [
+        1600,
+        720
+      ]
+    },
+    {
+      "id": "mountain",
+      "file": "far/mountain_far_01.png",
+      "parallax": 0.14,
+      "size": [
+        1600,
+        720
+      ]
+    },
+    {
+      "id": "forest",
+      "file": "mid/forest_mid_01.png",
+      "parallax": 0.4,
+      "size": [
+        1600,
+        720
+      ]
+    },
+    {
+      "id": "ground",
+      "file": "near/ground_fixed_01.png",
+      "parallax": 1,
+      "size": [
+        1600,
+        720
+      ]
+    },
+    {
+      "id": "props",
+      "file": "near/near_props_fixed_01.png",
+      "parallax": 1,
+      "size": [
+        1600,
+        720
+      ]
+    }
+  ]
+}
