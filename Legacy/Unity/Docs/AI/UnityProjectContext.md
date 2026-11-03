@@ -4,7 +4,7 @@ Analyzed 2026-11-02. Source baseline: Godot main `b47cc494f27258a1f1343aa0beeade
 
 ## Confirmed environment
 
-- Root is a new Unity project: `Assets`, `Packages/manifest.json`, `ProjectSettings/ProjectVersion.txt`.
+- Legacy/Unity is the preserved Unity project: `Assets`, `Packages/manifest.json`, `ProjectSettings/ProjectVersion.txt`.
 - Editor target: 6000.3.0f1 (Unity 6.3 LTS). Built-in pipeline; all game rendering is native uGUI pixel meshes/RawImages, with an empty solid-black Camera for letterboxing. No SRP asset, physics engine or third-party runtime is required.
 - Legacy Input Manager, keyboard + EventSystem/StandaloneInputModule multitouch. `ProjectSettings/InputManager.asset` contains UI navigation axes.
 - UGUI 2.0.0; Unity Test Framework 1.4.6; built-in UI, inputlegacy, imageconversion, imgui, textrendering, audio modules. Package resolution in Editor not yet observed.

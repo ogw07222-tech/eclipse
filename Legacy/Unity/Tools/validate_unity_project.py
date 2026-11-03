@@ -9,6 +9,7 @@ import re
 import struct
 
 ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = ROOT.parents[1]
 errors = []
 def check(condition, message):
     if not condition:
@@ -28,8 +29,8 @@ for path in (ROOT / 'Assets').rglob('*'):
         guid = match[1]
         check(guid not in guids, f'Duplicate GUID: {guid}')
         guids[guid] = path
-for source in (ROOT / 'Legacy/Godot/assets').rglob('*.png'):
-    target = ROOT / 'Assets/Resources/Eclipse' / source.relative_to(ROOT / 'Legacy/Godot/assets')
+for source in (REPO_ROOT / 'Legacy/Godot/assets').rglob('*.png'):
+    target = ROOT / 'Assets/Resources/Eclipse' / source.relative_to(REPO_ROOT / 'Legacy/Godot/assets')
     check(target.exists(), f'Missing PNG: {target}')
     if target.exists():
         check(hashlib.sha256(source.read_bytes()).digest() == hashlib.sha256(target.read_bytes()).digest(), f'PNG changed: {target}')
