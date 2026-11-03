@@ -56,6 +56,9 @@ jobs:
       - name: Verify original SDL3 runtime and game data
         run: |
           python3 ../../native-engine/tools/verify_apk.py app/build/outputs/apk/debug/app-debug.apk
+          unzip -p app/build/outputs/apk/debug/app-debug.apk lib/arm64-v8a/libeclipse_game.so > /tmp/eclipse-game-check.so
+          test -s /tmp/eclipse-game-check.so
+          file /tmp/eclipse-game-check.so | grep -q ARM
       - name: Verify debug APK signature
         run: |
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs app/build/outputs/apk/debug/app-debug.apk
