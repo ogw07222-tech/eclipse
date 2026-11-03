@@ -30,7 +30,7 @@ button:hover{background:#41775a}.buttons{display:flex;flex-wrap:wrap;gap:9px;ali
 <button id="random">시드 변경</button><button id="reset">기본값</button><button id="shot">PNG 저장</button>
 <span id="status" class="small" aria-live="polite">PNG 로딩 중…</span>
 </div>
-<p>기본 에셋: 메인 나무 1종(tree_large_01), 서브 나무 1종(tree_mid_01), 덤불 2종·풀 2종·바위 1종·소형 장식 2종. 원경의 불투명 PNG는 실제 엔진과 동일하게 사용하지 않아.</p>
+<p>기본 에셋: 메인 나무 1종(tree_large_01), 서브 나무 1종(tree_mid_01), 덤불 2종·풀 2종·바위 1종·소형 장식 2종. 원경 코드 나무는 제거했고, 나무는 PNG 2종만 사용해.</p>
 </main>
 <script>
 "use strict";
@@ -77,7 +77,7 @@ function generate(o){
      previous=x;
    }
  }
- distribute(K.Far,0,1,265,180,1.25,558,11);
+ // Distant procedural trees removed: PNG species only.
  distribute(K.LargeTree,1,1,185,150,3.32,584,17);
  distribute(K.MidTree,2,1,425,315,2.72,582,23);
  distribute(K.Bush,3,2,195,115,1.15,584,29);
@@ -89,16 +89,6 @@ function generate(o){
 }
 const parallax=[.10,.23,.44,.72,1,.82];
 function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)))}
-function proceduralTree(cx,ground,height,tint){
- let top=ground-height;
- rect(cx-8,top+height*.27,16,height*.73,tint===0?"#29433b":"#3b4934");
- for(let row=0;row<8;row++){
-   let y=top+row*height*.073;
-   let wid=(70+Math.sin(row*.66)*22)*(tint===0?1:1.2);
-   rect(cx-wid,y,wid*2,17,tint===0?"#244b48":"#3b744c");
-   if(row%3===0)rect(cx-wid*.8,y+5,wid*.8,5,"#538859");
- }
-}
 function render(){
  const o=cfg(),sprites=generate(o);
  el("seedValue").textContent=o.seed;
@@ -112,21 +102,29 @@ function render(){
  function obj(s){
    let x=Math.floor((s.x-(o.camera-640)*parallax[s.layer])/3+.5)*3;
    if(x < -700||x>1900)return;
-   if(s.kind===K.Far){proceduralTree(x,558,142*s.scale,0);return}
+   if(s.kind===K.Far)return;
    const image=imgs[s.kind+"/"+s.v];
    if(image&&image.complete&&image.naturalWidth){
      const w=image.naturalWidth*s.scale,h=image.naturalHeight*s.scale;
      ctx.drawImage(image,Math.round(x-w/2),Math.round(s.y-h),Math.round(w),Math.round(h));
-   }else if(s.kind===K.LargeTree||s.kind===K.MidTree){
-     proceduralTree(x,s.y,(s.kind===K.LargeTree?148:128)*s.scale,1);
-   }else if(s.kind===K.Bush){rect(x-20,s.y-34,40,34,"#3b744c")}
-   else if(s.kind===K.Grass){rect(x,s.y-17,5,17,"#83a65a")}
-   else if(s.kind===K.Rock){rect(x-15,s.y-12,30,12,"#334661")}
+   } // No low-quality procedural substitute if a PNG fails to load.
  }
  for(const s of sprites)if(s.layer<4)obj(s);
  rect(0,578,1280,12,"#527b45");
  rect(0,585,1280,135,"#2b4034");
  rect(0,585,1280,8,"#73995d");
+ for(let i=0;i<74;i++){
+   const h=(Math.imul(i,2654435761)+20261103)>>>0;
+   const x=((h^(h>>>13))>>>0)%1650-(o.camera-640);
+   const y=594+((h>>>11)%18)*6;
+   rect(x,y,18+(h%6)*6,6,i%4===0?"#344b3b":"#304638");
+ }
+ for(let i=0;i<50;i++){
+   const h=(Math.imul(i,2246822519)+9137)>>>0;
+   const x=((h^(h>>>15))>>>0)%1650-(o.camera-640);
+   const y=577-(h%3)*3;
+   rect(x,y,9+(h%4)*6,3,i%5===0?"#7b985d":"#658450");
+ }
  for(const s of sprites)if(s.layer>=4)obj(s);
  // Reference knight height (~192 px in the native game), no gameplay simulation.
  rect(129,393,23,184,"#202c3a");rect(115,410,50,97,"#748d9c");

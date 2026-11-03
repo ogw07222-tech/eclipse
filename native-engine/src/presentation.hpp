@@ -49,67 +49,6 @@ class Presentation {
     }
     void number(int n,float x,float y,int scale=3,unsigned rgb=0xf2d48c){char buffer[24];std::snprintf(buffer,sizeof(buffer),"%d",n);text(buffer,x,y,scale,rgb);}
 
-    // Stable procedural variation; integer pixel blocks and independent layer motion.
-    static unsigned forestHash(int seed,int salt){
-        unsigned h=static_cast<unsigned>(seed)*374761393u+static_cast<unsigned>(salt)*668265263u;
-        h=(h^(h>>13))*1274126177u;
-        return (h^(h>>16))&0x7fffffffu;
-    }
-    void forestTree(float cx,float bottom,float height,int layer,int seed){
-        constexpr unsigned trunks[]={0x243c45,0x29433b,0x3b4934};
-        constexpr unsigned leaves[]={0x244b48,0x2c5c49,0x3b744c};
-        constexpr unsigned highlights[]={0x33575a,0x39705a,0x538859};
-        float trunk=12.f+forestHash(seed,6)%3*6;
-        float crownY=bottom-height*(.62f+(forestHash(seed,7)%9)*.025f);
-        world(cx-trunk*.5f,crownY,trunk,bottom-crownY,trunks[layer],6);
-        if(seed%4==0){
-            world(cx-24,crownY+24,30,6,trunks[layer],6);
-            world(cx+3,crownY+12,30,6,trunks[layer],6);
-        }else{
-            world(cx-30,crownY+36,33,6,trunks[layer],6);
-            world(cx+3,crownY+24,33,6,trunks[layer],6);
-        }
-        float radius=38.f+forestHash(seed,10)%5*6+layer*5;
-        if(seed%7==0){
-            for(int tier=0;tier<3;++tier){
-                float y=bottom-height+tier*39,w=radius*(1.1f+tier*.15f);
-                for(int row=0;row<5;++row)
-                    world(cx-w*.5f+row*5,y+row*9,w-row*10,12,leaves[layer],6);
-            }
-        }else{
-            for(int clump=0;clump<7;++clump){
-                unsigned h=forestHash(seed,20+clump);
-                float x=cx+(static_cast<int>(h%17)-8)*6;
-                float y=bottom-height+((h/19)%9)*6+(clump%3)*15;
-                float r=radius*(.42f+((h/37)%5)*.08f);
-                for(int row=-3;row<=3;++row){
-                    float w=r*(1.f-std::abs(row)*.16f);
-                    world(x-w,y+row*9,w*2,12,leaves[layer],6);
-                }
-            }
-        }
-        for(int k=0;k<6;++k){
-            unsigned h=forestHash(seed,51+k);
-            float x=cx+(static_cast<int>(h%17)-8)*6;
-            float y=bottom-height+(h/23%11)*6;
-            world(x,y,12+h%3*6,6,highlights[layer],6);
-        }
-        if(layer==2&&seed%5==0){
-            world(cx-3,bottom-38,6,30,0x43604a,6);
-            world(cx+6,bottom-24,6,12,0x527b45,6);
-        }
-    }
-    void forestBush(float x,float bottom,float radius,int layer,int seed){
-        constexpr unsigned leaves[]={0x244b48,0x2c5c49,0x3b744c};
-        constexpr unsigned highlights[]={0x33575a,0x39705a,0x538859};
-        for(int n=0;n<4;++n){
-            unsigned h=forestHash(seed,70+n);
-            float bx=x+(n-2)*12+h%9,top=bottom-radius-h%13;
-            world(bx-12,top+9,30,radius*.65f,leaves[layer],6);
-            world(bx-6,top,18,12,leaves[layer],6);
-            if(n%2==0)world(bx,top+6,12,6,highlights[layer],6);
-        }
-    }
     static size_t forestIndex(const ForestSprite& sprite) {
         switch(sprite.kind) {
             case ForestKind::Far: return sprite.variant;
@@ -148,28 +87,27 @@ class Presentation {
                 return;
             }
         }
-        // Procedural compatibility rendering until forest PNG files are imported.
-        // The generator is authoritative for positions and counts in both modes.
-        const float wx=sx+offset;
-        switch(sprite.kind) {
-            case ForestKind::Far:
-            case ForestKind::LargeTree:
-            case ForestKind::MidTree:
-                forestTree(wx,sprite.groundY,
-                    (sprite.kind==ForestKind::LargeTree?220.f:
-                     sprite.kind==ForestKind::MidTree?155.f:120.f)*sprite.scale,
-                     sprite.kind==ForestKind::Far?0:sprite.kind==ForestKind::LargeTree?2:1,
-                     static_cast<int>(sprite.phase%1000));
-                break;
-            case ForestKind::Bush:
-            case ForestKind::Plant:
-                forestBush(wx,sprite.groundY,32.f*sprite.scale,2,
-                    static_cast<int>(sprite.phase%1000));break;
-            case ForestKind::Rock: world(wx-16,sprite.groundY-13,32,13,0x334661,3);break;
-            case ForestKind::Grass: world(wx,sprite.groundY-16,6,16,0x83a65a,3);break;
-            case ForestKind::Detail: world(wx-6,sprite.groundY-9,12,9,0x527b45,3);break;
-            case ForestKind::Effect: break;
+        // Missing PNG: skip this decoration instead of drawing mismatched low-res trees.
+        // The original sprite library is shipped with the APK and desktop assets.
+    }
+    void forestGround(float camera) {
+        // Deterministic low-contrast patches, consistent with the browser preview.
+        // Draw behind sprite props so the character remains legible.
+        for(int i=0;i<74;++i) {
+            const unsigned h=static_cast<unsigned>(i)*2654435761u + 20261103u;
+            const float x=static_cast<float>((h^(h>>13))%1650u);
+            const float y=594.f+static_cast<float>((h>>11)%18u)*6.f;
+            world(x,y,18.f+static_cast<float>(h%6u)*6.f,6.f,
+                i%4==0?0x344b3b:0x304638,6);
         }
+        for(int i=0;i<50;++i) {
+            const unsigned h=static_cast<unsigned>(i)*2246822519u + 9137u;
+            const float x=static_cast<float>((h^(h>>15))%1650u);
+            const float y=577.f-static_cast<float>(h%3u)*3.f;
+            world(x,y,9.f+static_cast<float>(h%4u)*6.f,3.f,
+                i%5==0?0x7b985d:0x658450,3);
+        }
+        (void)camera;
     }
     void forest(const Combat& g,float camera) {
         rect(0,0,viewWidth,viewHeight,0x152334);
@@ -188,6 +126,7 @@ class Presentation {
         world(0,578,1600,12,0x527b45);
         world(0,585,1600,135,0x2b4034);
         world(0,585,1600,8,0x73995d);
+        forestGround(camera);
         for(const auto& instance:instances) {
             if(instance.layer<4)continue;
             forestObject(instance,camera,g.clock);
