@@ -156,8 +156,8 @@ jobs:
           {
             echo "### Release APK identity"
             echo 'Package: `com.eclipse.nativegame`'
-            echo "Version code: `$version_code`"
-            echo "Signing certificate SHA-256: `$actual_cert`"
+            echo "Version code: $version_code"
+            echo "Signing certificate SHA-256: $actual_cert"
             echo 'Compare this certificate to the installed APK before attempting an update.'
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Upload updateable signed APK
