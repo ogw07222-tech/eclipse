@@ -10,7 +10,7 @@
 .vs/
 .idea/
 *.csproj
-!Tools/CombatChecks/CombatChecks.csproj
+!Legacy/Unity/Tools/CombatChecks/CombatChecks.csproj
 *.sln
 *.suo
 *.user
@@ -34,3 +34,11 @@ __pycache__/
 /native-engine/android/local.properties
 
 /native-engine/review/
+
+# Archived Unity editor-generated files
+/Legacy/Unity/[Ll]ibrary/
+/Legacy/Unity/[Tt]emp/
+/Legacy/Unity/[Bb]uilds/
+/Legacy/Unity/[Oo]bj/
+/Legacy/Unity/[Ll]ogs/
+/Legacy/Unity/UserSettings/
