@@ -113,3 +113,9 @@ The ground uses a restrained earthy palette and purposeful material layers: brok
 ## Active sprite repair committed
 
 At commit `6e6a466`, the current two tree PNGs and two bush PNGs were replaced directly on `main` with wider source crops and updated manifest dimensions. The images use indexed PNG palette optimization to keep the GitHub and Android artifact compact. Older ZIP manual-import instructions above are now **historical** and no longer needed. Browser preview warns when local files are stale. Run `git pull --ff-only origin main` before evaluating the new soil and sprite edges.
+
+## Moonlit forest visual update
+
+The browser preview and SDL3 renderer now share the same design: deterministic horizontal mirroring of the two active tree PNGs (40% main / 50% secondary), transparent-root padding correction (9 source pixels on main, 17 on secondary), a stepped blue-black sky gradient, round pixel moon with translucent halo and crater accents, and a clear shaded boundary between sparse grass and layered brown soil. Source sprites are never flipped vertically. The forest remains static except optional ambient effects, and gameplay collision stays at world y585.
+
+**Preview without APK:** `cd ~/eclipse && git pull --ff-only && python -m http.server 8765 --bind 127.0.0.1`, then open `http://127.0.0.1:8765/native-engine/preview/forest.html?v=moonlit`. This is a layout preview and not a full native SDL render test.
