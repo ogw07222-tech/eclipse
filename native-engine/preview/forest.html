@@ -13,11 +13,13 @@ canvas{display:block;width:100%;height:auto;image-rendering:pixelated;touch-acti
 input[type=range]{width:100%;accent-color:#93c5a0}input[type=number]{background:#0e1b21;border:1px solid #53685c;color:#fff;border-radius:5px;padding:7px;width:100%}
 button{background:#305b48;border:1px solid #60866e;border-radius:7px;color:#fff;padding:10px 12px;cursor:pointer;font-weight:600}
 button:hover{background:#41775a}.buttons{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
-.small{font-size:12px;color:#adbbb7}#status{padding:0 2px;color:#b4d2bf}
+.small{font-size:12px;color:#adbbb7}
+.warning{background:#45301d;border:1px solid #bd884d;padding:11px 13px;color:#ffdda6;border-radius:8px;font-size:13px;margin:10px 0}#status{padding:0 2px;color:#b4d2bf}
 </style></head><body>
 <div class="header"><h1>ECLIPSE · Forest Preview</h1>
 <p>APK 빌드 없이 브라우저에서 숲의 PNG 배치·크기·밀도를 확인하는 도구. 전투 코드를 실행하는 건 아니고 배경 생성 규칙을 그대로 옮긴 시각 미리보기야.</p></div>
 <main>
+<p id="assetWarning" class="warning" hidden>구버전 PNG가 로드됐어.</p>
 <div class="stage"><canvas id="scene" width="1280" height="720" aria-label="픽셀 숲 배경 미리보기"></canvas></div>
 <div class="panel">
 <div class="control"><label for="seed">시드 <span id="seedValue">20261103</span></label><input type="number" id="seed" min="0" max="4294967295" value="20261103"></div>
@@ -47,6 +49,20 @@ const files={
   "6/1":"grass/grass_02.png"
 };
 const imgs={};let loaded=0;
+const expectedSize={
+  "1/0":[233,180], "2/0":[164,144], "3/0":[187,106], "3/1":[179,142]
+};
+function checkSpriteVersions(){
+  const mismatches=Object.entries(expectedSize)
+    .filter(([id,wh])=>{const im=imgs[id];return !im||!im.complete||im.naturalWidth!==wh[0]||im.naturalHeight!==wh[1]})
+    .map(([id])=>files[id]);
+  const warning=document.getElementById("assetWarning");
+  warning.hidden=mismatches.length===0;
+  if(mismatches.length)warning.textContent="구버전 또는 누락된 PNG "+mismatches.length+
+    "개: "+mismatches.join(", ")+
+    " — ZIP 수정본을 GitHub 저장소에 적용하고 새로고침해야 잘린 부분이 복구돼.";
+}
+
 const ctx=document.getElementById("scene").getContext("2d");
 ctx.imageSmoothingEnabled=false;
 const el=id=>document.getElementById(id);
@@ -168,8 +184,8 @@ function render(){
 }
 for(const [id,path] of Object.entries(files)){
  const im=new Image();
- im.onload=()=>{loaded++;render()};
- im.onerror=()=>{render()};
+ im.onload=()=>{loaded++;checkSpriteVersions();render()};
+ im.onerror=()=>{checkSpriteVersions();render()};
  im.src=root+path;imgs[id]=im;
 }
 for(const id of ["seed","density","size","variation","camera"])
