@@ -100,9 +100,14 @@ function generate(o){
      if(x-previous<minGap)continue;
      let scale=clamp(baseScale*o.size*(1+(unit(o.seed,salt,i,2)-.5)*.45*o.variation),.28,5);
      let v=rand(o.seed,salt,i,3)%varieties;
-     const flipX=(kind===K.LargeTree||kind===K.MidTree) &&
-       unit(o.seed,salt,i,5)<(kind===K.LargeTree?.40:.50);
-     out.push({kind,layer,v,x:Math.floor(x/3+.5)*3,y:baseline,scale,phase:rand(o.seed,salt,i,4),flipX});
+     const isTree=kind===K.LargeTree||kind===K.MidTree;
+     const flipProbability=isTree?.42:kind===K.Bush?.44:
+       kind===K.Grass?.5:kind===K.Rock?.35:.38;
+     const flipX=unit(o.seed,salt,i,5)<flipProbability;
+     const shade=rand(o.seed,salt,i,6)%3;
+     const widthFactor=1+(unit(o.seed,salt,i,7)*2-1)*(isTree?.055:.09);
+     out.push({kind,layer,v,x:Math.floor(x/3+.5)*3,y:baseline,scale,
+       phase:rand(o.seed,salt,i,4),flipX,shade,widthFactor});
      previous=x;
    }
  }
@@ -173,15 +178,18 @@ function render(){
      let scale=s.scale*referenceHeight/sourceHeight;
      if(s.kind===K.LargeTree||s.kind===K.MidTree)
        scale=Math.min(scale,(s.y-12)/sourceHeight);
-     const w=image.naturalWidth*scale,h=image.naturalHeight*scale;
-     // Source pixels below the alpha-visible roots must not float above the floor.
+     const w=image.naturalWidth*scale*s.widthFactor,h=image.naturalHeight*scale;
+     // Original root anchor remains unchanged by width/shade/flip transforms.
      const rootPadding=s.kind===K.LargeTree?9:s.kind===K.MidTree?17:0;
      const top=Math.round(s.y-h+rootPadding*scale);
      const left=Math.round(x-w/2);
+     ctx.save();
+     ctx.filter="brightness("+[232/255,244/255,1][s.shade]+")";
      if(s.flipX){
-       ctx.save();ctx.translate(left+Math.round(w),0);ctx.scale(-1,1);
-       ctx.drawImage(image,0,top,Math.round(w),Math.round(h));ctx.restore();
+       ctx.translate(left+Math.round(w),0);ctx.scale(-1,1);
+       ctx.drawImage(image,0,top,Math.round(w),Math.round(h));
      }else ctx.drawImage(image,left,top,Math.round(w),Math.round(h));
+     ctx.restore();
    } // No low-quality procedural substitute if a PNG fails to load.
  }
  for(const s of sprites)if(s.layer<4)obj(s);
