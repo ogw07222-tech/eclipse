@@ -295,7 +295,7 @@ class Presentation {
     }
     void enemy(const Enemy& e,float clock){
         const float scale=slimeSpec(e.kind).scale,h=(e.kind==0?80:100)*scale;
-        const int frame=slimeFrame(e.travelPhase,e.attackAge,e.kind);
+        const int frame=enemyFrame(e);
         SDL_FRect source{float(frame%4*slimeCell),float(frame/4*slimeCell),slimeCell,slimeCell};
         SDL_FRect target{std::round(e.x-offset-slimePivotX*scale),std::round(e.y-slimePivotY*scale),slimeCell*scale,slimeCell*scale};
         auto* texture=slimeTextures_[e.kind];

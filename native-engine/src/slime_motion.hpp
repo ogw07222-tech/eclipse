@@ -5,11 +5,11 @@
 namespace eclipse {
 // Authored atlas: 4 columns, movement 0..7, bite 8..15. Left-facing art.
 constexpr int slimeCell=128,slimeColumns=4,slimePivotX=64,slimePivotY=116;
-struct SlimeSpec { int health,damage; float speed,attackDuration,cooldown,scale; };
+struct SlimeSpec { int health,damage; float speed,attackDuration,cooldown,scale,contact,engageGap,attackReach; };
 inline constexpr SlimeSpec slimeSpecs[]={
-    {55,9,95,.72f,1.30f,1.5f},
-    {85,15,63,.88f,1.80f,1.75f},
-    {150,23,49,1.04f,2.20f,2.25f}
+    {55,9,95,.72f,1.30f,1.5f,.50f,22,26},
+    {85,15,63,1.10f,1.80f,1.75f,.68f,108,18},
+    {150,23,49,1.16f,2.20f,2.25f,.61f,36,40}
 };
 inline const SlimeSpec& slimeSpec(int kind){return slimeSpecs[std::clamp(kind,0,2)];}
 inline int slimeFrame(float travel,float attackAge,int kind){

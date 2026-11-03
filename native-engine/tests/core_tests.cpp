@@ -13,9 +13,67 @@ int main(){int failed=0,total=0;
     auto test=[&](const char* name,auto fn){++total;try{fn();std::cout<<"PASS "<<name<<'\n';}catch(const std::exception& e){++failed;std::cerr<<"FAIL "<<name<<": "<<e.what()<<'\n';}};
     test("Initial four enemy wave",[]{Combat g;check(g.foes()==4&&g.player.health==100&&!g.ended,"Initial wave");check(g.enemies[0].health==55&&g.enemies[1].health==85,"Enemy types");near(g.enemies[3].x,1285);});
     test("Slime strength increases green red purple",[]{Combat g;check(g.enemies[3].kind==2,"Purple elite missing");for(int i=0;i<2;++i){check(slimeSpecs[i].health<slimeSpecs[i+1].health&&slimeSpecs[i].damage<slimeSpecs[i+1].damage,"Tier order");}});
-    test("Slime bite waits for contact and hits only once",[]{for(int kind=0;kind<3;++kind){auto g=arena();auto& e=g.enemies[0];e=Enemy(kind,g.player.x+40);g.step(1.f/60,{});check(e.attackAge==0&&g.player.health==100,"Instant bite");const float contact=slimeSpec(kind).attackDuration*.5f;while(e.attackAge+1.f/60<contact)g.step(1.f/60,{});check(g.player.health==100,"Hit before contact");g.step(1.f/60,{});check(g.player.health==100-e.damage,"Missing contact hit");int hp=g.player.health;wait(g,35);check(g.player.health==hp,"Repeated contact");}});
+    test("Slime bite waits for contact and hits only once",[]{for(int kind=0;kind<3;++kind){auto g=arena();auto& e=g.enemies[0];e=Enemy(kind,g.player.x+40);g.step(1.f/60,{});check(e.attackAge==0&&g.player.health==100,"Instant bite");const float contact=slimeSpec(kind).attackDuration*slimeSpec(kind).contact;while(e.attackAge+1.f/60<contact)g.step(1.f/60,{});check(g.player.health==100,"Hit before contact");g.step(1.f/60,{});check(g.player.health==100-e.damage,"Missing contact hit");int hp=g.player.health;wait(g,35);check(g.player.health==hp,"Repeated contact");}});
     test("Slime telegraph can be escaped and facing stays locked",[]{auto g=arena();auto& e=g.enemies[0];e=Enemy(0,g.player.x+40);g.step(1.f/60,{});check(e.facing==-1,"Facing");g.player.x=e.x+30;wait(g,25);check(g.player.health==100&&e.facing==-1,"Bite hit behind locked jaw");});
     test("Slime animation uses motion and bounded one-shot clips",[]{auto g=arena();auto& e=g.enemies[0];float phase=e.travelPhase;wait(g,8);check(e.travelPhase!=phase,"Walk frozen");check(slimeFrame(0,-1,0)==0&&slimeFrame(.99f,-1,0)==7,"Walk bounds");for(int kind=0;kind<3;++kind){check(slimeFrame(0,0,kind)==8&&slimeFrame(0,slimeSpec(kind).attackDuration*.5f,kind)==12&&slimeFrame(0,100,kind)==15,"Bite atlas range");}});
+    test("Animated monster bodies use their outer silhouette in both directions",[]{
+        for(int kind=0;kind<3;++kind)for(int frame=0;frame<16;++frame){
+            Enemy e(kind,600);e.travelPhase=frame<8?(frame+.1f)/8:0;e.attackAge=frame<8?-1:(frame-8+.1f)/8*slimeSpec(kind).attackDuration;
+            e.facing=-1;const auto left=enemyBounds(e);check(left.right-left.left>40,"Body too narrow");
+            bool inside=false;enemyAnyBand(e,[&](BodyRect band){const float y=(band.top+band.bottom)*.5f;
+                check(enemyOverlaps(e,{band.left+.1f,y,band.left+1,y+.1f}),"Outer visible body not hittable");inside=true;return true;});check(inside,"No body bands");
+            e.facing=1;const auto right=enemyBounds(e);near(right.left,1200-left.right);near(right.right,1200-left.left);near(right.top,left.top);near(right.bottom,left.bottom);
+        }
+    });
+    test("Monster empty outline corners do not become rectangular hit targets",[]{
+        Enemy e(2,600);e.facing=-1;const auto whole=enemyBounds(e);bool tested=false;
+        enemyAnyBand(e,[&](BodyRect band){if(band.left-whole.left<8)return false;
+            const float y=(band.top+band.bottom)*.5f;check(!enemyOverlaps(e,{whole.left+.1f,y,whole.left+1,y+.1f}),"Empty corner became solid");tested=true;return true;});
+        check(tested,"No narrower silhouette band found");
+    });
+    test("Sword can hit a monster edge while its center is outside reach",[]{
+        auto g=arena();auto& e=g.enemies[0];e=Enemy(0,0);e.speed=0;e.attackTimer=1000;
+        const float offset=enemyBounds(e).left;e.x=g.player.x+96-offset-3;
+        check(e.x-g.player.x>96,"Center should be beyond legacy reach");Actions a;a.attack=true;g.step(1.f/60,a);wait(g,12);
+        check(e.health==43,"Sword missed visible outer body");
+    });
+    test("Swept projectiles hit animated outer bands without tunneling",[]{
+        for(int kind=0;kind<3;++kind){Enemy e(kind,600);bool tested=false;
+            enemyAnyBand(e,[&](BodyRect band){const float y=(band.top+band.bottom)*.5f;
+                check(enemySweptDisc(e,band.left-200,band.right+200,y,3),"Fast projectile tunneled");
+                check(enemySweptDisc(e,band.left-8,band.left-2,y,3),"Projectile radius missed body edge");tested=true;return true;});check(tested,"No projectile band");
+            const auto bounds=enemyBounds(e);check(!enemySweptDisc(e,bounds.left-100,bounds.right+100,bounds.top-20,3),"Projectile hit empty air");
+        }
+    });
+    test("Enemy attack distance starts at its visible front edge",[]{
+        for(int kind=0;kind<3;++kind){auto g=arena();auto& e=g.enemies[0];e=Enemy(kind,500);e.facing=-1;e.speed=0;
+            g.player.x=enemyBounds(e).left-slimeSpec(kind).engageGap-13;
+            check(std::abs(e.x-g.player.x)>46,"Must be beyond old center trigger");g.step(1.f/60,{});
+            check(e.attackAge==0,"Did not engage from outer edge");
+        }
+    });
+    test("Red slime jumps forward and commits to the telegraphed landing point",[]{
+        auto g=arena();auto& e=g.enemies[0];e=Enemy(1,400);g.player.x=300;g.step(1.f/60,{});
+        const float target=e.attackToX;check(target<e.attackFromX,"No forward landing target");g.player.x=700;
+        float highest=0;bool moved=false,landed=false;for(int i=0;i<70;++i){g.step(1.f/60,{});highest=std::max(highest,floorY-e.y);moved|=e.x<390;
+            if(e.attackAge>=slimeSpec(1).attackDuration*slimeSpec(1).contact){near(e.x,target);landed=true;}}
+        check(highest>110&&moved&&landed,"No physical leap arc");near(e.y,floorY);check(g.player.health==100,"Homing slam ignored dodge");
+    });
+    test("Red slam lands once and can be jumped over",[]{
+        for(int jump=0;jump<2;++jump){auto g=arena();auto& e=g.enemies[0];e=Enemy(1,400);g.player.x=300;g.step(1.f/60,{});
+            const float contact=slimeSpec(1).attackDuration*slimeSpec(1).contact;
+            while(e.attackAge+1.f/60<contact){g.step(1.f/60,{});check(g.player.health==100,"Slam hit before landing");}
+            if(jump){g.player.y=floorY-65;g.player.grounded=false;g.player.vy=0;}
+            g.step(1.f/60,{});const int expected=jump?100:85;check(g.player.health==expected,"Slam landing range/vertical dodge");
+            wait(g,20);check(g.player.health==expected,"One slam dealt repeated damage");
+        }
+    });
+    test("Airborne monster collision follows the sprite rather than the floor",[]{
+        Enemy e(1,600);e.y=floorY-120;e.attackAge=slimeSpec(1).attackDuration*.45f;
+        const auto body=enemyBounds(e);check(body.bottom<floorY-100,"Airborne body stayed at floor");
+        check(!enemyOverlaps(e,{500,floorY-20,700,floorY}),"Ground sword hit empty leap shadow");
+    });
+
     test("Movement facing walls",[]{auto g=arena();Actions a;a.right=true;g.step(1.f/60,a);near(g.player.x,140+280.f/60);g.player.x=1549;g.step(1.f/60,a);near(g.player.x,1550);a={};a.left=true;g.player.x=26;g.step(1.f/60,a);near(g.player.x,25);check(g.player.facing== -1,"Facing");});
     test("Jump apex and landing",[]{auto g=arena();Actions a;a.jump=true;g.step(1.f/60,a);check(!g.player.grounded&&g.player.vy<0,"Jump");float highest=g.player.y;for(int i=0;i<90;++i){g.step(1.f/60,{});highest=std::min(highest,g.player.y);}check(floorY-highest>160&&floorY-highest<180,"Apex");check(g.player.grounded&&g.player.vy==0,"Landing");});
     test("Dash immunity and cooldown",[]{auto g=arena();Actions a;a.dash=true;g.step(1.f/60,a);near(g.player.vx,780);g.damagePlayer(15);check(g.player.health==100,"Dash immunity");wait(g,12);float cooldown=g.player.dashCooldown;g.step(1.f/60,a);check(g.player.dashLeft==0&&g.player.dashCooldown<cooldown,"Cooldown");wait(g,60);g.step(1.f/60,a);check(g.player.dashLeft>0,"Reactivation");});
@@ -39,7 +97,7 @@ int main(){int failed=0,total=0;
     test("Damage immunity defeat freeze",[]{auto g=arena();g.damagePlayer(9);g.damagePlayer(9);check(g.player.health==91,"Damage immunity");wait(g,45);g.damagePlayer(999);check(g.ended&&!g.won&&g.player.health==0,"Defeat");float x=g.player.x;Actions a;a.right=true;g.step(1.f/60,a);near(g.player.x,x);});
     test("Stage clear",[]{auto g=arena();for(auto& e:g.enemies)g.hit(e,1000,false);g.step(1.f/60,{});check(g.ended&&g.won&&g.foes()==0,"Clear");});
     test("Restart clears gear projectiles effects",[]{auto g=arena();g.player.form=1;g.player.equip(0);Actions a;a.attack=true;g.step(1.f/60,a);g.hit(g.enemies[0],1,true);a={};a.restart=true;g.step(1.f/60,a);check(g.foes()==4&&g.projectiles.empty()&&g.popups.empty()&&!g.ended&&g.player.form==0&&g.player.gear.selected[0]==0,"Restart state");});
-    test("Rear and vertical melee excluded",[]{auto g=arena();g.enemies[0].x=80;Actions a;a.attack=true;g.step(1.f/60,a);check(g.enemies[0].health==55,"Rear hit");wait(g,18);g.player.y=400;g.player.grounded=false;g.enemies[0].x=200;a={};a.skill=true;g.step(1.f/60,a);check(g.enemies[0].health==55,"Vertical hit");});
+    test("Rear and vertical melee excluded",[]{auto g=arena();g.enemies[0].x=g.player.x-200;Actions a;a.attack=true;g.step(1.f/60,a);check(g.enemies[0].health==55,"Rear hit");wait(g,18);g.player.y=400;g.player.grounded=false;g.enemies[0].x=200;a={};a.skill=true;g.step(1.f/60,a);check(g.enemies[0].health==55,"Vertical hit");});
     test("Multitouch independent keyboard ownership",[]{Input in;in.pointer(1,60,650,true);in.pointer(2,1160,590,true);auto a=in.sample();check(a.left&&a.attack,"Move plus attack");check(!in.sample().attack,"Held attack edge");in.pointer(2,0,0,false);check(in.sample().left,"Attack up retains movement");Actions k;k.right=true;in.keyboard(k);in.pointer(1,0,0,false);check(in.sample().right,"Keyboard retained");in.reset();check(!in.sample().right,"Reset");});
     test("Fast tap buffered between simulation steps",[]{Input in;in.pointer(1,1160,590,true);in.pointer(1,0,0,false);check(in.sample().attack,"Fast touch lost");check(!in.sample().attack,"Single consume");});
     test("Joystick upward jump and focus reset",[]{Input in;in.pointer(1,99,610,true);check(in.sample().jump,"Up jump");check(!in.sample().jump,"Held jump repeated");in.reset();check(!in.sample().jump,"Focus clear");});
