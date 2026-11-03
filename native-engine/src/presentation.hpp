@@ -173,12 +173,16 @@ class Presentation {
         for(unsigned i=0;i<134;++i) {
             const unsigned h=soilHash(i,6,seed);
             const float x=static_cast<float>(i*12);
+            // Crisp soil/air interface: darker undercut, thin natural grass on top.
+            // The shape varies in pixel increments but gameplay floor stays at y585.
+            world(x,585,12,3,h%4u==0?0x65432f:0x4e3427,3);
+            world(x,588,12,3,h%5u==0?0x503326:0x392920,3);
             if(h%7u==0)continue;
             world(x,582,12,3,h%4u==0?0x668354:h%4u==1?0x4d7147:0x42653e,3);
             if(h%4u==0)
                 world(x+3,576.f-static_cast<float>((h>>7)%2u)*3.f,
                       3,6,0x73965a,3);
-            if(h%9u==0)world(x+6,585,6,3,0x66513a,3);
+            if(h%9u==0)world(x+6,579,6,3,0x849860,3);
         }
     }
     void forestSky() {
