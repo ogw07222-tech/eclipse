@@ -5,12 +5,15 @@
 #include <cstdio>
 #include "core.hpp"
 #include "sword_trails.hpp"
+#include "forest_generator.hpp"
 
 namespace eclipse {
 class Presentation {
     SDL_Renderer* renderer;
     std::array<SDL_Texture*,5> textures{};
     float offset=0;
+    ForestGenerator forestGenerator_{};
+    std::array<SDL_Texture*,40> forestTextures_{};
     static SDL_Color color(unsigned rgb,Uint8 alpha=255){return {static_cast<Uint8>(rgb>>16),static_cast<Uint8>(rgb>>8),static_cast<Uint8>(rgb),alpha};}
     void rect(float x,float y,float w,float h,unsigned rgb,Uint8 alpha=255){
         auto c=color(rgb,alpha);SDL_SetRenderDrawColor(renderer,c.r,c.g,c.b,c.a);
@@ -107,54 +110,79 @@ class Presentation {
             if(n%2==0)world(bx,top+6,12,6,highlights[layer],6);
         }
     }
-    void forest(const Combat& g,float camera){
-        rect(0,0,viewWidth,viewHeight,0x152334);
-        for(int row=0;row<11;++row){
-            int half=2+std::min(row,10-row);
-            world(1190-half*6,105+row*6,(half*2+1)*6,6,0xaebda3);
+    static size_t forestIndex(const ForestSprite& sprite) {
+        switch(sprite.kind) {
+            case ForestKind::Far: return sprite.variant;
+            case ForestKind::LargeTree: return 3+sprite.variant;
+            case ForestKind::MidTree: return 8+sprite.variant;
+            case ForestKind::Bush: return 12+sprite.variant;
+            case ForestKind::Grass: return 17+sprite.variant;
+            case ForestKind::Rock: return 21+sprite.variant;
+            case ForestKind::Plant: return 34+sprite.variant;
+            case ForestKind::Detail: return 28+sprite.variant;
+            case ForestKind::Effect: return 37+sprite.variant;
         }
-        for(int i=0;i<62;++i)world((i*233+49)%1600,(i*97+59)%315,6,6,0x718d8c);
-        constexpr float factors[]={.12f,.28f,.48f};
-        constexpr int steps[]={124,110,104},heights[]={172,210,242};
-        for(int layer=0;layer<3;++layer){
-            // world() subtracts the full camera offset; add its complement.
-            float shift=std::round((camera-640)*(1.f-factors[layer])/6.f)*6.f;
-            for(int i=-3;i<22;++i){
-                int seed=i+layer*173;
-                float x=i*steps[layer]+(static_cast<int>(forestHash(seed,1)%65)-32)+shift;
-                float height=heights[layer]+(static_cast<int>(forestHash(seed,2)%12)-5)*6;
-                forestTree(x,584,height,layer,seed);
+        return 0;
+    }
+    void forestObject(const ForestSprite& sprite,float camera,float clock){
+        const float sx=forestGenerator_.drawX(sprite,camera);
+        if(sx < -330 || sx > viewWidth+330)return;
+        const size_t index=forestIndex(sprite);
+        SDL_Texture* image=forestTextures_[index];
+        if(image) {
+            float w=0,h=0;
+            if(SDL_GetTextureSize(image,&w,&h)) {
+                const float scale=sprite.scale;
+                const float py=sprite.groundY+forestGenerator_.microMotion(sprite,clock);
+                SDL_FRect target{std::round(sx-w*scale*.5f),
+                    std::round(py-h*scale),std::round(w*scale),std::round(h*scale)};
+                SDL_RenderTexture(renderer,image,nullptr,&target);
+                return;
             }
-            for(int i=-2;i<35;++i){
-                int seed=i+layer*391;
-                float x=i*61+forestHash(seed,9)%42+shift;
-                forestBush(x,579-layer*3,21+forestHash(seed,8)%23,layer,seed);
-            }
+        }
+        // Procedural compatibility rendering until forest PNG files are imported.
+        // The generator is authoritative for positions and counts in both modes.
+        const float wx=sx+offset;
+        switch(sprite.kind) {
+            case ForestKind::Far:
+            case ForestKind::LargeTree:
+            case ForestKind::MidTree:
+                forestTree(wx,sprite.groundY,
+                    (sprite.kind==ForestKind::LargeTree?220.f:
+                     sprite.kind==ForestKind::MidTree?155.f:120.f)*sprite.scale,
+                     sprite.kind==ForestKind::Far?0:sprite.kind==ForestKind::LargeTree?2:1,
+                     static_cast<int>(sprite.phase%1000));
+                break;
+            case ForestKind::Bush:
+            case ForestKind::Plant:
+                forestBush(wx,sprite.groundY,32.f*sprite.scale,2,
+                    static_cast<int>(sprite.phase%1000));break;
+            case ForestKind::Rock: world(wx-16,sprite.groundY-13,32,13,0x334661,3);break;
+            case ForestKind::Grass: world(wx,sprite.groundY-16,6,16,0x83a65a,3);break;
+            case ForestKind::Detail: world(wx-6,sprite.groundY-9,12,9,0x527b45,3);break;
+            case ForestKind::Effect: break;
+        }
+    }
+    void forest(const Combat& g,float camera) {
+        rect(0,0,viewWidth,viewHeight,0x152334);
+        // Sky and moon are stationary; no global foliage sway.
+        for(int row=0;row<11;++row) {
+            int half=2+std::min(row,10-row);
+            rect(1190-half*6,105+row*6,(half*2+1)*6,6,0xaebda3);
+        }
+        for(int i=0;i<62;++i)
+            rect((i*233+49)%1280,(i*97+59)%315,3,3,0x718d8c);
+        const auto& instances=forestGenerator_.sprites();
+        for(const auto& instance:instances) {
+            if(instance.layer>=4)break;
+            forestObject(instance,camera,g.clock);
         }
         world(0,578,1600,12,0x527b45);
         world(0,585,1600,135,0x2b4034);
         world(0,585,1600,8,0x73995d);
-        for(int i=0;i<115;++i){
-            int seed=i+861;
-            float x=i*15+forestHash(seed,3)%12;
-            if(x>1600)break;
-            float sway=std::round(std::sin(g.clock*1.5f+seed))*3;
-            world(x+sway,574-forestHash(seed,4)%3*6,6,6+forestHash(seed,5)%3*6,
-                i%7==0?0x83a65a:i%3==0?0x527b45:0x73995d,3);
-            if(i%11==0){
-                world(x-6,581,18,6,0x334661,3);
-                world(x,578,6,3,0x62736b,3);
-            }
-            if(i%19==0){
-                world(x,562,3,15,0x527b45,3);
-                world(x-3,556,9,6,0xb6aa88,3);
-            }
-        }
-        for(int i=0;i<45;++i){
-            int seed=1171+i;
-            float x=i*37+forestHash(seed,2)%20;
-            world(x,604+forestHash(seed,3)%15*6,6+forestHash(seed,4)%4*6,6,
-                i%4==0?0x334661:0x3a5141,6);
+        for(const auto& instance:instances) {
+            if(instance.layer<4)continue;
+            forestObject(instance,camera,g.clock);
         }
     }
     void enemy(const Enemy& e,float clock){
@@ -203,7 +231,10 @@ class Presentation {
     }
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);}
+    ~Presentation(){for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+        for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);}
+    void setForestSettings(ForestSettings settings) {forestGenerator_.regenerate(settings);}
+    const ForestGenerator& forestGenerator() const {return forestGenerator_;}
     static std::string asset(const char* name){
 #ifdef SDL_PLATFORM_ANDROID
         return name; // SDL 3.2 routes this through Android's AssetManager.
@@ -221,6 +252,61 @@ public:
             textures[i]=SDL_CreateTextureFromSurface(renderer,image);SDL_DestroySurface(image);
             if(!textures[i])return false;
             SDL_SetTextureScaleMode(textures[i],SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(textures[i],SDL_BLENDMODE_BLEND);
+        }
+        // Optional sprite library: the procedural renderer remains functional without it.
+        // Only startup loads textures; no per-frame filesystem work.
+        constexpr const char* forestFiles[40]={
+            "background/forest_far_01.png",
+            "background/forest_far_02.png",
+            "background/forest_far_03.png",
+            "trees_large/tree_large_01.png",
+            "trees_large/tree_large_02.png",
+            "trees_large/tree_large_03.png",
+            "trees_large/tree_large_04.png",
+            "trees_large/tree_large_05.png",
+            "trees_medium/tree_mid_01.png",
+            "trees_medium/tree_mid_02.png",
+            "trees_medium/tree_mid_03.png",
+            "trees_medium/tree_mid_04.png",
+            "bushes/bush_01.png",
+            "bushes/bush_02.png",
+            "bushes/bush_03.png",
+            "bushes/bush_04.png",
+            "bushes/bush_05.png",
+            "grass/grass_01.png",
+            "grass/grass_02.png",
+            "grass/grass_03.png",
+            "grass/grass_04.png",
+            "rocks/rock_01.png",
+            "rocks/rock_02.png",
+            "rocks/rock_03.png",
+            "terrain/tile_ground_01.png",
+            "terrain/tile_ground_02.png",
+            "terrain/tile_ground_03.png",
+            "terrain/tile_ground_04.png",
+            "details/fallen_log_01.png",
+            "details/flower_01.png",
+            "details/hanging_vines_01.png",
+            "details/mushroom_01.png",
+            "details/mushroom_02.png",
+            "details/stump_01.png",
+            "plants/plant_01.png",
+            "plants/plant_02.png",
+            "plants/plant_03.png",
+            "effects/effect_01.png",
+            "effects/effect_02.png",
+            "effects/effect_03.png"
+        };
+        for(size_t i=0;i<forestTextures_.size();++i) {
+            auto name=asset((std::string("forest/")+forestFiles[i]).c_str());
+            SDL_Surface* surface=IMG_Load(name.c_str());
+            if(!surface)continue;
+            forestTextures_[i]=SDL_CreateTextureFromSurface(renderer,surface);
+            SDL_DestroySurface(surface);
+            if(forestTextures_[i]) {
+                SDL_SetTextureScaleMode(forestTextures_[i],SDL_SCALEMODE_NEAREST);
+                SDL_SetTextureBlendMode(forestTextures_[i],SDL_BLENDMODE_BLEND);
+            }
         }
         return true;
     }
