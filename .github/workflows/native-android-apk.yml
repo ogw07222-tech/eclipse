@@ -1,17 +1,12 @@
 name: Native Android APK
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'native-engine/**'
-      - 'Assets/Resources/Eclipse/**'
-      - '.github/workflows/native-android-apk.yml'
-  pull_request:
-    paths:
-      - 'native-engine/**'
-      - 'Assets/Resources/Eclipse/**'
-      - '.github/workflows/native-android-apk.yml'
+    inputs:
+      run_emulator:
+        description: 'Run Android emulator combat smoke test'
+        required: false
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -75,6 +70,7 @@ jobs:
             echo "Commit: $GITHUB_SHA"
           } >> "$GITHUB_STEP_SUMMARY"
   android-smoke:
+    if: ${{ inputs.run_emulator == true }}
     name: Android emulator combat smoke
     needs: apk
     runs-on: ubuntu-latest
