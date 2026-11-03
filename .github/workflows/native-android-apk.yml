@@ -64,6 +64,7 @@ jobs:
             echo "Commit: $GITHUB_SHA"
           } >> "$GITHUB_STEP_SUMMARY"
   android-smoke:
+    if: ${{ inputs.run_emulator == true }}
     name: Android emulator combat smoke
     needs: apk
     runs-on: ubuntu-latest
