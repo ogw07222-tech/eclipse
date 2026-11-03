@@ -4,12 +4,13 @@
 #include <cmath>
 #include <vector>
 #include "motion.hpp"
+#include "forest_layers.hpp"
 #include "slime_motion.hpp"
 #include "monster_collision.hpp"
 
 namespace eclipse {
 constexpr double fixedStep=1.0/60.0;
-constexpr float viewWidth=1280,viewHeight=720,floorY=585,worldWidth=1600;
+constexpr float viewWidth=1280,viewHeight=720,floorY=ForestLayerScene::floorY,worldWidth=1600;
 struct Actions {
     bool left=false,right=false,jump=false,attack=false,dash=false,skill=false,swap=false;
     bool restart=false,inventory=false,weapon=false,armor=false,charm=false;
