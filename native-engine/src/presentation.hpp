@@ -17,6 +17,8 @@ class Presentation {
     std::array<SDL_Texture*,40> forestTextures_{};
     std::array<SDL_Texture*,4> forestLayerTextures_{};
     bool forestLayersReady_=false;
+    std::array<SDL_Texture*,6> forestV3Textures_{};
+    bool forestV3Ready_=false;
     static SDL_Color color(unsigned rgb,Uint8 alpha=255){return {static_cast<Uint8>(rgb>>16),static_cast<Uint8>(rgb>>8),static_cast<Uint8>(rgb),alpha};}
     void rect(float x,float y,float w,float h,unsigned rgb,Uint8 alpha=255){
         auto c=color(rgb,alpha);SDL_SetRenderDrawColor(renderer,c.r,c.g,c.b,c.a);
@@ -238,6 +240,25 @@ class Presentation {
         }
     }
     void forest(const Combat& g,float camera) {
+        if(forestV3Ready_) {
+            // Layer art only: no scene randomization or NPC occupancy changes.
+            // Every asset's native dimensions and world-ground height are fixed.
+            for(size_t i=0;i<forestV3Textures_.size();++i) {
+                SDL_Texture* image=forestV3Textures_[i];
+                float w=0.f,h=0.f;
+                if(!SDL_GetTextureSize(image,&w,&h))continue;
+                const float shift=(camera-640.f)*ForestLayerScene::layersV3[i].parallax;
+                SDL_FRect target{std::round(-shift),0.f,w,h};
+                if(i==2) {
+                    const Uint8 tint=static_cast<Uint8>(
+                        ForestLayerScene::farTint(forestGenerator_.settings().seed));
+                    SDL_SetTextureColorMod(image,tint,tint,tint);
+                }
+                SDL_RenderTexture(renderer,image,nullptr,&target);
+                if(i==2)SDL_SetTextureColorMod(image,255,255,255);
+            }
+            return;
+        }
         if(forestLayersReady_){
             // Composed PNG layers: no random tree/log placement or varying collision.
             // The ground layer has world-space parallax=1, preserving y=585.
@@ -316,7 +337,8 @@ public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
     ~Presentation(){for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
-        for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);}
+        for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
+        for(auto* texture:forestV3Textures_)if(texture)SDL_DestroyTexture(texture);}
     void setForestSettings(ForestSettings settings) {forestGenerator_.regenerate(settings);}
     const ForestGenerator& forestGenerator() const {return forestGenerator_;}
     static std::string asset(const char* name){
@@ -390,6 +412,29 @@ public:
             if(forestTextures_[i]) {
                 SDL_SetTextureScaleMode(forestTextures_[i],SDL_SCALEMODE_NEAREST);
                 SDL_SetTextureBlendMode(forestTextures_[i],SDL_BLENDMODE_BLEND);
+            }
+        }
+        // v3 is activated only if all six PNG layers exist with exact dimensions.
+        // No collision/AI coordinate or gameplay scene state is read from these files.
+        forestV3Ready_=true;
+        for(size_t i=0;i<ForestLayerScene::layersV3.size();++i) {
+            const auto filename=asset(ForestLayerScene::layersV3[i].file);
+            SDL_Surface* surface=IMG_Load(filename.c_str());
+            if(!surface){forestV3Ready_=false;break;}
+            const int expectedWidth=i==0?1280:ForestLayerScene::worldWidth;
+            if(surface->w!=expectedWidth || surface->h!=720) {
+                SDL_DestroySurface(surface);forestV3Ready_=false;break;
+            }
+            forestV3Textures_[i]=SDL_CreateTextureFromSurface(renderer,surface);
+            SDL_DestroySurface(surface);
+            if(!forestV3Textures_[i]){forestV3Ready_=false;break;}
+            SDL_SetTextureScaleMode(forestV3Textures_[i],SDL_SCALEMODE_NEAREST);
+            SDL_SetTextureBlendMode(forestV3Textures_[i],SDL_BLENDMODE_BLEND);
+        }
+        if(!forestV3Ready_) {
+            for(auto*& texture:forestV3Textures_) {
+                if(texture)SDL_DestroyTexture(texture);
+                texture=nullptr;
             }
         }
         // Optional composed forest v2: all four PNGs must load before activation.
