@@ -49,7 +49,7 @@ int main(){int failed=0,total=0;
         check(a.sprites().size()==b.sprites().size(),"Unstable count");
         for(size_t i=0;i<a.sprites().size();++i) {
             const auto& x=a.sprites()[i];const auto& y=b.sprites()[i];
-            check(x.kind==y.kind&&x.variant==y.variant&&x.x==y.x&&x.scale==y.scale&&x.flipX==y.flipX,"Unstable sprite");
+            check(x.kind==y.kind&&x.variant==y.variant&&x.x==y.x&&x.scale==y.scale&&x.flipX==y.flipX&&x.shade==y.shade&&x.widthFactor==y.widthFactor,"Unstable sprite");
         }
         s.seed=23;ForestGenerator c(s);
         bool different=c.sprites().size()!=a.sprites().size();
@@ -57,17 +57,26 @@ int main(){int failed=0,total=0;
             different|=c.sprites()[i].x!=a.sprites()[i].x;
         check(different,"Seed ignored");
     });
-    test("Forest reflection is seeded and tree-only",[]{
+    test("Forest variation is seeded across every active species",[]{
         ForestSettings s;s.seed=20261103;s.density=1;ForestGenerator a(s),b(s);
-        int mirrored=0,unmirrored=0;
+        int treeFlipped=0,treeNormal=0,propFlipped=0,propNormal=0;
+        bool widthChanged=false,hasShade=false;
         for(size_t i=0;i<a.sprites().size();++i){
-            const auto& x=a.sprites()[i];
-            check(x.flipX==b.sprites()[i].flipX,"Unstable reflection");
+            const auto& x=a.sprites()[i];const auto& y=b.sprites()[i];
+            check(x.flipX==y.flipX&&x.shade==y.shade&&x.widthFactor==y.widthFactor,
+                "Unstable forest transformation");
+            check(x.shade<=2&&x.widthFactor>.90f&&x.widthFactor<1.10f,
+                "Subtle variation escaped limits");
+            widthChanged|=x.widthFactor!=1.f;hasShade|=x.shade!=2;
             if(x.kind==ForestKind::LargeTree||x.kind==ForestKind::MidTree){
-                if(x.flipX)++mirrored;else ++unmirrored;
-            }else check(!x.flipX,"Unexpected prop reflection");
+                if(x.flipX)++treeFlipped;else ++treeNormal;
+            }else{
+                if(x.flipX)++propFlipped;else ++propNormal;
+            }
         }
-        check(mirrored>0&&unmirrored>0,"No visual variety");
+        check(treeFlipped>0&&treeNormal>0,"Tree flip diversity absent");
+        check(propFlipped>0&&propNormal>0,"Other props still repeat identically");
+        check(widthChanged&&hasShade,"No subtle shape/tone differences");
     });
     test("Forest bounded density and sorted layers",[]{
         ForestSettings s;s.density=0;ForestGenerator empty(s);
