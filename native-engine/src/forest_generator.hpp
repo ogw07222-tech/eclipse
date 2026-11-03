@@ -15,6 +15,8 @@ struct ForestSprite {
     float x, groundY, scale;
     uint32_t phase;
     bool flipX = false;
+    uint8_t shade = 0;    // 0..2: subtle per-instance brightness
+    float widthFactor = 1.f; // slight silhouette change, height/foot unchanged
 };
 struct ForestSettings {
     uint32_t seed = 20261103u;
@@ -60,10 +62,17 @@ class ForestGenerator {
             const float s=clamp(baseScale*settings_.size*
                 (1.f + (unit(salt,i,2)-.5f)*.45f*settings_.variation),.28f,5.0f);
             uint8_t variation=static_cast<uint8_t>(random(salt,i,3)%varieties);
+            const bool isTree=kind==ForestKind::LargeTree || kind==ForestKind::MidTree;
+            const float flipProbability=isTree?.42f:kind==ForestKind::Bush?.44f:
+                kind==ForestKind::Grass?.5f:kind==ForestKind::Rock?.35f:.38f;
+            const bool flipped=unit(salt,i,5)<flipProbability;
+            const uint8_t shade=static_cast<uint8_t>(random(salt,i,6)%3u);
+            // Wide trees retain a recognizable species silhouette; low props vary more.
+            const float widthVariance=isTree?.055f:.09f;
+            const float widthFactor=1.f+(unit(salt,i,7)*2.f-1.f)*widthVariance;
             sprites_.push_back({kind,variation,layer,
                 std::round(x/3.f)*3.f,baseline,s,random(salt,i,4),
-                (kind==ForestKind::LargeTree || kind==ForestKind::MidTree) &&
-                unit(salt,i,5)<(kind==ForestKind::LargeTree?.40f:.50f)});
+                flipped,shade,widthFactor});
             previous=x;
         }
     }
