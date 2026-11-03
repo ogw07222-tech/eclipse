@@ -1,7 +1,34 @@
 #pragma once
+#include "motion.hpp"
+#include <algorithm>
+#include <cmath>
 namespace eclipse {
 struct SwordTrailSpan{int x,y,width,shade;};
 struct SwordTrailFrame{int start,count,alpha;};
+// Shared by rendering and collision: three screen pixels per source pixel.
+struct SwordBounds{float x,y,w,h;};
+inline SwordBounds swordSpanBounds(SwordTrailSpan s,float x,float y,int facing,float range){
+    float width=s.width*3.f*range;
+    return {facing>0?x+(s.x-motionPivotX)*3.f*range:x-(s.x+s.width-motionPivotX)*3.f*range,
+            y+(s.y-motionPivotY)*3.f,width,3};
+}
+// The trail is the blade tip's path. Test the swept blade from the grip to
+// each lit trail cell, rather than leaving a hollow collision ring at close range.
+inline bool swordSpanHits(SwordTrailSpan span,float x,float y,int facing,float range,
+                          float left,float top,float right,float bottom){
+    const float gripX=x+facing*24*range,gripY=y-48;
+    for(int cell=0;cell<span.width;++cell){
+        const auto tip=swordSpanBounds({span.x+cell,span.y,1,span.shade},x,y,facing,range);
+        float dx=tip.x+tip.w*.5f-gripX,dy=tip.y+1.5f-gripY,t0=0,t1=1;
+        auto clip=[&](float start,float delta,float low,float high){
+            if(std::abs(delta)<.0001f)return start>=low&&start<=high;
+            float a=(low-start)/delta,b=(high-start)/delta;if(a>b)std::swap(a,b);
+            t0=std::max(t0,a);t1=std::min(t1,b);return t0<=t1;
+        };
+        if(clip(gripX,dx,left-1.5f,right+1.5f)&&clip(gripY,dy,top-1.5f,bottom+1.5f))return true;
+    }
+    return false;
+}
 constexpr SwordTrailFrame swordTrailFrames[]={
 {0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},
 {0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},{0,0,0},
