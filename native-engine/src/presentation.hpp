@@ -19,6 +19,7 @@ class Presentation {
     bool forestLayersReady_=false;
     std::array<SDL_Texture*,6> forestV3Textures_{};
     bool forestV3Ready_=false;
+    bool forestEntranceReady_=false;
     static SDL_Color color(unsigned rgb,Uint8 alpha=255){return {static_cast<Uint8>(rgb>>16),static_cast<Uint8>(rgb>>8),static_cast<Uint8>(rgb),alpha};}
     void rect(float x,float y,float w,float h,unsigned rgb,Uint8 alpha=255){
         auto c=color(rgb,alpha);SDL_SetRenderDrawColor(renderer,c.r,c.g,c.b,c.a);
@@ -243,11 +244,13 @@ class Presentation {
         if(forestV3Ready_) {
             // Layer art only: no scene randomization or NPC occupancy changes.
             // Every asset's native dimensions and world-ground height are fixed.
+            const auto& activeScene=forestEntranceReady_
+                ? ForestLayerScene::layersEntrance : ForestLayerScene::layersV3;
             for(size_t i=0;i<forestV3Textures_.size();++i) {
                 SDL_Texture* image=forestV3Textures_[i];
                 float w=0.f,h=0.f;
                 if(!SDL_GetTextureSize(image,&w,&h))continue;
-                const float shift=(camera-640.f)*ForestLayerScene::layersV3[i].parallax;
+                const float shift=(camera-640.f)*activeScene[i].parallax;
                 SDL_FRect target{std::round(-shift),0.f,w,h};
                 if(i==2) {
                     const Uint8 tint=static_cast<Uint8>(
@@ -423,29 +426,39 @@ public:
                 SDL_SetTextureBlendMode(forestTextures_[i],SDL_BLENDMODE_BLEND);
             }
         }
-        // v3 is activated only if all six PNG layers exist with exact dimensions.
-        // No collision/AI coordinate or gameplay scene state is read from these files.
-        forestV3Ready_=true;
-        for(size_t i=0;i<ForestLayerScene::layersV3.size();++i) {
-            const auto filename=asset(ForestLayerScene::layersV3[i].file);
-            SDL_Surface* surface=IMG_Load(filename.c_str());
-            if(!surface){forestV3Ready_=false;break;}
-            const int expectedWidth=i==0?1280:ForestLayerScene::worldWidth;
-            if(surface->w!=expectedWidth || surface->h!=720) {
-                SDL_DestroySurface(surface);forestV3Ready_=false;break;
+        // Prefer new authored forest entrance, then v3. Both require all six
+        // layers, so partial/corrupt asset sets can never render mixed scenes.
+        // Reuse the same texture slots to avoid doubling GPU memory.
+        auto loadSixLayers=[&](const std::array<ForestLayer,6>& scene)->bool {
+            bool ready=true;
+            for(size_t i=0;i<scene.size();++i) {
+                const auto filename=asset(scene[i].file);
+                SDL_Surface* surface=IMG_Load(filename.c_str());
+                if(!surface){ready=false;break;}
+                const int expectedWidth=i==0?1280:ForestLayerScene::worldWidth;
+                if(surface->w!=expectedWidth || surface->h!=720) {
+                    SDL_DestroySurface(surface);ready=false;break;
+                }
+                forestV3Textures_[i]=SDL_CreateTextureFromSurface(renderer,surface);
+                SDL_DestroySurface(surface);
+                if(!forestV3Textures_[i]){ready=false;break;}
+                SDL_SetTextureScaleMode(forestV3Textures_[i],SDL_SCALEMODE_NEAREST);
+                SDL_SetTextureBlendMode(forestV3Textures_[i],SDL_BLENDMODE_BLEND);
             }
-            forestV3Textures_[i]=SDL_CreateTextureFromSurface(renderer,surface);
-            SDL_DestroySurface(surface);
-            if(!forestV3Textures_[i]){forestV3Ready_=false;break;}
-            SDL_SetTextureScaleMode(forestV3Textures_[i],SDL_SCALEMODE_NEAREST);
-            SDL_SetTextureBlendMode(forestV3Textures_[i],SDL_BLENDMODE_BLEND);
-        }
-        if(!forestV3Ready_) {
-            for(auto*& texture:forestV3Textures_) {
-                if(texture)SDL_DestroyTexture(texture);
-                texture=nullptr;
+            if(!ready) {
+                for(auto*& texture:forestV3Textures_) {
+                    if(texture)SDL_DestroyTexture(texture);
+                    texture=nullptr;
+                }
             }
-        }
+            return ready;
+        };
+        forestEntranceReady_=loadSixLayers(ForestLayerScene::layersEntrance);
+        forestV3Ready_=forestEntranceReady_
+            || loadSixLayers(ForestLayerScene::layersV3);
+        if(forestEntranceReady_)SDL_Log("ECLIPSE scene: forest entrance PNG 6/6");
+        else if(forestV3Ready_)SDL_Log("ECLIPSE scene: forest v3 PNG 6/6");
+        else SDL_Log("ECLIPSE scene: falling back to forest v2 or legacy art");
         // Optional composed forest v2: all four PNGs must load before activation.
         // Missing or invalid parts fall back to the existing complete legacy forest.
         forestLayersReady_=true;
