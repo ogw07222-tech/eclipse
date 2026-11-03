@@ -16,11 +16,15 @@ assets = ['knight_motion.png', 'ui/attack_states.png', 'ui/dash_states.png',
           'ui/swap_skill_states.png', 'ui/joystick_arrows_new.png']
 # Forest assets are packaged by the Android Gradle Sync task. Verify all actual
 # source PNG files instead of assuming the historical five-PNG baseline.
-forest_root = root / 'Assets/Resources/Eclipse/forest'
-forest_assets = sorted(
-    'forest/' + path.relative_to(forest_root).as_posix()
-    for path in forest_root.rglob('*.png')
-) if forest_root.is_dir() else []
+art_root = root / 'Assets/Resources/Eclipse'
+forest_assets = []
+for forest_folder in ('forest', 'forest_v2', 'forest_v3'):
+    forest_root = art_root / forest_folder
+    if forest_root.is_dir():
+        forest_assets.extend(sorted(
+            forest_folder + '/' + path.relative_to(forest_root).as_posix()
+            for path in forest_root.rglob('*.png')
+        ))
 assets += forest_assets
 with zipfile.ZipFile(args.apk) as apk:
     if apk.testzip():
