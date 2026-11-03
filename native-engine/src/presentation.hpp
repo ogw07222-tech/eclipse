@@ -355,7 +355,10 @@ class Presentation {
     }
     void icon(int texture,int col,int row,float x,float y,float size,bool down){
         SDL_FRect source{col*128.f,row*128.f,128,128},target{x,y,size,size};
-        SDL_SetTextureColorMod(textures[texture],down?180:255,down?180:255,down?180:255);SDL_RenderTexture(renderer,textures[texture],&source,&target);
+        SDL_SetTextureColorMod(textures[texture],down?180:255,down?180:255,down?180:255);
+        SDL_SetTextureAlphaMod(textures[texture],down?191:153);
+        SDL_RenderTexture(renderer,textures[texture],&source,&target);
+        SDL_SetTextureAlphaMod(textures[texture],255);
     }
     void hud(const Combat& g,Actions held,const ControlLayout& layout,std::array<float,2> stick){
         const auto& p=g.player;constexpr const char* heart[]={"..XX.XX..",".XXXXXXX.","XXXXXXXXX","XXXXXXXXX",".XXXXXXX.","..XXXXX..","...XXX...","....X...."};
@@ -365,11 +368,12 @@ class Presentation {
         text("GEAR",780,44,2);text(p.form==0?"BLADE":"FIRE",235,48,3,0x9ed7ff);number(g.foes(),1180,43,5,0xece7d2);text("FOES",1090,25,2);
         const auto& c=layout.buttons;
         const auto& js=c[ControlLayout::Stick];
-        icon(4,0,0,js.x,js.y,js.size,false);
+        const bool stickActive=held.left||held.right||held.jump;
+        icon(4,0,0,js.x,js.y,js.size,stickActive);
         float thumb=js.size*.36f,tx=js.x+(js.size-thumb)*.5f+stick[0],ty=js.y+(js.size-thumb)*.5f+stick[1];
-        rect(tx-3,ty-3,thumb+6,thumb+6,0x101923,210);
-        rect(tx,ty,thumb,thumb,held.left||held.right||held.jump?0xe3bd72:0x91b4bb,245);
-        rect(tx+thumb*.22f,ty+thumb*.22f,thumb*.56f,thumb*.56f,0x304f61,220);
+        rect(tx-3,ty-3,thumb+6,thumb+6,0x101923,stickActive?165:130);
+        rect(tx,ty,thumb,thumb,stickActive?0xe3bd72:0x91b4bb,stickActive?191:153);
+        rect(tx+thumb*.22f,ty+thumb*.22f,thumb*.56f,thumb*.56f,0x304f61,stickActive?170:135);
         icon(1,held.attack?1:0,0,c[ControlLayout::Attack].x,c[ControlLayout::Attack].y,c[ControlLayout::Attack].size,held.attack);
         icon(2,held.dash?1:0,0,c[ControlLayout::Dash].x,c[ControlLayout::Dash].y,c[ControlLayout::Dash].size,held.dash);
         icon(3,0,0,c[ControlLayout::Swap].x,c[ControlLayout::Swap].y,c[ControlLayout::Swap].size,held.swap);
