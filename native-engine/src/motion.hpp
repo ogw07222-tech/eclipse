@@ -14,7 +14,10 @@ constexpr MotionClip motionClips[]={
     {176,12,0.900000f,0.500000f,0.000000f},
     {80,6,0.120000f,0.500000f,0.000000f},
     {16,8,0.600000f,0.500000f,72.000000f},
+    {192,8,0.380000f,0.625000f,0.000000f},
 };
-constexpr int motionWidth=64,motionHeight=94,motionColumns=16,motionRows=12,motionPivotX=28,motionPivotY=88;
+constexpr int motionWidth=64,motionHeight=94,motionColumns=16,motionRows=13,motionPivotX=28,motionPivotY=88;
 constexpr float motionScale=1.85f;
+constexpr float airSlamWindup=.10f,airSlamRecovery=.18f,airSlamDropSpeed=1100.f,airSlamRadius=68.f,airSlamImpactDuration=.28f;
+constexpr int slamContactTipX=34,slamContactTipY=86;
 }

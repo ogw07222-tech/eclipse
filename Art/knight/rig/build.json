@@ -1,13 +1,13 @@
 {
   "inputs": {
-    "Art/knight/redesign/blade_paths.json": "db8ae4a418a42d3ca47a1904dac6a090f759a0c0ae30c1e12c84a3306a3a3df1",
-    "Art/knight/redesign/knight_64x94_master.png": "f274ec217ec413195049670e5f6ef5fd242e8a089c7414118dea3d18a45cf9d9",
-    "Tools/bake_knight_motion.py": "aec432bbd816b57d3412c3d4ba7932bb2428b4221615f302ef53ce429f2c90b7",
-    "Art/knight/rig/clips.json": "9b23fb4aafe1190e61f7ccd59e23db4a3796e28274866ba0b7b1422c757045eb"
+    "Art/knight/redesign/blade_paths.json": "d1653330760b700c20b2ac424f185957e2789ad8d00a844355b4b9fecfea1fe4",
+    "Art/knight/redesign/knight_64x94_master.png": "4a90f0705cacc7166613ea8d3edf4740070cdf5e3e28a20839bc04f5dbe106ff",
+    "Tools/bake_knight_motion.py": "abf9d11614c57369e44b2f47056221489e4f6bdf0079a4dd390652e4d13d0aec",
+    "Art/knight/rig/clips.json": "e57d8bd84408355562c7d847901354c2ca4d74db19aea9d559cc9d2ad63fc01e"
   },
   "outputs": {
-    "Assets/Resources/Eclipse/knight_motion.png": "4a08119f87dfc7a73ec4d4a4f58ab7d098d270005b6345b723a19aed8c97f0f7",
-    "native-engine/src/motion.hpp": "19c5460a61832f20c8cad6290f8bca8509e3f7e128ab0722c836b01c211e4abb",
-    "native-engine/src/sword_trails.hpp": "63ec83b4b7365255385d2a71a873f5120f6bbab80b9749628585b6413450c7e8"
+    "Assets/Resources/Eclipse/knight_motion.png": "f7f4344b39f6d5146f0a2c8f453b1241a6691b04a777ec6dc34055305654ae0c",
+    "native-engine/src/motion.hpp": "3b49769452eb6f5a637de8a0137456503e8d39c62edd2aff9fcaf7bade458c32",
+    "native-engine/src/sword_trails.hpp": "0f11be50722ab5b9dce73e9a27415d75820a18863dee2e510f8dfdb53b5d6ee4"
   }
 }

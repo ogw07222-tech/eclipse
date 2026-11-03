@@ -316,10 +316,37 @@ class Presentation {
         disk(x+p.facing*22-offset,y-64,7,0xffb74b,3);
         if(p.attackFlash>0)ring(x+p.facing*16-offset,y-36,40,0xffb74b);
     }
+    void slamShockwave(const Player& p){
+        if(p.slamImpact<=0)return;
+        const float t=std::clamp(1-p.slamImpact/airSlamImpactDuration,0.f,1.f);
+        const float center=p.slamImpactX-offset,ground=p.slamImpactY;
+        const float radius=(8+(airSlamRadius-8)*std::sqrt(t))*p.gear.range();
+        const Uint8 fade=static_cast<Uint8>(235*(1-t));
+        // Three stepped ground arcs, white front over cold-blue trailing energy.
+        for(int layer=0;layer<3;++layer){
+            const float r=radius*(1-layer*.16f),height=(11-layer*2)*(1-t);
+            for(int x=-static_cast<int>(r);x<=r;x+=3){
+                const float k=std::max(0.f,1-x*x/(r*r));
+                const float y=ground-std::round(std::sqrt(k)*height/3)*3;
+                rect(center+x,y+layer*3,3,3,layer==0?0xf3ffff:layer==1?0x7ec5ed:0x284a70,
+                     static_cast<Uint8>(fade*(layer==0?1.f:layer==1?.75f:.45f)));
+            }
+        }
+        // Grounded flash and ballistic pixel fragments remain at the contact.
+        if(t<.35f){const float f=1-t/.35f;
+            rect(center-3,ground-34*f,6,34*f,0x7ec5ed,static_cast<Uint8>(170*f));
+            rect(center-1,ground-25*f,3,25*f,0xf3ffff,static_cast<Uint8>(245*f));
+        }
+        for(int i=0;i<9;++i){
+            const float dx=(i-4)*(8+17*t),height=(9+i%3*8)*std::sin(t*3.14159265f);
+            rect(center+dx,ground-height,3,i%3==0?6:3,i%2?0x7ec5ed:0xf3ffff,fade);
+        }
+    }
+
     void swordTrail(const Player& p,const Animation& a){
-        if(p.health<=0||a.state<4||a.state>6)return;
+        if(p.health<=0||((a.state<4||a.state>6)&&a.state!=12))return;
         const auto frame=swordTrailFrames[a.frame];
-        constexpr unsigned colors[]={0,0x365d70,0x7ba4ad,0xdce7db};constexpr int alpha[]={0,95,165,235};
+        constexpr unsigned colors[]={0,0x284a70,0x7ec5ed,0xf3ffff};constexpr int alpha[]={0,100,205,255};
         for(int i=frame.start;i<frame.start+frame.count;++i){const auto s=swordTrailSpans[i];
             float x=p.facing>0?p.x+(s.x-motionPivotX)*motionScale:p.x-(s.x+s.width-motionPivotX)*motionScale;
             rect(x-offset,p.y+(s.y-motionPivotY)*motionScale,s.width*motionScale,motionScale,colors[s.shade],static_cast<Uint8>(alpha[s.shade]*frame.alpha/255));
@@ -531,6 +558,7 @@ public:
         forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.clock);
         for(const auto& b:g.projectiles){disk(b.x-offset,b.y,b.empowered?14:8,0xf16b32);disk(b.x-offset,b.y,b.empowered?7:4,0xffe7a1);}
         const auto& p=g.player;
+        slamShockwave(p);
         if(p.form==0)swordTrail(p,a);
         if(p.form==0){SDL_FRect source{static_cast<float>(a.frame%motionColumns*motionWidth),static_cast<float>(a.frame/motionColumns*motionHeight),motionWidth,motionHeight},dest{std::round(p.x-offset-(p.facing>0?motionPivotX:motionWidth-motionPivotX)*motionScale),std::round(p.y-motionPivotY*motionScale),motionWidth*motionScale,motionHeight*motionScale};
             SDL_RenderTextureRotated(renderer,textures[0],&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);

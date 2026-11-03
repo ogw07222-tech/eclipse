@@ -6,8 +6,8 @@ from PIL import Image,ImageDraw
 ROOT=Path(__file__).resolve().parents[1]
 MASTER=ROOT/'Art/knight/redesign/knight_64x94_master.png'
 OUT=ROOT/'Assets/Resources/Eclipse/knight_motion.png'
-CLIPS=[('idle',0,8,.96,8),('walk',16,8,.60,8),('run',32,16,.428571,16),('jump',48,6,.52,6),('fall',64,6,.65,6),('land',80,6,.12,6),('dash',96,8,.15,8),('weak_slash',112,8,.23,8),('strong_slash',128,10,.34,10),('thrust',144,10,.42,10),('hurt',160,6,.23,6),('death',176,12,.90,12)]
-TRAIL_WINDOWS={'weak_slash':(3,5),'strong_slash':(5,7),'thrust':(4,6)}
+CLIPS=[('idle',0,8,.96,8),('walk',16,8,.60,8),('run',32,16,.428571,16),('jump',48,6,.52,6),('fall',64,6,.65,6),('land',80,6,.12,6),('dash',96,8,.15,8),('weak_slash',112,8,.23,8),('strong_slash',128,10,.34,10),('thrust',144,10,.42,10),('hurt',160,6,.23,6),('death',176,12,.90,12),('air_slam',192,8,.38,8)]
+TRAIL_WINDOWS={'weak_slash':(3,5),'strong_slash':(5,7),'thrust':(4,6),'air_slam':(2,6)}
 
 def trail_mask(name,i,indices,paths):
     """Sweep the actual blade segment in cell coordinates, behind the actor."""
@@ -50,14 +50,39 @@ def trail_mask(name,i,indices,paths):
         # The leading edge ends on the CURRENT blade, not the preceding pose.
         edge=(round(w[0]+(tip[0]-w[0])*.7),round(w[1]+(tip[1]-w[1])*.7))
         draw.line([edge,tuple(tip)],fill=3,width=1)
+    # A second curved edge and short detached pixel glints add depth without
+    # changing gameplay reach or attaching a second sword to the character.
+    if name!='thrust':
+        for layer,factor in ((1,1.10),(2,.78)):
+            line=[]
+            for k in range(15):
+                t=.20+.80*k/14;a=angle0+delta*t
+                cx=old[0]+(w[0]-old[0])*t;cy=old[1]+(w[1]-old[1])*t
+                radius=(old_length+(length-old_length)*t)*factor
+                line.append((round(cx+math.cos(a)*radius),round(cy+math.sin(a)*radius)))
+            draw.line(line,fill=layer,width=1)
+        for k in range(5):
+            t=.15+.17*k;a=angle0+delta*t
+            cx=old[0]+(w[0]-old[0])*t;cy=old[1]+(w[1]-old[1])*t
+            radius=(old_length+(length-old_length)*t)*(1.04+.03*(k%2))
+            x=round(cx+math.cos(a)*radius-math.sin(a)*(2+k%3))
+            y=round(cy+math.sin(a)*radius+math.cos(a)*(2+k%3))
+            draw.line([(x,y),(x+round(math.cos(a)*2),y+round(math.sin(a)*2))],fill=2,width=1)
+            draw.point((x,y),fill=3)
+    else:
+        draw.line([point(-length*.45,-half*1.5),point(1,-half*.7)],fill=1,width=1)
+        draw.line([point(-length*.45,half*1.5),point(1,half*.7)],fill=1,width=1)
+    draw.line([(tip[0]-1,tip[1]),(tip[0]+1,tip[1])],fill=3,width=1)
+    draw.point(tuple(tip),fill=3)
+    if name=='air_slam':return mask,[180,230,255,255,120][i-begin]
     fades=(255,210,110) if name!='thrust' else (190,255,150)
     return mask,fades[i-begin]
 
 def bake_trails(metadata):
     paths=json.loads((ROOT/'Art/knight/redesign/blade_paths.json').read_text())
-    frames=[(0,0,0)]*192;spans=[]
-    fx=Image.new('RGBA',(96*16,128*12))
-    palette=[(0,0,0,0),(54,93,112,95),(123,164,173,165),(220,231,219,235)]
+    frames=[(0,0,0)]*208;spans=[]
+    fx=Image.new('RGBA',(96*16,128*13))
+    palette=[(0,0,0,0),(40,74,112,100),(126,197,237,205),(243,255,255,255)]
     for clip in metadata:
         for i in range(clip['count']):
             mask,alpha=trail_mask(clip['name'],i,clip['source_indices'],paths)
@@ -84,7 +109,7 @@ def bake_trails(metadata):
 def bake():
     source=Image.open(MASTER)
     if source.mode!='P':raise ValueError('Master must use the approved indexed pixel palette')
-    if source.size!=(1024,1128):raise ValueError('Master must be 16x12 cells of 64x94')
+    if source.size!=(1024,1222):raise ValueError('Master must be 16x13 cells of 64x94')
     atlas=Image.new('P',source.size,source.getpixel((0,0)));atlas.putpalette(source.getpalette('RGBA'),rawmode='RGBA');atlas.info['transparency']=source.getpixel((0,0));metadata=[]
     review=ROOT/'native-engine/review';review.mkdir(parents=True,exist_ok=True)
     for name,start,count,duration,source_count in CLIPS:
@@ -110,6 +135,6 @@ def bake():
     digest=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
     stamp={'inputs':{str(p.relative_to(ROOT)):digest(p) for p in inputs},'outputs':{str(p.relative_to(ROOT)):digest(p) for p in outputs}}
     (ROOT/'Art/knight/rig/build.json').write_text(json.dumps(stamp,indent=2)+'\n')
-    print('Packed 104 playable frames from 104 authored PNG poses; 64x94 cells; 1024x1128 atlas.')
+    print('Packed 112 playable frames from 112 authored PNG poses; 64x94 cells; 1024x1222 atlas.')
 if __name__=='__main__':bake()
 

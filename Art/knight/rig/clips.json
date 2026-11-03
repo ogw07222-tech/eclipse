@@ -222,5 +222,23 @@
       10,
       11
     ]
+  },
+  {
+    "name": "air_slam",
+    "start": 192,
+    "count": 8,
+    "duration": 0.38,
+    "loop": false,
+    "source_count": 8,
+    "source_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ]
   }
 ]
