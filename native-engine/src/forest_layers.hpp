@@ -13,6 +13,16 @@ struct ForestLayerScene {
     static constexpr int worldWidth=1600;
     static constexpr int viewportWidth=1280;
     static constexpr int floorY=585;
+    // Forest entrance: authored pixel-art layers; default biome scene.
+    // Foreground items are non-colliding visual decorations only.
+    static constexpr std::array<ForestLayer,6> layersEntrance{{
+        {"forest_entrance/sky/sky.png",0.f,false},
+        {"forest_entrance/clouds/clouds.png",.06f,false},
+        {"forest_entrance/far/mountains.png",.14f,false},
+        {"forest_entrance/mid/trees.png",.40f,false},
+        {"forest_entrance/near/ground.png",1.f,true},
+        {"forest_entrance/near/props.png",1.f,true}
+    }};
     // v3 layers are artwork-only. No random world positions or new collisions.
     static constexpr std::array<ForestLayer,6> layersV3{{
         {"forest_v3/sky/sky_gradient_moon_01.png",0.f,false},
