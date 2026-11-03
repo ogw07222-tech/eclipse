@@ -105,3 +105,7 @@ A revised image patch, `eclipse_forest_cropping_fix.zip`, re-extracts the **main
 The playable surface remains y=585 and collision is unchanged. The original continuous green ground slab has been replaced by layered dark brown soil, strata, low-contrast rocky pixels, deterministic clods and a sparse, thin irregular grass fringe. Both the SDL renderer and browser preview use the same coordinate-based hash and color palette, and the ground remains static during scroll.
 
 The original concept-sheet pack includes several edge-touching art fragments and seven opaque backgrounds/terrain tiles that are **not seamless**. Four active foreground sprites (two trees and two bushes) have a separately prepared wider re-extraction pack. Until that pack is imported, the repository still contains the older crops. Non-active reference sprites remain in the archive for future art production, not active gameplay. Do not infer a fully restored sprite solely from added alpha margins.
+
+## Soil art pass v2
+
+The ground uses a restrained earthy palette and purposeful material layers: broken thin moss fringe (surface), dark humus (top), warm clay bands (middle), dark compressed stone (bottom), horizontal sediment veins, embedded pebble highlights, sparse roots, and clustered crumbs. No green-filled ground. The C++ runtime and APK-free browser preview use matching coordinate hash + seed. Layout does not change every frame, and collision remains at y=585.
