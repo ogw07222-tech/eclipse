@@ -31,18 +31,19 @@ namespace Eclipse
             // Deterministic, pixel-snapped parallax: uneven woodland rather than repeated pines.
             for (int layer = 0; layer < 3; layer++)
             {
-                float shift = Mathf.Round(offset * Factors[layer] / 6f) * 6f;
+                // WorldBlock subtracts camera offset, so compensate to retain slow layer motion.
+                float shift = Mathf.Round(offset * (1f - Factors[layer]) / 6f) * 6f;
                 for (int i = -3; i < 22; i++)
                 {
                     int seed = i + layer * 173;
-                    float cx = i * Steps[layer] + (Hash(seed, 1) % 65 - 32) - shift;
+                    float cx = i * Steps[layer] + (Hash(seed, 1) % 65 - 32) + shift;
                     float height = Heights[layer] + (Hash(seed, 2) % 12 - 5) * 6;
                     ForestTree(cx, 584, height, layer, seed);
                 }
                 for (int i = -2; i < 35; i++)
                 {
                     int seed = i + layer * 391;
-                    float bx = i * 61 + Hash(seed, 9) % 42 - shift;
+                    float bx = i * 61 + Hash(seed, 9) % 42 + shift;
                     Bush(bx, 579 - layer * 3, 21 + Hash(seed, 8) % 23, layer, seed);
                 }
             }
