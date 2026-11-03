@@ -14,13 +14,18 @@ args = parser.parse_args()
 root = Path(__file__).resolve().parents[2]
 assets = ['knight_motion.png', 'ui/attack_states.png', 'ui/dash_states.png',
           'ui/swap_skill_states.png', 'ui/joystick_arrows_new.png']
-# Forest assets are packaged by the Android Gradle Sync task. Verify all actual
-# source PNG files instead of assuming the historical five-PNG baseline.
-forest_root = root / 'Assets/Resources/Eclipse/forest'
-forest_assets = sorted(
-    'forest/' + path.relative_to(forest_root).as_posix()
-    for path in forest_root.rglob('*.png')
-) if forest_root.is_dir() else []
+# Match the exact three forest collections included by packageEclipseAssets
+# in native-engine/android/app/build.gradle. New layered PNG packs must be
+# accounted for by the APK verifier, not mistaken for unexpected assets.
+forest_assets = []
+for folder in ('forest', 'forest_v2', 'forest_v3'):
+    forest_root = root / 'Assets/Resources/Eclipse' / folder
+    if forest_root.is_dir():
+        forest_assets.extend(
+            folder + '/' + path.relative_to(forest_root).as_posix()
+            for path in forest_root.rglob('*.png')
+        )
+forest_assets.sort()
 assets += forest_assets
 with zipfile.ZipFile(args.apk) as apk:
     if apk.testzip():
