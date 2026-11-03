@@ -1,14 +1,6 @@
 name: Native engine checks
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'native-engine/**'
-      - 'Assets/Resources/Eclipse/knight_motion.png'
-      - 'Tools/*knight*'
-      - 'Art/knight/**'
-      - '.github/workflows/native-engine-checks.yml'
   pull_request:
     paths:
       - 'native-engine/**'
