@@ -54,3 +54,34 @@ If installing the signed APK over an installed ECLIPSE app gives `INSTALL_FAILED
 If the message is `INSTALL_FAILED_VERSION_DOWNGRADE`, inspect existing/new `versionCode`. All default signed builds from this workflow advance by GitHub run number; do not manually reset `versionCode` or move to older builds.
 
 APK signature checking and contents validation happen before any updateable artifact is published, but the signing certificate must be protected outside the repository.
+
+## Safe upgrade diagnosis (preserve app data)
+
+**Do not uninstall, clear app storage, or use `adb install -r -d` as an attempted signature fix.**
+The signing certificate of the installed APK must match the candidate release APK.
+GitHub cannot inspect the existing device installation.
+
+1. Download a release artifact and read `APK-UPDATE-INFO.txt` (new artifacts). It contains the new APK's package name, version code and signing certificate SHA-256.
+2. If Android platform-tools are available on a connected computer, use:
+   ```sh
+   adb shell dumpsys package com.eclipse.nativegame | grep -E 'versionCode=|SigningDetails|signatures'
+   adb shell pm path com.eclipse.nativegame
+   adb install -r ECLIPSE-Native-Signed.apk
+   ```
+   Do not run the install command until you have backed up important data if the signing key is unknown. The installer error often distinguishes `INSTALL_FAILED_UPDATE_INCOMPATIBLE` (certificates differ) from `INSTALL_FAILED_VERSION_DOWNGRADE` (version too old).
+3. To get the existing signing fingerprint, pull the installed base APK when device permissions permit:
+   ```sh
+   adb shell pm path com.eclipse.nativegame
+   # Copy the path printed after "package:" into the command below:
+   adb pull /path/from/pm/base.apk existing-eclipse.apk
+   apksigner verify --print-certs existing-eclipse.apk
+   apksigner verify --print-certs ECLIPSE-Native-Signed.apk
+   ```
+   Compare `Signer #1 certificate SHA-256 digest` exactly. If the paths are inaccessible, use another trusted APK inspection tool or extract the original APK from your own build artifact.
+4. If certificates match, ensure the new `versionCode` is not lower, then install over the app without uninstalling. If they differ, find and use the original signing keystore to rebuild the update. Android does not allow bypassing this security check. If the original key is lost, a properly verified data backup/migration is required before uninstall/reinstall; native private app data may not be exportable.
+
+### Optional release certificate pin
+
+Once you have independently verified the SHA-256 certificate of the installed production APK, add GitHub Actions secret `ECLIPSE_EXPECTED_CERT_SHA256` with that 64-hex digest (colons accepted). Release builds then **fail** if the keystore unexpectedly changes. Do not pin an unverified new certificate as a substitute for checking the existing installation. The workflow publishes the current certificate fingerprint and version code in both the Actions job summary and `APK-UPDATE-INFO.txt`.
+
+The pin is optional to keep existing builds functional; without it, release jobs only verify that a valid certificate exists, not that it matches previous installs.
