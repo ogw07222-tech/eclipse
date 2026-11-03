@@ -16,6 +16,7 @@ class Presentation {
     float offset=0;
     SDL_Texture* settingsGear_=nullptr;
     SDL_Texture* settingsPanel_=nullptr;
+    SDL_Texture* settingsWindow_=nullptr;
     ForestGenerator forestGenerator_{};
     std::array<SDL_Texture*,40> forestTextures_{};
     std::array<SDL_Texture*,4> forestLayerTextures_{};
@@ -382,7 +383,7 @@ class Presentation {
     }
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -439,6 +440,7 @@ public:
         };
         settingsGear_=loadSettingsTexture("ui/settings_gear.png");
         settingsPanel_=loadSettingsTexture("ui/settings_menu_panel.png");
+        settingsWindow_=loadSettingsTexture("ui/settings_window.png");
         // Optional sprite library: the procedural renderer remains functional without it.
         // Only startup loads textures; no per-frame filesystem work.
         constexpr const char* forestFiles[40]={
@@ -572,7 +574,7 @@ public:
         if(settingsGear_){
             SDL_FRect gear{ControlLayout::gearX,ControlLayout::gearY,ControlLayout::gearSize,ControlLayout::gearSize};
             SDL_RenderTexture(renderer,settingsGear_,nullptr,&gear);
-        }else{rect(ControlLayout::gearX,ControlLayout::gearY,48,48,0x243746);text("CFG",1224,35,2);}
+        }else{rect(ControlLayout::gearX,ControlLayout::gearY,ControlLayout::gearSize,ControlLayout::gearSize,0x243746);text("CFG",1208,38,3); }
         if(layout.editing){
             rect(0,0,1280,720,0x060b16,165);
             // Main navigation is a separate reusable PNG, not a CSS-style rectangle.
@@ -588,6 +590,10 @@ public:
                 text(items[i],i==1?51:71,y+20,3,active?0xeaf5ff:0xd9dce3);
             }
             rect(328,86,888,549,0x697381);rect(335,93,874,535,0x101923);
+            if(settingsWindow_){
+                SDL_FRect frame{328,86,888,549};
+                SDL_RenderTexture(renderer,settingsWindow_,nullptr,&frame);
+            }
             rect(356,113,824,72,0x2d3646);rect(363,120,810,58,0x1b2838);
             text("SETTINGS",570,131,4,0xe6e6ef);
             rect(1120,103,90,65,0x4d586a);text("X",1155,124,4);
