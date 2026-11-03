@@ -105,16 +105,16 @@ namespace Eclipse
             float crownY = bottom - height * (.62f + (Hash(seed, 7) % 9) * .025f);
             Color bark = Trunks[layer], leaf = Leaves[layer], bright = Highlights[layer];
             // Broadleaf trees and occasional uneven conifers, not identical tiered cones.
-            Block(cx - trunk * .5f, crownY, trunk, bottom - crownY, bark, 6);
+            WorldBlock(cx - trunk * .5f, crownY, trunk, bottom - crownY, bark, 6);
             if (seed % 4 == 0)
             {
-                Block(cx - 24, crownY + 24, 30, 6, bark, 6);
-                Block(cx + 3, crownY + 12, 30, 6, bark, 6);
+                WorldBlock(cx - 24, crownY + 24, 30, 6, bark, 6);
+                WorldBlock(cx + 3, crownY + 12, 30, 6, bark, 6);
             }
             else
             {
-                Block(cx - 30, crownY + 36, 33, 6, bark, 6);
-                Block(cx + 3, crownY + 24, 33, 6, bark, 6);
+                WorldBlock(cx - 30, crownY + 36, 33, 6, bark, 6);
+                WorldBlock(cx + 3, crownY + 24, 33, 6, bark, 6);
             }
             float radius = 38 + Hash(seed, 10) % 5 * 6 + layer * 5;
             if (seed % 7 == 0)
@@ -125,7 +125,7 @@ namespace Eclipse
                     float y = bottom - height + tier * 39;
                     float w = radius * (1.1f + tier * .15f);
                     for (int row = 0; row < 5; row++)
-                        Block(cx - w * .5f + row * 5, y + row * 9, w - row * 10, 12, leaf, 6);
+                        WorldBlock(cx - w * .5f + row * 5, y + row * 9, w - row * 10, 12, leaf, 6);
                 }
             }
             else
@@ -140,7 +140,7 @@ namespace Eclipse
                     for (int row = -3; row <= 3; row++)
                     {
                         float width = r * (1f - Mathf.Abs(row) * .16f);
-                        Block(x - width, y + row * 9, width * 2, 12, leaf, 6);
+                        WorldBlock(x - width, y + row * 9, width * 2, 12, leaf, 6);
                     }
                 }
             }
@@ -149,12 +149,12 @@ namespace Eclipse
                 int h = Hash(seed, 51 + k);
                 float xx = cx + (h % 17 - 8) * 6;
                 float yy = bottom - height + (h / 23 % 11) * 6;
-                Block(xx, yy, 12 + h % 3 * 6, 6, bright, 6);
+                WorldBlock(xx, yy, 12 + h % 3 * 6, 6, bright, 6);
             }
             if (layer == 2 && seed % 5 == 0)
             {
-                Block(cx - 3, bottom - 38, 6, 30, Hex("43604a"), 6);
-                Block(cx + 6, bottom - 24, 6, 12, Moss, 6);
+                WorldBlock(cx - 3, bottom - 38, 6, 30, Hex("43604a"), 6);
+                WorldBlock(cx + 6, bottom - 24, 6, 12, Moss, 6);
             }
         }
         private void Bush(float x, float bottom, float radius, int layer, int seed)
@@ -165,9 +165,9 @@ namespace Eclipse
                 int h = Hash(seed, 70 + n);
                 float bx = x + (n - 2) * 12 + h % 9;
                 float top = bottom - radius - h % 13;
-                Block(bx - 12, top + 9, 30, radius * .65f, foliage, 6);
-                Block(bx - 6, top, 18, 12, foliage, 6);
-                if (n % 2 == 0) Block(bx, top + 6, 12, 6, glint, 6);
+                WorldBlock(bx - 12, top + 9, 30, radius * .65f, foliage, 6);
+                WorldBlock(bx - 6, top, 18, 12, foliage, 6);
+                if (n % 2 == 0) WorldBlock(bx, top + 6, 12, 6, glint, 6);
             }
         }
         private void Enemy(EnemyState e)
