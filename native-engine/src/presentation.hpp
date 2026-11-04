@@ -1030,8 +1030,8 @@ public:
                 const float phase=seconds*2.45f+u*6.8f+v*2.1f;
                 const float flutter=std::sin(phase)+0.20f*std::sin(phase*1.7f+v*3.f);
                 vertices[row*(columns+1)+col]={{
-                    x+weight*9.6f*std::sin(phase+1.f),
-                    y+weight*30.f*flutter
+                    x+weight*4.0f*std::sin(phase+1.f),
+                    y+weight*12.f*flutter
                 },{1,1,1,1},{x/width,y/height}};
             }
         }
