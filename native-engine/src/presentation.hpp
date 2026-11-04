@@ -851,25 +851,27 @@ public:
         SDL_RenderClear(renderer);
         SDL_RenderTexture(renderer,titleTexture_,&lowerSource,&lowerScene);
 
-        // Warp a local mesh over the cape. Pin its edges and shoulder so
-        // the surrounding characters and the knight's sword stay fixed.
-        constexpr int columns=20, rows=14;
+        // Source-aligned transparent cape is the only deforming texture.
+        // The old mesh pinned the far-left cloth tips to its boundary, making
+        // the center stretch while the visible tail barely moved.
+        // Overscan the alpha bounds; pin the shoulder (upper-right) instead.
+        constexpr int columns=28, rows=20;
         std::array<SDL_Vertex,(columns+1)*(rows+1)> vertices{};
         for(int row=0;row<=rows;++row){
             const float v=static_cast<float>(row)/rows;
             for(int col=0;col<=columns;++col){
                 const float u=static_cast<float>(col)/columns;
-                const float x=220+440*u, y=230+355*v;
-                const float edge=std::sin(3.141593f*u)*std::sin(3.141593f*v);
-                const float center=0.92f-0.57f*u;
-                const float cloth=std::clamp(1-std::abs(v-center)*3.4f,0.f,1.f);
-                // Fourfold cape flutter amplitude: the shoulder stays fixed while the
-                // loose cloth gets a slightly stronger, slower traveling wave.
-                const float wave=edge*cloth*(1-u);
-                const float phase=seconds*2.45f+u*7+v*2;
-                const float flutter=std::sin(phase)+0.20f*std::sin(phase*1.7f+v*3.0f);
-                vertices[row*(columns+1)+col]={{x+wave*9.6f*std::sin(phase+1),
-                    y+wave*30.0f*flutter},{1,1,1,1},{x/width,y/height}};
+                const float x=185.f+505.f*u, y=215.f+415.f*v;
+                const float loose=std::pow(1.f-u,1.6f);
+                const float vertical=std::clamp((v-0.02f)/0.26f,0.f,1.f);
+                const float shoulderPin=std::clamp((690.f-x)/75.f,0.f,1.f);
+                const float weight=loose*vertical*shoulderPin;
+                const float phase=seconds*2.45f+u*6.8f+v*2.1f;
+                const float flutter=std::sin(phase)+0.20f*std::sin(phase*1.7f+v*3.f);
+                vertices[row*(columns+1)+col]={{
+                    x+weight*9.6f*std::sin(phase+1.f),
+                    y+weight*30.f*flutter
+                },{1,1,1,1},{x/width,y/height}};
             }
         }
         static const auto indices=[]{
