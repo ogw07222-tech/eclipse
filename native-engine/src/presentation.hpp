@@ -245,48 +245,6 @@ class Presentation {
         }
     }
     void forest(const Combat& g,float camera) {
-        if(forestEntranceReady_) {
-            // Fixed forest entrance art correction. These remain original authored PNGs:
-            // only the image compositing, size and tint differ. NPC / floor untouched.
-            // Ground is drawn before tree bases to avoid cutting roots at the grass line.
-            constexpr int drawOrder[]{0,1,2,4,3,5};
-            for(int index : drawOrder) {
-                SDL_Texture* image=forestV3Textures_[index];
-                const float shift=(camera-640.f)*ForestLayerScene::layersEntrance[index].parallax;
-                Uint8 r=255,g=255,b=255;
-                if(index==2){r=214;g=214;b=220;} // mountain depth
-                if(index==4){r=204;g=188;b=204;} // darken/desaturate bright grass
-                if(index==3){r=238;g=237;b=235;} // trees remain legible in moonlight
-                if(index==5){r=214;g=214;b=214;} // de-emphasize foreground rocks
-                SDL_SetTextureColorMod(image,r,g,b);
-                if(index==5) {
-                    // Crop each edge decoration separately to preserve the NPC
-                    // corridors and avoid dragging rocks into the combat center.
-                    constexpr float scale=.82f;
-                    constexpr float anchorY=585.f;
-                    constexpr SDL_FRect leftSrc{0.f,0.f,450.f,720.f};
-                    constexpr SDL_FRect rightSrc{1170.f,0.f,430.f,720.f};
-                    SDL_FRect leftDst{-shift,anchorY-anchorY*scale,
-                                      leftSrc.w*scale,720.f*scale};
-                    SDL_FRect rightDst{1600.f-rightSrc.w*scale-shift,
-                                       anchorY-anchorY*scale,
-                                       rightSrc.w*scale,720.f*scale};
-                    SDL_RenderTexture(renderer,image,&leftSrc,&leftDst);
-                    SDL_RenderTexture(renderer,image,&rightSrc,&rightDst);
-                } else {
-                    float width=0.f,height=0.f;
-                    if(SDL_GetTextureSize(image,&width,&height)) {
-                        // Art originally ended above the physical grass; slide the
-                        // trees down to align the roots with the fixed y=585 floor.
-                        SDL_FRect dest{std::round(-shift),index==3?50.f:0.f,
-                                       width,height};
-                        SDL_RenderTexture(renderer,image,nullptr,&dest);
-                    }
-                }
-                SDL_SetTextureColorMod(image,255,255,255);
-            }
-            return;
-        }
         if(forestV3Ready_) {
             // Layer art only: no scene randomization or NPC occupancy changes.
             // Every asset's native dimensions and world-ground height are fixed.
@@ -348,6 +306,13 @@ class Presentation {
         SDL_RenderTextureRotated(renderer,texture,&source,&target,0,nullptr,e.facing>0?SDL_FLIP_HORIZONTAL:SDL_FLIP_NONE);
         SDL_SetTextureColorMod(texture,255,255,255);
         world(e.x-21,e.y-h-15,42,5,0x262435);world(e.x-21,e.y-h-15,42.f*e.health/e.maxHealth,5,0xf47777);
+        if(e.bleedStacks>0){
+            const float x=e.x-offset-19,y=e.y-h-34;
+            rect(x+4,y,4,4,0xf2a0aa);
+            rect(x+2,y+4,8,8,0xc84f65);
+            rect(x+4,y+12,4,3,0x92354b);
+            number(e.bleedStacks,x+14,y,2,e.bleedStacks==bleedMaxStacks?0xffc0c3:0xe8798d);
+        }
         if(e.bleed>0)for(int i=0;i<6;++i){float phase=std::fmod(clock*(17+i%3*4)+i*11,h);world(e.x+i*13%29-14,e.y-h+phase,3,i%2==0?6:3,i%2==0?0xe34359:0x8f183a,3);}
         if(e.burn>0)for(int i=0;i<9;++i){float rise=std::fmod(clock*(29+i%4*6)+i*9,h+18);world(e.x+i*17%35-17+std::sin(clock*5+i)*3,e.y+4-rise,i%3==0?6:3,i%2==0?9:6,i%3==0?0xffb74b:i%3==1?0xf16b32:0xbb3839,3);}
         if(e.reactionFlash>0)for(int i=0;i<8;++i)world(e.x+i%4*17-26,e.y-h*.5f+i/4*18-9,9,6,0xffbc57,3);
@@ -401,10 +366,34 @@ class Presentation {
         SDL_RenderTexture(renderer,textures[texture],&source,&target);
         SDL_SetTextureAlphaMod(textures[texture],255);
     }
+    void skillButton(const ControlRect& b,const char* label,float remaining,float duration,
+                     bool pressed,unsigned accent,bool enabled=true){
+        // Pixel octagon, with a bottom-up cooldown fill inside its inset.
+        const float unit=std::max(2.f,std::floor(b.size/18.f));
+        const float cut=3*unit;
+        const Uint8 alpha=enabled?(pressed?240:206):85;
+        for(float y=0;y<b.size;y+=unit){
+            const float inset=std::max(0.f,std::max(cut-y,y-(b.size-cut)));
+            const float h=std::min(unit,b.size-y);
+            rect(b.x+inset,b.y+y,b.size-inset*2,h,accent,alpha);
+            if(y<unit||y+h>=b.size)continue;
+            const bool cooling=remaining>0&&y>=b.size*(1-std::clamp(remaining/duration,0.f,1.f));
+            rect(b.x+inset+unit,b.y+y,b.size-(inset+unit)*2,h,
+                 cooling?0x3f303e:pressed?0x354650:0x15202b,alpha);
+        }
+        const int scale=b.size>=85?3:2;
+        const float width=std::char_traits<char>::length(label)*6.f*scale;
+        text(label,b.x+(b.size-width)/2,b.y+b.size*.25f,scale,enabled?0xe8e1d7:0x6d7079);
+        if(enabled&&remaining>0)number(static_cast<int>(std::ceil(remaining)),b.x+b.size*.38f,b.y+b.size*.59f,scale,accent);
+        else if(enabled)rect(b.x+b.size*.34f,b.y+b.size*.69f,b.size*.32f,3,accent,alpha);
+    }
     void hud(const Combat& g,Actions held,const ControlLayout& layout,std::array<float,2> stick){
         const auto& p=g.player;constexpr const char* heart[]={"..XX.XX..",".XXXXXXX.","XXXXXXXXX","XXXXXXXXX",".XXXXXXX.","..XXXXX..","...XXX...","....X...."};
         for(int i=0;i<7;++i)for(int y=0;y<8;++y)for(int x=0;x<9;++x)if(heart[y][x]=='X')rect(360+i*55+x*5,18+y*5,6,6,static_cast<float>(p.health)/p.maxHealth()>=(i+.5f)/7?0xf56b78:0x364451);
-        for(int i=0;i<5;++i){rect(365+i*48,76,42,16,0x101923);rect(369+i*48,80,34,8,std::clamp(1-p.skillCooldown/4,0.f,1.f)>i/5.f?0xe3bd72:0x353a43);}
+        if(p.form==0&&p.preparation>0){
+            text("READY",365,76,2,0xe3bd72);
+            rect(431,78,166*p.preparation/preparationDuration,7,0xe3bd72);
+        }
         for(int i=0;i<4;++i){rect(765+i*74,21,66,61,0x080d17);rect(771+i*74,27,54,49,0x667482);rect(777+i*74,33,42,37,0x222c3d);}
         text("GEAR",780,44,2);text(p.form==0?"BLADE":"FIRE",235,48,3,0x9ed7ff);number(g.foes(),1180,43,5,0xece7d2);text("FOES",1090,25,2);
         const auto& c=layout.buttons;
@@ -418,8 +407,11 @@ class Presentation {
         icon(1,held.attack?1:0,0,c[ControlLayout::Attack].x,c[ControlLayout::Attack].y,c[ControlLayout::Attack].size,held.attack);
         icon(2,held.dash?1:0,0,c[ControlLayout::Dash].x,c[ControlLayout::Dash].y,c[ControlLayout::Dash].size,held.dash);
         icon(3,0,0,c[ControlLayout::Swap].x,c[ControlLayout::Swap].y,c[ControlLayout::Swap].size,held.swap);
-        icon(3,0,1,c[ControlLayout::Skill].x,c[ControlLayout::Skill].y,c[ControlLayout::Skill].size,held.skill);
-        if(p.skillCooldown>0)number(static_cast<int>(std::ceil(p.skillCooldown)),c[ControlLayout::Skill].x+20,c[ControlLayout::Skill].y+25,4,0xffd277);
+        const bool knight=p.form==0;
+        skillButton(c[ControlLayout::Skill],knight?"STAB":"FIRE",
+            knight?p.skillCooldown:p.mageSkillCooldown,knight?thrustCooldown:4.1f,held.skill,0xcaa2a4);
+        skillButton(c[ControlLayout::Sweep],"SWEEP",p.sweepReady,sweepCooldown,held.skillSweep,0x92b5ce,knight);
+        skillButton(c[ControlLayout::Buff],"PREP",p.buffReady,buffCooldown,held.skillBuff,0xe3bd72,knight);
         if(p.swapCooldown>0)number(static_cast<int>(std::ceil(p.swapCooldown)),c[ControlLayout::Swap].x+20,c[ControlLayout::Swap].y+25,3,0xffd277);
         if(g.inventory){rect(46,135,460,340,0xe3bd72);rect(50,139,452,332,0x1c2a34);text("EQUIPMENT",66,153,3);
             for(int i=0;i<3;++i){text(p.gear.name(i),66,200+i*42,2);rect(66+i*143,413,132,45,0x304039);text(i==0?"WEAPON":i==1?"ARMOR":"CHARM",75+i*143,428,2);}
@@ -435,7 +427,7 @@ class Presentation {
     }
     void settings(const ControlLayout& layout){
         constexpr unsigned ink=0xe4dfd1,muted=0x9eacba,gold=0xc7a575;
-        const char* names[]={"JOYSTICK","ATTACK","DASH","SWAP","SKILL"};
+        const char* names[]={"JOYSTICK","ATTACK","DASH","SWAP","STAB","SWEEP","PREP"};
         if(layout.reposition){
             rect(0,0,1280,720,0x07101b,54);
             menuTile(45,26,730,110,0x172331,0x596878);
@@ -713,6 +705,15 @@ public:
         forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.clock);
         for(const auto& b:g.projectiles){disk(b.x-offset,b.y,b.empowered?14:8,0xf16b32);disk(b.x-offset,b.y,b.empowered?7:4,0xffe7a1);}
         const auto& p=g.player;
+        for(const auto& effect:g.bleedSpreads){
+            const float progress=1-effect.life/.23f;
+            for(int i=0;i<5;++i){
+                const float t=std::clamp(progress-i*.09f,0.f,1.f);
+                const float x=effect.fromX+(effect.toX-effect.fromX)*t;
+                const float y=effect.fromY+(effect.toY-effect.fromY)*t-50*t*(1-t);
+                world(x,y,4,i==0?6:3,i==0?0xf48694:0x9d394f);
+            }
+        }
         slamShockwave(p);
         if(p.form==0)swordTrail(p,a);
         if(p.form==0){SDL_FRect source{static_cast<float>(a.frame%motionColumns*motionWidth),static_cast<float>(a.frame/motionColumns*motionHeight),motionWidth,motionHeight},dest{std::round(p.x-offset-(p.facing>0?motionPivotX:motionWidth-motionPivotX)*motionScale),std::round(p.y-motionPivotY*motionScale),motionWidth*motionScale,motionHeight*motionScale};
@@ -721,7 +722,7 @@ public:
         if(p.swapFlash>0)ring(p.x-offset,p.y-36,44,0xe3bd72);
         static const ControlLayout defaultLayout{};
         const ControlLayout& layout=customLayout?*customLayout:defaultLayout;
-        if(layout.showNumbers)for(const auto& popup:g.popups)number(popup.amount,popup.x-offset-12,popup.y,3,popup.kind==DamageKind::Fire?0xff9155:popup.kind==DamageKind::Bleed?0xe76878:0xf2d48c);
+        if(layout.showNumbers)for(const auto& popup:g.popups)number(popup.amount,popup.x-offset-12,popup.y,3,popup.kind==DamageKind::Fire?0xff9155:(popup.kind==DamageKind::Bleed||popup.kind==DamageKind::Execute)?0xe76878:0xf2d48c);
         hud(g,held,layout,stick);
         // PNG-backed gothic gear and vertical menu. All actions use ControlLayout hitboxes.
         if(settingsGear_){
