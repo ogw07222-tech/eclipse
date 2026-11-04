@@ -38,7 +38,7 @@ void updateKeyboard(){const auto& k=keyState;eclipse::Actions a;
         a.skillSweep=k[SDL_SCANCODE_U];a.skillBuff=k[SDL_SCANCODE_O];
         a.dash=k[SDL_SCANCODE_LSHIFT]||k[SDL_SCANCODE_RSHIFT];a.restart=k[SDL_SCANCODE_R];a.inventory=k[SDL_SCANCODE_I];a.weapon=k[SDL_SCANCODE_1];a.armor=k[SDL_SCANCODE_2];a.charm=k[SDL_SCANCODE_3];input.keyboard(a);
 }
-void events(bool& titleActive,float titleSeconds){
+void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
     const bool wasTitle=titleActive;
     SDL_Event e;
     while(!layout.exitRequested&&SDL_PollEvent(&e)){
@@ -59,6 +59,7 @@ void events(bool& titleActive,float titleSeconds){
                 if(choosingQaCharacter){
                     if(e.key.scancode==SDL_SCANCODE_1||e.key.scancode==SDL_SCANCODE_KP_1)selection=0;
                     if(e.key.scancode==SDL_SCANCODE_2||e.key.scancode==SDL_SCANCODE_KP_2)selection=1;
+                    if(e.key.scancode==SDL_SCANCODE_3||e.key.scancode==SDL_SCANCODE_KP_3)selection=2;
                 }else if(e.key.scancode==SDL_SCANCODE_RETURN||e.key.scancode==SDL_SCANCODE_KP_ENTER||e.key.scancode==SDL_SCANCODE_SPACE){
                     selection=0;
                 }
@@ -69,17 +70,24 @@ void events(bool& titleActive,float titleSeconds){
                 const SDL_FPoint position=finger?SDL_FPoint{e.tfinger.x,e.tfinger.y}:SDL_FPoint{e.button.x,e.button.y};
                 if(choosingQaCharacter){
                     const auto& buttons=eclipse::Presentation::qaCharacterButtons;
-                    for(int i=0;i<3;++i)if(SDL_PointInRectFloat(&position,&buttons[i]))selection=i;
+                    for(size_t i=0;i<buttons.size();++i)if(SDL_PointInRectFloat(&position,&buttons[i]))selection=static_cast<int>(i);
                 }else{
                     for(int i=0;i<4;++i)if(SDL_PointInRectFloat(&position,&eclipse::Presentation::titleButtons[i]))selection=i;
                 }
             }
             if(choosingQaCharacter){
-                if(selection==2){choosingQaCharacter=false;continue;}
-                if(selection==0||selection==1){
+                if(selection==3){choosingQaCharacter=false;continue;}
+                if(selection>=0&&selection<3){
+                    if(selection==2&&!view.loadWhiteNight()){
+                        const std::string reason=SDL_GetError();
+                        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",reason.c_str());
+                        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"ECLIPSE ASSET ERROR",reason.c_str(),window);
+                        continue;
+                    }
                     qaStartForm=selection;
                     game.restart();
-                    game.player.form=qaStartForm;
+                    game.player.form=qaStartForm==1?1:0;
+                    game.player.whiteNight=qaStartForm==2;
                     animation.reset();
                     input.reset();
                     keyState.fill(false);
@@ -133,8 +141,12 @@ void events(bool& titleActive,float titleSeconds){
 void tick(eclipse::Actions action){
     if(action.restart){input.reset();keyState.fill(false);animation.reset();camera=640;}
     const int previousMotion=animation.state;
+    game.cameraCenter=camera;
     game.step(static_cast<float>(eclipse::fixedStep),action);
-    if(action.restart&&qaStartForm>=0)game.player.form=qaStartForm;
+    if(action.restart&&qaStartForm>=0){
+        game.player.form=qaStartForm==1?1:0;
+        game.player.whiteNight=qaStartForm==2;
+    }
     animation.step(game.player,static_cast<float>(eclipse::fixedStep));
     if(animation.state!=previousMotion)SDL_Log("ECLIPSE motion state=%d frame=%d",animation.state,animation.frame);
     if(action.inventory||action.swap||action.restart||action.weapon||action.armor||action.charm)
@@ -278,7 +290,7 @@ int main(int argc,char** argv){
     SDL_Log("ECLIPSE first playable scene: demon castle entrance (combat playtest; tutorial later)");
     float titleSeconds=0;
     Uint64 last=SDL_GetTicksNS();double accumulator=0;
-    while(running){Uint64 start=SDL_GetTicksNS();events(titleActive,titleSeconds);
+    while(running){Uint64 start=SDL_GetTicksNS();events(titleActive,titleSeconds,*view);
         if(!running||layout.exitRequested)break;
         if(!foreground){accumulator=0;SDL_Delay(50);last=SDL_GetTicksNS();continue;}
         const double elapsed=std::min((start-last)/1e9,.1);last=start;

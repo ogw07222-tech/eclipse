@@ -19,6 +19,7 @@ class Presentation {
     SDL_Texture* titleTexture_=nullptr;
     SDL_Texture* titleCape_=nullptr;
     SDL_Texture* titleMenu_=nullptr;
+    SDL_Texture* whiteNightLance_=nullptr;
     std::array<SDL_Texture*,3> slimeTextures_{};
     SDL_Texture* enemyBarFrame_=nullptr;
     SDL_Texture* executeIcon_=nullptr;
@@ -337,6 +338,12 @@ class Presentation {
             rect(barX,barY,88,18,0x0b0b12);
             rect(barX+2,barY+2,84,14,0x61505d);
         }
+        if(e.lightMark>0){
+            const float x=e.x-offset,y=barY-12;
+            rect(x-2,y-7,4,14,0xffc640);
+            rect(x-7,y-2,14,4,0xffc640);
+            rect(x-2,y-2,4,4,0xfff6bf);
+        }
         const float hpRatio=std::clamp(float(e.health)/e.maxHealth,0.f,1.f);
         const float trailRatio=std::clamp(std::max(float(e.health),e.trailingHealth)/e.maxHealth,0.f,1.f);
         const float fillX=barX+4,fillY=barY+5,fillW=80.f;
@@ -622,7 +629,7 @@ class Presentation {
         const auto& p=g.player;
         playerHealthBar(p);
         for(int i=0;i<4;++i){rect(765+i*74,21,66,61,0x080d17);rect(771+i*74,27,54,49,0x667482);rect(777+i*74,33,42,37,0x222c3d);}
-        text("GEAR",780,44,2);text(p.form==0?"BLADE":"FIRE",28,73,2,0x9ed7ff);number(g.foes(),1180,43,5,0xece7d2);text("FOES",1090,25,2);
+        text("GEAR",780,44,2);text(p.whiteNight?"WHITE NIGHT":p.form==0?"BLADE":"FIRE",28,73,2,0x9ed7ff);number(g.foes(),1180,43,5,0xece7d2);text("FOES",1090,25,2);
         const auto& c=layout.buttons;
         const auto& js=c[ControlLayout::Stick];
         const bool stickActive=held.left||held.right||held.jump;
@@ -795,7 +802,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){if(whiteNightLance_)SDL_DestroyTexture(whiteNightLance_);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -876,8 +883,28 @@ public:
     static constexpr std::array<SDL_FRect,4> titleButtons{{{166,626,224,60},{407,626,224,60},{648,626,224,60},{889,626,224,60}}};
     static constexpr float titleReadyTime=0.85f;
 
-    static constexpr std::array<SDL_FRect,3> qaCharacterButtons{{
-        {410,424,460,52},{410,486,460,52},{530,552,220,44}
+    bool loadWhiteNight(){
+        if(whiteNightLance_)return true;
+        const auto path=asset("ui/white_night_lance.png");
+        auto* texture=IMG_LoadTexture(renderer,path.c_str());
+        if(!texture){
+            const std::string cause=SDL_GetError();
+            SDL_SetError("ECLIPSE ASSET ERROR: %s: %s",path.c_str(),cause.c_str());
+            return false;
+        }
+        float width=0,height=0;
+        if(!SDL_GetTextureSize(texture,&width,&height)||width!=64||height!=3){
+            SDL_DestroyTexture(texture);
+            SDL_SetError("ECLIPSE ASSET ERROR: %s expected 64x3, got %.0fx%.0f",path.c_str(),width,height);
+            return false;
+        }
+        SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST);
+        whiteNightLance_=texture;
+        return true;
+    }
+
+    static constexpr std::array<SDL_FRect,4> qaCharacterButtons{{
+        {410,374,460,52},{410,436,460,52},{410,498,460,52},{530,562,220,44}
     }};
 
     void drawTitle(float seconds,bool showSettings=false,bool chooseQaCharacter=false){
@@ -946,11 +973,11 @@ public:
         const int strip[]={0,1,2,1,3,2,2,3,4,3,5,4};
         SDL_RenderGeometry(renderer,titleTexture_,logo,6,strip,12);
         if(seconds>=titleReadyTime&&chooseQaCharacter){
-            rect(386,364,508,250,0x101223);
-            rect(386,364,508,3,0xad95c7);
-            text("QA CHARACTER SELECT",469,386,3,0xffe2b7);
-            constexpr const char* labels[]={"1 KNIGHT","2 FIRE MAGE","BACK"};
-            for(int i=0;i<3;++i){
+            rect(386,320,508,304,0x101223);
+            rect(386,320,508,3,0xad95c7);
+            text("QA CHARACTER SELECT",469,340,3,0xffe2b7);
+            constexpr const char* labels[]={"1 KNIGHT","2 FIRE MAGE","3 WHITE NIGHT","BACK"};
+            for(size_t i=0;i<qaCharacterButtons.size();++i){
                 const auto& target=qaCharacterButtons[i];
                 const SDL_FRect source{0,0,112,30};
                 SDL_RenderTexture(renderer,titleMenu_,&source,&target);
@@ -1148,6 +1175,24 @@ public:
     void draw(const Combat& g,const Animation& a,float camera,Actions held,const char* capture=nullptr,const char* reviewLabel=nullptr,const ControlLayout* customLayout=nullptr,std::array<float,2> stick={}){
         offset=std::round(camera)-640;SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);SDL_SetRenderDrawColor(renderer,21,35,52,255);SDL_RenderClear(renderer);
         forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.clock);
+        if(whiteNightLance_)for(const auto& lance:g.lightLances){
+            // The PNG points right. Rotate it down and keep its tip on the hit point.
+            const SDL_FRect dest{lance.x-offset-19,lance.y-20.5f,38,3};
+            SDL_RenderTextureRotated(renderer,whiteNightLance_,nullptr,&dest,90,nullptr,SDL_FLIP_NONE);
+        }
+        for(const auto& burst:g.lightBursts){
+            const float t=1-burst.life/.24f,x=burst.x-offset,y=burst.y;
+            if(t<.32f){
+                rect(x-2,y-13,4,26,0xffdc6c);
+                rect(x-12,y-2,24,4,0xfff4bc);
+            }
+            for(int i=0;i<8;++i){
+                const float angle=i*.785398f;
+                const float radius=5+30*t;
+                rect(x+std::cos(angle)*radius,y+std::sin(angle)*radius,3,3,i%2?0xffbe32:0xffed92,
+                    static_cast<Uint8>(255*(1-t)));
+            }
+        }
         for(const auto& b:g.projectiles){
             const int radius=b.empowered?14:8;
             const float x=b.x-offset;
