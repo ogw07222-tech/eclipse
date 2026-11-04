@@ -59,39 +59,27 @@ const entranceImgs=Array(6).fill(null),entranceLoaded=Array(6).fill(false);
 const entranceReady=()=>entranceLoaded.every(Boolean);
 function drawEntrance(o){
   const parallax=[0,.06,.14,.40,1,1];
-  for(let i=0;i<entranceFiles.length;i++){
+  const drawOrder=[0,1,2,4,3,5]; // ground before tree bases
+  for(const i of drawOrder){
     ctx.save();
-    if(i===2)ctx.filter="brightness("+((239+(o.seed%17))/255)+")";
-    ctx.drawImage(entranceImgs[i],Math.round(-(o.camera-640)*parallax[i]),0);
+    const shift=(o.camera-640)*parallax[i],im=entranceImgs[i];
+    if(i===2)ctx.filter="brightness(0.84)";
+    if(i===4)ctx.filter="brightness(0.79) saturate(0.76)";
+    if(i===3)ctx.filter="brightness(0.93)";
+    if(i===5)ctx.filter="brightness(0.84)";
+    if(i===5){
+      // Separate edge decoration crops: no props creep into NPC combat center.
+      const scale=.82,y=585-585*scale;
+      ctx.drawImage(im,0,0,450,720,-shift,y,450*scale,720*scale);
+      ctx.drawImage(im,1050,0,550,720,1600-550*scale-shift,y,550*scale,720*scale);
+    } else {
+      ctx.drawImage(im,Math.round(-shift),i===3?50:0);
+    }
     ctx.restore();
   }
   if(el("zones").checked)drawNpcZones(o);
   drawReferenceKnight();
-  el("status").textContent="숲 입구 PNG 6/6 · 원화 레이어 · 지면/NPC 위치 고정";
-}
-// Forest v3 six-role PNG scene: fully deterministic, NPC-safe by construction.
-const v3Files=[
-  "sky/sky_gradient_moon_01.png",
-  "clouds/clouds_01.png",
-  "far/mountain_far_01.png",
-  "mid/forest_mid_01.png",
-  "near/ground_fixed_01.png",
-  "near/near_props_fixed_01.png"
-];
-const v3Parallax=[0,.06,.14,.40,1,1];
-const v3Imgs=Array(6).fill(null),v3Loaded=Array(6).fill(false);
-const v3Ready=()=>v3Loaded.every(Boolean);
-function drawV3(o){
-  const shift=o.camera-640;
-  for(let i=0;i<6;i++){
-    ctx.save();
-    if(i===2)ctx.filter="brightness("+((239+(o.seed%17))/255)+")";
-    ctx.drawImage(v3Imgs[i],Math.round(-shift*v3Parallax[i]),0);
-    ctx.restore();
-  }
-  if(el("zones").checked)drawNpcZones(o);
-  drawReferenceKnight();
-  el("status").textContent="forest_v3 · PNG 6/6 · 하늘/구름/산/숲/지면/근경 · NPC 및 지형 고정";
+  el("status").textContent="숲 입구 PNG 6/6 · 지면/나무 접지 보정 · 근경 축소 · NPC 고정";
 }
 function drawNpcZones(o){
   for(const [a,b] of [[260,425],[710,900],[1180,1360]]){
