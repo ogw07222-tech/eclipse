@@ -154,7 +154,7 @@ int main(int argc,char** argv){
         SDL_Log("PASS eight combat/UI/facing/trail scenes and all five PNG textures");view.reset();cleanup();return 0;
     }
     if(argc>2&&std::string(argv[1])=="--motion-review"){
-        constexpr const char* names[]={"IDLE","RUN","JUMP","FALL","WEAK SLASH","STRONG SLASH","THRUST","DASH","HURT","DEATH","LAND","WALK","AIR SLAM"};
+        constexpr const char* names[]={"IDLE","RUN","JUMP","FALL","WEAK SLASH","STRONG SLASH","THRUST","DASH","HIT FLASH","DEATH","LAND","WALK","AIR SLAM"};
         int captureIndex=0;std::ofstream positions(std::string(argv[2])+"/positions.csv");positions<<"frame,x,y,motion\n";
         for(int motion=0;motion<13;++motion){
             game.restart();animation.reset();
