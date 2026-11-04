@@ -17,6 +17,8 @@ class Presentation {
     SDL_Renderer* renderer;
     std::array<SDL_Texture*,5> textures{};
     SDL_Texture* titleTexture_=nullptr;
+    SDL_Texture* titleBg_=nullptr;
+    SDL_Texture* titleKnightFg_=nullptr;
     SDL_Texture* titleCape_=nullptr;
     SDL_Texture* titleMenu_=nullptr;
     std::array<SDL_Texture*,3> slimeTextures_{};
@@ -795,7 +797,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleBg_)SDL_DestroyTexture(titleBg_);if(titleKnightFg_)SDL_DestroyTexture(titleKnightFg_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -861,6 +863,20 @@ public:
             SDL_SetTextureScaleMode(titleCape_,SDL_SCALEMODE_NEAREST);
             SDL_SetTextureBlendMode(titleCape_,SDL_BLENDMODE_BLEND);
         }
+        // A clean background and foreground armor are paired: never mix half
+        // of a new title set with the old flattened composition.
+        titleBg_=IMG_LoadTexture(renderer,asset("title/bg_clean.png").c_str());
+        titleKnightFg_=IMG_LoadTexture(renderer,asset("title/knight_fg.png").c_str());
+        if(!titleBg_ || !titleKnightFg_){
+            if(titleBg_){SDL_DestroyTexture(titleBg_);titleBg_=nullptr;}
+            if(titleKnightFg_){SDL_DestroyTexture(titleKnightFg_);titleKnightFg_=nullptr;}
+            SDL_Log("ECLIPSE title: clean three-layer pack absent; using legacy backdrop");
+        }else{
+            for(SDL_Texture* layer:{titleBg_,titleKnightFg_}){
+                SDL_SetTextureScaleMode(layer,SDL_SCALEMODE_NEAREST);
+                SDL_SetTextureBlendMode(layer,SDL_BLENDMODE_BLEND);
+            }
+        }
         SDL_SetTextureScaleMode(titleTexture_,SDL_SCALEMODE_NEAREST);
         SDL_SetTextureBlendMode(titleTexture_,SDL_BLENDMODE_BLEND);
         titleMenu_=IMG_LoadTexture(renderer,asset("ui/title_menu.png").c_str());
@@ -891,7 +907,7 @@ public:
         const float eased=reveal*reveal*(3-2*reveal);
         SDL_SetRenderDrawColor(renderer,11,10,18,255);
         SDL_RenderClear(renderer);
-        SDL_RenderTexture(renderer,titleTexture_,&lowerSource,&lowerScene);
+        SDL_RenderTexture(renderer,titleBg_?titleBg_:titleTexture_,&lowerSource,&lowerScene);
 
         // Source-aligned transparent cape is the only deforming texture.
         // The old mesh pinned the far-left cloth tips to its boundary, making
@@ -931,9 +947,16 @@ public:
         // A transparent source-aligned cape layer prevents nearby characters,
         // knight armor and sword from deforming with the cloth mesh.
         if(titleCape_){
-            SDL_SetTextureAlphaMod(titleCape_,220);
+            // The clean backdrop contains no baked-in cape; draw cloth fully
+            // opaque in its solid pixels to avoid a static double-cape ghost.
+            SDL_SetTextureAlphaMod(titleCape_,titleBg_?255:220);
             SDL_RenderGeometry(renderer,titleCape_,vertices.data(),static_cast<int>(vertices.size()),
                                indices.data(),static_cast<int>(indices.size()));
+        }
+        // Re-cover the cape root with stationary armor, helmet and sword.
+        if(titleBg_ && titleKnightFg_){
+            const SDL_FRect screen{0.f,0.f,width,height};
+            SDL_RenderTexture(renderer,titleKnightFg_,nullptr,&screen);
         }
 
         // The logo and eclipse share the upper artwork strip. Fade its
