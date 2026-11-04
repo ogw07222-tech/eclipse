@@ -38,11 +38,19 @@ constexpr int bleedMaxStacks=10,bleedSlowStacks=5;
 constexpr float bleedDuration=3.f,bleedTickInterval=.75f;
 enum class SwordStrike {Basic,Thrust,Sweep};
 
+enum class WhiteMove { None, Slash, Rush, Command, Blink, Verdict };
+struct WhiteClip {int start,count;float duration,contact;};
+constexpr WhiteClip whiteClips[]={{0,1,1,0},{16,15,.46f,.184f},{31,12,.50f,.125f},
+    {43,12,.46f,.23f},{55,12,.36f,.15f},{67,20,1.12f,.728f}};
 struct Player {
     Equipment gear;
     float x=140,y=floorY,vx=0,vy=0;
     int health=100,form=0,facing=1,combo=0,attackSerial=0,hurtSerial=0,landingSerial=0;
     bool grounded=true,whiteNight=false;
+    WhiteMove whiteMove=WhiteMove::None;
+    float whiteAge=0,whiteBoost=0;
+    size_t whiteTarget=0;
+    unsigned whiteRushHits=0;
     float takeoffLock=0;
     float dashLeft=0,dashCooldown=0,attackCooldown=0,skillCooldown=0,swapCooldown=0;
     float invulnerable=0,coyote=0,jumpBuffer=0,attackFlash=0,comboWindow=0,hitStop=0,swapFlash=0;
@@ -81,8 +89,9 @@ struct Enemy {
     bool dead()const{return health<=0;}
 };
 struct Projectile {float x,y;int facing,damage;bool empowered;float life=1.6f,remainingDrop=0;};
-struct LightLance {size_t target;float x,y,life=.65f;};
-struct LightBurst {float x,y,life=.24f;};
+struct LightLance {size_t target;float x,y,life=.65f;float offset=0,angle=90;bool verdict=false;};
+enum class LightFx { Impact, Slash, Rush, Command, Depart, Arrive, Verdict };
+struct LightBurst {float x,y,life=.24f;LightFx kind=LightFx::Impact;int facing=1;};
 enum class DamageKind{Normal,Fire,Bleed,Execute};
 struct BleedSpread {float fromX,fromY,toX,toY,life=.23f;};
 struct Popup{float x,y;int amount;DamageKind kind;float age=0;};
@@ -275,6 +284,87 @@ class Combat {
         if(thrust)p.skillCooldown=thrustCooldown;
         else p.sweepReady=sweepCooldown;
     }
+    size_t farthestLightMark()const{
+        size_t target=enemies.size();
+        float distance=-1;
+        const float left=cameraCenter-viewWidth*.5f;
+        for(size_t i=0;i<enemies.size();++i){
+            const auto& e=enemies[i];
+            const float dx=std::abs(e.x-player.x);
+            if(!e.dead()&&e.lightMark>0&&e.x>=left&&e.x<=left+viewWidth&&dx>distance){
+                target=i;distance=dx;
+            }
+        }
+        return target;
+    }
+    void whiteEffect(LightFx kind,float x,float y){
+        lightBursts.push_back({x,y,.24f,kind,player.facing});
+    }
+    bool stepWhiteMove(float dt,const Actions& a){
+        auto& p=player;
+        if(p.whiteMove==WhiteMove::None){
+            if(!p.grounded||p.dashLeft>0||p.slamRecover>0||!canAttack())return false;
+            if(a.skill&&p.skillCooldown<=0){p.whiteMove=WhiteMove::Rush;p.skillCooldown=2.2f;}
+            else if(a.skillSweep&&p.sweepReady<=0){p.whiteMove=WhiteMove::Command;p.sweepReady=5.f;}
+            else if((a.skillBuff&&p.buffReady<=0)||(a.swap&&p.swapCooldown<=0)){
+                p.whiteTarget=farthestLightMark();
+                if(p.whiteTarget==enemies.size())return false;
+                if(a.skillBuff&&p.buffReady<=0){p.whiteMove=WhiteMove::Blink;p.buffReady=2.5f;}
+                else {p.whiteMove=WhiteMove::Verdict;p.swapCooldown=9.f;}
+            }else if(a.attack&&p.attackCooldown<=0){p.whiteMove=WhiteMove::Slash;p.attackCooldown=.46f/p.basicSpeed();}
+            else return false;
+            p.whiteAge=0;p.whiteRushHits=0;p.vx=0;p.vy=0;
+        }
+        const auto move=p.whiteMove;
+        const auto clip=whiteClips[static_cast<int>(move)];
+        const float speed=move==WhiteMove::Slash?p.basicSpeed():1.f;
+        const float old=p.whiteAge;
+        p.whiteAge=std::min(clip.duration,old+dt*speed);
+        if(old<clip.contact&&p.whiteAge>=clip.contact){
+            if(move==WhiteMove::Slash){
+                whiteEffect(LightFx::Slash,p.x+p.facing*42,p.y-48);
+                melee(15+p.gear.attack(),0,105*p.gear.range());
+            }else if(move==WhiteMove::Command){
+                p.whiteBoost=3.5f;whiteEffect(LightFx::Command,p.x,p.y-42);
+            }else if(move==WhiteMove::Blink&&!enemies[p.whiteTarget].dead()){
+                auto& e=enemies[p.whiteTarget];
+                whiteEffect(LightFx::Depart,p.x,p.y-48);
+                const float side=e.x>=p.x?1.f:-1.f;
+                p.x=std::clamp(e.x+side*58,25.f,1550.f);p.y=floorY;
+                p.facing=e.x>=p.x?1:-1;
+                whiteEffect(LightFx::Arrive,p.x,p.y-48);
+            }else if(move==WhiteMove::Verdict&&!enemies[p.whiteTarget].dead()){
+                const auto& e=enemies[p.whiteTarget];
+                whiteEffect(LightFx::Slash,p.x+p.facing*42,p.y-48);
+                whiteEffect(LightFx::Verdict,e.x,e.y-45);
+                for(int i=0;i<6;++i){
+                    const float offset=(i-2.5f)*38;
+                    lightLances.push_back({p.whiteTarget,e.x+offset,enemyBounds(e).top-165.f,.65f,offset,90.f,true});
+                }
+            }
+        }
+        if(move==WhiteMove::Rush){
+            const float travel=std::max(0.f,std::min(.36f,p.whiteAge)-std::max(clip.contact,old));
+            if(travel>0){
+                const float from=p.x;
+                p.x=std::clamp(from+p.facing*1080*travel,25.f,1550.f);
+                if(static_cast<int>(old*60)%2==0)whiteEffect(LightFx::Rush,p.x,p.y-47);
+                const BodyRect strike{std::min(from,p.x)-18,p.y-83,std::max(from,p.x)+18,p.y+2};
+                const bool hadHit=p.whiteRushHits!=0;
+                for(size_t i=0;i<enemies.size();++i){
+                    auto& e=enemies[i];
+                    if(e.dead()||(p.whiteRushHits&(1u<<i))||!enemyOverlaps(e,strike))continue;
+                    p.whiteRushHits|=1u<<i;
+                    hit(e,18+p.gear.attack(),false);
+                    if(!e.dead())e.lightMark=5.f;
+                    whiteEffect(LightFx::Impact,e.x,e.y-38);
+                }
+                if(!hadHit&&p.whiteRushHits)launchLightLance();
+            }
+        }
+        if(p.whiteAge>=clip.duration)p.whiteMove=WhiteMove::None;
+        return true;
+    }
     void stepPlayer(float dt,Actions a){
         auto& p=player;
         p.dashLeft=down(p.dashLeft,dt);p.dashCooldown=down(p.dashCooldown,dt);p.attackCooldown=down(p.attackCooldown,dt);
@@ -284,7 +374,13 @@ class Combat {
         p.buffReady=down(p.buffReady,dt);
         p.preparation=down(p.preparation,dt);p.swapCooldown=down(p.swapCooldown,dt);p.invulnerable=down(p.invulnerable,dt);
         p.attackFlash=down(p.attackFlash,dt);p.comboWindow=down(p.comboWindow,dt);p.swapFlash=down(p.swapFlash,dt);
+        p.whiteBoost=down(p.whiteBoost,dt);
         if(p.hitStop>0){p.hitStop=down(p.hitStop,dt);return;}
+        if(p.whiteNight&&stepWhiteMove(dt,a))return;
+        if(p.whiteNight){
+            a.skill=a.skillSweep=a.skillBuff=a.swap=false;
+            if(p.grounded)a.attack=false;
+        }
         p.takeoffLock=down(p.takeoffLock,dt);
         p.slamRecover=down(p.slamRecover,dt);p.slamImpact=down(p.slamImpact,dt);
         if(p.comboWindow<=0)p.combo=0;
@@ -445,9 +541,15 @@ class Combat {
         lightLances.erase(std::remove_if(lightLances.begin(),lightLances.end(),[&](LightLance& lance){
             if((lance.life-=dt)<=0)return true;
             const auto& target=enemies[lance.target];
-            if(!target.dead())lance.x=target.x;
-            const float previousY=lance.y;
-            lance.y+=1050.f*dt;
+            if(lance.verdict&&target.dead())return true;
+            const float previousX=lance.x,previousY=lance.y;
+            const float speed=player.whiteBoost>0?1890.f:1050.f;
+            lance.y+=speed*dt;
+            if(!target.dead()){
+                const float spread=lance.verdict?std::clamp((enemyBounds(target).top-lance.y)/165.f,0.f,1.f):0.f;
+                lance.x=target.x+lance.offset*spread;
+            }
+            lance.angle=std::atan2(lance.y-previousY,lance.x-previousX)*57.29578f;
             Enemy* first=nullptr;
             float contact=lance.y;
             for(auto& e:enemies){
@@ -462,7 +564,7 @@ class Combat {
                 });
             }
             if(!first)return lance.y>viewHeight;
-            damageEnemy(*first,10+player.gear.attack(),DamageKind::Normal,false);
+            damageEnemy(*first,(lance.verdict?8:10)+player.gear.attack(),DamageKind::Normal,false);
             if(!first->dead())first->lightMark=5.f;
             lightBursts.push_back({lance.x,contact});
             return true;
@@ -592,7 +694,8 @@ struct Animation {
         else phase=time/clip.duration*clip.count;
         const int key=std::clamp(static_cast<int>(phase),0,clip.count-1);
         frame=clip.start+key;
-        midpoint=(loop||key+1<clip.count)&&phase-key>=.5f;
+        // Keep the original silhouettes during the jump-to-fall transition.
+        midpoint=next!=2&&next!=3&&(loop||key+1<clip.count)&&phase-key>=.5f;
     }
 };
 }
