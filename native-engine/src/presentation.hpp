@@ -3,6 +3,7 @@
 #include <SDL3_image/SDL_image.h>
 #include <string>
 #include <cstdio>
+#include <vector>
 #include "core.hpp"
 #include "sword_trails.hpp"
 #include "forest_generator.hpp"
@@ -26,6 +27,9 @@ class Presentation {
     std::array<SDL_Texture*,6> forestV3Textures_{};
     bool forestV3Ready_=false;
     bool forestEntranceReady_=false;
+    struct Ghost {float x,y,time;int frame,facing,form;bool slam;};
+    std::vector<Ghost> ghosts_{};
+    float lastGhostSample_=-1,lastGhostClock_=-1,lastGhostX_=0,lastGhostY_=0;
     static SDL_Color color(unsigned rgb,Uint8 alpha=255){return {static_cast<Uint8>(rgb>>16),static_cast<Uint8>(rgb>>8),static_cast<Uint8>(rgb),alpha};}
     void rect(float x,float y,float w,float h,unsigned rgb,Uint8 alpha=255){
         auto c=color(rgb,alpha);SDL_SetRenderDrawColor(renderer,c.r,c.g,c.b,c.a);
@@ -347,11 +351,57 @@ class Presentation {
         if(e.reactionFlash>0)for(int i=0;i<8;++i)world(e.x+i%4*17-26,e.y-h*.5f+i/4*18-9,9,6,0xffbc57,3);
     }
     void mage(const Player& p){
-        float x=p.x,y=p.y;world(x-15,y-55,30,40,0x5a2837);world(x-12,y-52,24,30,0xf69a5c);disk(x-offset,y-60,15,0xf6d3b3,3);world(x-12,y-70,24,10,0x5a2837);
-        world(x+p.facing*7-2,y-62,4,4,0x151b2c);world(x-12,y-15,10,15,0x5a2837);world(x+2,y-15,10,15,0x5a2837);
-        for(int i=0;i<9;++i)world(x+p.facing*(15+i),y-35-i*3,6,6,0x8f6ad4,3);
-        disk(x+p.facing*22-offset,y-64,7,0xffb74b,3);
+        const bool white=p.hurtTint>.13f,red=p.hurtTint>0&&!white;
+        const unsigned robe=white?0xf4f0ea:red?0x9d3447:0x5a2837;
+        const unsigned skin=white?0xffffff:red?0xdd7c89:0xf69a5c;
+        const unsigned face=white?0xfff8f0:red?0xe6a0aa:0xf6d3b3;
+        float x=p.x,y=p.y;world(x-15,y-55,30,40,robe);world(x-12,y-52,24,30,skin);disk(x-offset,y-60,15,face,3);world(x-12,y-70,24,10,robe);
+        world(x+p.facing*7-2,y-62,4,4,white?0xf5f1eb:0x151b2c);world(x-12,y-15,10,15,robe);world(x+2,y-15,10,15,robe);
+        for(int i=0;i<9;++i)world(x+p.facing*(15+i),y-35-i*3,6,6,white?0xf5f1eb:red?0xce788a:0x8f6ad4,3);
+        disk(x+p.facing*22-offset,y-64,7,white?0xffffff:red?0xffb2a0:0xffb74b,3);
         if(p.attackFlash>0)ring(x+p.facing*16-offset,y-36,40,0xffb74b);
+    }
+    void afterimages(const Combat& g,const Animation& a){
+        const Player& p=g.player;
+        // Clock reversal (restart) or teleport must discard old silhouettes.
+        if(g.clock<lastGhostClock_ || (lastGhostClock_>=0 &&
+           (std::abs(p.x-lastGhostX_)>260 || std::abs(p.y-lastGhostY_)>280))){
+            ghosts_.clear();lastGhostSample_=-1;
+        }
+        if(g.clock>lastGhostClock_){
+            ghosts_.erase(std::remove_if(ghosts_.begin(),ghosts_.end(),[&](const Ghost& s){
+                return g.clock-s.time>(s.slam?.15f:.19f);}),ghosts_.end());
+            const bool dash=p.health>0&&p.dashLeft>0&&std::abs(p.vx)>300.f;
+            const bool slam=p.health>0&&p.form==0&&p.airSlam&&
+                p.slamAge>=airSlamWindup&&p.vy>200.f;
+            if((dash||slam)&&(lastGhostSample_<0||g.clock-lastGhostSample_>=(slam?.035f:.04f))){
+                if(ghosts_.size()>=6)ghosts_.erase(ghosts_.begin());
+                ghosts_.push_back({p.x,p.y,g.clock,a.frame,p.facing,p.form,slam});
+                lastGhostSample_=g.clock;
+            }
+            if(!dash&&!slam)lastGhostSample_=-1;
+        }
+        lastGhostClock_=g.clock;lastGhostX_=p.x;lastGhostY_=p.y;
+        for(const Ghost& s:ghosts_){
+            const float duration=s.slam?.15f:.19f,age=g.clock-s.time;
+            if(age<.018f||age>duration)continue;
+            const Uint8 alpha=static_cast<Uint8>(std::clamp(1.f-age/duration,0.f,1.f)*(s.slam?145.f:132.f));
+            if(s.form==0){
+                SDL_Texture* image=textures[0];
+                SDL_SetTextureColorMod(image,s.slam?160:120,s.slam?181:155,s.slam?196:186);
+                SDL_SetTextureAlphaMod(image,alpha);
+                SDL_FRect src{float(s.frame%motionColumns*motionWidth),float(s.frame/motionColumns*motionHeight),motionWidth,motionHeight};
+                SDL_FRect dst{std::round(s.x-offset-(s.facing>0?motionPivotX:motionWidth-motionPivotX)*motionScale),
+                    std::round(s.y-motionPivotY*motionScale),motionWidth*motionScale,motionHeight*motionScale};
+                SDL_RenderTextureRotated(renderer,image,&src,&dst,0,nullptr,s.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
+                SDL_SetTextureAlphaMod(image,255);SDL_SetTextureColorMod(image,255,255,255);
+            }else{
+                const float x=std::round(s.x-offset),y=std::round(s.y);
+                rect(x-15,y-66,30,51,0x70869f,alpha);
+                rect(x-12,y-15,10,15,0x70869f,alpha);rect(x+2,y-15,10,15,0x70869f,alpha);
+                for(int i=0;i<8;++i)rect(x+s.facing*(15+i),y-35-i*3,5,5,0x91a4b7,alpha);
+            }
+        }
     }
     void slamShockwave(const Player& p){
         if(p.slamImpact<=0)return;
@@ -754,10 +804,26 @@ public:
                 world(x,y,4,i==0?6:3,i==0?0xf48694:0x9d394f);
             }
         }
+        afterimages(g,a);
         slamShockwave(p);
         if(p.form==0)swordTrail(p,a);
-        if(p.form==0){SDL_FRect source{static_cast<float>(a.frame%motionColumns*motionWidth),static_cast<float>(a.frame/motionColumns*motionHeight),motionWidth,motionHeight},dest{std::round(p.x-offset-(p.facing>0?motionPivotX:motionWidth-motionPivotX)*motionScale),std::round(p.y-motionPivotY*motionScale),motionWidth*motionScale,motionHeight*motionScale};
-            SDL_RenderTextureRotated(renderer,textures[0],&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
+        if(p.form==0){
+            SDL_Texture* image=textures[0];
+            SDL_FRect source{static_cast<float>(a.frame%motionColumns*motionWidth),static_cast<float>(a.frame/motionColumns*motionHeight),motionWidth,motionHeight},
+                dest{std::round(p.x-offset-(p.facing>0?motionPivotX:motionWidth-motionPivotX)*motionScale),
+                    std::round(p.y-motionPivotY*motionScale),motionWidth*motionScale,motionHeight*motionScale};
+            const bool white=p.hurtTint>.13f,red=p.hurtTint>0&&!white;
+            if(red)SDL_SetTextureColorMod(image,255,125,140);
+            SDL_RenderTextureRotated(renderer,image,&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
+            if(red)SDL_SetTextureColorMod(image,255,255,255);
+            if(white){
+                // Additive white overlay preserves sprite contours and transparent pixels.
+                SDL_SetTextureBlendMode(image,SDL_BLENDMODE_ADD);
+                SDL_SetTextureColorMod(image,255,244,237);SDL_SetTextureAlphaMod(image,185);
+                SDL_RenderTextureRotated(renderer,image,&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
+                SDL_SetTextureAlphaMod(image,255);SDL_SetTextureColorMod(image,255,255,255);
+                SDL_SetTextureBlendMode(image,SDL_BLENDMODE_BLEND);
+            }
         }else mage(p);
         if(p.swapFlash>0)ring(p.x-offset,p.y-36,44,0xe3bd72);
         static const ControlLayout defaultLayout{};
