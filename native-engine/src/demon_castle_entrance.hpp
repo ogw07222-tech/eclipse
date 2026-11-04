@@ -38,12 +38,12 @@ public:
         for(size_t i=0;i<images_.size();++i) {
             const std::string path=resolve(paths[i]);
             SDL_Surface* surface=IMG_Load(path.c_str());
-            if(!surface) {clear();return false;}
+            if(!surface) {const std::string reason=SDL_GetError();clear();SDL_SetError("ECLIPSE ASSET ERROR: cannot load %s: %s",path.c_str(),reason.c_str());return false;}
             const bool shapeOK=surface->w==widths[i]&&surface->h==heights[i];
-            if(!shapeOK){SDL_DestroySurface(surface);clear();return false;}
+            if(!shapeOK){const int actualW=surface->w,actualH=surface->h;SDL_DestroySurface(surface);clear();SDL_SetError("ECLIPSE ASSET ERROR: %s has size %dx%d; expected %dx%d",path.c_str(),actualW,actualH,widths[i],heights[i]);return false;}
             images_[i]=SDL_CreateTextureFromSurface(renderer_,surface);
             SDL_DestroySurface(surface);
-            if(!images_[i]){clear();return false;}
+            if(!images_[i]){const std::string reason=SDL_GetError();clear();SDL_SetError("ECLIPSE ASSET ERROR: texture creation failed for %s: %s",path.c_str(),reason.c_str());return false;}
             SDL_SetTextureScaleMode(images_[i],SDL_SCALEMODE_NEAREST);
             SDL_SetTextureBlendMode(images_[i],SDL_BLENDMODE_BLEND);
         }
