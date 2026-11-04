@@ -1,5 +1,12 @@
 plugins { id 'com.android.application' }
 
+// VACODE public identity configuration shared with NOCT. These are client identifiers, not secrets.
+// Override using Gradle properties if VACODE rotates the web client/project.
+def vacodeUrl = providers.gradleProperty('vacodeSupabaseUrl').getOrElse('https://wuuyxhxhfcingbgraikd.supabase.co')
+def vacodeKey = providers.gradleProperty('vacodePublishableKey').getOrElse('sb_publishable_XU6AGL9jahZLwVSoDqIm9w_01egWmoi')
+def vacodeGoogleClientId = providers.gradleProperty('vacodeGoogleWebClientId').getOrElse('206323277384-ng1jjdf7ov79etmkb7bdu8jd48f9ja2m.apps.googleusercontent.com')
+
+
 def sdlSource = file('../vendor/SDL')
 if (!new File(sdlSource, 'android-project/app/src/main/java/org/libsdl/app/SDLActivity.java').exists()) {
     throw new GradleException('SDL Android sources missing. Run python3 native-engine/tools/prepare_android.py first.')
@@ -20,6 +27,7 @@ if (signedRelease) {
         throw new GradleException('Release keystore file missing')
 }
 android {
+    buildFeatures { buildConfig true }
     signingConfigs {
         if (signedRelease) {
             eclipseRelease {
@@ -42,6 +50,9 @@ android {
         targetSdk 35
         versionCode Integer.parseInt(providers.gradleProperty('eclipseVersionCode').getOrElse('1'))
         versionName '0.4.0'
+        buildConfigField 'String', 'VACODE_SUPABASE_URL', "\"${vacodeUrl}\""
+        buildConfigField 'String', 'VACODE_PUBLISHABLE_KEY', "\"${vacodeKey}\""
+        buildConfigField 'String', 'VACODE_GOOGLE_WEB_CLIENT_ID', "\"${vacodeGoogleClientId}\""
         ndk { abiFilters.addAll(providers.gradleProperty('eclipseAbis').getOrElse('arm64-v8a').split(',') as List) }
         externalNativeBuild {
             cmake {
@@ -71,3 +82,9 @@ android {
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
 }
 tasks.named('preBuild').configure { dependsOn 'packageEclipseAssets' }
+
+dependencies {
+    implementation 'androidx.credentials:credentials:1.5.0'
+    implementation 'androidx.credentials:credentials-play-services-auth:1.5.0'
+    implementation 'com.google.android.libraries.identity.googleid:googleid:1.1.1'
+}
