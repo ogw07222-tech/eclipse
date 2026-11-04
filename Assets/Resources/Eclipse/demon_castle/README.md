@@ -23,3 +23,16 @@ Packaging support exists for desktop CMake and the normal Android Gradle asset S
 
 ## Asset delivery status
 Five castle PNG layers were committed to `main` in commit `8e1b9a2`. Their existence in Git does not prove Studio import or runtime decoding succeeded. Any missing/invalid required layer now causes a logged startup failure; owner-run runtime validation is still required.
+
+## Replacement art pack (November 2026)
+The corrected PNG pack is distributed as `demon_castle_fixed_assets.zip`. The original earlier ZIP had a duplicate skyline, visible straight extraction cuts, and a non-seamless floor. The replacement keeps the same five filenames and dimensions, reduces repeated moon/architecture imagery, and aligns the floor's outer columns exactly.
+
+After downloading the replacement ZIP to Termux Downloads, install it **only in the game repository**:
+```sh
+cd ~/eclipse
+git pull --ff-only origin main
+bash scripts/install-castle-entrance.sh
+```
+The installer validates each image before overwriting, and backs up previously installed images outside the repository. It does not edit Studio files, commit or push, or execute GitHub Actions. To publish the new art, explicitly stage only `Assets/Resources/Eclipse/demon_castle/entrance/*.png`, commit, and push the game repository.
+
+This note is not proof of an on-device SDL3 runtime test: the replacement pack must be installed, committed, and loaded in Studio locally before such a claim can be made.
