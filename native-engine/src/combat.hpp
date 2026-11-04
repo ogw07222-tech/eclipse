@@ -411,7 +411,7 @@ public:
     bool ended=false,won=false,inventory=false;
     float clock=0;
     Combat(){projectiles.reserve(16);popups.reserve(32);restart();}
-    void restart(){player={};enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};projectiles.clear();popups.clear();bleedSpreads.clear();enemies.back().boss=true;ended=won=inventory=false;clock=0;}
+    void restart(){player={};enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};projectiles.clear();popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=0;}
     int foes()const{int count=0;for(const auto& e:enemies)if(!e.dead())++count;return count;}
     void hit(Enemy& e,int amount,bool fire,int bleed=0,bool slam=false){
         if(e.dead()||ended)return;
