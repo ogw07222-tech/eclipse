@@ -1,12 +1,7 @@
 package com.eclipse.nativegame;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CancellationSignal;
-import android.view.Gravity;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.credentials.CredentialManager;
@@ -43,7 +38,6 @@ import java.util.concurrent.Executors;
  */
 public final class MainActivity extends SDLActivity {
     private final ExecutorService authExecutor = Executors.newSingleThreadExecutor();
-    private Button accountButton;
     private volatile boolean authenticating;
     private volatile String signedInUserId;
     private volatile String accessToken;
@@ -54,29 +48,14 @@ public final class MainActivity extends SDLActivity {
         return new String[] { "SDL3", "SDL3_image", "main" };
     }
 
-    @Override
-    protected void onCreate(Bundle state) {
-        super.onCreate(state);
-        // SDL continues to own the game view. This small native control is temporary until
-        // the title-screen UI can dispatch an explicit authentication request.
-        accountButton = new Button(this);
-        accountButton.setText("VACODE 로그인");
-        accountButton.setAllCaps(false);
-        accountButton.setTextColor(Color.WHITE);
-        accountButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xBB252637));
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT,
-            Gravity.TOP | Gravity.CENTER_HORIZONTAL);
-        params.topMargin = Math.round(6 * getResources().getDisplayMetrics().density);
-        addContentView(accountButton, params);
-        accountButton.setOnClickListener(v -> {
+    // Invoked only by the SDL title VACODE button; no Android overlay obscures the art.
+    public void showVacodeLogin() {
+        runOnUiThread(() -> {
             if (authenticating) return;
             if (signedInUserId != null) {
-                // Explicit sign-out: no credential or token is retained by this bridge.
                 signedInUserId = null;
                 accessToken = null;
                 refreshToken = null;
-                updateButton();
                 Toast.makeText(this, "VACODE 로그아웃", Toast.LENGTH_SHORT).show();
             } else {
                 signInWithVacode();
@@ -85,12 +64,7 @@ public final class MainActivity extends SDLActivity {
     }
 
     private void updateButton() {
-        runOnUiThread(() -> {
-            if (accountButton == null) return;
-            accountButton.setEnabled(!authenticating);
-            accountButton.setText(authenticating ? "VACODE 인증 중…" :
-                signedInUserId == null ? "VACODE 로그인" : "VACODE 연결됨 · 로그아웃");
-        });
+        // Authentication status is surfaced by Toast; SDL owns the title UI.
     }
 
     private void notifyUser(String message) {
