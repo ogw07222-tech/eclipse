@@ -10,6 +10,7 @@
 #include "forest_generator.hpp"
 #include "forest_layers.hpp"
 #include "demon_castle_entrance.hpp"
+#include "title_screen.hpp"
 
 namespace eclipse {
 class Presentation {
@@ -775,6 +776,16 @@ public:
 #else
         const char* base=SDL_GetBasePath();return std::string(base?base:"")+"assets/"+name;
 #endif
+    }
+    void drawTitle(TitleScreen& title,float seconds){
+        title.draw(renderer,seconds);
+        SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);
+        const auto box=TitleScreen::startButton;
+        rect(box.x,box.y,box.w,box.h,0x9584b5,220);
+        rect(box.x+2,box.y+2,box.w-4,box.h-4,0x141421,245);
+        rect(box.x+12,box.y+6,box.w-24,1,0x615374,230);
+        text("START",box.x+(box.w-87)/2,box.y+14,3,0xf2ebff);
+        SDL_RenderPresent(renderer);
     }
     bool load(){
         // Castle entrance PNGs are optional until the tutorial scene is integrated.

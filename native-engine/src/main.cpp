@@ -8,6 +8,8 @@ namespace {
 SDL_Window* window=nullptr;SDL_Renderer* renderer=nullptr;
 eclipse::Combat game;eclipse::Animation animation;eclipse::Input input;eclipse::ControlLayout layout;
 bool running=true,foreground=true;float camera=640;
+eclipse::TitleScreen title;
+bool titleActive=false;
 std::array<bool,SDL_SCANCODE_COUNT> keyState{};
 void updateKeyboard(){const auto& k=keyState;eclipse::Actions a;
         a.left=k[SDL_SCANCODE_A]||k[SDL_SCANCODE_LEFT];a.right=k[SDL_SCANCODE_D]||k[SDL_SCANCODE_RIGHT];a.jump=k[SDL_SCANCODE_SPACE]||k[SDL_SCANCODE_W]||k[SDL_SCANCODE_UP];
@@ -15,12 +17,36 @@ void updateKeyboard(){const auto& k=keyState;eclipse::Actions a;
         a.skillSweep=k[SDL_SCANCODE_U];a.skillBuff=k[SDL_SCANCODE_O];
         a.dash=k[SDL_SCANCODE_LSHIFT]||k[SDL_SCANCODE_RSHIFT];a.restart=k[SDL_SCANCODE_R];a.inventory=k[SDL_SCANCODE_I];a.weapon=k[SDL_SCANCODE_1];a.armor=k[SDL_SCANCODE_2];a.charm=k[SDL_SCANCODE_3];input.keyboard(a);
 }
+bool titleStartEvent(SDL_Event& event){
+    if(event.type==SDL_EVENT_KEY_DOWN)
+        return !event.key.repeat&&(event.key.scancode==SDL_SCANCODE_RETURN||
+            event.key.scancode==SDL_SCANCODE_KP_ENTER||event.key.scancode==SDL_SCANCODE_SPACE);
+    SDL_FPoint point{};
+    if(event.type==SDL_EVENT_FINGER_DOWN&&event.tfinger.touchID!=SDL_MOUSE_TOUCHID){
+        if(!SDL_ConvertEventToRenderCoordinates(renderer,&event)) return false;
+        point={event.tfinger.x,event.tfinger.y};
+    }else if(event.type==SDL_EVENT_MOUSE_BUTTON_DOWN&&event.button.which!=SDL_TOUCH_MOUSEID&&
+             event.button.button==SDL_BUTTON_LEFT){
+        if(!SDL_ConvertEventToRenderCoordinates(renderer,&event)) return false;
+        point={event.button.x,event.button.y};
+    }else return false;
+    return SDL_PointInRectFloat(&point,&eclipse::TitleScreen::startButton);
+}
 void events(){
     SDL_Event e;
     while(!layout.exitRequested&&SDL_PollEvent(&e)){
         if(e.type==SDL_EVENT_QUIT){running=false;continue;}
         if(e.type==SDL_EVENT_WINDOW_FOCUS_LOST||e.type==SDL_EVENT_WILL_ENTER_BACKGROUND){foreground=false;input.reset();keyState.fill(false);continue;}
         if(e.type==SDL_EVENT_WINDOW_FOCUS_GAINED||e.type==SDL_EVENT_DID_ENTER_FOREGROUND){foreground=true;continue;}
+        if(titleActive){
+            if(!foreground) continue;
+            if(e.type==SDL_EVENT_KEY_DOWN&&e.key.scancode==SDL_SCANCODE_ESCAPE) running=false;
+            if(titleStartEvent(e)){
+                titleActive=false;
+                title.clear();
+            }
+            continue;
+        }
         if((e.type==SDL_EVENT_KEY_DOWN||e.type==SDL_EVENT_KEY_UP)&&e.key.scancode==SDL_SCANCODE_R)
             SDL_Log("ECLIPSE restart key type=%u foreground=%d",static_cast<unsigned>(e.type),foreground);
         if(foreground&&(e.type==SDL_EVENT_KEY_DOWN||e.type==SDL_EVENT_KEY_UP)&&e.key.scancode>=0&&e.key.scancode<SDL_SCANCODE_COUNT){
@@ -61,7 +87,7 @@ void tick(eclipse::Actions action){
         SDL_Log("ECLIPSE state form=%d inventory=%d hp=%d foes=%d restart=%d weapon=%d armor=%d charm=%d",game.player.form,game.inventory,game.player.health,game.foes(),action.restart,game.player.gear.selected[0],game.player.gear.selected[1],game.player.gear.selected[2]);
     camera+=(std::clamp(game.player.x,640.f,960.f)-camera)*(1-std::exp(-5*static_cast<float>(eclipse::fixedStep)));
 }
-void cleanup(){if(renderer)SDL_DestroyRenderer(renderer);if(window)SDL_DestroyWindow(window);SDL_Quit();}
+void cleanup(){title.clear();if(renderer)SDL_DestroyRenderer(renderer);if(window)SDL_DestroyWindow(window);SDL_Quit();}
 }
 int main(int argc,char** argv){
     bool smoke=argc>1&&std::string(argv[1])=="--smoke-test";
@@ -159,13 +185,23 @@ int main(int argc,char** argv){
         SDL_Log("REVIEW live combat replay complete");
         view.reset();cleanup();return 0;
     }
+    titleActive=title.load(renderer,eclipse::Presentation::asset("title/eclipse.png").c_str());
+    if(!titleActive) SDL_Log("ECLIPSE title artwork unavailable: %s",SDL_GetError());
+    float titleSeconds=0;
     Uint64 last=SDL_GetTicksNS();double accumulator=0;
     while(running){Uint64 start=SDL_GetTicksNS();events();
-        if(layout.exitRequested)break;
+        if(!running||layout.exitRequested)break;
         if(!foreground){accumulator=0;SDL_Delay(50);last=SDL_GetTicksNS();continue;}
-        accumulator+=std::min((start-last)/1e9,.1);last=start;
-        while(accumulator>=eclipse::fixedStep){if(!layout.editing)tick(input.sample());accumulator-=eclipse::fixedStep;}
-        view->draw(game,animation,camera,input.held(),nullptr,nullptr,&layout,input.stickOffset());
+        const double elapsed=std::min((start-last)/1e9,.1);
+        last=start;
+        if(titleActive){
+            titleSeconds+=static_cast<float>(elapsed);
+            view->drawTitle(title,titleSeconds);
+        }else{
+            accumulator+=elapsed;
+            while(accumulator>=eclipse::fixedStep){if(!layout.editing)tick(input.sample());accumulator-=eclipse::fixedStep;}
+            view->draw(game,animation,camera,input.held(),nullptr,nullptr,&layout,input.stickOffset());
+        }
         double remaining=eclipse::fixedStep-(SDL_GetTicksNS()-start)/1e9;if(remaining>0)SDL_DelayNS(static_cast<Uint64>(remaining*1e9));
     }
     view.reset();cleanup();return 0;
