@@ -15,6 +15,7 @@ namespace eclipse {
 class Presentation {
     SDL_Renderer* renderer;
     std::array<SDL_Texture*,5> textures{};
+    SDL_Texture* titleTexture_=nullptr;
     std::array<SDL_Texture*,3> slimeTextures_{};
     SDL_Texture* enemyBarFrame_=nullptr;
     SDL_Texture* executeIcon_=nullptr;
@@ -791,7 +792,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -818,6 +819,85 @@ public:
         const char* base=SDL_GetBasePath();return std::string(base?base:"")+"assets/"+name;
 #endif
     }
+    bool loadTitle(){
+        titleTexture_=IMG_LoadTexture(renderer,asset("title/eclipse.png").c_str());
+        if(!titleTexture_)return false;
+        SDL_SetTextureScaleMode(titleTexture_,SDL_SCALEMODE_NEAREST);
+        SDL_SetTextureBlendMode(titleTexture_,SDL_BLENDMODE_BLEND);
+        return true;
+    }
+
+    static constexpr SDL_FRect titleButton{534,630,212,48};
+    static constexpr float titleReadyTime=0.85f;
+
+    void drawTitle(float seconds){
+        constexpr float width=1280, height=720;
+        constexpr float logoBand=195;
+        const SDL_FRect lowerScene{0,logoBand,width,height-logoBand};
+        const SDL_FRect lowerSource{0,logoBand*865/height,1536,865-logoBand*865/height};
+        const float reveal=std::clamp((seconds-0.12f)/0.73f,0.f,1.f);
+        const float eased=reveal*reveal*(3-2*reveal);
+        SDL_SetRenderDrawColor(renderer,11,10,18,255);
+        SDL_RenderClear(renderer);
+        SDL_RenderTexture(renderer,titleTexture_,&lowerSource,&lowerScene);
+
+        // Warp a local mesh over the cape. Pin its edges and shoulder so
+        // the surrounding characters and the knight's sword stay fixed.
+        constexpr int columns=20, rows=14;
+        std::array<SDL_Vertex,(columns+1)*(rows+1)> vertices{};
+        for(int row=0;row<=rows;++row){
+            const float v=static_cast<float>(row)/rows;
+            for(int col=0;col<=columns;++col){
+                const float u=static_cast<float>(col)/columns;
+                const float x=220+440*u, y=230+355*v;
+                const float edge=std::sin(3.141593f*u)*std::sin(3.141593f*v);
+                const float center=0.92f-0.57f*u;
+                const float cloth=std::clamp(1-std::abs(v-center)*3.4f,0.f,1.f);
+                const float wave=edge*cloth*(1-u);
+                const float phase=seconds*2.7f+u*7+v*2;
+                vertices[row*(columns+1)+col]={{x+wave*3*std::sin(phase+1),y+wave*16*std::sin(phase)},
+                    {1,1,1,1},{x/width,y/height}};
+            }
+        }
+        static const auto indices=[]{
+            std::array<int,columns*rows*6> triangles{};
+            int i=0;
+            for(int row=0;row<rows;++row){
+                for(int col=0;col<columns;++col){
+                    const int a=row*(columns+1)+col, b=a+columns+1;
+                    triangles[i++]=a;triangles[i++]=a+1;triangles[i++]=b;
+                    triangles[i++]=a+1;triangles[i++]=b+1;triangles[i++]=b;
+                }
+            }
+            return triangles;
+        }();
+        SDL_RenderGeometry(renderer,titleTexture_,vertices.data(),static_cast<int>(vertices.size()),
+                           indices.data(),static_cast<int>(indices.size()));
+
+        // The logo and eclipse share the upper artwork strip. Fade its
+        // lower edge into the fully visible scene while the lettering appears.
+        const SDL_FColor faded{1,1,1,eased}, visible{1,1,1,1};
+        constexpr float fadeStart=logoBand-55;
+        const SDL_Vertex logo[]={
+            {{0,0},faded,{0,0}},{{width,0},faded,{1,0}},
+            {{0,fadeStart},faded,{0,fadeStart/height}},{{width,fadeStart},faded,{1,fadeStart/height}},
+            {{0,logoBand},visible,{0,logoBand/height}},{{width,logoBand},visible,{1,logoBand/height}}
+        };
+        const int strip[]={0,1,2,1,3,2,2,3,4,3,5,4};
+        SDL_RenderGeometry(renderer,titleTexture_,logo,6,strip,12);
+        if(seconds>=titleReadyTime){
+            const auto& b=titleButton;
+            rect(b.x,b.y,b.w,b.h,0x11101d,235);
+            const auto glow=static_cast<Uint8>(174+38*std::sin(seconds*2.6f));
+            rect(b.x,b.y,b.w,2,0xb5a7ce,glow);
+            rect(b.x,b.y+b.h-2,b.w,2,0x817491,glow);
+            rect(b.x,b.y,2,b.h,0x817491,glow);
+            rect(b.x+b.w-2,b.y,2,b.h,0x817491,glow);
+            text("START",b.x+(b.w-87)/2,b.y+(b.h-21)/2,3,0xe9e1f3);
+        }
+        SDL_RenderPresent(renderer);
+    }
+
     bool load(){
         // Castle entrance PNGs are optional until the tutorial scene is integrated.
         // Incomplete packs do not replace the established forest scene.
