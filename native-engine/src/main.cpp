@@ -17,7 +17,7 @@ void updateKeyboard(){const auto& k=keyState;eclipse::Actions a;
 }
 void events(){
     SDL_Event e;
-    while(SDL_PollEvent(&e)){
+    while(!layout.exitRequested&&SDL_PollEvent(&e)){
         if(e.type==SDL_EVENT_QUIT){running=false;continue;}
         if(e.type==SDL_EVENT_WINDOW_FOCUS_LOST||e.type==SDL_EVENT_WILL_ENTER_BACKGROUND){foreground=false;input.reset();keyState.fill(false);continue;}
         if(e.type==SDL_EVENT_WINDOW_FOCUS_GAINED||e.type==SDL_EVENT_DID_ENTER_FOREGROUND){foreground=true;continue;}
@@ -161,6 +161,7 @@ int main(int argc,char** argv){
     }
     Uint64 last=SDL_GetTicksNS();double accumulator=0;
     while(running){Uint64 start=SDL_GetTicksNS();events();
+        if(layout.exitRequested)break;
         if(!foreground){accumulator=0;SDL_Delay(50);last=SDL_GetTicksNS();continue;}
         accumulator+=std::min((start-last)/1e9,.1);last=start;
         while(accumulator>=eclipse::fixedStep){if(!layout.editing)tick(input.sample());accumulator-=eclipse::fixedStep;}

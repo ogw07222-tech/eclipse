@@ -488,8 +488,9 @@ class Presentation {
         menuTile(376,107,716,67,0x172331,0x596878);
         text(tabs[layout.page],398,126,4,ink);
         rect(389,187,755,2,0x596878);
-        menuTile(1120,103,90,65,0x302832,0x705d68);
-        text("X",1157,123,4,ink);
+        menuTile(ControlLayout::backX,ControlLayout::backY,
+                 ControlLayout::backWidth,ControlLayout::backHeight,0x213242,0x596878);
+        text("BACK",ControlLayout::backX+10,ControlLayout::backY+22,3,ink);
 
         if(layout.page==ControlLayout::Controls){
             text("TOUCH BUTTON POSITION AND SIZE",390,218,2,muted);
