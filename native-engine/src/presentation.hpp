@@ -985,10 +985,10 @@ public:
             SDL_SetError("ECLIPSE ASSET ERROR: %s: %s",motionPath.c_str(),cause.c_str());
             return false;
         }
-        if(!SDL_GetTextureSize(motion,&width,&height)||width!=512||height!=1056){
+        if(!SDL_GetTextureSize(motion,&width,&height)||width!=512||height!=1152){
             SDL_DestroyTexture(motion);
             SDL_DestroyTexture(texture);
-            SDL_SetError("ECLIPSE ASSET ERROR: %s expected 512x1056, got %.0fx%.0f",motionPath.c_str(),width,height);
+            SDL_SetError("ECLIPSE ASSET ERROR: %s expected 512x1152, got %.0fx%.0f",motionPath.c_str(),width,height);
             return false;
         }
         SDL_SetTextureScaleMode(motion,SDL_SCALEMODE_NEAREST);
@@ -1401,9 +1401,19 @@ public:
             if(p.whiteMove!=WhiteMove::None){
                 const auto clip=whiteClips[static_cast<int>(p.whiteMove)];
                 whiteFrame=clip.start+std::min(clip.count-1,static_cast<int>(p.whiteAge*clip.count/clip.duration));
-            }else if(a.state==1||a.state==7){
-                whiteFrame=std::clamp(static_cast<int>(a.travelPhase*16),0,15);
-            }else if(!p.grounded)whiteFrame=p.vy<0?7:11;
+            }else if(a.state==7){
+                whiteFrame=3;
+            }else if(!p.grounded){
+                // The takeoff and landing sprites share the same world foot anchor.
+                // Airborne poses progress with vertical velocity, not horizontal travel.
+                const float phase=std::clamp((p.vy+650.f)/1300.f,0.f,1.f);
+                whiteFrame=8+std::min(6,static_cast<int>(phase*7));
+            }else if(a.state==10){
+                whiteFrame=15;
+            }else if(a.state==1||a.state==11){
+                const int start=a.state==11?88:0;
+                whiteFrame=start+std::clamp(static_cast<int>(a.travelPhase*8),0,7);
+            }
             const SDL_FRect source{float(whiteFrame%8*64),float(whiteFrame/8*96),64,96};
             const SDL_FRect dest{std::round(p.x-offset-32*motionScale),std::round(p.y-88*motionScale),64*motionScale,96*motionScale};
             if(p.whiteMove==WhiteMove::Rush&&p.whiteAge>=.125f&&p.whiteAge<.36f){
