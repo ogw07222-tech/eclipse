@@ -15,11 +15,11 @@ Assets/Resources/Eclipse/demon_castle/entrance/
 
 The **floor is a single PNG** drawn as many times as needed, not five duplicate files. Do not include any old prototype `layered_preview.png`, `entrance_preview_full.png` or scene-baked duplicate floor images in game assets. Other biomes' PNG assets are unrelated and must not be deleted.
 
-`native-engine/src/demon_castle_entrance.hpp` loads precisely these five images atomically (missing file = no scene override). It does not affect game physics or collision. The player collision floor is y=597 and the visible artwork surface begins y=585.
+`native-engine/src/demon_castle_entrance.hpp` loads precisely these five images atomically. Missing, invalid-sized, or corrupt files now produce an explicit `ECLIPSE ASSET ERROR` and fail the game load rather than silently showing the forest. It does not affect game physics or collision. The player collision floor is y=597 and the visible artwork surface begins y=585.
 
 Desktop test-only preview: `./eclipse_engine --castle-preview`. This does **not** permanently change the forest arena. The tutorial scene transition still needs a scene-state hook when the tutorial gameplay is implemented.
 
 Packaging support exists for desktop CMake and the normal Android Gradle asset Sync. Do not trigger GitHub Actions without the user's permission.
 
 ## Asset delivery status
-The approved-reference layers have been generated in the ChatGPT working environment and delivered as a separate downloadable ZIP, but **the binary PNGs are not committed to this GitHub repository**. The code is ready to load them after they are placed at the exact paths above. Do not claim that the in-game scene works until assets are actually committed and a local rendering test is performed.
+Five castle PNG layers were committed to `main` in commit `8e1b9a2`. Their existence in Git does not prove Studio import or runtime decoding succeeded. Any missing/invalid required layer now causes a logged startup failure; owner-run runtime validation is still required.
