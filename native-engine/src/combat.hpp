@@ -457,7 +457,7 @@ public:
     void damagePlayer(int amount){
         auto& p=player;if(ended||p.invulnerable>0||p.health<=0)return;
         holdHealthTrail(p,.12f);
-        p.health=std::max(0,p.health-std::max(1,amount-p.gear.defense()));p.hurtTint=.18f;cancelAirSlam();cancelMageCast();p.meleeLeft=0;p.invulnerable=.7f;p.attackFlash=.28f;++p.hurtSerial;p.combo=0;p.comboWindow=0;
+        p.health=std::max(0,p.health-std::max(1,amount-p.gear.defense()));p.hurtTint=.18f;cancelAirSlam();cancelMageCast();p.meleeLeft=0;p.invulnerable=.7f;p.attackFlash=0;++p.hurtSerial;p.combo=0;p.comboWindow=0;
         if(p.health==0){ended=true;won=false;inventory=false;}
     }
     void step(float dt,Actions a){
@@ -508,7 +508,7 @@ struct Animation {
         // Freeze visual action during a gameplay hit-stop, except death/hurt feedback.
         float visualDt=p.hitStop>0&&p.health>0&&hurtTime<=0?0:dt;
         attackTime=std::max(0.f,attackTime-visualDt);hurtTime=std::max(0.f,hurtTime-dt);if(!landed)landTime=std::max(0.f,landTime-visualDt);
-        int next=p.health<=0?9:hurtTime>0?8:p.dashLeft>0?7:(p.airSlam||p.slamRecover>0)?12:attackTime>0?attackState:!p.grounded?(p.vy<0?2:3):landTime>0?10:std::abs(p.vx)>20?(std::abs(p.vx)<180?11:1):0;
+        int next=p.health<=0?9:p.dashLeft>0?7:(p.airSlam||p.slamRecover>0)?12:attackTime>0?attackState:!p.grounded?(p.vy<0?2:3):landTime>0?10:std::abs(p.vx)>20?(std::abs(p.vx)<180?11:1):0;
         if(next!=state||retrigger){state=next;time=0;}else time+=visualDt;
         const auto clip=motionClips[next];int index=0;
         if(next==0)index=static_cast<int>(time/clip.duration*clip.count)%clip.count;
@@ -522,7 +522,6 @@ struct Animation {
         }
         else if((next>=4&&next<=6)||isSkillMotion(next))index=static_cast<int>((1-attackTime/attackDuration)*clip.count);
         else if(next==7)index=static_cast<int>((1-std::clamp(p.dashLeft/.15f,0.f,1.f))*clip.count);
-        else if(next==8)index=static_cast<int>((1-hurtTime/.23f)*clip.count);
         else if(next==10)index=static_cast<int>((1-landTime/clip.duration)*clip.count);
         else index=static_cast<int>(time/clip.duration*clip.count);
         frame=clip.start+std::clamp(index,0,clip.count-1);
