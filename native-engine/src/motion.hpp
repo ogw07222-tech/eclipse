@@ -1,6 +1,10 @@
 #pragma once
 namespace eclipse {
 struct MotionClip{int start,count;float duration,contact,stride;};
+constexpr int thrustSkillState=13,sweepSkillState=14,prepSkillState=15;
+constexpr int skillMotionColumns=4,skillMotionRows=3,skillMotionStart=208;
+constexpr int skillMotionWidth=112,skillMotionPivotX=44;
+constexpr bool isSkillMotion(int state){return state>=thrustSkillState&&state<=prepSkillState;}
 constexpr MotionClip motionClips[]={
     {0,8,0.960000f,0.500000f,0.000000f},
     {32,16,0.428571f,0.500000f,120.000000f},
@@ -15,6 +19,9 @@ constexpr MotionClip motionClips[]={
     {80,6,0.120000f,0.500000f,0.000000f},
     {16,8,0.600000f,0.500000f,72.000000f},
     {192,8,0.380000f,0.625000f,0.000000f},
+    {208,4,.48f,.455f,0.f}, // thrust contact matches the extended pose
+    {212,4,.415f,.50f,0.f},  // sweep contact matches the downswing
+    {216,4,.40f,.50f,0.f},  // raise the sword, brace, recover
 };
 constexpr int motionWidth=64,motionHeight=94,motionColumns=16,motionRows=13,motionPivotX=28,motionPivotY=88;
 constexpr float motionScale=1.85f;

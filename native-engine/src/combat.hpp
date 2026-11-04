@@ -33,7 +33,8 @@ struct Equipment {
 constexpr float thrustCooldown=6.f,sweepCooldown=9.f,buffCooldown=14.f;
 constexpr float preparationDuration=5.f;
 constexpr int bleedMaxStacks=10,bleedSlowStacks=5;
-constexpr float bleedDuration=5.f,bleedTickInterval=.75f;
+// Every 3 seconds one stack expires; reapplying bleed resets that countdown.
+constexpr float bleedDuration=3.f,bleedTickInterval=.75f;
 enum class SwordStrike {Basic,Thrust,Sweep};
 
 struct Player {
@@ -236,7 +237,7 @@ class Combat {
         const bool thrust=strike==SwordStrike::Thrust;
         cancelAirSlam();
         p.strike=strike;
-        p.attackPose=thrust?6:5;
+        p.attackPose=thrust?thrustSkillState:sweepSkillState;
         const auto clip=motionClips[p.attackPose];
         p.meleeLeft=clip.duration*clip.contact;
         p.meleeReach=(thrust?120.f:125.f)*p.gear.range();
@@ -283,6 +284,10 @@ class Combat {
         if(attackAllowed&&a.skillBuff&&p.form==0&&p.buffReady<=0&&p.grounded&&p.dashLeft<=0&&p.slamRecover<=0){
             p.preparation=preparationDuration;
             p.buffReady=buffCooldown;
+            if(p.meleeLeft<=0){
+                p.attackPose=prepSkillState;
+                ++p.attackSerial;
+            }
         }
         if(attackAllowed&&a.attack&&p.attackCooldown<=0&&p.dashLeft<=0&&!p.airSlam&&p.slamRecover<=0)basic();
         if(attackAllowed&&p.dashLeft<=0&&p.slamRecover<=0){
@@ -360,7 +365,11 @@ class Combat {
                 if(!e.boss&&e.bleedStacks==bleedMaxStacks&&e.health*10<=e.maxHealth)
                     damageEnemy(e,e.health,DamageKind::Execute,false);
             }
-            if(e.bleed<=0){e.bleedStacks=0;e.bleedTick=0;}
+            if(e.bleed<=0){
+                --e.bleedStacks;
+                if(e.bleedStacks>0)e.bleed=bleedDuration;
+                else {e.bleedStacks=0;e.bleedTick=0;}
+            }
         }
         if(e.burn>0){e.burn=down(e.burn,dt);e.burnTick+=dt;if(e.burnTick>=.6f){e.burnTick-=.6f;damageEnemy(e,2,DamageKind::Fire,true);}}
         if(e.dead())return;
@@ -472,19 +481,25 @@ public:
     }
 };
 struct Animation {
-    int state=-1,frame=0,attackSerial=0,hurtSerial=0,landingSerial=0,combo=1;
+    int state=-1,frame=0,attackSerial=0,hurtSerial=0,landingSerial=0,combo=1,attackState=4;
     float time=0,attackTime=0,attackDuration=.36f,hurtTime=0,landTime=0,travelPhase=0,lastX=140;
     bool initialized=false,wasHitStopped=false;
     void reset(){*this=Animation{};}
     void step(const Player& p,float dt){
         bool retrigger=p.attackSerial!=attackSerial;
         float distance=initialized?std::abs(p.x-lastX):0;lastX=p.x;initialized=true;
-        if(retrigger){attackSerial=p.attackSerial;combo=p.attackPose>0?p.attackPose-3:std::clamp(p.combo,1,3);
-            attackDuration=p.attackPose>0?motionClips[p.attackPose].duration:
-                p.form==0&&p.combo>0?motionClips[3+combo].duration/p.basicSpeed():p.mageCastLeft>0?mageCastDuration:.36f;attackTime=p.hitStop>0?attackDuration*(1-motionClips[3+combo].contact):attackDuration;}
+        if(retrigger){
+            attackSerial=p.attackSerial;
+            combo=std::clamp(p.combo,1,3);
+            attackState=p.attackPose>0?p.attackPose:3+combo;
+            const auto& clip=motionClips[attackState];
+            attackDuration=p.attackPose>0?clip.duration:
+                p.form==0&&p.combo>0?clip.duration/p.basicSpeed():p.mageCastLeft>0?mageCastDuration:.36f;
+            attackTime=p.hitStop>0?attackDuration*(1-clip.contact):attackDuration;
+        }
         if(p.hurtSerial!=hurtSerial){hurtSerial=p.hurtSerial;hurtTime=.23f;}
-        if(p.dashLeft>0||hurtTime>0||p.airSlam||p.slamRecover>0||(!p.grounded&&p.form==0))attackTime=0;
-        if(p.hitStop>0&&!wasHitStopped&&attackTime>0)attackTime=attackDuration*(1-motionClips[3+combo].contact);
+        if((isSkillMotion(attackState)&&p.form!=0)||p.dashLeft>0||hurtTime>0||p.airSlam||p.slamRecover>0||(!p.grounded&&p.form==0))attackTime=0;
+        if(p.hitStop>0&&!wasHitStopped&&attackTime>0)attackTime=attackDuration*(1-motionClips[attackState].contact);
         wasHitStopped=p.hitStop>0;
         const bool landed=p.landingSerial!=landingSerial;
         landingSerial=p.landingSerial;
@@ -493,7 +508,7 @@ struct Animation {
         // Freeze visual action during a gameplay hit-stop, except death/hurt feedback.
         float visualDt=p.hitStop>0&&p.health>0&&hurtTime<=0?0:dt;
         attackTime=std::max(0.f,attackTime-visualDt);hurtTime=std::max(0.f,hurtTime-dt);if(!landed)landTime=std::max(0.f,landTime-visualDt);
-        int next=p.health<=0?9:hurtTime>0?8:p.dashLeft>0?7:(p.airSlam||p.slamRecover>0)?12:attackTime>0?3+combo:!p.grounded?(p.vy<0?2:3):landTime>0?10:std::abs(p.vx)>20?(std::abs(p.vx)<180?11:1):0;
+        int next=p.health<=0?9:hurtTime>0?8:p.dashLeft>0?7:(p.airSlam||p.slamRecover>0)?12:attackTime>0?attackState:!p.grounded?(p.vy<0?2:3):landTime>0?10:std::abs(p.vx)>20?(std::abs(p.vx)<180?11:1):0;
         if(next!=state||retrigger){state=next;time=0;}else time+=visualDt;
         const auto clip=motionClips[next];int index=0;
         if(next==0)index=static_cast<int>(time/clip.duration*clip.count)%clip.count;
@@ -505,7 +520,7 @@ struct Animation {
                 3+std::min(1,static_cast<int>((p.slamAge-airSlamWindup)/.08f));
             else index=5+std::min(2,static_cast<int>((1-p.slamRecover/airSlamRecovery)*3));
         }
-        else if(next>=4&&next<=6)index=static_cast<int>((1-attackTime/attackDuration)*clip.count);
+        else if((next>=4&&next<=6)||isSkillMotion(next))index=static_cast<int>((1-attackTime/attackDuration)*clip.count);
         else if(next==7)index=static_cast<int>((1-std::clamp(p.dashLeft/.15f,0.f,1.f))*clip.count);
         else if(next==8)index=static_cast<int>((1-hurtTime/.23f)*clip.count);
         else if(next==10)index=static_cast<int>((1-landTime/clip.duration)*clip.count);
