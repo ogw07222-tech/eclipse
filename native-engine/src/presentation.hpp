@@ -531,13 +531,17 @@ class Presentation {
         constexpr unsigned ink=0xe4dfd1,muted=0x9eacba,gold=0xc7a575;
         const char* names[]={"JOYSTICK","ATTACK","DASH","SWAP","STAB","SWEEP","PREP"};
         if(layout.reposition){
-            rect(0,0,1280,720,0x07101b,54);
+            // Fullscreen editing: leave the gameplay and HUD visible. The entire
+            // settings window is suppressed until DONE is pressed.
+            rect(0,0,1280,720,0x07101b,38);
             menuTile(45,26,730,110,0x172331,0x596878);
-            text("EDIT TOUCH LAYOUT",64,43,3,ink);
-            text("DRAG TO MOVE  PINCH TO RESIZE",64,80,2,muted);
-            text(names[layout.selected],64,109,2,gold);
-            number(static_cast<int>(std::round(layout.buttons[layout.selected].size)),188,109,2,gold);
-            text("PX",228,109,2,gold);
+            rect(57,38,5,84,gold);
+            rect(68,37,683,2,0xc1e4ec,135);
+            text("CONTROL EDIT MODE",78,43,3,ink);
+            text("DRAG TO MOVE  /  PINCH TO RESIZE",78,80,2,muted);
+            text(names[layout.selected],78,109,2,gold);
+            number(static_cast<int>(std::round(layout.buttons[layout.selected].size)),213,109,2,gold);
+            text("PX",256,109,2,gold);
             const auto& b=layout.buttons[layout.selected];
             for(float y:{b.y-4,b.y+b.size+1}){
                 rect(b.x-4,y,17,3,gold);
@@ -548,6 +552,7 @@ class Presentation {
                 rect(x,b.y+b.size-13,3,17,gold);
             }
             menuTile(1030,80,205,65,0x304b58,gold);
+            rect(1041,90,4,44,0xc1e4ec);
             text("DONE",1094,102,3,ink);
             return;
         }
@@ -614,24 +619,17 @@ class Presentation {
             rect(453,291,6,52,0xc1e4ec);
             rect(470,292,553,2,0xc8d8de,140);
             text("EDIT ON SCREEN",614,306,3,ink);
-            text("SELECTED CONTROL",440,365,2,muted);
-            menuTile(440,385,100,68,0x213242,0x596878);
-            rect(477,416,26,4,ink);
-            menuTile(550,385,390,68,0x0f1926,0x465363);
-            rect(561,394,4,50,gold,185);
-            text(names[layout.selected],579,410,3,ink);
-            number(static_cast<int>(std::round(layout.buttons[layout.selected].size)),791,409,3,gold);
-            text("PX",854,411,2,muted);
-            menuTile(950,385,100,68,0x213242,0x596878);
-            rect(987,416,26,4,ink);
-            rect(998,405,4,26,ink);
+            text("EDITING MODE",440,376,2,muted);
+            menuTile(440,405,600,62,0x0f1926,0x465363);
+            rect(452,416,4,40,gold,185);
+            text("DRAG BUTTONS  /  PINCH WITH TWO FINGERS",469,428,2,ink);
             menuTile(445,485,285,68,0x302832,0x705d68);
             rect(454,495,4,46,0xa77b83);
             text("RESET",544,509,3,ink);
             menuTile(750,485,285,68,0x213242,0x596878);
             rect(759,495,4,46,0xc1e4ec);
             text("SAVE",856,509,3,ink);
-            text("DRAG TO MOVE  PINCH TO RESIZE",440,565,2,muted);
+            text("DONE RETURNS TO SETTINGS",440,565,2,muted);
         }else if(layout.page==ControlLayout::Sound){
             text("MUSIC AND COMBAT EFFECT LEVELS",390,218,2,muted);
             for(int i=0;i<2;++i){
