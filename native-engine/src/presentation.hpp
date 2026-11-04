@@ -265,7 +265,7 @@ class Presentation {
                     constexpr float scale=.82f;
                     constexpr float anchorY=585.f;
                     constexpr SDL_FRect leftSrc{0.f,0.f,450.f,720.f};
-                    constexpr SDL_FRect rightSrc{1050.f,0.f,550.f,720.f};
+                    constexpr SDL_FRect rightSrc{1170.f,0.f,430.f,720.f};
                     SDL_FRect leftDst{-shift,anchorY-anchorY*scale,
                                       leftSrc.w*scale,720.f*scale};
                     SDL_FRect rightDst{1600.f-rightSrc.w*scale-shift,
