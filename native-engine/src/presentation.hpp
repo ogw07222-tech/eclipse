@@ -821,9 +821,13 @@ public:
 #endif
     }
     bool loadTitle(){
-        titleTexture_=IMG_LoadTexture(renderer,asset("title/eclipse.png").c_str());
+        // Studio imports title layers under the already-supported ui/ namespace.
+        // Standalone Game APKs keep their original title/ asset paths.
+        titleTexture_=IMG_LoadTexture(renderer,asset("ui/title_eclipse.png").c_str());
+        if(!titleTexture_)titleTexture_=IMG_LoadTexture(renderer,asset("title/eclipse.png").c_str());
         if(!titleTexture_)return false;
-        titleCape_=IMG_LoadTexture(renderer,asset("title/cape.png").c_str());
+        titleCape_=IMG_LoadTexture(renderer,asset("ui/title_cape.png").c_str());
+        if(!titleCape_)titleCape_=IMG_LoadTexture(renderer,asset("title/cape.png").c_str());
         if(titleCape_){
             SDL_SetTextureScaleMode(titleCape_,SDL_SCALEMODE_NEAREST);
             SDL_SetTextureBlendMode(titleCape_,SDL_BLENDMODE_BLEND);
