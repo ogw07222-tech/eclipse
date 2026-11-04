@@ -920,13 +920,13 @@ public:
     }
 
     bool load(){
-        // Required asset pack. A missing, corrupt or incorrectly sized layer is fatal:
-        // never silently render the forest when the castle pack fails to load.
+        // Preload the castle for its future tutorial scene, but do not require
+        // tutorial art to start an unrelated forest gameplay scene.
+        // The explicit castle preview request checks readiness and raises an error.
         if(!castleEntrance_.load(renderer,[&](const char* name){return asset(name);})) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",SDL_GetError());
-            return false;
-        }
-        SDL_Log("ECLIPSE demon castle entrance assets: ready");
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+                "ECLIPSE castle asset preload failed (castle scene unavailable): %s",SDL_GetError());
+        } else SDL_Log("ECLIPSE demon castle entrance assets: ready");
         constexpr const char* files[]={"knight_motion.png","ui/attack_states.png","ui/dash_states.png","ui/swap_skill_states.png","ui/joystick_arrows_new.png"};
         for(int i=0;i<5;++i){const auto path=asset(files[i]);SDL_Surface* image=IMG_Load(path.c_str());
             if(!image){SDL_Log("Required PNG missing or invalid: %s (%s)",path.c_str(),SDL_GetError());return false;}
