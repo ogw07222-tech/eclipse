@@ -1,23 +1,25 @@
-# Demon Castle Entrance — tutorial background prototype
+# ECLIPSE — Demon Castle Entrance (tutorial art)
+ 
+## Approved visual reference
+Dark charcoal gothic stone, tall barred gate at right, hooded statues, muted worn red banners, orange braziers and an eclipsed moon. The approved user-supplied image is the source of truth; **do not use the older generated placeholder art**.
 
-The opening tutorial's dark-gothic castle entrance is intentionally separate from the existing forest and from the later throne-room boss arena. The art direction uses charcoal masonry, muted red banners, small warm braziers and minimal violet emission.
+## Five PNG layer contract
+```
+Assets/Resources/Eclipse/demon_castle/entrance/
+  sky_far.png             # 1280x720, 0.00 camera parallax
+  far_castle.png           # 1280x720, 0.18
+  mid_ruins.png            # 1600x720, 0.42
+  near_gate.png            # 1600x720, 1.00
+  floor_repeat_512.png     # 512x135, repeated horizontally starting y=585
+```
 
-## Layer contract (SDL3, 1280 × 720 logical viewport)
-Put the following PNGs under `Assets/Resources/Eclipse/demon_castle/entrance/`:
+The **floor is a single PNG** drawn as many times as needed, not five duplicate files. Do not include any old prototype `layered_preview.png`, `entrance_preview_full.png` or scene-baked duplicate floor images in game assets. Other biomes' PNG assets are unrelated and must not be deleted.
 
-| PNG | Pixel size | Parallax | Usage |
-| --- | --- | --- | --- |
-| sky_far.png | 1280×720 | fixed | opaque sky |
-| far_castle.png | 1280×720 | 0.18 | distant silhouettes |
-| mid_ruins.png | 1600×720 | 0.42 | collapsed exterior arches |
-| near_gate.png | 1600×720 | 1.0 | unique castle gate |
-| floor_repeat_512.png | 512×135 | 1.0 | exactly one horizontally repeated texture |
+`native-engine/src/demon_castle_entrance.hpp` loads precisely these five images atomically (missing file = no scene override). It does not affect game physics or collision. The player collision floor is y=597 and the visible artwork surface begins y=585.
 
-All layers use nearest-neighbor, no interpolation. The floor illustration begins at y=585, while existing engine collision is at y=597; do not infer collision from PNG pixels.
+Desktop test-only preview: `./eclipse_engine --castle-preview`. This does **not** permanently change the forest arena. The tutorial scene transition still needs a scene-state hook when the tutorial gameplay is implemented.
 
-`native-engine/src/demon_castle_entrance.hpp` loads the five textures as an **optional atomic pack**. Missing or incorrect dimensions leave the original forest intact; `Presentation::setDemonCastleEntrance(true)` enables this art when loaded, and false restores forest rendering. The controller currently does not select scenes automatically, since the tutorial scene/state transition is not implemented. It must be called from the tutorial's entry transition only, not at the global startup of the forest combat prototype.
+Packaging support exists for desktop CMake and the normal Android Gradle asset Sync. Do not trigger GitHub Actions without the user's permission.
 
-Build pipelines package the folder whenever PNGs exist. **No GitHub Actions workflow or automatic testing is requested or run.**
-
-## Art status
-The initial prototype exports and reference previews were generated separately from the repository. A game-ready transparent-seam art pass is still needed before enabling this scene in production. 
+## Asset delivery status
+The approved-reference layers have been generated in the ChatGPT working environment and delivered as a separate downloadable ZIP, but **the binary PNGs are not committed to this GitHub repository**. The code is ready to load them after they are placed at the exact paths above. Do not claim that the in-game scene works until assets are actually committed and a local rendering test is performed.
