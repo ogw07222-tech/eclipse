@@ -50,8 +50,8 @@ def trail_mask(name, i, indices, paths):
             for along, drift in ((.62, .52), (1.12, .41), (1.67, .26)):
                 draw.line([point(along, side * drift),
                            point(along + .15, side * drift * .82)], fill=4, width=1)
-        draw.polygon([point(.46, 0), point(.95, -.16), point(reach, 0),
-                      point(.95, .16)], fill=2)
+        draw.polygon([point(.32, 0), point(.95, -.22), point(reach, 0),
+                      point(.95, .22)], fill=2)
         draw.polygon([point(.74, 0), point(1.14, -.08), point(reach - .04, 0),
                       point(1.14, .08)], fill=4)
         draw.line([point(.78, 0), point(reach - .1, 0)], fill=3, width=1)
@@ -80,15 +80,18 @@ def trail_mask(name, i, indices, paths):
                          [sweep(t, inner(t)) for t in reversed(times)], fill=shade)
 
         # Tapered crescent, separated echo, icy rim and short white crest.
-        ribbon(0, 1, lambda t: outer(t) - .50 * t, outer, 1)
-        ribbon(.11, 1, lambda t: outer(t) - .30 * t, outer, 2)
+        # A translucent inner fan follows the whole blade behind the bright edge.
+        ribbon(.06, 1, lambda t: .35 + .16 * (1 - t),
+               lambda t: outer(t) - .25, 1)
+        ribbon(0, 1, lambda t: outer(t) - .60 * t, outer, 1)
+        ribbon(.11, 1, lambda t: outer(t) - .37 * t, outer, 2)
         ribbon(.28, 1, lambda t: outer(t) - .12 * t, outer, 4)
         draw.line([sweep(t / 32, outer(t / 32) - .02) for t in range(17, 33)],
                   fill=3, width=1)
         draw.line([sweep(t / 32, outer(t / 32) + .13) for t in range(5, 25)],
                   fill=2, width=1)
         # Connect the crescent to the current steel tip and throw off sparks.
-        draw.line([pixel(tx, ty), sweep(1, reach)], fill=4, width=2)
+        draw.line([sweep(1, .38), sweep(1, reach)], fill=4, width=2)
         for k, t in enumerate((.10, .23, .36, .53, .69, .84, .94)):
             radius = outer(t) + .20 + .08 * (k % 3)
             point = sweep(t, radius, 2 + k % 3)
