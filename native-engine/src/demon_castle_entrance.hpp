@@ -59,12 +59,6 @@ public:
             float x=std::round(-travel*factors[i]);
             SDL_FRect destination{x,0.f,w,720.f};
             SDL_RenderTexture(renderer_,images_[i],nullptr,&destination);
-            // Far scenery extends seamlessly when camera movement reveals an edge.
-            if(i==1) {
-                SDL_FRect before{x-w,0.f,w,720.f},after{x+w,0.f,w,720.f};
-                SDL_RenderTexture(renderer_,images_[i],nullptr,&before);
-                SDL_RenderTexture(renderer_,images_[i],nullptr,&after);
-            }
         }
         // Floor texture is authored for the same y=585 visible surface as the forest.
         // Draw one texture repeatedly in world space; no new platform collisions.
