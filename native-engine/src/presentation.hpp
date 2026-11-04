@@ -852,14 +852,11 @@ public:
 #endif
     }
     bool loadTitle(){
-        // Studio imports title layers under the already-supported ui/ namespace.
-        // Standalone Game APKs keep their original title/ asset paths.
-        titleTexture_=IMG_LoadTexture(renderer,asset("ui/title_eclipse.png").c_str());
-        if(!titleTexture_)titleTexture_=IMG_LoadTexture(renderer,asset("title/eclipse.png").c_str());
-        if(!titleTexture_){SDL_SetError("ECLIPSE ASSET ERROR: title background missing or invalid (ui/title_eclipse.png or title/eclipse.png)");return false;}
-        titleCape_=IMG_LoadTexture(renderer,asset("ui/title_cape.png").c_str());
-        if(!titleCape_)titleCape_=IMG_LoadTexture(renderer,asset("title/cape.png").c_str());
-        if(!titleCape_){SDL_SetError("ECLIPSE ASSET ERROR: title cape missing or invalid (ui/title_cape.png or title/cape.png)");return false;}
+        // Canonical title assets: Studio now supports the title/ namespace.
+        titleTexture_=IMG_LoadTexture(renderer,asset("title/eclipse.png").c_str());
+        if(!titleTexture_){SDL_SetError("ECLIPSE ASSET ERROR: title/eclipse.png missing or invalid");return false;}
+        titleCape_=IMG_LoadTexture(renderer,asset("title/cape.png").c_str());
+        if(!titleCape_){SDL_SetError("ECLIPSE ASSET ERROR: title/cape.png missing or invalid");return false;}
         if(titleCape_){
             SDL_SetTextureScaleMode(titleCape_,SDL_SCALEMODE_NEAREST);
             SDL_SetTextureBlendMode(titleCape_,SDL_BLENDMODE_BLEND);
