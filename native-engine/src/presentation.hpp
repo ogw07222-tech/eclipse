@@ -11,6 +11,7 @@
 #include "forest_generator.hpp"
 #include "forest_layers.hpp"
 #include "demon_castle_entrance.hpp"
+#include "mage_pixel_finish.hpp"
 
 namespace eclipse {
 class Presentation {
@@ -1058,6 +1059,13 @@ public:
             const auto path=asset(name);SDL_Surface* image=IMG_Load(path.c_str());
             if(!image)return nullptr;
             if(width&&(image->w!=width||image->h!=height)){SDL_DestroySurface(image);return nullptr;}
+            // Rework the original mage pixels in the real game texture path.
+            // Neither the sprite silhouette nor the 64x94 frame layout changes.
+            if(std::strcmp(name,"mage_motion.png")==0 || std::strcmp(name,"mage_run.png")==0){
+                SDL_Surface* finished=finishMagePixels(image);
+                if(finished){SDL_DestroySurface(image);image=finished;}
+                else SDL_LogError(SDL_LOG_CATEGORY_RENDER,"ECLIPSE mage pixel finish failed: %s",SDL_GetError());
+            }
             SDL_Texture* texture=SDL_CreateTextureFromSurface(renderer,image);
             SDL_DestroySurface(image);
             if(texture){SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(texture,SDL_BLENDMODE_BLEND);}
