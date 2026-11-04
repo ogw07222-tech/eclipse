@@ -3,6 +3,7 @@
 #include <SDL3_image/SDL_image.h>
 #include <string>
 #include <cstdio>
+#include <vector>
 #include "core.hpp"
 #include "sword_trails.hpp"
 #include "forest_generator.hpp"
@@ -15,6 +16,7 @@ class Presentation {
     std::array<SDL_Texture*,3> slimeTextures_{};
     SDL_Texture* enemyBarFrame_=nullptr;
     SDL_Texture* executeIcon_=nullptr;
+    std::array<SDL_Texture*,3> knightSkillTextures_{};
     float offset=0;
     SDL_Texture* mageRun_=nullptr;
     SDL_Texture* mageMotion_=nullptr;
@@ -28,6 +30,11 @@ class Presentation {
     std::array<SDL_Texture*,6> forestV3Textures_{};
     bool forestV3Ready_=false;
     bool forestEntranceReady_=false;
+    struct Ghost {
+        float x,y,time;int frame,columns,facing;SDL_Texture* texture;bool slam;
+    };
+    std::vector<Ghost> ghosts_{};
+    float lastGhostSample_=-1,lastGhostClock_=-1,lastGhostX_=0,lastGhostY_=0;
     static SDL_Color color(unsigned rgb,Uint8 alpha=255){return {static_cast<Uint8>(rgb>>16),static_cast<Uint8>(rgb>>8),static_cast<Uint8>(rgb),alpha};}
     void rect(float x,float y,float w,float h,unsigned rgb,Uint8 alpha=255){
         auto c=color(rgb,alpha);SDL_SetRenderDrawColor(renderer,c.r,c.g,c.b,c.a);
@@ -355,6 +362,38 @@ class Presentation {
         disk(x+p.facing*22-offset,y-64,7,0xffb74b,3);
         if(p.attackFlash>0)ring(x+p.facing*16-offset,y-36,40,0xffb74b);
     }
+    void afterimages(const Combat& g,const Animation& a,SDL_Texture* actorTexture,int frame,int columns){
+        const auto& p=g.player;
+        if(g.clock<lastGhostClock_||(lastGhostClock_>=0 &&
+            (std::abs(p.x-lastGhostX_)>260||std::abs(p.y-lastGhostY_)>280))){
+            ghosts_.clear();lastGhostSample_=-1;
+        }
+        if(g.clock>lastGhostClock_){
+            ghosts_.erase(std::remove_if(ghosts_.begin(),ghosts_.end(),[&](const Ghost& s){
+                return g.clock-s.time>(s.slam?.15f:.19f);}),ghosts_.end());
+            const bool dash=p.health>0&&p.dashLeft>0&&std::abs(p.vx)>300.f;
+            const bool slam=p.health>0&&p.form==0&&p.airSlam&&
+                p.slamAge>=airSlamWindup&&p.vy>200.f;
+            if((dash||slam)&&actorTexture&&(lastGhostSample_<0||g.clock-lastGhostSample_>=(slam?.035f:.04f))){
+                if(ghosts_.size()>=6)ghosts_.erase(ghosts_.begin());
+                ghosts_.push_back({p.x,p.y,g.clock,frame,columns,p.facing,actorTexture,slam});
+                lastGhostSample_=g.clock;
+            }
+            if(!dash&&!slam)lastGhostSample_=-1;
+        }
+        lastGhostClock_=g.clock;lastGhostX_=p.x;lastGhostY_=p.y;
+        for(const auto& s:ghosts_){
+            const float lifetime=s.slam?.15f:.19f,age=g.clock-s.time;
+            if(age<.018f||age>lifetime)continue;
+            SDL_SetTextureColorMod(s.texture,s.slam?160:120,s.slam?181:155,s.slam?196:186);
+            SDL_SetTextureAlphaMod(s.texture,static_cast<Uint8>(std::clamp(1.f-age/lifetime,0.f,1.f)*(s.slam?145.f:132.f)));
+            SDL_FRect source{float(s.frame%s.columns*motionWidth),float(s.frame/s.columns*motionHeight),motionWidth,motionHeight};
+            SDL_FRect dest{std::round(s.x-offset-(s.facing>0?motionPivotX:motionWidth-motionPivotX)*motionScale),
+                std::round(s.y-motionPivotY*motionScale),motionWidth*motionScale,motionHeight*motionScale};
+            SDL_RenderTextureRotated(renderer,s.texture,&source,&dest,0,nullptr,s.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
+            SDL_SetTextureAlphaMod(s.texture,255);SDL_SetTextureColorMod(s.texture,255,255,255);
+        }
+    }
     void slamShockwave(const Player& p){
         if(p.slamImpact<=0)return;
         const float t=std::clamp(1-p.slamImpact/airSlamImpactDuration,0.f,1.f);
@@ -398,7 +437,28 @@ class Presentation {
         SDL_SetTextureAlphaMod(textures[texture],255);
     }
     void skillButton(const ControlRect& b,const char* label,float remaining,float duration,
-                     bool pressed,unsigned accent,bool enabled=true){
+                     bool pressed,unsigned accent,bool enabled=true,int art=-1){
+        if(art>=0&&art<3&&knightSkillTextures_[art]){
+            SDL_Texture* image=knightSkillTextures_[art];
+            SDL_FRect target{std::round(b.x),std::round(b.y),std::round(b.size),std::round(b.size)};
+            SDL_SetTextureAlphaMod(image,pressed?240:205);
+            SDL_SetTextureColorMod(image,pressed?255:220,pressed?255:225,pressed?255:230);
+            SDL_RenderTexture(renderer,image,nullptr,&target);
+            SDL_SetTextureColorMod(image,255,255,255);
+            SDL_SetTextureAlphaMod(image,255);
+            if(remaining>0&&duration>0){
+                const float progress=std::clamp(remaining/duration,0.f,1.f);
+                const float top=b.y+b.size*(1-progress);
+                const float inset=b.size*.18f;
+                if(top<b.y+b.size-inset)
+                    rect(b.x+inset,std::max(top,b.y+inset),b.size-2*inset,
+                         b.y+b.size-inset-std::max(top,b.y+inset),0x111725,155);
+                number(static_cast<int>(std::ceil(remaining)),b.x+b.size*.39f,b.y+b.size*.6f,
+                       b.size>=85?3:2,0xe5e2dc);
+            }else rect(b.x+b.size*.39f,b.y+b.size*.83f,b.size*.22f,3,accent,210);
+            return;
+        }
+
         // Pixel octagon, with a bottom-up cooldown fill inside its inset.
         const float unit=std::max(2.f,std::floor(b.size/18.f));
         const float cut=3*unit;
@@ -440,9 +500,9 @@ class Presentation {
         icon(3,0,0,c[ControlLayout::Swap].x,c[ControlLayout::Swap].y,c[ControlLayout::Swap].size,held.swap);
         const bool knight=p.form==0;
         skillButton(c[ControlLayout::Skill],knight?"STAB":"FIRE",
-            knight?p.skillCooldown:p.mageSkillCooldown,knight?thrustCooldown:4.1f,held.skill,0xcaa2a4);
-        skillButton(c[ControlLayout::Sweep],"SWEEP",p.sweepReady,sweepCooldown,held.skillSweep,0x92b5ce,knight);
-        skillButton(c[ControlLayout::Buff],"PREP",p.buffReady,buffCooldown,held.skillBuff,0xe3bd72,knight);
+            knight?p.skillCooldown:p.mageSkillCooldown,knight?thrustCooldown:4.1f,held.skill,0xcaa2a4,true,knight?0:-1);
+        skillButton(c[ControlLayout::Sweep],"SWEEP",p.sweepReady,sweepCooldown,held.skillSweep,0x92b5ce,knight,knight?1:-1);
+        skillButton(c[ControlLayout::Buff],"PREP",p.buffReady,buffCooldown,held.skillBuff,0xe3bd72,knight,knight?2:-1);
         if(p.swapCooldown>0)number(static_cast<int>(std::ceil(p.swapCooldown)),c[ControlLayout::Swap].x+20,c[ControlLayout::Swap].y+25,3,0xffd277);
         if(g.inventory){rect(46,135,460,340,0xe3bd72);rect(50,139,452,332,0x1c2a34);text("EQUIPMENT",66,153,3);
             for(int i=0;i<3;++i){text(p.gear.name(i),66,200+i*42,2);rect(66+i*143,413,132,45,0x304039);text(i==0?"WEAPON":i==1?"ARMOR":"CHARM",75+i*143,428,2);}
@@ -597,7 +657,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -660,6 +720,9 @@ public:
         settingsWindow_=loadOptionalTexture("ui/settings_window.png");
         enemyBarFrame_=loadOptionalTexture("ui/enemy_bar_frame.png");
         executeIcon_=loadOptionalTexture("ui/execute_skull.png");
+        knightSkillTextures_[0]=loadOptionalTexture("ui/knight_skill_stab.png");
+        knightSkillTextures_[1]=loadOptionalTexture("ui/knight_skill_sweep.png");
+        knightSkillTextures_[2]=loadOptionalTexture("ui/knight_skill_prep.png");
         // Optional sprite library: the procedural renderer remains functional without it.
         // Only startup loads textures; no per-frame filesystem work.
         constexpr const char* forestFiles[40]={
@@ -819,10 +882,23 @@ public:
                 frame=row*columns+index;
             }
         }
+        afterimages(g,a,actorTexture,frame,columns);
         if(actorTexture){
             SDL_FRect source{static_cast<float>(frame%columns*motionWidth),static_cast<float>(frame/columns*motionHeight),motionWidth,motionHeight};
             SDL_FRect dest{std::round(p.x-offset-(p.facing>0?motionPivotX:motionWidth-motionPivotX)*motionScale),std::round(p.y-motionPivotY*motionScale),motionWidth*motionScale,motionHeight*motionScale};
+            const bool white=p.hurtTint>.13f,red=p.hurtTint>0&&!white;
+            if(red)SDL_SetTextureColorMod(actorTexture,255,125,140);
             SDL_RenderTextureRotated(renderer,actorTexture,&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
+            if(red)SDL_SetTextureColorMod(actorTexture,255,255,255);
+            if(white){
+                SDL_SetTextureBlendMode(actorTexture,SDL_BLENDMODE_ADD);
+                SDL_SetTextureColorMod(actorTexture,255,244,237);
+                SDL_SetTextureAlphaMod(actorTexture,185);
+                SDL_RenderTextureRotated(renderer,actorTexture,&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
+                SDL_SetTextureAlphaMod(actorTexture,255);
+                SDL_SetTextureColorMod(actorTexture,255,255,255);
+                SDL_SetTextureBlendMode(actorTexture,SDL_BLENDMODE_BLEND);
+            }
         }else mage(p);
         if(p.swapFlash>0)ring(p.x-offset,p.y-36,44,0xe3bd72);
         static const ControlLayout defaultLayout{};
