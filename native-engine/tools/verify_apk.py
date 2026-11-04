@@ -10,6 +10,8 @@ import zipfile
 parser = argparse.ArgumentParser()
 parser.add_argument('apk', type=Path)
 parser.add_argument('--abi', default='arm64-v8a', choices=['arm64-v8a', 'x86_64'])
+parser.add_argument('--all-assets', action='store_true',
+                    help='For Studio APK: validate every PNG/JSON resource rather than legacy Game APK subset')
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[2]
 assets = ['knight_motion.png', 'mage_run.png', 'mage_motion.png', 'ui/attack_states.png', 'ui/dash_states.png',
@@ -27,6 +29,12 @@ for folder in ('monsters', 'forest', 'forest_v2', 'forest_v3', 'forest_entrance'
     ) if folder_root.is_dir() else []
     assets.extend(folder_assets[folder])
 forest_assets = sum(len(folder_assets[folder]) for folder in ('forest', 'forest_v2', 'forest_v3', 'forest_entrance'))
+if args.all_assets:
+    # Studio now bundles the complete resource tree. Keep the standalone Game
+    # APK's original subset validation unchanged unless this flag is selected.
+    assets = sorted(path.relative_to(art_root).as_posix()
+                    for path in art_root.rglob('*')
+                    if path.is_file() and path.suffix.lower() in ('.png', '.json'))
 with zipfile.ZipFile(args.apk) as apk:
     if apk.testzip():
         raise SystemExit('APK ZIP integrity failed')
@@ -40,11 +48,12 @@ with zipfile.ZipFile(args.apk) as apk:
     for asset in assets:
         expected = (root / 'Assets/Resources/Eclipse' / asset).read_bytes()
         assert apk.read('assets/' + asset) == expected, 'Asset changed or missing: ' + asset
-    packaged = [n for n in apk.namelist() if n.startswith('assets/') and n.endswith('.png')]
+    asset_exts = ('.png', '.json') if args.all_assets else ('.png',)
+    packaged = [n for n in apk.namelist() if n.startswith('assets/') and n.endswith(asset_exts)]
     expected_names = {'assets/' + name for name in assets}
     actual_names = set(packaged)
     assert actual_names == expected_names, (
-        'APK PNG set differs from source: '
+        'APK asset set differs from source: '
         f'missing={sorted(expected_names - actual_names)}, '
         f'unexpected={sorted(actual_names - expected_names)}'
     )
