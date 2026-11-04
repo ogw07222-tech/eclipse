@@ -16,6 +16,7 @@ class Presentation {
     SDL_Renderer* renderer;
     std::array<SDL_Texture*,5> textures{};
     SDL_Texture* titleTexture_=nullptr;
+    SDL_Texture* titleCape_=nullptr;
     std::array<SDL_Texture*,3> slimeTextures_{};
     SDL_Texture* enemyBarFrame_=nullptr;
     SDL_Texture* executeIcon_=nullptr;
@@ -792,7 +793,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -822,6 +823,11 @@ public:
     bool loadTitle(){
         titleTexture_=IMG_LoadTexture(renderer,asset("title/eclipse.png").c_str());
         if(!titleTexture_)return false;
+        titleCape_=IMG_LoadTexture(renderer,asset("title/cape.png").c_str());
+        if(titleCape_){
+            SDL_SetTextureScaleMode(titleCape_,SDL_SCALEMODE_NEAREST);
+            SDL_SetTextureBlendMode(titleCape_,SDL_BLENDMODE_BLEND);
+        }
         SDL_SetTextureScaleMode(titleTexture_,SDL_SCALEMODE_NEAREST);
         SDL_SetTextureBlendMode(titleTexture_,SDL_BLENDMODE_BLEND);
         return true;
@@ -855,7 +861,7 @@ public:
                 const float cloth=std::clamp(1-std::abs(v-center)*3.4f,0.f,1.f);
                 const float wave=edge*cloth*(1-u);
                 const float phase=seconds*2.7f+u*7+v*2;
-                vertices[row*(columns+1)+col]={{x+wave*3*std::sin(phase+1),y+wave*16*std::sin(phase)},
+                vertices[row*(columns+1)+col]={{x+wave*1.5f*std::sin(phase+1),y+wave*4.5f*std::sin(phase)},
                     {1,1,1,1},{x/width,y/height}};
             }
         }
@@ -871,8 +877,13 @@ public:
             }
             return triangles;
         }();
-        SDL_RenderGeometry(renderer,titleTexture_,vertices.data(),static_cast<int>(vertices.size()),
-                           indices.data(),static_cast<int>(indices.size()));
+        // A transparent source-aligned cape layer prevents nearby characters,
+        // knight armor and sword from deforming with the cloth mesh.
+        if(titleCape_){
+            SDL_SetTextureAlphaMod(titleCape_,220);
+            SDL_RenderGeometry(renderer,titleCape_,vertices.data(),static_cast<int>(vertices.size()),
+                               indices.data(),static_cast<int>(indices.size()));
+        }
 
         // The logo and eclipse share the upper artwork strip. Fade its
         // lower edge into the fully visible scene while the lettering appears.
