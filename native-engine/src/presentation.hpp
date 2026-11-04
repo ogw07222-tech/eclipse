@@ -347,10 +347,9 @@ class Presentation {
     void swordTrail(const Player& p,const Animation& a){
         if(p.health<=0||((a.state<4||a.state>6)&&a.state!=12))return;
         const auto frame=swordTrailFrames[a.frame];
-        constexpr unsigned colors[]={0,0x284a70,0x7ec5ed,0xf3ffff};constexpr int alpha[]={0,100,205,255};
         for(int i=frame.start;i<frame.start+frame.count;++i){const auto s=swordTrailSpans[i];
             float x=p.facing>0?p.x+(s.x-motionPivotX)*motionScale:p.x-(s.x+s.width-motionPivotX)*motionScale;
-            rect(x-offset,p.y+(s.y-motionPivotY)*motionScale,s.width*motionScale,motionScale,colors[s.shade],static_cast<Uint8>(alpha[s.shade]*frame.alpha/255));
+            rect(x-offset,p.y+(s.y-motionPivotY)*motionScale,s.width*motionScale,motionScale,swordTrailColors[s.shade],static_cast<Uint8>(swordTrailAlpha[s.shade]*frame.alpha/255));
         }
     }
     void icon(int texture,int col,int row,float x,float y,float size,bool down){
