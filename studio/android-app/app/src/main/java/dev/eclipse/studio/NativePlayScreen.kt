@@ -36,6 +36,11 @@ class NativePlayActivity : ComponentActivity() {
                         shape = RectangleShape
                     ) { Text("▶ 플레이") }
                     Spacer(Modifier.height(12.dp))
+                    Button(
+                        onClick = { startActivity(Intent(this@NativePlayActivity, MainActivity::class.java)) },
+                        shape = RectangleShape
+                    ) { Text("▣ Studio 편집기 열기") }
+                    Spacer(Modifier.height(12.dp))
                     Text("게임 종료 또는 Android 뒤로가기로 이 화면에 복귀")
                 }
             }
