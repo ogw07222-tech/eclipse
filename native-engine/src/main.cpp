@@ -10,7 +10,10 @@
 namespace {
 SDL_Window* window=nullptr;SDL_Renderer* renderer=nullptr;
 eclipse::Combat game;eclipse::Animation animation;eclipse::Input input;eclipse::ControlLayout layout;
-bool running=true,foreground=true,titleSettings=false;float camera=640;
+bool running=true,foreground=true,titleSettings=false;
+bool choosingQaCharacter=false;
+int qaStartForm=-1;
+float camera=640;
 void requestVacodeLogin(){
 #ifdef SDL_PLATFORM_ANDROID
     auto* env=static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
@@ -43,26 +46,52 @@ void events(bool& titleActive,float titleSeconds){
         if(e.type==SDL_EVENT_WINDOW_FOCUS_LOST||e.type==SDL_EVENT_WILL_ENTER_BACKGROUND){foreground=false;input.reset();keyState.fill(false);continue;}
         if(e.type==SDL_EVENT_WINDOW_FOCUS_GAINED||e.type==SDL_EVENT_DID_ENTER_FOREGROUND){foreground=true;continue;}
         if(wasTitle){
-            if(!foreground)continue;
+            if(!foreground||!titleActive)continue;
             if(e.type==SDL_EVENT_KEY_DOWN&&e.key.scancode==SDL_SCANCODE_ESCAPE){
-                if(titleSettings)titleSettings=false;
+                if(choosingQaCharacter)choosingQaCharacter=false;
+                else if(titleSettings)titleSettings=false;
                 else running=false;
                 continue;
             }
             if(titleSeconds<eclipse::Presentation::titleReadyTime)continue;
             int selection=-1;
             if(e.type==SDL_EVENT_KEY_DOWN&&!e.key.repeat){
-                if(e.key.scancode==SDL_SCANCODE_RETURN||e.key.scancode==SDL_SCANCODE_KP_ENTER||e.key.scancode==SDL_SCANCODE_SPACE)selection=0;
-                if(e.key.scancode==SDL_SCANCODE_ESCAPE){titleSettings=false;continue;}
+                if(choosingQaCharacter){
+                    if(e.key.scancode==SDL_SCANCODE_1||e.key.scancode==SDL_SCANCODE_KP_1)selection=0;
+                    if(e.key.scancode==SDL_SCANCODE_2||e.key.scancode==SDL_SCANCODE_KP_2)selection=1;
+                }else if(e.key.scancode==SDL_SCANCODE_RETURN||e.key.scancode==SDL_SCANCODE_KP_ENTER||e.key.scancode==SDL_SCANCODE_SPACE){
+                    selection=0;
+                }
             }
             const bool finger=e.type==SDL_EVENT_FINGER_DOWN&&e.tfinger.touchID!=SDL_MOUSE_TOUCHID;
             const bool mouse=e.type==SDL_EVENT_MOUSE_BUTTON_DOWN&&e.button.which!=SDL_TOUCH_MOUSEID&&e.button.button==SDL_BUTTON_LEFT;
             if((finger||mouse)&&SDL_ConvertEventToRenderCoordinates(renderer,&e)){
                 const SDL_FPoint position=finger?SDL_FPoint{e.tfinger.x,e.tfinger.y}:SDL_FPoint{e.button.x,e.button.y};
-                for(int i=0;i<4;++i)if(SDL_PointInRectFloat(&position,&eclipse::Presentation::titleButtons[i]))selection=i;
+                if(choosingQaCharacter){
+                    const auto& buttons=eclipse::Presentation::qaCharacterButtons;
+                    for(int i=0;i<3;++i)if(SDL_PointInRectFloat(&position,&buttons[i]))selection=i;
+                }else{
+                    for(int i=0;i<4;++i)if(SDL_PointInRectFloat(&position,&eclipse::Presentation::titleButtons[i]))selection=i;
+                }
+            }
+            if(choosingQaCharacter){
+                if(selection==2){choosingQaCharacter=false;continue;}
+                if(selection==0||selection==1){
+                    qaStartForm=selection;
+                    game.restart();
+                    game.player.form=qaStartForm;
+                    animation.reset();
+                    input.reset();
+                    keyState.fill(false);
+                    camera=640;
+                    choosingQaCharacter=false;
+                    titleActive=false;
+                    SDL_Log("ECLIPSE QA selected form=%d",qaStartForm);
+                }
+                continue;
             }
             switch(selection){
-                case 0: titleActive=false;titleSettings=false;break;
+                case 0: choosingQaCharacter=true;titleSettings=false;break;
                 case 1: requestVacodeLogin();break;
                 case 2: titleSettings=!titleSettings;break;
                 case 3: running=false;break;
@@ -104,7 +133,9 @@ void events(bool& titleActive,float titleSeconds){
 void tick(eclipse::Actions action){
     if(action.restart){input.reset();keyState.fill(false);animation.reset();camera=640;}
     const int previousMotion=animation.state;
-    game.step(static_cast<float>(eclipse::fixedStep),action);animation.step(game.player,static_cast<float>(eclipse::fixedStep));
+    game.step(static_cast<float>(eclipse::fixedStep),action);
+    if(action.restart&&qaStartForm>=0)game.player.form=qaStartForm;
+    animation.step(game.player,static_cast<float>(eclipse::fixedStep));
     if(animation.state!=previousMotion)SDL_Log("ECLIPSE motion state=%d frame=%d",animation.state,animation.frame);
     if(action.inventory||action.swap||action.restart||action.weapon||action.armor||action.charm)
         SDL_Log("ECLIPSE state form=%d inventory=%d hp=%d foes=%d restart=%d weapon=%d armor=%d charm=%d",game.player.form,game.inventory,game.player.health,game.foes(),action.restart,game.player.gear.selected[0],game.player.gear.selected[1],game.player.gear.selected[2]);
@@ -253,7 +284,7 @@ int main(int argc,char** argv){
         const double elapsed=std::min((start-last)/1e9,.1);last=start;
         if(titleActive){
             titleSeconds+=static_cast<float>(elapsed);
-            view->drawTitle(titleSeconds,titleSettings);
+            view->drawTitle(titleSeconds,titleSettings,choosingQaCharacter);
         }else{
             accumulator+=elapsed;
             while(accumulator>=eclipse::fixedStep){if(!layout.editing)tick(input.sample());accumulator-=eclipse::fixedStep;}
