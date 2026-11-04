@@ -479,8 +479,19 @@ class Presentation {
         else if(enabled)rect(b.x+b.size*.34f,b.y+b.size*.69f,b.size*.32f,3,accent,alpha);
     }
     void hud(const Combat& g,Actions held,const ControlLayout& layout,std::array<float,2> stick){
-        const auto& p=g.player;constexpr const char* heart[]={"..XX.XX..",".XXXXXXX.","XXXXXXXXX","XXXXXXXXX",".XXXXXXX.","..XXXXX..","...XXX...","....X...."};
-        for(int i=0;i<7;++i)for(int y=0;y<8;++y)for(int x=0;x<9;++x)if(heart[y][x]=='X')rect(360+i*55+x*5,18+y*5,6,6,static_cast<float>(p.health)/p.maxHealth()>=(i+.5f)/7?0xf56b78:0x364451);
+        const auto& p=g.player;
+        const float hpRate=std::clamp(float(p.health)/p.maxHealth(),0.f,1.f);
+        const float bx=360.f,by=18.f,bw=378.f,bh=44.f;
+        rect(bx,by,bw,bh,0x0b1017);rect(bx+3,by+3,bw-6,bh-6,0x697887);
+        rect(bx+6,by+6,bw-12,bh-12,0x19232b);
+        const float fill=std::floor((bw-18)*hpRate/3.f)*3.f;
+        if(fill>0){
+            rect(bx+9,by+9,fill,bh-18,p.health*4<=p.maxHealth()?0xa54456:0x638d80);
+            rect(bx+9,by+9,fill,4,p.health*4<=p.maxHealth()?0xdb7a87:0xaad4c1);
+        }
+        char hpLabel[36];
+        std::snprintf(hpLabel,sizeof(hpLabel),"HP %d / %d",p.health,p.maxHealth());
+        text(hpLabel,bx+78,by+15,2,0x0a111a);text(hpLabel,bx+76,by+13,2,0xf0eee6);
         if(p.form==0&&p.preparation>0){
             text("READY",365,76,2,0xe3bd72);
             rect(431,78,166*p.preparation/preparationDuration,7,0xe3bd72);
