@@ -1,15 +1,7 @@
 name: Native engine checks
+# Manual execution only. Never dispatch without explicit owner approval.
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - 'native-engine/**'
-      - 'Assets/Resources/Eclipse/knight_motion.png'
-      - 'Tools/*knight*'
-      - 'Tools/art/**'
-      - 'Assets/Resources/Eclipse/monsters/**'
-      - 'Art/knight/**'
-      - '.github/workflows/native-engine-checks.yml'
 permissions:
   contents: read
 jobs:
