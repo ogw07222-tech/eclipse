@@ -44,6 +44,7 @@ struct Player {
     float takeoffLock=0;
     float dashLeft=0,dashCooldown=0,attackCooldown=0,skillCooldown=0,swapCooldown=0;
     float invulnerable=0,coyote=0,jumpBuffer=0,attackFlash=0,comboWindow=0,hitStop=0,swapFlash=0;
+    float hurtTint=0; // visual-only: short white flash and muted-red impact
     bool airSlam=false;
     float slamAge=0,slamRecover=0,slamImpact=0,slamImpactX=0,slamImpactY=floorY;
     float mageCastLeft=0;
@@ -417,12 +418,13 @@ public:
     }
     void damagePlayer(int amount){
         auto& p=player;if(ended||p.invulnerable>0||p.health<=0)return;
-        p.health=std::max(0,p.health-std::max(1,amount-p.gear.defense()));cancelAirSlam();cancelMageCast();p.meleeLeft=0;p.invulnerable=.7f;p.attackFlash=.28f;++p.hurtSerial;p.combo=0;p.comboWindow=0;
+        p.health=std::max(0,p.health-std::max(1,amount-p.gear.defense()));p.hurtTint=.18f;cancelAirSlam();cancelMageCast();p.meleeLeft=0;p.invulnerable=.7f;p.attackFlash=.28f;++p.hurtSerial;p.combo=0;p.comboWindow=0;
         if(p.health==0){ended=true;won=false;inventory=false;}
     }
     void step(float dt,Actions a){
         if(a.restart){restart();return;}
         clock+=dt;
+        player.hurtTint=down(player.hurtTint,dt);
         for(auto& effect:bleedSpreads)effect.life-=dt;
         bleedSpreads.erase(std::remove_if(bleedSpreads.begin(),bleedSpreads.end(),
             [](const BleedSpread& effect){return effect.life<=0;}),bleedSpreads.end());

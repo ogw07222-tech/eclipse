@@ -31,8 +31,8 @@ android {
         applicationId = "dev.eclipse.studio"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2-native-play"
+        versionCode = (System.getenv("ECLIPSE_STUDIO_VERSION_CODE")?.toIntOrNull() ?: 3)
+        versionName = "0.3-native-play"
         ndk { abiFilters += listOf("arm64-v8a") }
         externalNativeBuild {
             cmake {
@@ -64,6 +64,9 @@ android {
     }
     buildTypes {
         getByName("debug") {
+            if (hasStableSigning) signingConfig = signingConfigs.getByName("studioStable")
+        }
+        getByName("release") {
             if (hasStableSigning) signingConfig = signingConfigs.getByName("studioStable")
         }
     }
