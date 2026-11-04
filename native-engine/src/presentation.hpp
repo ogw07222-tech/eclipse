@@ -13,6 +13,8 @@ class Presentation {
     SDL_Renderer* renderer;
     std::array<SDL_Texture*,5> textures{};
     std::array<SDL_Texture*,3> slimeTextures_{};
+    SDL_Texture* enemyBarFrame_=nullptr;
+    SDL_Texture* executeIcon_=nullptr;
     float offset=0;
     SDL_Texture* settingsGear_=nullptr;
     SDL_Texture* settingsPanel_=nullptr;
@@ -305,9 +307,36 @@ class Presentation {
         SDL_SetTextureColorMod(texture,255,e.hitFlash>0?135:255,e.hitFlash>0?135:255);
         SDL_RenderTextureRotated(renderer,texture,&source,&target,0,nullptr,e.facing>0?SDL_FLIP_HORIZONTAL:SDL_FLIP_NONE);
         SDL_SetTextureColorMod(texture,255,255,255);
-        world(e.x-21,e.y-h-15,42,5,0x262435);world(e.x-21,e.y-h-15,42.f*e.health/e.maxHealth,5,0xf47777);
+        // Pixel-art PNG bezel, with independent clipped fills for immediate HP and
+        // the delayed white segment. 88x18, more than twice the former height.
+        const float barX=std::round(e.x-offset-44),barY=std::round(e.y-h-25);
+        if(enemyBarFrame_) {
+            SDL_FRect dest{barX,barY,88.f,18.f};
+            SDL_RenderTexture(renderer,enemyBarFrame_,nullptr,&dest);
+        } else {
+            rect(barX,barY,88,18,0x0b0b12);
+            rect(barX+2,barY+2,84,14,0x61505d);
+        }
+        const float hpRatio=std::clamp(float(e.health)/e.maxHealth,0.f,1.f);
+        const float trailRatio=std::clamp(std::max(float(e.health),e.trailingHealth)/e.maxHealth,0.f,1.f);
+        const float fillX=barX+4,fillY=barY+5,fillW=80.f;
+        // Never render a minimum one-pixel fill for zero HP.
+        if(trailRatio>0)rect(fillX,fillY,fillW*trailRatio,8,0xf3f0ea);
+        if(hpRatio>0)rect(fillX,fillY,fillW*hpRatio,8,e.kind==2?0xbb526c:0xc74b53);
+        if(e.bleedStacks==bleedMaxStacks&&!e.boss){
+            // 10% execution threshold appears only while 10-stack bleed is active.
+            rect(fillX+8-1,fillY-2,2,12,0xf0a8b2);
+            const bool ready=e.health*10<=e.maxHealth;
+            if(executeIcon_){
+                SDL_SetTextureColorMod(executeIcon_,ready?255:130,ready?255:95,ready?255:103);
+                SDL_FRect icon{barX+88,barY-2,24.f,24.f};
+                SDL_RenderTexture(renderer,executeIcon_,nullptr,&icon);
+                SDL_SetTextureColorMod(executeIcon_,255,255,255);
+            }
+            if(ready)text("EXECUTE",barX+2,barY-15,2,0xffb5bf);
+        }
         if(e.bleedStacks>0){
-            const float x=e.x-offset-19,y=e.y-h-34;
+            const float x=e.x-offset-19,y=e.y-h-44;
             rect(x+4,y,4,4,0xf2a0aa);
             rect(x+2,y+4,8,8,0xc84f65);
             rect(x+4,y+12,4,3,0x92354b);
@@ -537,7 +566,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -595,6 +624,8 @@ public:
         settingsGear_=loadSettingsTexture("ui/settings_gear.png");
         settingsPanel_=loadSettingsTexture("ui/settings_menu_panel.png");
         settingsWindow_=loadSettingsTexture("ui/settings_window.png");
+        enemyBarFrame_=loadSettingsTexture("ui/enemy_bar_frame.png");
+        executeIcon_=loadSettingsTexture("ui/execute_skull.png");
         // Optional sprite library: the procedural renderer remains functional without it.
         // Only startup loads textures; no per-frame filesystem work.
         constexpr const char* forestFiles[40]={

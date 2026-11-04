@@ -58,6 +58,8 @@ struct Enemy {
     int kind=0,health=55,maxHealth=55,damage=9;
     float x=0,y=floorY,speed=95,attackTimer=0,bleed=0,bleedTick=0,burn=0,burnTick=0,hitFlash=0,reactionFlash=0,knockback=0;
     float travelPhase=0,attackAge=-1,attackFromX=0,attackToX=0;
+    // Visual-only delayed damage segment. Actual health always changes immediately.
+    float trailingHealth=-1.f,healthTrailHold=0.f;
     int facing=-1;
     int bleedStacks=0;
     bool boss=false;
@@ -110,6 +112,9 @@ class Combat {
     static float toward(float value,float step){return value>0?std::max(0.f,value-step):std::min(0.f,value+step);}
     void damageEnemy(Enemy& e,int amount,DamageKind kind,bool dot){
         if(e.dead())return;
+        if(e.trailingHealth<0)e.trailingHealth=static_cast<float>(e.health);
+        e.trailingHealth=std::max(e.trailingHealth,static_cast<float>(e.health));
+        e.healthTrailHold=std::max(e.healthTrailHold,dot?.35f:.12f);
         e.health=std::max(0,e.health-amount);if(!dot)e.hitFlash=.18f;
         popups.push_back({e.x,e.y-86,amount,kind});
     }
@@ -309,6 +314,11 @@ class Combat {
     void stepEnemy(Enemy& e,float dt){
         if(e.dead())return;
         e.attackTimer=down(e.attackTimer,dt);e.hitFlash=down(e.hitFlash,dt);e.reactionFlash=down(e.reactionFlash,dt);e.knockback=toward(e.knockback,650*dt);
+        // DOT ticks keep adding to the same white damage segment; after the hold
+        // it shrinks at a bounded, frame-rate-independent speed.
+        if(e.trailingHealth<0)e.trailingHealth=static_cast<float>(e.health);
+        e.healthTrailHold=down(e.healthTrailHold,dt);
+        if(e.healthTrailHold<=0)e.trailingHealth=std::max(static_cast<float>(e.health),e.trailingHealth-e.maxHealth*dt/.20f);
         if(e.bleedStacks>0){
             e.bleedTick+=std::min(dt,e.bleed);
             e.bleed=down(e.bleed,dt);
