@@ -14,6 +14,7 @@ class Presentation {
     std::array<SDL_Texture*,5> textures{};
     std::array<SDL_Texture*,3> slimeTextures_{};
     float offset=0;
+    SDL_Texture* mageRun_=nullptr;
     SDL_Texture* settingsGear_=nullptr;
     SDL_Texture* settingsPanel_=nullptr;
     SDL_Texture* settingsWindow_=nullptr;
@@ -536,7 +537,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){if(mageRun_)SDL_DestroyTexture(mageRun_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -582,18 +583,20 @@ public:
             SDL_SetTextureScaleMode(slimeTextures_[i],SDL_SCALEMODE_NEAREST);
             SDL_SetTextureBlendMode(slimeTextures_[i],SDL_BLENDMODE_BLEND);
         }
-        // Optional standalone pixel PNGs for the native settings overlay.
-        auto loadSettingsTexture=[&](const char* name)->SDL_Texture* {
+        // Optional sprite textures allow older asset packs to keep rendering.
+        auto loadOptionalTexture=[&](const char* name,int width=0,int height=0)->SDL_Texture* {
             const auto path=asset(name);SDL_Surface* image=IMG_Load(path.c_str());
             if(!image)return nullptr;
+            if(width&&(image->w!=width||image->h!=height)){SDL_DestroySurface(image);return nullptr;}
             SDL_Texture* texture=SDL_CreateTextureFromSurface(renderer,image);
             SDL_DestroySurface(image);
             if(texture){SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(texture,SDL_BLENDMODE_BLEND);}
             return texture;
         };
-        settingsGear_=loadSettingsTexture("ui/settings_gear.png");
-        settingsPanel_=loadSettingsTexture("ui/settings_menu_panel.png");
-        settingsWindow_=loadSettingsTexture("ui/settings_window.png");
+        mageRun_=loadOptionalTexture("mage_run.png",motionWidth*motionColumns,motionHeight);
+        settingsGear_=loadOptionalTexture("ui/settings_gear.png");
+        settingsPanel_=loadOptionalTexture("ui/settings_menu_panel.png");
+        settingsWindow_=loadOptionalTexture("ui/settings_window.png");
         // Optional sprite library: the procedural renderer remains functional without it.
         // Only startup loads textures; no per-frame filesystem work.
         constexpr const char* forestFiles[40]={
@@ -715,8 +718,13 @@ public:
         const auto& p=g.player;
         slamShockwave(p);
         if(p.form==0)swordTrail(p,a);
-        if(p.form==0){SDL_FRect source{static_cast<float>(a.frame%motionColumns*motionWidth),static_cast<float>(a.frame/motionColumns*motionHeight),motionWidth,motionHeight},dest{std::round(p.x-offset-(p.facing>0?motionPivotX:motionWidth-motionPivotX)*motionScale),std::round(p.y-motionPivotY*motionScale),motionWidth*motionScale,motionHeight*motionScale};
-            SDL_RenderTextureRotated(renderer,textures[0],&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
+        const auto run=motionClips[1];
+        const bool mageRunning=p.form!=0&&mageRun_&&a.frame>=run.start&&a.frame<run.start+run.count;
+        if(p.form==0||mageRunning){
+            const int frame=mageRunning?a.frame-run.start:a.frame;
+            SDL_FRect source{static_cast<float>(frame%motionColumns*motionWidth),static_cast<float>(frame/motionColumns*motionHeight),motionWidth,motionHeight};
+            SDL_FRect dest{std::round(p.x-offset-(p.facing>0?motionPivotX:motionWidth-motionPivotX)*motionScale),std::round(p.y-motionPivotY*motionScale),motionWidth*motionScale,motionHeight*motionScale};
+            SDL_RenderTextureRotated(renderer,mageRunning?mageRun_:textures[0],&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
         }else mage(p);
         if(p.swapFlash>0)ring(p.x-offset,p.y-36,44,0xe3bd72);
         static const ControlLayout defaultLayout{};
