@@ -101,6 +101,9 @@ int main(int argc,char** argv){
     }
     layout.load();input.setLayout(&layout);
     if(!view->load()){SDL_Log("ECLIPSE asset load failed: %s",SDL_GetError());view.reset();cleanup();return 1;}
+    // Manual local artwork preview only; main gameplay still uses the forest by default.
+    // Run eclipse_engine --castle-preview with the optional five-PNG castle entrance pack.
+    if(argc>1 && std::string(argv[1])=="--castle-preview") view->setDemonCastleEntrance(true);
     SDL_Log("ECLIPSE ready: five UI/knight textures, three slime atlases, combat scene, 1280x720");
     if(argc>2&&std::string(argv[1])=="--slime-review"){
         // Simulate the real AI/physics, including the red slime's leap arc.
