@@ -428,8 +428,9 @@ class Presentation {
             SDL_RenderTexture(renderer,settingsWindow_,nullptr,&frame);
         }
 
-        text("ECLIPSE",43,120,4,ink);
-        text("SETTINGS",44,166,2,gold);
+        menuTile(34,110,234,79,0x172331,0x596878);
+        text("ECLIPSE",48,122,4,ink);
+        text("SETTINGS",49,163,2,gold);
         rect(42,192,214,2,0x596878);
         const char* tabs[]={"SOUND","CONTROLS","GAME","BACK"};
         for(int i=0;i<4;++i){
@@ -439,9 +440,11 @@ class Presentation {
             if(active)rect(31,y+13,4,42,gold);
             text(tabs[i],49,y+23,3,active?ink:muted);
         }
-        text("AUTO SAVE",44,588,2,muted);
+        menuTile(36,559,228,43,0x172331,0x465363);
+        text("AUTO SAVE",54,572,2,muted);
 
-        text(tabs[layout.page],390,130,4,ink);
+        menuTile(376,107,716,67,0x172331,0x596878);
+        text(tabs[layout.page],398,126,4,ink);
         rect(389,187,755,2,0x596878);
         menuTile(1120,103,90,65,0x302832,0x705d68);
         text("X",1157,123,4,ink);
@@ -464,7 +467,7 @@ class Presentation {
             text("RESET",544,509,3,ink);
             menuTile(750,485,285,68,0x213242,0x596878);
             text("SAVE",856,509,3,ink);
-            text("DRAG TO MOVE  PINCH TO RESIZE",440,582,2,muted);
+            text("DRAG TO MOVE  PINCH TO RESIZE",440,565,2,muted);
         }else if(layout.page==ControlLayout::Sound){
             text("MUSIC AND COMBAT EFFECT LEVELS",390,218,2,muted);
             for(int i=0;i<2;++i){
