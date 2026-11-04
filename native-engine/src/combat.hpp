@@ -60,7 +60,7 @@ struct Player {
 struct Enemy {
     int kind=0,health=55,maxHealth=55,damage=9;
     float x=0,y=floorY,speed=95,attackTimer=0,bleed=0,bleedTick=0,burn=0,burnTick=0,hitFlash=0,reactionFlash=0,knockback=0;
-    float travelPhase=0,attackAge=-1,attackFromX=0,attackToX=0;
+    float travelPhase=0,attackAge=-1,attackFromX=0,attackToX=0,stagger=0;
     // Visual-only delayed damage segment. Actual health always changes immediately.
     float trailingHealth=-1.f,healthTrailHold=0.f;
     int facing=-1;
@@ -198,7 +198,7 @@ class Combat {
         const BodyRect strike{p.slamImpactX-radius,p.slamImpactY-44,p.slamImpactX+radius,p.slamImpactY+8};
         bool connected=false;
         for(auto& e:enemies){if(e.dead()||!enemyOverlaps(e,strike))continue;
-            hit(e,24+p.gear.attack(),false);connected=true;}
+            hit(e,24+p.gear.attack(),false,0,true);connected=true;}
         p.hitStop=std::max(p.hitStop,connected?.065f:.025f);
     }
     void basic(){
@@ -245,7 +245,7 @@ class Combat {
         p.coyote=p.grounded?.11f:down(p.coyote,dt);p.jumpBuffer=a.jump?.13f:down(p.jumpBuffer,dt);
         float axis=static_cast<float>(a.right)-static_cast<float>(a.left);
         if(axis!=0&&!p.airSlam&&p.slamRecover<=0&&(p.meleeLeft<=0||p.strike==SwordStrike::Basic))p.facing=axis>0?1:-1;
-        if(a.dash&&p.dashCooldown<=0){cancelAirSlam();cancelMageCast();p.meleeLeft=0;p.dashLeft=.15f;p.dashCooldown=.85f;p.invulnerable=std::max(p.invulnerable,.15f);}
+        if(a.dash&&p.dashCooldown<=0&&p.slamRecover<=0){cancelAirSlam();cancelMageCast();p.meleeLeft=0;p.dashLeft=.15f;p.dashCooldown=.85f;p.invulnerable=std::max(p.invulnerable,.15f);}
         if(p.dashLeft>0){p.vx=780*p.facing*p.gear.speed();p.vy=0;}
         else {
             p.vx=axis*280*p.gear.speed();
@@ -254,7 +254,7 @@ class Combat {
                 launchJump();
         }
         const bool attackAllowed=canAttack();
-        if(a.swap&&p.swapCooldown<=0){
+        if(a.swap&&p.swapCooldown<=0&&p.slamRecover<=0){
             cancelAirSlam();cancelMageCast();p.meleeLeft=0;p.form=1-p.form;p.swapCooldown=1;
             p.attackFlash=.22f;p.combo=0;p.comboWindow=0;p.attackPose=0;p.swapFlash=.24f;
             if(attackAllowed){
@@ -262,12 +262,12 @@ class Combat {
                 if(p.form==0)melee(13,false,112);else projectile(14,false);
             }
         }
-        if(attackAllowed&&a.skillBuff&&p.form==0&&p.buffReady<=0&&p.grounded&&p.dashLeft<=0){
+        if(attackAllowed&&a.skillBuff&&p.form==0&&p.buffReady<=0&&p.grounded&&p.dashLeft<=0&&p.slamRecover<=0){
             p.preparation=preparationDuration;
             p.buffReady=buffCooldown;
         }
         if(attackAllowed&&a.attack&&p.attackCooldown<=0&&p.dashLeft<=0&&!p.airSlam&&p.slamRecover<=0)basic();
-        if(attackAllowed&&p.dashLeft<=0){
+        if(attackAllowed&&p.dashLeft<=0&&p.slamRecover<=0){
             if(p.form==0){
                 const bool windingUp=p.meleeLeft>0&&p.strike!=SwordStrike::Basic;
                 if(!windingUp&&a.skill&&p.skillCooldown<=0){
@@ -328,7 +328,7 @@ class Combat {
     }
     void stepEnemy(Enemy& e,float dt){
         if(e.dead())return;
-        e.attackTimer=down(e.attackTimer,dt);e.hitFlash=down(e.hitFlash,dt);e.reactionFlash=down(e.reactionFlash,dt);e.knockback=toward(e.knockback,650*dt);
+        e.attackTimer=down(e.attackTimer,dt);e.hitFlash=down(e.hitFlash,dt);e.reactionFlash=down(e.reactionFlash,dt);e.stagger=down(e.stagger,dt);e.knockback=toward(e.knockback,650*dt);
         // DOT ticks keep adding to the same white damage segment; after the hold
         // it shrinks at a bounded, frame-rate-independent speed.
         if(e.trailingHealth<0)e.trailingHealth=static_cast<float>(e.health);
@@ -350,7 +350,10 @@ class Combat {
         if(e.dead())return;
         const float dx=player.x-e.x;float vx=0;
         const auto& spec=slimeSpec(e.kind);
-        if(e.attackAge>=0){
+        if(e.stagger>0){
+            // Knocked-back enemies cannot wind up or land an already-started attack.
+            e.attackAge=-1;e.y=floorY;
+        }else if(e.attackAge>=0){
             const float before=e.attackAge;e.attackAge+=dt;
             const float phase=std::min(1.f,e.attackAge/spec.attackDuration);
             if(e.kind==1){
@@ -409,10 +412,18 @@ public:
     Combat(){projectiles.reserve(16);popups.reserve(32);restart();}
     void restart(){player={};enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};projectiles.clear();popups.clear();bleedSpreads.clear();enemies.back().boss=true;ended=won=inventory=false;clock=0;}
     int foes()const{int count=0;for(const auto& e:enemies)if(!e.dead())++count;return count;}
-    void hit(Enemy& e,int amount,bool fire,int bleed=0){
+    void hit(Enemy& e,int amount,bool fire,int bleed=0,bool slam=false){
         if(e.dead()||ended)return;
         if(fire){e.burn=3;e.burnTick=0;if(e.bleed>0){amount+=22;e.bleed=0;e.bleedStacks=0;e.bleedTick=0;e.reactionFlash=.5f;}}
-        e.knockback=(e.x>=player.x?1:-1)*(e.reactionFlash>0?210:135);
+        // Bosses resist displacement and keep their attacks; ordinary monsters
+        // have their attack canceled whenever a real knockback is applied.
+        if(!e.boss){
+            e.knockback=(e.x>=player.x?1:-1)*(slam?315.f:e.reactionFlash>0?210.f:135.f);
+            e.stagger=std::max(e.stagger,slam?.32f:.16f);
+            e.attackAge=-1;
+            e.y=floorY; // Restore pose after interrupting red slime's body slam.
+            e.attackTimer=std::max(e.attackTimer,slam?.42f:.22f);
+        }
         damageEnemy(e,amount,fire?DamageKind::Fire:DamageKind::Normal,false);
         addBleed(e,bleed);
     }
