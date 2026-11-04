@@ -15,7 +15,7 @@ constexpr float viewWidth=1280,viewHeight=720,floorY=ForestLayerScene::floorY,wo
 struct Actions {
     bool left=false,right=false,jump=false,attack=false,dash=false,skill=false,swap=false;
     bool restart=false,inventory=false,weapon=false,armor=false,charm=false;
-    bool jumpHeld=false;
+    bool jumpHeld=false,skillSweep=false,skillBuff=false;
 };
 struct Equipment {
     std::array<int,3> selected{};
@@ -30,6 +30,12 @@ struct Equipment {
         return names[slot][selected[slot]];
     }
 };
+constexpr float thrustCooldown=6.f,sweepCooldown=9.f,buffCooldown=14.f;
+constexpr float preparationDuration=5.f;
+constexpr int bleedMaxStacks=10,bleedSlowStacks=5;
+constexpr float bleedDuration=5.f,bleedTickInterval=.75f;
+enum class SwordStrike {Basic,Thrust,Sweep};
+
 struct Player {
     Equipment gear;
     float x=140,y=floorY,vx=0,vy=0;
@@ -40,7 +46,11 @@ struct Player {
     float invulnerable=0,coyote=0,jumpBuffer=0,attackFlash=0,comboWindow=0,hitStop=0,swapFlash=0;
     bool airSlam=false;
     float slamAge=0,slamRecover=0,slamImpact=0,slamImpactX=0,slamImpactY=floorY;
-    float meleeLeft=0,meleeReach=0;int meleeDamage=0;bool meleeBleed=false;
+    float meleeLeft=0,meleeReach=0;
+    int meleeDamage=0,meleeBleed=0,attackPose=0;
+    SwordStrike strike=SwordStrike::Basic;
+    float sweepReady=0,buffReady=0,mageSkillCooldown=0,preparation=0;
+    float basicSpeed() const {return gear.speed()*(preparation>0?1.20f:1.f);}
     int maxHealth()const{return 100+gear.hp();}
     void equip(int slot){int before=maxHealth();gear.cycle(slot);health=std::clamp(health+maxHealth()-before,1,maxHealth());}
 };
@@ -49,11 +59,14 @@ struct Enemy {
     float x=0,y=floorY,speed=95,attackTimer=0,bleed=0,bleedTick=0,burn=0,burnTick=0,hitFlash=0,reactionFlash=0,knockback=0;
     float travelPhase=0,attackAge=-1,attackFromX=0,attackToX=0;
     int facing=-1;
+    int bleedStacks=0;
+    bool boss=false;
     Enemy(int type=0,float at=0):kind(std::clamp(type,0,2)),health(slimeSpec(kind).health),maxHealth(health),damage(slimeSpec(kind).damage),x(at),speed(slimeSpec(kind).speed){}
     bool dead()const{return health<=0;}
 };
 struct Projectile {float x,y;int facing,damage;bool empowered;float life=1.6f;};
-enum class DamageKind{Normal,Fire,Bleed};
+enum class DamageKind{Normal,Fire,Bleed,Execute};
+struct BleedSpread {float fromX,fromY,toX,toY,life=.23f;};
 struct Popup{float x,y;int amount;DamageKind kind;float age=0;};
 // Horizontal one-way surfaces share the same descending foot-contact rule.
 struct GroundSurface {
@@ -100,12 +113,69 @@ class Combat {
         e.health=std::max(0,e.health-amount);if(!dot)e.hitFlash=.18f;
         popups.push_back({e.x,e.y-86,amount,kind});
     }
-    void melee(int damage,bool bleed,float reach){
+    void melee(int damage,int bleed,float reach){
         const BodyRect strike=player.facing>0?BodyRect{player.x-9,player.y-102,player.x+reach,player.y+2}:
             BodyRect{player.x-reach,player.y-102,player.x+9,player.y+2};
         for(auto& e:enemies){
             if(e.dead()||!enemyOverlaps(e,strike))continue;
             hit(e,damage,false,bleed);player.hitStop=std::max(player.hitStop,damage<20?.045f:.075f);
+        }
+    }
+    static void addBleed(Enemy& e,int stacks) {
+        if(e.dead()||stacks<=0)return;
+        if(e.bleedStacks==0)e.bleedTick=0;
+        e.bleedStacks=std::min(bleedMaxStacks,e.bleedStacks+stacks);
+        e.bleed=bleedDuration;
+    }
+    void resolveSwordSkill() {
+        auto& p=player;
+        if(p.strike==SwordStrike::Thrust){
+            const float reach=p.meleeReach;
+            const BodyRect strike=p.facing>0?BodyRect{p.x,p.y-78,p.x+reach,p.y-29}:
+                BodyRect{p.x-reach,p.y-78,p.x,p.y-29};
+            Enemy* nearest=nullptr;
+            float best=std::numeric_limits<float>::infinity();
+            for(auto& e:enemies){
+                if(e.dead()||!enemyOverlaps(e,strike))continue;
+                const auto body=enemyBounds(e);
+                const float edge=std::max(0.f,p.facing>0?body.left-p.x:p.x-body.right);
+                if(edge<best){best=edge;nearest=&e;}
+            }
+            if(nearest){
+                hit(*nearest,p.meleeDamage,false,2);
+                p.hitStop=.075f;
+            }
+            return;
+        }
+
+        const float reach=p.meleeReach,centerY=p.y-43;
+        std::array<bool,4> sources{};
+        for(size_t i=0;i<enemies.size();++i){
+            auto& e=enemies[i];
+            if(e.dead())continue;
+            const bool intersects=enemyAnyBand(e,[&](BodyRect band){
+                if(p.facing>0?band.right<=p.x:band.left>=p.x)return false;
+                const float dx=std::max({0.f,band.left-p.x,p.x-band.right})/reach;
+                const float dy=std::max({0.f,band.top-centerY,centerY-band.bottom})/58.f;
+                return dx*dx+dy*dy<=1.f;
+            });
+            if(!intersects)continue;
+            sources[i]=e.bleedStacks>0;
+            hit(e,p.meleeDamage,false);
+            p.hitStop=.065f;
+        }
+        // Snapshot sources before applying any spread so newly affected enemies cannot relay it.
+        for(size_t i=0;i<enemies.size();++i){
+            auto& target=enemies[i];
+            if(target.dead())continue;
+            for(size_t j=0;j<enemies.size();++j){
+                if(i==j||!sources[j])continue;
+                const auto& source=enemies[j];
+                if(std::hypot(target.x-source.x,target.y-source.y)>110.f)continue;
+                addBleed(target,1);
+                bleedSpreads.push_back({source.x,source.y-42,target.x,target.y-42});
+                break;
+            }
         }
     }
     void projectile(int damage,bool empowered){projectiles.push_back({player.x+player.facing*27,player.y-33,player.facing,damage,empowered});}
@@ -123,25 +193,41 @@ class Combat {
         p.hitStop=std::max(p.hitStop,connected?.065f:.025f);
     }
     void basic(){
-        auto& p=player;p.attackFlash=.16f;++p.attackSerial;
+        auto& p=player;p.attackFlash=.16f;p.attackPose=0;++p.attackSerial;
         if(p.form==0&&!p.grounded){
             p.airSlam=true;p.slamAge=0;p.slamRecover=0;p.combo=0;p.comboWindow=0;p.meleeLeft=0;
             p.jumpBuffer=p.coyote=0;p.attackCooldown=.55f/p.gear.speed();return;
         }
-        if(p.form==0){p.combo=p.comboWindow>0?p.combo%3+1:1;p.comboWindow=.8f;
-            p.attackCooldown=(p.combo==1?.23f:p.combo==2?.25f:.42f)/p.gear.speed();
-            const auto clip=motionClips[3+p.combo];p.meleeLeft=clip.duration*clip.contact/p.gear.speed();
-            p.meleeDamage=(p.combo==1?12:p.combo==2?15:23)+p.gear.attack();p.meleeBleed=p.combo==3;p.meleeReach=(p.combo==3?115:96)*p.gear.range();
+        if(p.form==0){p.strike=SwordStrike::Basic;p.combo=p.comboWindow>0?p.combo%3+1:1;p.comboWindow=.8f;
+            p.attackCooldown=(p.combo==1?.23f:p.combo==2?.25f:.42f)/p.basicSpeed();
+            const auto clip=motionClips[3+p.combo];p.meleeLeft=clip.duration*clip.contact/p.basicSpeed();
+            p.meleeDamage=(p.combo==1?12:p.combo==2?15:23)+p.gear.attack();p.meleeBleed=p.combo==3?2:0;p.meleeReach=(p.combo==3?115:96)*p.gear.range();
         }else{p.combo=0;p.attackCooldown=.47f;projectile(11+p.gear.attack(),false);}
     }
-    void skill(){
-        auto& p=player;cancelAirSlam();p.meleeLeft=0;p.skillCooldown=p.form==0?3.4f:4.1f;p.attackFlash=.28f;++p.attackSerial;
-        if(p.form==0)melee(23+p.gear.attack(),true,96*p.gear.range());else projectile(25+p.gear.attack(),true);
+    void swordSkill(SwordStrike strike) {
+        auto& p=player;
+        const bool thrust=strike==SwordStrike::Thrust;
+        cancelAirSlam();
+        p.strike=strike;
+        p.attackPose=thrust?6:5;
+        const auto clip=motionClips[p.attackPose];
+        p.meleeLeft=clip.duration*clip.contact;
+        p.meleeReach=(thrust?120.f:125.f)*p.gear.range();
+        p.meleeDamage=(thrust?32:18)+p.gear.attack();
+        p.attackCooldown=std::max(p.attackCooldown,clip.duration);
+        p.attackFlash=.28f;
+        ++p.attackSerial;
+        if(thrust)p.skillCooldown=thrustCooldown;
+        else p.sweepReady=sweepCooldown;
     }
     void stepPlayer(float dt,Actions a){
         auto& p=player;
         p.dashLeft=down(p.dashLeft,dt);p.dashCooldown=down(p.dashCooldown,dt);p.attackCooldown=down(p.attackCooldown,dt);
-        p.skillCooldown=down(p.skillCooldown,dt);p.swapCooldown=down(p.swapCooldown,dt);p.invulnerable=down(p.invulnerable,dt);
+        p.skillCooldown=down(p.skillCooldown,dt);
+        p.mageSkillCooldown=down(p.mageSkillCooldown,dt);
+        p.sweepReady=down(p.sweepReady,dt);
+        p.buffReady=down(p.buffReady,dt);
+        p.preparation=down(p.preparation,dt);p.swapCooldown=down(p.swapCooldown,dt);p.invulnerable=down(p.invulnerable,dt);
         p.attackFlash=down(p.attackFlash,dt);p.comboWindow=down(p.comboWindow,dt);p.swapFlash=down(p.swapFlash,dt);
         if(p.hitStop>0){p.hitStop=down(p.hitStop,dt);return;}
         p.takeoffLock=down(p.takeoffLock,dt);
@@ -149,7 +235,7 @@ class Combat {
         if(p.comboWindow<=0)p.combo=0;
         p.coyote=p.grounded?.11f:down(p.coyote,dt);p.jumpBuffer=a.jump?.13f:down(p.jumpBuffer,dt);
         float axis=static_cast<float>(a.right)-static_cast<float>(a.left);
-        if(axis!=0&&!p.airSlam&&p.slamRecover<=0)p.facing=axis>0?1:-1;
+        if(axis!=0&&!p.airSlam&&p.slamRecover<=0&&(p.meleeLeft<=0||p.strike==SwordStrike::Basic))p.facing=axis>0?1:-1;
         if(a.dash&&p.dashCooldown<=0){cancelAirSlam();p.meleeLeft=0;p.dashLeft=.15f;p.dashCooldown=.85f;p.invulnerable=std::max(p.invulnerable,.15f);}
         if(p.dashLeft>0){p.vx=780*p.facing*p.gear.speed();p.vy=0;}
         else {
@@ -161,17 +247,37 @@ class Combat {
         const bool attackAllowed=canAttack();
         if(a.swap&&p.swapCooldown<=0){
             cancelAirSlam();p.meleeLeft=0;p.form=1-p.form;p.swapCooldown=1;
-            p.attackFlash=.22f;p.combo=0;p.comboWindow=0;p.swapFlash=.24f;
+            p.attackFlash=.22f;p.combo=0;p.comboWindow=0;p.attackPose=0;p.swapFlash=.24f;
             if(attackAllowed){
                 ++p.attackSerial;
                 if(p.form==0)melee(13,false,112);else projectile(14,false);
             }
         }
+        if(attackAllowed&&a.skillBuff&&p.form==0&&p.buffReady<=0&&p.grounded&&p.dashLeft<=0){
+            p.preparation=preparationDuration;
+            p.buffReady=buffCooldown;
+        }
         if(attackAllowed&&a.attack&&p.attackCooldown<=0&&p.dashLeft<=0&&!p.airSlam&&p.slamRecover<=0)basic();
-        if(attackAllowed&&a.skill&&p.skillCooldown<=0)skill();
+        if(attackAllowed&&p.dashLeft<=0){
+            if(p.form==0){
+                const bool windingUp=p.meleeLeft>0&&p.strike!=SwordStrike::Basic;
+                if(!windingUp&&a.skill&&p.skillCooldown<=0){
+                    if(p.grounded)swordSkill(SwordStrike::Thrust);
+                    else if(p.airSlam)cancelAirSlam();
+                }
+                else if(!windingUp&&a.skillSweep&&p.sweepReady<=0&&p.grounded)swordSkill(SwordStrike::Sweep);
+            }else if(a.skill&&p.mageSkillCooldown<=0){
+                cancelAirSlam();
+                p.meleeLeft=0;p.attackPose=0;p.attackFlash=.28f;++p.attackSerial;
+                p.mageSkillCooldown=4.1f;
+                projectile(25+p.gear.attack(),true);
+            }
+        }
         if(p.airSlam){p.slamAge+=dt;p.vx=axis*120.f;
             if(p.slamAge>=airSlamWindup)p.vy=std::max(p.vy,airSlamDropSpeed);}
         else if(p.slamRecover>0)p.vx=0;
+        else if(p.meleeLeft>0&&p.strike!=SwordStrike::Basic)
+            p.vx=p.strike==SwordStrike::Thrust?p.facing*65.f:0.f;
 
         const float nextX=std::clamp(p.x+p.vx*dt,25.f,1550.f);
         const float nextY=p.y+p.vy*dt;
@@ -190,12 +296,31 @@ class Combat {
                     launchJump();
             }
         }
-        if(p.meleeLeft>0){p.meleeLeft=down(p.meleeLeft,dt);if(p.meleeLeft==0){melee(p.meleeDamage,p.meleeBleed,p.meleeReach);if(p.combo==2&&p.hitStop>0)p.hitStop=std::max(p.hitStop,.065f);}}
+        if(p.meleeLeft>0){
+            p.meleeLeft=down(p.meleeLeft,dt);
+            if(p.meleeLeft==0){
+                if(p.strike==SwordStrike::Basic){
+                    melee(p.meleeDamage,p.meleeBleed,p.meleeReach);
+                    if(p.combo==2&&p.hitStop>0)p.hitStop=std::max(p.hitStop,.065f);
+                }else resolveSwordSkill();
+            }
+        }
     }
     void stepEnemy(Enemy& e,float dt){
         if(e.dead())return;
         e.attackTimer=down(e.attackTimer,dt);e.hitFlash=down(e.hitFlash,dt);e.reactionFlash=down(e.reactionFlash,dt);e.knockback=toward(e.knockback,650*dt);
-        if(e.bleed>0){e.bleed=down(e.bleed,dt);e.bleedTick+=dt;if(e.bleedTick>=.75f){e.bleedTick=0;damageEnemy(e,3,DamageKind::Bleed,true);}}
+        if(e.bleedStacks>0){
+            e.bleedTick+=std::min(dt,e.bleed);
+            e.bleed=down(e.bleed,dt);
+            if(e.bleedTick>=bleedTickInterval){
+                e.bleedTick-=bleedTickInterval;
+                const int damage=3+(e.bleedStacks-1)/2+(e.boss&&e.bleedStacks==bleedMaxStacks?3:0);
+                damageEnemy(e,damage,DamageKind::Bleed,true);
+                if(!e.boss&&e.bleedStacks==bleedMaxStacks&&e.health*10<=e.maxHealth)
+                    damageEnemy(e,e.health,DamageKind::Execute,false);
+            }
+            if(e.bleed<=0){e.bleedStacks=0;e.bleedTick=0;}
+        }
         if(e.burn>0){e.burn=down(e.burn,dt);e.burnTick+=dt;if(e.burnTick>=.6f){e.burnTick-=.6f;damageEnemy(e,2,DamageKind::Fire,true);}}
         if(e.dead())return;
         const float dx=player.x-e.x;float vx=0;
@@ -222,7 +347,7 @@ class Combat {
         }else{
             if(std::abs(dx)>1)e.facing=dx>0?1:-1;
             const float gap=enemyFrontGap(e,player);
-            if(gap>spec.engageGap)vx=e.facing*e.speed;
+            if(gap>spec.engageGap)vx=e.facing*e.speed*(e.bleedStacks>=bleedSlowStacks?.8f:1.f);
             else if(e.attackTimer<=0&&std::abs(player.y-e.y)<100){
                 e.attackAge=0;e.attackTimer=spec.cooldown;e.attackFromX=e.x;
                 e.attackToX=e.x+e.facing*std::clamp(std::abs(dx),60.f,240.f);
@@ -250,17 +375,18 @@ public:
     std::array<Enemy,4> enemies;
     std::vector<Projectile> projectiles;
     std::vector<Popup> popups;
+    std::vector<BleedSpread> bleedSpreads;
     bool ended=false,won=false,inventory=false;
     float clock=0;
     Combat(){projectiles.reserve(16);popups.reserve(32);restart();}
-    void restart(){player={};enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};projectiles.clear();popups.clear();ended=won=inventory=false;clock=0;}
+    void restart(){player={};enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};projectiles.clear();popups.clear();bleedSpreads.clear();enemies.back().boss=true;ended=won=inventory=false;clock=0;}
     int foes()const{int count=0;for(const auto& e:enemies)if(!e.dead())++count;return count;}
-    void hit(Enemy& e,int amount,bool fire,bool bleed=false){
+    void hit(Enemy& e,int amount,bool fire,int bleed=0){
         if(e.dead()||ended)return;
-        if(fire){e.burn=3;e.burnTick=0;if(e.bleed>0){amount+=22;e.bleed=0;e.reactionFlash=.5f;}}
-        if(bleed){e.bleed=4.5f;e.bleedTick=0;}
+        if(fire){e.burn=3;e.burnTick=0;if(e.bleed>0){amount+=22;e.bleed=0;e.bleedStacks=0;e.bleedTick=0;e.reactionFlash=.5f;}}
         e.knockback=(e.x>=player.x?1:-1)*(e.reactionFlash>0?210:135);
         damageEnemy(e,amount,fire?DamageKind::Fire:DamageKind::Normal,false);
+        addBleed(e,bleed);
     }
     void damagePlayer(int amount){
         auto& p=player;if(ended||p.invulnerable>0||p.health<=0)return;
@@ -270,6 +396,9 @@ public:
     void step(float dt,Actions a){
         if(a.restart){restart();return;}
         clock+=dt;
+        for(auto& effect:bleedSpreads)effect.life-=dt;
+        bleedSpreads.erase(std::remove_if(bleedSpreads.begin(),bleedSpreads.end(),
+            [](const BleedSpread& effect){return effect.life<=0;}),bleedSpreads.end());
         for(auto& popup:popups){popup.age+=dt;popup.y-=27*dt;}
         popups.erase(std::remove_if(popups.begin(),popups.end(),[](const Popup& p){return p.age>=.6f;}),popups.end());
         if(ended)return;
@@ -290,8 +419,9 @@ struct Animation {
     void step(const Player& p,float dt){
         bool retrigger=p.attackSerial!=attackSerial;
         float distance=initialized?std::abs(p.x-lastX):0;lastX=p.x;initialized=true;
-        if(retrigger){attackSerial=p.attackSerial;combo=std::clamp(p.combo,1,3);
-            attackDuration=p.form==0&&p.combo>0?motionClips[3+combo].duration/p.gear.speed():.36f;attackTime=p.hitStop>0?attackDuration*(1-motionClips[3+combo].contact):attackDuration;}
+        if(retrigger){attackSerial=p.attackSerial;combo=p.attackPose>0?p.attackPose-3:std::clamp(p.combo,1,3);
+            attackDuration=p.attackPose>0?motionClips[p.attackPose].duration:
+                p.form==0&&p.combo>0?motionClips[3+combo].duration/p.basicSpeed():.36f;attackTime=p.hitStop>0?attackDuration*(1-motionClips[3+combo].contact):attackDuration;}
         if(p.hurtSerial!=hurtSerial){hurtSerial=p.hurtSerial;hurtTime=.23f;}
         if(p.dashLeft>0||hurtTime>0||p.airSlam||p.slamRecover>0||(!p.grounded&&p.form==0))attackTime=0;
         if(p.hitStop>0&&!wasHitStopped&&attackTime>0)attackTime=attackDuration*(1-motionClips[3+combo].contact);

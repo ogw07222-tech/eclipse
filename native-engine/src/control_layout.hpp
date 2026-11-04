@@ -10,9 +10,13 @@ namespace eclipse {
 struct ControlRect { float x,y,size; };
 class ControlLayout {
 public:
-    enum {Stick,Attack,Dash,Swap,Skill,Count};
+    enum {Stick,Attack,Dash,Swap,Skill,Sweep,Buff,Count};
     enum Page { Sound, Controls, Game };
-    std::array<ControlRect,Count> buttons{{{35,586,128},{1110,540,116},{985,560,100},{995,445,90},{1115,420,94}}};
+    static constexpr std::array<ControlRect,Count> defaultButtons{{
+        {35,586,128},{1110,540,116},{985,560,100},{995,445,90},{1115,420,94},
+        {902,455,82},{1030,347,82}
+    }};
+    std::array<ControlRect,Count> buttons=defaultButtons;
     std::string storagePath;
     bool editing=false;             // compatibility with current game pause/render loop
     bool reposition=false;          // overlay for on-screen button manipulation
@@ -37,14 +41,15 @@ public:
         b.x=std::clamp(b.x,0.f,1280.f-b.size);
         b.y=std::clamp(b.y,0.f,720.f-b.size);
     }
-    void defaults(){buttons={{{35,586,128},{1110,540,116},{985,560,100},{995,445,90},{1115,420,94}}};selected=Stick;save();}
+    void defaults(){buttons=defaultButtons;selected=Stick;save();}
     std::string path() const {return storagePath;}
     void load(){
         auto file=path();if(file.empty())return;
         FILE* f=std::fopen(file.c_str(),"r");if(!f)return;
-        int version=0;bool valid=std::fscanf(f,"ECLIPSE_CONTROLS %d",&version)==1&&(version==1||version==2);
-        auto next=buttons;
-        for(int i=0;valid&&i<Count;++i)valid=std::fscanf(f,"%f %f %f",&next[i].x,&next[i].y,&next[i].size)==3&&
+        int version=0;bool valid=std::fscanf(f,"ECLIPSE_CONTROLS %d",&version)==1&&(version>=1&&version<=3);
+        auto next=defaultButtons;
+        const int savedCount=version>=3?Count:5;
+        for(int i=0;valid&&i<savedCount;++i)valid=std::fscanf(f,"%f %f %f",&next[i].x,&next[i].y,&next[i].size)==3&&
             std::isfinite(next[i].x)&&std::isfinite(next[i].y)&&std::isfinite(next[i].size);
         if(valid&&version>=2){
             int nextBgm=bgm,nextSfx=sfx,shake=1,numbers=1;
@@ -59,7 +64,7 @@ public:
     void save() const {
         auto file=path();if(file.empty())return;
         FILE* f=std::fopen(file.c_str(),"w");if(!f)return;
-        std::fprintf(f,"ECLIPSE_CONTROLS 2\n");
+        std::fprintf(f,"ECLIPSE_CONTROLS 3\n");
         for(const auto& b:buttons)std::fprintf(f,"%.2f %.2f %.2f\n",b.x,b.y,b.size);
         std::fprintf(f,"%d %d %d %d\n",bgm,sfx,screenShake?1:0,showNumbers?1:0);
         std::fclose(f);

@@ -5,7 +5,7 @@
 
 namespace eclipse {
 class Input {
-    enum class Region{None,Move,Attack,Dash,Skill,Swap,Inventory,Weapon,Armor,Charm,Retry};
+    enum class Region{None,Move,Attack,Dash,Skill,Sweep,Buff,Swap,Inventory,Weapon,Armor,Charm,Retry};
     struct Pointer{std::int64_t id=0;bool used=false;Region region=Region::None;Actions held;};
     std::array<Pointer,8> pointers{};
     Actions keys{},pending{};
@@ -22,19 +22,20 @@ class Input {
         if(inside(x,y,765,21,288,61))return Region::Inventory;
         {
             const auto& b=(layout_?layout_:&fallbackLayout_)->buttons;
-            const Region regions[]={Region::Move,Region::Attack,Region::Dash,Region::Swap,Region::Skill};
+            const Region regions[]={Region::Move,Region::Attack,Region::Dash,Region::Swap,Region::Skill,Region::Sweep,Region::Buff};
             for(int i=ControlLayout::Count-1;i>=0;--i)
                 if(inside(x,y,b[i].x,b[i].y,b[i].size,b[i].size))return regions[i];
         }
         return Region::None;
     }
     static void merge(Actions& a,Actions b){
-        a.jumpHeld|=b.jumpHeld;a.left|=b.left;a.right|=b.right;a.jump|=b.jump;a.attack|=b.attack;a.dash|=b.dash;a.skill|=b.skill;a.swap|=b.swap;
+        a.jumpHeld|=b.jumpHeld;a.left|=b.left;a.right|=b.right;a.jump|=b.jump;a.attack|=b.attack;a.dash|=b.dash;a.skill|=b.skill;a.skillSweep|=b.skillSweep;a.skillBuff|=b.skillBuff;a.swap|=b.swap;
         a.restart|=b.restart;a.inventory|=b.inventory;a.weapon|=b.weapon;a.armor|=b.armor;a.charm|=b.charm;
     }
     void latch(Actions now,Actions before){
         pending.jump|=now.jump&&!before.jump;pending.attack|=now.attack&&!before.attack;pending.dash|=now.dash&&!before.dash;
-        pending.skill|=now.skill&&!before.skill;pending.swap|=now.swap&&!before.swap;pending.restart|=now.restart&&!before.restart;
+        pending.skill|=now.skill&&!before.skill;
+        pending.skillSweep|=now.skillSweep&&!before.skillSweep;pending.skillBuff|=now.skillBuff&&!before.skillBuff;pending.swap|=now.swap&&!before.swap;pending.restart|=now.restart&&!before.restart;
         pending.inventory|=now.inventory&&!before.inventory;pending.weapon|=now.weapon&&!before.weapon;pending.armor|=now.armor&&!before.armor;pending.charm|=now.charm&&!before.charm;
     }
 public:
@@ -54,6 +55,7 @@ public:
             now.left=dx< -radius*.23f;now.right=dx>radius*.23f;now.jump=dy< -radius*.52f;now.jumpHeld=now.jump;
         }else if(region(x,y,ended,inventory)==slot->region){
             switch(slot->region){case Region::Attack:now.attack=true;break;case Region::Dash:now.dash=true;break;case Region::Skill:now.skill=true;break;
+                case Region::Sweep:now.skillSweep=true;break;case Region::Buff:now.skillBuff=true;break;
                 case Region::Swap:now.swap=true;break;case Region::Inventory:now.inventory=true;break;case Region::Weapon:now.weapon=true;break;
                 case Region::Armor:now.armor=true;break;case Region::Charm:now.charm=true;break;case Region::Retry:now.restart=true;break;default:break;}
         }

@@ -202,7 +202,7 @@ int main(){int failed=0,total=0;
     test("Jump apex and landing",[]{auto g=arena();Actions a;a.jump=true;g.step(1.f/60,a);check(!g.player.grounded&&g.player.vy<0,"Jump");float highest=g.player.y;for(int i=0;i<90;++i){g.step(1.f/60,{});highest=std::min(highest,g.player.y);}check(floorY-highest>160&&floorY-highest<180,"Apex");check(g.player.grounded&&g.player.vy==0,"Landing");});
     test("Dash immunity and cooldown",[]{auto g=arena();Actions a;a.dash=true;g.step(1.f/60,a);near(g.player.vx,780);g.damagePlayer(15);check(g.player.health==100,"Dash immunity");wait(g,12);float cooldown=g.player.dashCooldown;g.step(1.f/60,a);check(g.player.dashLeft==0&&g.player.dashCooldown<cooldown,"Cooldown");wait(g,60);g.step(1.f/60,a);check(g.player.dashLeft>0,"Reactivation");});
     test("Three hit combo damage lands at the blade contact",[]{auto g=arena();auto& e=g.enemies[0];Actions a;a.attack=true;int health=55;
-        for(int combo=1;combo<=3;++combo){e.x=200;g.step(1.f/60,a);check(e.health==health&&g.player.combo==combo,"Hit skipped wind-up");wait(g,combo==3?14:13);health-=combo==1?12:combo==2?15:23;check(e.health==health,"Contact damage");if(combo==3)check(e.bleed>4,"Finisher bleed");wait(g,20);}
+        for(int combo=1;combo<=3;++combo){e.x=200;g.step(1.f/60,a);check(e.health==health&&g.player.combo==combo,"Hit skipped wind-up");wait(g,combo==3?14:13);health-=combo==1?12:combo==2?15:23;check(e.health==health,"Contact damage");if(combo==3)check(e.bleedStacks==2&&g.player.preparation==0,"Passive finisher bleed requires no buff");wait(g,20);}
     });
     test("Wind-up cancellation cannot leave a ghost sword hit",[]{for(int mode=0;mode<4;++mode){auto g=arena();g.enemies[0].x=200;Actions a;a.attack=true;g.step(1.f/60,a);a={};
         if(mode==0)a.dash=true;else if(mode==1)a.swap=true;else if(mode==2)g.damagePlayer(1);else a.restart=true;
@@ -216,7 +216,61 @@ int main(){int failed=0,total=0;
     test("Bleed fire reaction consumes once",[]{auto g=arena();auto& e=g.enemies[0];g.hit(e,1,false,true);g.hit(e,11,true);check(e.health==21&&e.bleed==0&&e.burn>0&&e.reactionFlash>0,"Reaction +22");g.hit(e,1,true);check(e.health==20,"No repeat reaction");});
     test("Bleed and burn ticks",[]{auto g=arena();g.hit(g.enemies[0],1,false,true);wait(g,46);check(g.enemies[0].health==51,"Bleed tick");g.hit(g.enemies[1],1,true);wait(g,37);check(g.enemies[1].health==82,"Burn tick");});
     test("Both swap entry attacks cooldown",[]{auto g=arena();Actions a;a.swap=true;g.step(1.f/60,a);check(g.player.form==1&&g.projectiles.size()==1&&g.projectiles[0].damage==14,"Mage entry");g.step(1.f/60,a);check(g.player.form==1&&g.projectiles.size()==1,"Swap cooldown");wait(g,61);g.enemies[0].x=200;g.step(1.f/60,a);check(g.player.form==0&&g.enemies[0].health==42,"Sword entry");});
-    test("Mage empowered projectile collision",[]{auto g=arena();g.player.form=1;Actions a;a.skill=true;g.step(1.f/60,a);check(g.projectiles.size()==1&&g.projectiles[0].empowered,"Skill");near(g.player.skillCooldown,4.1f);g.enemies[0].x=230;wait(g,12);check(g.enemies[0].health==30&&g.enemies[0].burn>0,"Collision and burn");});
+    test("Mage empowered projectile collision",[]{auto g=arena();g.player.form=1;Actions a;a.skill=true;g.step(1.f/60,a);check(g.projectiles.size()==1&&g.projectiles[0].empowered,"Skill");near(g.player.mageSkillCooldown,4.1f);g.enemies[0].x=230;wait(g,12);check(g.enemies[0].health==30&&g.enemies[0].burn>0,"Collision and burn");});
+    test("Thrust selects nearest live target in either facing",[]{
+        for(int facing:{-1,1}){
+            auto g=arena();g.player.x=600;g.player.facing=facing;
+            g.enemies[0]=Enemy(0,600+facing*115);
+            g.enemies[1]=Enemy(0,600+facing*70);
+            for(auto& e:g.enemies){e.speed=0;e.attackTimer=1000;}
+            Actions a;a.skill=true;g.step(1.f/60,a);
+            check(g.enemies[1].health==55,"Thrust skipped wind-up");
+            wait(g,16);
+            check(g.enemies[0].health==55&&g.enemies[1].health==23&&g.enemies[1].bleedStacks==2,"Thrust hit more than the nearest target");
+        }
+    });
+    test("Sweep spreads at most once and cannot relay through a new target",[]{
+        auto g=arena();g.player.x=500;
+        g.enemies={Enemy(0,550),Enemy(0,590),Enemy(0,690),Enemy(0,775)};
+        for(auto& e:g.enemies){e.speed=0;e.attackTimer=1000;}
+        g.hit(g.enemies[0],0,false,2);g.hit(g.enemies[1],0,false,2);
+        for(auto& e:g.enemies)e.knockback=0;
+        Actions a;a.skillSweep=true;g.step(1.f/60,a);wait(g,14);
+        check(g.enemies[0].health==37&&g.enemies[1].health==37,"Sweep failed its direct area hit");
+        check(g.enemies[2].health==55&&g.enemies[2].bleedStacks==1&&g.enemies[3].bleedStacks==0,"Spread incorrectly relayed through a new source");
+        check(g.enemies[0].bleedStacks==3&&g.enemies[1].bleedStacks==3,"Spread applied more than once");
+    });
+    test("Bleed milestones slow at five and execute only regular enemies at ten",[]{
+        auto g=arena();
+        g.enemies[0]=Enemy(0,700);g.enemies[1]=Enemy(0,700);
+        for(int i=0;i<2;++i){g.enemies[i].attackTimer=1000;g.hit(g.enemies[i],0,false,4+i);g.enemies[i].knockback=0;}
+        g.step(1.f/60,{});
+        near(700-g.enemies[1].x,(700-g.enemies[0].x)*.8f);
+        for(int i=0;i<2;++i){
+            auto& e=g.enemies[i];e.health=i==0?12:15;e.boss=i==1;e.speed=0;
+            g.hit(e,0,false,10);check(e.bleedStacks==10,"Cap not enforced");
+        }
+        wait(g,46);
+        check(g.enemies[0].dead()&&g.enemies[1].health==5,"Incorrect regular or boss maximum-stack effect");
+    });
+    test("Preparation accelerates basic contact and keeps skill cooldowns separate",[]{
+        auto g=arena();Actions a;a.skillBuff=true;a.attack=true;
+        g.step(1.f/60,a);
+        near(g.player.preparation,5.f);near(g.player.buffReady,14.f);
+        near(g.player.attackCooldown,.23f/1.2f);
+        check(g.player.skillCooldown==0&&g.player.sweepReady==0,"Preparation consumed another cooldown");
+        wait(g,302);check(g.player.preparation==0&&g.player.basicSpeed()==1,"Preparation did not expire");
+    });
+    test("Three skill buttons dispatch distinct touch edges",[]{
+        Input in;ControlLayout ui;in.setLayout(&ui);
+        for(int i=0;i<3;++i){
+            const auto& b=ui.buttons[ControlLayout::Skill+i];
+            in.pointer(i,b.x+b.size/2,b.y+b.size/2,true);
+            auto a=in.sample();
+            check(a.skill==(i==0)&&a.skillSweep==(i==1)&&a.skillBuff==(i==2),"Wrong touch skill");
+            in.pointer(i,b.x,b.y,false);
+        }
+    });
     test("Nine item stats health adjustment",[]{Player p;p.equip(0);p.equip(1);check(p.gear.attack()==6&&p.gear.defense()==4&&p.maxHealth()==130&&p.health==130,"Armor weapon");near(p.gear.speed(),.792f);near(p.gear.range(),1.16f);p.equip(2);check(p.gear.attack()==9,"Flame charm");p.equip(1);check(p.health==110&&p.maxHealth()==110,"Health adjustment");p.equip(2);check(p.gear.defense()==3&&p.maxHealth()==125,"Guardian charm");});
     test("Damage immunity defeat freeze",[]{auto g=arena();g.damagePlayer(9);g.damagePlayer(9);check(g.player.health==91,"Damage immunity");wait(g,45);g.damagePlayer(999);check(g.ended&&!g.won&&g.player.health==0,"Defeat");float x=g.player.x;Actions a;a.right=true;g.step(1.f/60,a);near(g.player.x,x);});
     test("Stage clear",[]{auto g=arena();for(auto& e:g.enemies)g.hit(e,1000,false);g.step(1.f/60,{});check(g.ended&&g.won&&g.foes()==0,"Clear");});
