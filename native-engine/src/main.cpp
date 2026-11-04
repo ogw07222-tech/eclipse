@@ -10,8 +10,29 @@
 namespace {
 SDL_Window* window=nullptr;SDL_Renderer* renderer=nullptr;
 eclipse::Combat game;eclipse::Animation animation;eclipse::Input input;eclipse::ControlLayout layout;
-bool running=true,foreground=true,titleSettings=false;
-bool choosingQaCharacter=false;
+bool running=true,foreground=true;
+enum class TitlePage { Main, StartOptions, QaCharacters, Gear, Settings };
+TitlePage titlePage=TitlePage::Main;
+bool waitingForVacode=false;
+bool vacodeSessionReady(){
+#ifdef SDL_PLATFORM_ANDROID
+    auto* env=static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
+    auto activity=static_cast<jobject>(SDL_GetAndroidActivity());
+    if(!env||!activity)return false;
+    jclass clazz=env->GetObjectClass(activity);
+    bool ready=false;
+    if(clazz){
+        jmethodID method=env->GetMethodID(clazz,"isVacodeSignedIn","()Z");
+        if(method)ready=env->CallBooleanMethod(activity,method)==JNI_TRUE;
+        if(env->ExceptionCheck()){env->ExceptionDescribe();env->ExceptionClear();ready=false;}
+        env->DeleteLocalRef(clazz);
+    }
+    env->DeleteLocalRef(activity);
+    return ready;
+#else
+    return false;
+#endif
+}
 int qaStartForm=-1;
 float camera=640;
 void requestVacodeLogin(){
@@ -48,15 +69,17 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
         if(wasTitle){
             if(!foreground||!titleActive)continue;
             if(e.type==SDL_EVENT_KEY_DOWN&&e.key.scancode==SDL_SCANCODE_ESCAPE){
-                if(choosingQaCharacter)choosingQaCharacter=false;
-                else if(titleSettings)titleSettings=false;
-                else running=false;
+                if(titlePage==TitlePage::Main)running=false;
+                else if(titlePage==TitlePage::Settings)titlePage=TitlePage::Gear;
+                else if(titlePage==TitlePage::QaCharacters)titlePage=TitlePage::StartOptions;
+                else titlePage=TitlePage::Main;
+                waitingForVacode=false;
                 continue;
             }
             if(titleSeconds<eclipse::Presentation::titleReadyTime)continue;
             int selection=-1;
             if(e.type==SDL_EVENT_KEY_DOWN&&!e.key.repeat){
-                if(choosingQaCharacter){
+                if(titlePage==TitlePage::QaCharacters){
                     if(e.key.scancode==SDL_SCANCODE_1||e.key.scancode==SDL_SCANCODE_KP_1)selection=0;
                     if(e.key.scancode==SDL_SCANCODE_2||e.key.scancode==SDL_SCANCODE_KP_2)selection=1;
                     if(e.key.scancode==SDL_SCANCODE_3||e.key.scancode==SDL_SCANCODE_KP_3)selection=2;
@@ -67,16 +90,28 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
             const bool finger=e.type==SDL_EVENT_FINGER_DOWN&&e.tfinger.touchID!=SDL_MOUSE_TOUCHID;
             const bool mouse=e.type==SDL_EVENT_MOUSE_BUTTON_DOWN&&e.button.which!=SDL_TOUCH_MOUSEID&&e.button.button==SDL_BUTTON_LEFT;
             if((finger||mouse)&&SDL_ConvertEventToRenderCoordinates(renderer,&e)){
-                const SDL_FPoint position=finger?SDL_FPoint{e.tfinger.x,e.tfinger.y}:SDL_FPoint{e.button.x,e.button.y};
-                if(choosingQaCharacter){
+                const SDL_FPoint pos=finger?SDL_FPoint{e.tfinger.x,e.tfinger.y}:SDL_FPoint{e.button.x,e.button.y};
+                if(titlePage==TitlePage::QaCharacters){
                     const auto& buttons=eclipse::Presentation::qaCharacterButtons;
-                    for(size_t i=0;i<buttons.size();++i)if(SDL_PointInRectFloat(&position,&buttons[i]))selection=static_cast<int>(i);
+                    for(size_t i=0;i<buttons.size();++i)if(SDL_PointInRectFloat(&pos,&buttons[i]))selection=static_cast<int>(i);
                 }else{
-                    for(int i=0;i<4;++i)if(SDL_PointInRectFloat(&position,&eclipse::Presentation::titleButtons[i]))selection=i;
+                    if(SDL_PointInRectFloat(&pos,&eclipse::Presentation::titleGear))selection=9;
+                    else if(SDL_PointInRectFloat(&pos,&eclipse::Presentation::titleBack))selection=8;
+                    else for(int i=0;i<2;++i)
+                        if(SDL_PointInRectFloat(&pos,&eclipse::Presentation::titleOptions[i]))selection=i;
                 }
             }
-            if(choosingQaCharacter){
-                if(selection==3){choosingQaCharacter=false;continue;}
+            if(selection==9){
+                titlePage=titlePage==TitlePage::Gear?TitlePage::Main:TitlePage::Gear;
+                waitingForVacode=false;continue;
+            }
+            if(selection==8){
+                titlePage=titlePage==TitlePage::Settings?TitlePage::Gear:
+                          titlePage==TitlePage::QaCharacters?TitlePage::StartOptions:TitlePage::Main;
+                waitingForVacode=false;continue;
+            }
+            if(titlePage==TitlePage::QaCharacters){
+                if(selection==3){titlePage=TitlePage::StartOptions;continue;}
                 if(selection>=0&&selection<3){
                     if(selection==2&&!view.loadWhiteNight()){
                         const std::string reason=SDL_GetError();
@@ -92,18 +127,29 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
                     input.reset();
                     keyState.fill(false);
                     camera=640;
-                    choosingQaCharacter=false;
-                    titleActive=false;
+                    titlePage=TitlePage::Main;titleActive=false;
                     SDL_Log("ECLIPSE QA selected form=%d",qaStartForm);
                 }
                 continue;
             }
-            switch(selection){
-                case 0: choosingQaCharacter=true;titleSettings=false;break;
-                case 1: requestVacodeLogin();break;
-                case 2: titleSettings=!titleSettings;break;
-                case 3: running=false;break;
-                default:break;
+            switch(titlePage){
+                case TitlePage::Main:
+                    if(selection==0)titlePage=TitlePage::StartOptions;
+                    break;
+                case TitlePage::StartOptions:
+                    if(selection==0){
+                        if(vacodeSessionReady()){waitingForVacode=false;titlePage=TitlePage::QaCharacters;}
+                        else if(!waitingForVacode){waitingForVacode=true;requestVacodeLogin();}
+                    }else if(selection==1){waitingForVacode=false;titlePage=TitlePage::QaCharacters;}
+                    break;
+                case TitlePage::Gear:
+                    if(selection==0)titlePage=TitlePage::Settings;
+                    else if(selection==1)running=false;
+                    break;
+                case TitlePage::Settings:
+                    if(selection==0)titlePage=TitlePage::Gear;
+                    break;
+                case TitlePage::QaCharacters:break;
             }
             continue;
         }
@@ -296,7 +342,12 @@ int main(int argc,char** argv){
         const double elapsed=std::min((start-last)/1e9,.1);last=start;
         if(titleActive){
             titleSeconds+=static_cast<float>(elapsed);
-            view->drawTitle(titleSeconds,titleSettings,choosingQaCharacter);
+            if(waitingForVacode&&vacodeSessionReady()&&titlePage==TitlePage::StartOptions){
+                waitingForVacode=false;
+                titlePage=TitlePage::QaCharacters;
+                SDL_Log("VACODE verified: select QA character");
+            }
+            view->drawTitle(titleSeconds,static_cast<int>(titlePage),waitingForVacode);
         }else{
             accumulator+=elapsed;
             while(accumulator>=eclipse::fixedStep){if(!layout.editing)tick(input.sample());accumulator-=eclipse::fixedStep;}
