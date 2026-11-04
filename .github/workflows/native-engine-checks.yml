@@ -1,4 +1,5 @@
 name: Native engine checks
+# Manual execution only. Never dispatch without explicit owner approval.
 on:
   workflow_dispatch:
 permissions:
