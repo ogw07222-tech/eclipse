@@ -33,7 +33,8 @@ struct Equipment {
 constexpr float thrustCooldown=6.f,sweepCooldown=9.f,buffCooldown=14.f;
 constexpr float preparationDuration=5.f;
 constexpr int bleedMaxStacks=10,bleedSlowStacks=5;
-constexpr float bleedDuration=5.f,bleedTickInterval=.75f;
+// Every 3 seconds one stack expires; reapplying bleed resets that countdown.
+constexpr float bleedDuration=3.f,bleedTickInterval=.75f;
 enum class SwordStrike {Basic,Thrust,Sweep};
 
 struct Player {
@@ -349,7 +350,11 @@ class Combat {
                 if(!e.boss&&e.bleedStacks==bleedMaxStacks&&e.health*10<=e.maxHealth)
                     damageEnemy(e,e.health,DamageKind::Execute,false);
             }
-            if(e.bleed<=0){e.bleedStacks=0;e.bleedTick=0;}
+            if(e.bleed<=0){
+                --e.bleedStacks;
+                if(e.bleedStacks>0)e.bleed=bleedDuration;
+                else {e.bleedStacks=0;e.bleedTick=0;}
+            }
         }
         if(e.burn>0){e.burn=down(e.burn,dt);e.burnTick+=dt;if(e.burnTick>=.6f){e.burnTick-=.6f;damageEnemy(e,2,DamageKind::Fire,true);}}
         if(e.dead())return;
