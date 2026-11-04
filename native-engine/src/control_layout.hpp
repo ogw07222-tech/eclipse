@@ -19,6 +19,7 @@ public:
     std::array<ControlRect,Count> buttons=defaultButtons;
     std::string storagePath;
     bool editing=false;             // compatibility with current game pause/render loop
+    bool exitRequested=false;
     bool reposition=false;          // overlay for on-screen button manipulation
     Page page=Controls;
     int selected=Stick;
@@ -30,7 +31,14 @@ public:
     int pinchButton=-1;
     int bgm=80,sfx=90;
     bool screenShake=true,showNumbers=true;
-    static constexpr float gearX=1218,gearY=18,gearSize=48;
+    static constexpr float gearX=1198,gearY=18,gearSize=64;
+    static constexpr float backX=1120,backY=103,backWidth=90,backHeight=65;
+    static constexpr float menuX=12,menuY=47,menuScale=.8f;
+    static constexpr float menuWidth=344*menuScale,menuHeight=783*menuScale;
+    static constexpr float tabX=menuX+49*menuScale,tabWidth=250*menuScale,tabHeight=86*menuScale;
+    static constexpr std::array<float,4> tabY{{
+        menuY+206*menuScale,menuY+306*menuScale,menuY+410*menuScale,menuY+513*menuScale
+    }};
     static bool inside(float x,float y,float bx,float by,float w,float h){return x>=bx&&x<bx+w&&y>=by&&y<by+h;}
     int hit(float x,float y) const {
         for(int i=Count-1;i>=0;--i)if(inside(x,y,buttons[i].x,buttons[i].y,buttons[i].size,buttons[i].size))return i;
@@ -120,11 +128,14 @@ public:
         if(!down)return true;
         // Motion only updates sliders or an active touch layout gesture.
         if(!motion){
-            if(inside(x,y,25,210,245,72)){page=Sound;return true;}
-            if(inside(x,y,25,292,245,72)){page=Controls;return true;}
-            if(inside(x,y,25,374,245,72)){page=Game;return true;}
-            if(inside(x,y,25,456,245,72)){close();return true;}
-            if(inside(x,y,1120,103,90,65)){close();return true;}
+            if(inside(x,y,gearX,gearY,gearSize,gearSize)||
+               inside(x,y,backX,backY,backWidth,backHeight)){close();return true;}
+            for(int i=0;i<4;++i){
+                if(!inside(x,y,tabX,tabY[i],tabWidth,tabHeight))continue;
+                if(i==3){close();exitRequested=true;}
+                else page=static_cast<Page>(i);
+                return true;
+            }
         }else if(page!=Sound)return true;
         if(page==Controls){
             if(inside(x,y,440,280,600,74)){startReposition();return true;}
