@@ -828,6 +828,16 @@ public:
                     return aliasedPath;
                 }
             }
+            // Generic route for any new PNG/JSON folder not accepted by the
+            // already-installed Studio APK. The packer stores it unchanged
+            // below ui/__studio_all__/, keeping subdirectories intact.
+            // Explicit legacy aliases above take precedence for old packs.
+            const std::string genericPath =
+                std::string(storage) + "/game_assets/ui/__studio_all__/" + logicalName;
+            if (FILE* file = std::fopen(genericPath.c_str(), "rb")) {
+                std::fclose(file);
+                return genericPath;
+            }
             const std::string overridePath = std::string(storage) + "/game_assets/" + name;
             if (FILE* file = std::fopen(overridePath.c_str(), "rb")) {
                 std::fclose(file);
