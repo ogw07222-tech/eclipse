@@ -68,23 +68,27 @@ for clip in clips:
         assert alpha>0 and mask.getbbox(),(name,i,'missing strike effect')
         current=paths[name][clip['source_indices'][i]]
         previous=paths[name][clip['source_indices'][i-1]]
-        assert mask.getpixel(tuple(current[2:]))==3,(name,i,'leading edge misses current sword tip')
-        # A short sword must not produce a giant unrelated arc. Every effect
-        # pixel remains within blade reach of the moving wrist segment.
+        assert mask.getpixel(tuple(v+o for v,o in zip(current[2:],bake.FX_ORIGIN)))==3,(name,i,'leading edge misses current sword tip')
+        # The energy extends past the steel while following the moving wrist.
         ax,ay=previous[:2];bx,by=current[:2];dx,dy=bx-ax,by-ay
-        max_radius=max(math.dist(previous[:2],previous[2:]),math.dist(current[:2],current[2:]))*1.5+1
+        max_radius=max(math.dist(previous[:2],previous[2:]),math.dist(current[:2],current[2:]))*(bake.FX_REACH[name]+.4)+3
         box=mask.getbbox();assert box[0]>0 and box[1]>0 and box[2]<mask.width and box[3]<mask.height
+        furthest=0.0
         for y in range(box[1],box[3]):
             for x in range(box[0],box[2]):
                 if not mask.getpixel((x,y)):continue
-                t=max(0,min(1,((x-ax)*dx+(y-ay)*dy)/max(.001,dx*dx+dy*dy)))
-                assert math.dist((x,y),(ax+dx*t,ay+dy*t))<=max_radius,(name,i,'oversized sword effect')
+                px,py=x-bake.FX_ORIGIN[0],y-bake.FX_ORIGIN[1]
+                t=max(0,min(1,((px-ax)*dx+(py-ay)*dy)/max(.001,dx*dx+dy*dy)))
+                distance=math.dist((px,py),(ax+dx*t,ay+dy*t))
+                furthest=max(furthest,distance)
+                assert distance<=max_radius,(name,i,'oversized sword effect')
+        assert furthest>math.dist(current[:2],current[2:])*1.25,(name,i,'energy does not extend beyond steel')
         trail_samples+=1
     if name in paths:
         contact=int(clip['count']*float(re.search(r'\{'+str(clip['start'])+r','+str(clip['count'])+r',[\d.]+f,([\d.]+)f',header).group(1)))
         assert bake.trail_mask(name,contact,clip['source_indices'],paths)[1]>0,(name,'contact has no effect')
 assert re.search(r'slamContactTipX='+str(paths['air_slam'][5][2])+r',slamContactTipY='+str(paths['air_slam'][5][3]),header),'Landing flash origin differs from sword tip'
-results.update(sword_effect_frames=trail_samples,maximum_blade_tip_annotation_error_px=maximum_tip_error,sword_effect_scale='derived from visible blade length; shared actor registration and world scale')
+results.update(sword_effect_frames=trail_samples,maximum_blade_tip_annotation_error_px=maximum_tip_error,sword_effect_scale='extended from the steel path; padded effect coordinates preserve actor registration')
 
 review=ROOT/'native-engine/review';review.mkdir(exist_ok=True)
 (review/'metrics.json').write_text(json.dumps(results,indent=2)+'\n')
