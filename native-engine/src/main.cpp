@@ -10,11 +10,10 @@
 namespace {
 SDL_Window* window=nullptr;SDL_Renderer* renderer=nullptr;
 eclipse::Combat game;eclipse::Animation animation;eclipse::Input input;eclipse::ControlLayout layout;
-bool running=true,foreground=true;float camera=640;
-enum class TitlePage { Main, StartOptions, Gear, Settings };
+bool running=true,foreground=true;
+enum class TitlePage { Main, StartOptions, QaCharacters, Gear, Settings };
 TitlePage titlePage=TitlePage::Main;
 bool waitingForVacode=false;
-// Only a verified VACODE session can complete the login branch.
 bool vacodeSessionReady(){
 #ifdef SDL_PLATFORM_ANDROID
     auto* env=static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
@@ -34,6 +33,8 @@ bool vacodeSessionReady(){
     return false;
 #endif
 }
+int qaStartForm=-1;
+float camera=640;
 void requestVacodeLogin(){
 #ifdef SDL_PLATFORM_ANDROID
     auto* env=static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
@@ -66,41 +67,67 @@ void events(bool& titleActive,float titleSeconds){
         if(e.type==SDL_EVENT_WINDOW_FOCUS_LOST||e.type==SDL_EVENT_WILL_ENTER_BACKGROUND){foreground=false;input.reset();keyState.fill(false);continue;}
         if(e.type==SDL_EVENT_WINDOW_FOCUS_GAINED||e.type==SDL_EVENT_DID_ENTER_FOREGROUND){foreground=true;continue;}
         if(wasTitle){
-            if(!foreground)continue;
+            if(!foreground||!titleActive)continue;
             if(e.type==SDL_EVENT_KEY_DOWN&&e.key.scancode==SDL_SCANCODE_ESCAPE){
                 if(titlePage==TitlePage::Main)running=false;
                 else if(titlePage==TitlePage::Settings)titlePage=TitlePage::Gear;
+                else if(titlePage==TitlePage::QaCharacters)titlePage=TitlePage::StartOptions;
                 else titlePage=TitlePage::Main;
                 waitingForVacode=false;
                 continue;
             }
             if(titleSeconds<eclipse::Presentation::titleReadyTime)continue;
             int selection=-1;
-            if(e.type==SDL_EVENT_KEY_DOWN&&!e.key.repeat&&
-                (e.key.scancode==SDL_SCANCODE_RETURN||e.key.scancode==SDL_SCANCODE_KP_ENTER||
-                 e.key.scancode==SDL_SCANCODE_SPACE))selection=0;
+            if(e.type==SDL_EVENT_KEY_DOWN&&!e.key.repeat){
+                if(titlePage==TitlePage::QaCharacters){
+                    if(e.key.scancode==SDL_SCANCODE_1||e.key.scancode==SDL_SCANCODE_KP_1)selection=0;
+                    if(e.key.scancode==SDL_SCANCODE_2||e.key.scancode==SDL_SCANCODE_KP_2)selection=1;
+                }else if(e.key.scancode==SDL_SCANCODE_RETURN||e.key.scancode==SDL_SCANCODE_KP_ENTER||e.key.scancode==SDL_SCANCODE_SPACE)selection=0;
+            }
             const bool finger=e.type==SDL_EVENT_FINGER_DOWN&&e.tfinger.touchID!=SDL_MOUSE_TOUCHID;
             const bool mouse=e.type==SDL_EVENT_MOUSE_BUTTON_DOWN&&e.button.which!=SDL_TOUCH_MOUSEID&&e.button.button==SDL_BUTTON_LEFT;
             if((finger||mouse)&&SDL_ConvertEventToRenderCoordinates(renderer,&e)){
-                const SDL_FPoint p=finger?SDL_FPoint{e.tfinger.x,e.tfinger.y}:SDL_FPoint{e.button.x,e.button.y};
-                if(SDL_PointInRectFloat(&p,&eclipse::Presentation::titleGear))selection=9;
-                else if(SDL_PointInRectFloat(&p,&eclipse::Presentation::titleBack))selection=8;
-                else {
-                    for(int i=0;i<2;++i)
-                        if(SDL_PointInRectFloat(&p,&eclipse::Presentation::titleOptions[i]))selection=i;
+                const SDL_FPoint pos=finger?SDL_FPoint{e.tfinger.x,e.tfinger.y}:SDL_FPoint{e.button.x,e.button.y};
+                if(titlePage==TitlePage::QaCharacters){
+                    for(int i=0;i<3;++i)if(SDL_PointInRectFloat(&pos,&eclipse::Presentation::qaCharacterButtons[i]))selection=i;
+                }else{
+                    if(SDL_PointInRectFloat(&pos,&eclipse::Presentation::titleGear))selection=9;
+                    else if(SDL_PointInRectFloat(&pos,&eclipse::Presentation::titleBack))selection=8;
+                    else for(int i=0;i<2;++i)
+                        if(SDL_PointInRectFloat(&pos,&eclipse::Presentation::titleOptions[i]))selection=i;
                 }
             }
-            if(selection==9){titlePage=titlePage==TitlePage::Gear?TitlePage::Main:TitlePage::Gear;waitingForVacode=false;continue;}
-            if(selection==8){titlePage=titlePage==TitlePage::Settings?TitlePage::Gear:TitlePage::Main;waitingForVacode=false;continue;}
+            if(selection==9){
+                titlePage=titlePage==TitlePage::Gear?TitlePage::Main:TitlePage::Gear;
+                waitingForVacode=false;continue;
+            }
+            if(selection==8){
+                titlePage=titlePage==TitlePage::Settings?TitlePage::Gear:
+                          titlePage==TitlePage::QaCharacters?TitlePage::StartOptions:TitlePage::Main;
+                waitingForVacode=false;continue;
+            }
+            if(titlePage==TitlePage::QaCharacters){
+                if(selection==2){titlePage=TitlePage::StartOptions;continue;}
+                if(selection==0||selection==1){
+                    qaStartForm=selection;
+                    game.restart();
+                    game.player.form=qaStartForm;
+                    animation.reset();input.reset();keyState.fill(false);
+                    camera=640;
+                    titlePage=TitlePage::Main;titleActive=false;
+                    SDL_Log("ECLIPSE QA selected form=%d",qaStartForm);
+                }
+                continue;
+            }
             switch(titlePage){
                 case TitlePage::Main:
                     if(selection==0)titlePage=TitlePage::StartOptions;
                     break;
                 case TitlePage::StartOptions:
                     if(selection==0){
-                        if(vacodeSessionReady()){titleActive=false;waitingForVacode=false;}
-                        else {waitingForVacode=true;requestVacodeLogin();}
-                    }else if(selection==1){titleActive=false;waitingForVacode=false;}
+                        if(vacodeSessionReady()){waitingForVacode=false;titlePage=TitlePage::QaCharacters;}
+                        else if(!waitingForVacode){waitingForVacode=true;requestVacodeLogin();}
+                    }else if(selection==1){waitingForVacode=false;titlePage=TitlePage::QaCharacters;}
                     break;
                 case TitlePage::Gear:
                     if(selection==0)titlePage=TitlePage::Settings;
@@ -109,6 +136,7 @@ void events(bool& titleActive,float titleSeconds){
                 case TitlePage::Settings:
                     if(selection==0)titlePage=TitlePage::Gear;
                     break;
+                case TitlePage::QaCharacters:break;
             }
             continue;
         }
@@ -146,7 +174,9 @@ void events(bool& titleActive,float titleSeconds){
 void tick(eclipse::Actions action){
     if(action.restart){input.reset();keyState.fill(false);animation.reset();camera=640;}
     const int previousMotion=animation.state;
-    game.step(static_cast<float>(eclipse::fixedStep),action);animation.step(game.player,static_cast<float>(eclipse::fixedStep));
+    game.step(static_cast<float>(eclipse::fixedStep),action);
+    if(action.restart&&qaStartForm>=0)game.player.form=qaStartForm;
+    animation.step(game.player,static_cast<float>(eclipse::fixedStep));
     if(animation.state!=previousMotion)SDL_Log("ECLIPSE motion state=%d frame=%d",animation.state,animation.frame);
     if(action.inventory||action.swap||action.restart||action.weapon||action.armor||action.charm)
         SDL_Log("ECLIPSE state form=%d inventory=%d hp=%d foes=%d restart=%d weapon=%d armor=%d charm=%d",game.player.form,game.inventory,game.player.health,game.foes(),action.restart,game.player.gear.selected[0],game.player.gear.selected[1],game.player.gear.selected[2]);
@@ -273,6 +303,20 @@ int main(int argc,char** argv){
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"ECLIPSE TITLE ASSET ERROR",reason.c_str(),window);
         view.reset();cleanup();return 1;
     }
+    // First playable scene: use the demon castle entrance as the temporary
+    // combat playtest backdrop. After validation this becomes the tutorial.
+    // Never silently fall back to the forest if the requested scene is missing.
+    if(!view->demonCastleEntranceReady()){
+        const std::string reason=SDL_GetError();
+        const std::string message=reason.empty()
+            ? "Demon castle entrance PNGs were not loaded. Check Assets/Resources/Eclipse/demon_castle/entrance."
+            : reason;
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"ECLIPSE CASTLE ASSET ERROR: %s",message.c_str());
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"ECLIPSE CASTLE ASSET ERROR",message.c_str(),window);
+        view.reset();cleanup();return 1;
+    }
+    view->setDemonCastleEntrance(true);
+    SDL_Log("ECLIPSE first playable scene: demon castle entrance (combat playtest; tutorial later)");
     float titleSeconds=0;
     Uint64 last=SDL_GetTicksNS();double accumulator=0;
     while(running){Uint64 start=SDL_GetTicksNS();events(titleActive,titleSeconds);
@@ -281,13 +325,12 @@ int main(int argc,char** argv){
         const double elapsed=std::min((start-last)/1e9,.1);last=start;
         if(titleActive){
             titleSeconds+=static_cast<float>(elapsed);
-            if(waitingForVacode&&vacodeSessionReady()){
+            if(waitingForVacode&&vacodeSessionReady()&&titlePage==TitlePage::StartOptions){
                 waitingForVacode=false;
-                titleActive=false;
-                titlePage=TitlePage::Main;
-                SDL_Log("VACODE verified: entering ECLIPSE combat");
+                titlePage=TitlePage::QaCharacters;
+                SDL_Log("VACODE verified: select QA character");
             }
-            if(titleActive)view->drawTitle(titleSeconds,static_cast<int>(titlePage),waitingForVacode);
+            view->drawTitle(titleSeconds,static_cast<int>(titlePage),waitingForVacode);
         }else{
             accumulator+=elapsed;
             while(accumulator>=eclipse::fixedStep){if(!layout.editing)tick(input.sample());accumulator-=eclipse::fixedStep;}

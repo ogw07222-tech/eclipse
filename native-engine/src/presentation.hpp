@@ -881,6 +881,10 @@ public:
     static constexpr SDL_FRect titleBack{26,25,190,50};
     static constexpr float titleReadyTime=0.85f;
 
+    static constexpr std::array<SDL_FRect,3> qaCharacterButtons{{
+        {410,424,460,52},{410,486,460,52},{530,552,220,44}
+    }};
+
     void drawTitle(float seconds,int page=0,bool loggingIn=false){
         constexpr float width=1280, height=720;
         constexpr float logoBand=195;
@@ -946,44 +950,48 @@ public:
         };
         const int strip[]={0,1,2,1,3,2,2,3,4,3,5,4};
         SDL_RenderGeometry(renderer,titleTexture_,logo,6,strip,12);
-        if(seconds>=titleReadyTime){
-            // The same PNG button atlas is reused for both menu levels.
-            // 0 = initial START; 1 = login/guest; 2 = gear menu; 3 = settings.
-            const char* primary=page==0?"START":page==1?"VACODE LOGIN":page==2?"SETTINGS":"BACK";
-            const char* secondary=page==1?"PLAY AS GUEST":page==2?"EXIT":nullptr;
-            auto button=[&](int index,const char* label){
-                const auto& dst=titleOptions[index];
-                const SDL_FRect src{0.f,float((index==0?0:1)*30),112.f,30.f};
-                SDL_SetTextureAlphaMod(titleMenu_,static_cast<Uint8>(230+25*std::sin(seconds*2.4f+index*.8f)));
-                SDL_RenderTexture(renderer,titleMenu_,&src,&dst);
-                const size_t length=std::strlen(label);
-                text(label,dst.x+(dst.w-length*18.f)*.5f,dst.y+19,3,index==0?0xffe2b7:0xe1e0ef);
-            };
-            if(page==1||page==2||page==3){
-                rect(390,500,500,195,0x080a16,156);
-                rect(390,500,500,2,0x9284ae,195);
+        if(seconds>=titleReadyTime&&page==2){
+            rect(386,364,508,250,0x101223);
+            rect(386,364,508,3,0xad95c7);
+            text("QA CHARACTER SELECT",469,386,3,0xffe2b7);
+            constexpr const char* labels[]={"1 KNIGHT","2 FIRE MAGE","BACK"};
+            for(int i=0;i<3;++i){
+                const auto& target=qaCharacterButtons[i];
+                const SDL_FRect source{0,0,112,30};
+                SDL_RenderTexture(renderer,titleMenu_,&source,&target);
+                text(labels[i],target.x+(target.w-std::strlen(labels[i])*18.f)*.5f,
+                    target.y+(target.h-21)*.5f,3,0xece3f4);
             }
-            button(0,primary);
-            if(secondary)button(1,secondary);
+        }else if(seconds>=titleReadyTime){
+            // Screens: MAIN=0, START_OPTIONS=1, QA=2, GEAR=3, SETTINGS=4.
+            constexpr const char* labels[]={"START","VACODE LOGIN","PLAY AS GUEST","SETTINGS","EXIT","BACK"};
+            const char* first=page==0?labels[0]:page==1?labels[1]:page==3?labels[3]:labels[5];
+            const char* second=page==1?labels[2]:page==3?labels[4]:nullptr;
+            const char* menuLabels[]={first,second};
+            for(int i=0;i<(second?2:1);++i){
+                const auto& target=titleOptions[i];
+                const SDL_FRect source{0.f,float((i==0?0:1)*30),112.f,30.f};
+                SDL_SetTextureAlphaMod(titleMenu_,static_cast<Uint8>(230+25*std::sin(seconds*2.4f+i*.8f)));
+                SDL_RenderTexture(renderer,titleMenu_,&source,&target);
+                const size_t length=std::strlen(menuLabels[i]);
+                text(menuLabels[i],target.x+(target.w-length*18.f)*.5f,target.y+19,3,i==0?0xffe2b7:0xe1e0ef);
+            }
             SDL_SetTextureAlphaMod(titleMenu_,255);
-            if(settingsGear_){
-                SDL_RenderTexture(renderer,settingsGear_,nullptr,&titleGear);
-            }
-            if(page!=0){
-                text("BACK",35,40,2,0xe1d4bf);
-                if(page==1){
-                    text("CHOOSE YOUR JOURNEY",423,516,2,0xbeb2d9);
-                    if(loggingIn)text("VERIFYING VACODE ACCOUNT",425,478,2,0xf0d5aa);
-                }else if(page==2)text("OPTIONS",576,516,2,0xbeb2d9);
-                else{
-                    rect(344,325,592,164,0x080a16,245);
-                    rect(344,325,592,3,0xb09ac9);
-                    text("SETTINGS",555,345,3,0xf0d5aa);
-                    text("CONTROL SETTINGS AVAILABLE IN GAME",389,406,2,0xe2d9e8);
-                    text("PRESS BACK TO RETURN",442,442,2,0xbbaccb);
-                }
+            if(page!=0)text("BACK",35,40,2,0xe1d4bf);
+            if(page==1){
+                text("CHOOSE YOUR JOURNEY",423,516,2,0xbeb2d9);
+                if(loggingIn)text("VERIFYING VACODE ACCOUNT",425,478,2,0xf0d5aa);
+            }else if(page==3)text("OPTIONS",576,516,2,0xbeb2d9);
+            else if(page==4){
+                rect(344,325,592,164,0x080a16,245);
+                rect(344,325,592,3,0xb09ac9);
+                text("SETTINGS",555,345,3,0xf0d5aa);
+                text("CONTROL SETTINGS AVAILABLE IN GAME",389,406,2,0xe2d9e8);
+                text("PRESS BACK TO RETURN",442,442,2,0xbbaccb);
             }
         }
+        if(seconds>=titleReadyTime&&page!=2&&settingsGear_)
+            SDL_RenderTexture(renderer,settingsGear_,nullptr,&titleGear);
         SDL_RenderPresent(renderer);
     }
 
