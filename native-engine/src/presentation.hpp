@@ -451,10 +451,9 @@ class Presentation {
         }
 
         rect(0,0,1280,720,0x080b12,184);
-        menuTile(12,86,280,549,0x121b29,0x536172);
         menuTile(328,86,888,549,0x121b29,0x536172);
         if(settingsPanel_){
-            SDL_FRect frame{12,86,280,549};
+            SDL_FRect frame{ControlLayout::menuX,ControlLayout::menuY,ControlLayout::menuWidth,ControlLayout::menuHeight};
             SDL_RenderTexture(renderer,settingsPanel_,nullptr,&frame);
         }
         if(settingsWindow_){
@@ -462,26 +461,36 @@ class Presentation {
             SDL_RenderTexture(renderer,settingsWindow_,nullptr,&frame);
         }
 
-        menuTile(34,110,234,79,0x172331,0x596878);
-        text("ECLIPSE",48,122,4,ink);
-        text("SETTINGS",49,163,2,gold);
-        rect(42,192,214,2,0x596878);
-        const char* tabs[]={"SOUND","CONTROLS","GAME","BACK"};
-        for(int i=0;i<4;++i){
-            const float y=210.f+i*82.f;
-            const bool active=i==static_cast<int>(layout.page);
-            menuTile(25,y,245,68,active?0x2c414d:0x1b2838,active?gold:0x465363);
-            if(active)rect(31,y+13,4,42,gold);
-            text(tabs[i],49,y+23,3,active?ink:muted);
+        const char* tabs[]={"SOUND","CONTROLS","GAME","EXIT"};
+        if(!settingsPanel_){
+            menuTile(ControlLayout::menuX,ControlLayout::menuY,
+                     ControlLayout::menuWidth,ControlLayout::menuHeight,0x121b29,0x536172);
+            text("SETTINGS",54,124,4,ink);
         }
-        menuTile(36,559,228,43,0x172331,0x465363);
-        text("AUTO SAVE",54,572,2,muted);
+        for(int i=0;i<4;++i){
+            const float x=ControlLayout::tabX,y=ControlLayout::tabY[i];
+            const bool active=i==static_cast<int>(layout.page);
+            if(!settingsPanel_){
+                menuTile(x,y,ControlLayout::tabWidth,ControlLayout::tabHeight,
+                         i==3?0x382c2b:0x1b2838,0x697480);
+                text(tabs[i],x+24,y+23,3,ink);
+            }
+            if(active){
+                constexpr unsigned blue=0xa4daef;
+                const float w=ControlLayout::tabWidth,h=ControlLayout::tabHeight;
+                rect(x+9,y,w-18,3,blue);
+                rect(x+9,y+h-3,w-18,3,blue);
+                rect(x,y+10,3,h-20,blue);
+                rect(x+w-3,y+10,3,h-20,blue);
+            }
+        }
 
         menuTile(376,107,716,67,0x172331,0x596878);
         text(tabs[layout.page],398,126,4,ink);
         rect(389,187,755,2,0x596878);
-        menuTile(1120,103,90,65,0x302832,0x705d68);
-        text("X",1157,123,4,ink);
+        menuTile(ControlLayout::backX,ControlLayout::backY,
+                 ControlLayout::backWidth,ControlLayout::backHeight,0x213242,0x596878);
+        text("BACK",ControlLayout::backX+10,ControlLayout::backY+22,3,ink);
 
         if(layout.page==ControlLayout::Controls){
             text("TOUCH BUTTON POSITION AND SIZE",390,218,2,muted);
@@ -724,12 +733,12 @@ public:
         const ControlLayout& layout=customLayout?*customLayout:defaultLayout;
         if(layout.showNumbers)for(const auto& popup:g.popups)number(popup.amount,popup.x-offset-12,popup.y,3,popup.kind==DamageKind::Fire?0xff9155:(popup.kind==DamageKind::Bleed||popup.kind==DamageKind::Execute)?0xe76878:0xf2d48c);
         hud(g,held,layout,stick);
+        if(layout.editing)settings(layout);
         // PNG-backed gothic gear and vertical menu. All actions use ControlLayout hitboxes.
-        if(settingsGear_){
+        if(!layout.reposition&&settingsGear_){
             SDL_FRect gear{ControlLayout::gearX,ControlLayout::gearY,ControlLayout::gearSize,ControlLayout::gearSize};
             SDL_RenderTexture(renderer,settingsGear_,nullptr,&gear);
-        }else{rect(ControlLayout::gearX,ControlLayout::gearY,ControlLayout::gearSize,ControlLayout::gearSize,0x243746);text("CFG",1208,38,3); }
-        if(layout.editing)settings(layout);
+        }else if(!layout.reposition){rect(ControlLayout::gearX,ControlLayout::gearY,ControlLayout::gearSize,ControlLayout::gearSize,0x243746);text("CFG",ControlLayout::gearX+6,ControlLayout::gearY+21,3); }
         if(reviewLabel)text(reviewLabel,470,120,3);
         if(g.ended){rect(0,0,1280,720,0x111a28,240);text(g.won?"STAGE CLEAR":"GAME OVER",390,260,7,g.won?0x8be4b5:0xff8d99);text("TAP RETRY OR PRESS R",410,350,3);
             rect(510,412,260,65,0xe3bd72);rect(514,416,252,57,0x304039);text("RETRY",548,433,4);
