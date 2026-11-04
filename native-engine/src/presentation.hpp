@@ -1179,6 +1179,11 @@ public:
                 frame=row*columns+index;
             }
         }
+        if(p.form==0&&a.state==1){
+            const float phase=a.travelPhase*motionClips[1].count;
+            const int subframe=static_cast<int>(phase*2);
+            if(subframe%2==1)frame=knightRunMidpointStart+subframe/2;
+        }
         afterimages(g,a,actorTexture,frame,columns);
         if(actorTexture){
             SDL_FRect source{static_cast<float>(frame%columns*width),static_cast<float>(frame/columns*motionHeight),static_cast<float>(width),motionHeight};

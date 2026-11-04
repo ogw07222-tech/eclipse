@@ -23,7 +23,8 @@ constexpr MotionClip motionClips[]={
     {212,4,.415f,.50f,0.f},  // sweep contact matches the downswing
     {216,4,.40f,.50f,0.f},  // raise the sword, brace, recover
 };
-constexpr int motionWidth=64,motionHeight=94,motionColumns=16,motionRows=13,motionPivotX=28,motionPivotY=88;
+constexpr int motionWidth=64,motionHeight=94,motionColumns=16,motionRows=14,motionPivotX=28,motionPivotY=88;
+constexpr int knightRunMidpointStart=13*motionColumns;
 constexpr float motionScale=1.85f;
 constexpr int mageMotionColumns=8,mageMotionRows=10,mageGroundCastRow=8,mageAirCastRow=9;
 constexpr int mageCastTipX=55,mageCastTipY=50;

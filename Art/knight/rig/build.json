@@ -1,13 +1,13 @@
 {
   "inputs": {
     "Art/knight/redesign/blade_paths.json": "da6d50e27c11d46ed2402a8c6ad58e590aa436afe7ccad8d9994ebb568c6fef2",
-    "Art/knight/redesign/knight_64x94_master.png": "b8cc2dba9415efc96b86f89c577d7498c3dda4aeb9b1a0aff79a749d8e05f527",
-    "Tools/bake_knight_motion.py": "3901d5f4787584d457f72559892cb78b4251a6cafc4f553015815c04cd966fb7",
+    "Art/knight/redesign/knight_64x94_master.png": "f669c4354d1232d7cb28e0a521a7ef98df5dc7e2d4424b6d0ffd322ec01227f3",
+    "Tools/bake_knight_motion.py": "c0a868637af08c6eb34e01932f14db30bf2240177e1f3bb34ac5c97dcb388765",
     "Art/knight/rig/clips.json": "fdce490b1ae8e39eb588dfaf5a7299a37c52d46f0f4fdef4919cb40efbf9e0f9"
   },
   "outputs": {
-    "Assets/Resources/Eclipse/knight_motion.png": "b8cc2dba9415efc96b86f89c577d7498c3dda4aeb9b1a0aff79a749d8e05f527",
-    "native-engine/src/motion.hpp": "8665781638091b481c3fb2374abe1be75f5416536b1384835f7d26d86ee9b633",
+    "Assets/Resources/Eclipse/knight_motion.png": "f669c4354d1232d7cb28e0a521a7ef98df5dc7e2d4424b6d0ffd322ec01227f3",
+    "native-engine/src/motion.hpp": "ff0986dfc5786c371819656d24f911deeb2e21df81353c0231be1e8627334f6a",
     "native-engine/src/sword_trails.hpp": "e660b395e742154c6ae7b883cb4ca5f5f88392b98dff048b81bfc9adc3b352d0"
   }
 }
