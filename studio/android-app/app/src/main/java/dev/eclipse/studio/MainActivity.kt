@@ -65,13 +65,15 @@ private fun StudioScreen() {
             }
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                listOf("화면 꾸미기", "그림 관리", "움직임 만들기", "공격 설정", "GitHub").forEach { name ->
+                listOf("화면 꾸미기", "▶ 웹 플레이", "그림 관리", "움직임 만들기", "공격 설정", "GitHub").forEach { name ->
                     SquareButton(name) { tab = name }
                 }
             }
             Text("시작하기: 항목을 추가하고 → 목록에서 선택하고 → 위치를 바꿔보세요", color = Color(0xFFBBDDEA), fontSize = 12.sp)
             Spacer(Modifier.height(8.dp))
-            if (tab == "GitHub") {
+            if (tab == "▶ 웹 플레이") {
+                Box(Modifier.weight(1f)) { GitHubLivePlay(onExit = { tab = "화면 꾸미기" }) }
+            } else if (tab == "GitHub") {
                 Box(Modifier.weight(1f)) { GitHubReader(onImportPng = { png -> githubPng = png; tab = "화면 꾸미기" }) }
             } else if (tab == "화면 꾸미기") {
                 Box(Modifier.weight(1f)) { VisualSceneEditor(githubPng = githubPng, onImported = { githubPng = null }) }
