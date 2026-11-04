@@ -656,10 +656,10 @@ class Presentation {
         icon(2,held.dash?1:0,0,c[ControlLayout::Dash].x,c[ControlLayout::Dash].y,c[ControlLayout::Dash].size,held.dash);
         icon(3,0,0,c[ControlLayout::Swap].x,c[ControlLayout::Swap].y,c[ControlLayout::Swap].size,held.swap);
         if(p.whiteNight){
-            skillSlot(c[ControlLayout::Skill],1,"RUSH",p.skillCooldown,2.2f,held.skill,0xffbd35,true,-1);
-            skillSlot(c[ControlLayout::Sweep],2,"BOOST",p.sweepReady,5.f,held.skillSweep,0xffdf76,true,-1);
-            skillSlot(c[ControlLayout::Buff],3,"BLINK",p.buffReady,2.5f,held.skillBuff,0xfff0b5,true,-1);
-            skillSlot(c[ControlLayout::Swap],4,"VERDICT",p.swapCooldown,9.f,held.swap,0xffca54,true,-1);
+            skillSlot(c[ControlLayout::Skill],1,"RUSH",p.skillCooldown,2.2f,held.skill,0xb4d8ee,true,-1);
+            skillSlot(c[ControlLayout::Sweep],2,"BOOST",p.sweepReady,5.f,held.skillSweep,0x9bb9d6,true,-1);
+            skillSlot(c[ControlLayout::Buff],3,"BLINK",p.buffReady,2.5f,held.skillBuff,0xd9ecf5,true,-1);
+            skillSlot(c[ControlLayout::Swap],4,"VERDICT",p.swapCooldown,9.f,held.swap,0xc4d7ed,true,-1);
         }else{
             const bool knight=p.form==0;
             skillSlot(c[ControlLayout::Skill],1,knight?"STAB":"FIRE",
