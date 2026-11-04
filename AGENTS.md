@@ -30,3 +30,10 @@ This is a manually available workflow, **not permission for assistants to use it
 5. Ask for approval only if a GitHub Actions run is actually necessary.
 
 If any other instruction conflicts, follow this project owner policy and do not initiate GitHub Actions.
+
+## Asset loading: fail loudly (mandatory)
+
+- Required game images (including the five demon-castle entrance layers and both title layers) must never silently fall back to another scene, placeholder, or missing animation when loading/decoding, dimension checks, or texture creation fail.
+- Report an explicit `ECLIPSE ASSET ERROR` with the exact file path, expected/actual dimensions when relevant, and underlying SDL error when available. Stop the affected game's startup/load with nonzero status rather than showing an unrelated scene.
+- Scene-selection policy is independent of asset integrity: the normal forest can remain the default until the tutorial transition is implemented, but a broken required castle pack must still be reported.
+- When introducing a new required asset, update packaging/import rules and document its expected paths and dimensions. Do not claim runtime success without owner-run testing.
