@@ -876,7 +876,11 @@ public:
     static constexpr std::array<SDL_FRect,4> titleButtons{{{166,626,224,60},{407,626,224,60},{648,626,224,60},{889,626,224,60}}};
     static constexpr float titleReadyTime=0.85f;
 
-    void drawTitle(float seconds,bool showSettings=false){
+    static constexpr std::array<SDL_FRect,3> qaCharacterButtons{{
+        {410,424,460,52},{410,486,460,52},{530,552,220,44}
+    }};
+
+    void drawTitle(float seconds,bool showSettings=false,bool chooseQaCharacter=false){
         constexpr float width=1280, height=720;
         constexpr float logoBand=195;
         const SDL_FRect lowerScene{0,logoBand,width,height-logoBand};
@@ -941,7 +945,19 @@ public:
         };
         const int strip[]={0,1,2,1,3,2,2,3,4,3,5,4};
         SDL_RenderGeometry(renderer,titleTexture_,logo,6,strip,12);
-        if(seconds>=titleReadyTime){
+        if(seconds>=titleReadyTime&&chooseQaCharacter){
+            rect(386,364,508,250,0x101223);
+            rect(386,364,508,3,0xad95c7);
+            text("QA CHARACTER SELECT",469,386,3,0xffe2b7);
+            constexpr const char* labels[]={"1 KNIGHT","2 FIRE MAGE","BACK"};
+            for(int i=0;i<3;++i){
+                const auto& target=qaCharacterButtons[i];
+                const SDL_FRect source{0,0,112,30};
+                SDL_RenderTexture(renderer,titleMenu_,&source,&target);
+                text(labels[i],target.x+(target.w-std::strlen(labels[i])*18.f)*.5f,
+                    target.y+(target.h-21)*.5f,3,0xece3f4);
+            }
+        }else if(seconds>=titleReadyTime){
             constexpr const char* labels[]={"START","VACODE","SETTINGS","EXIT"};
             for(int i=0;i<4;++i){
                 const auto& target=titleButtons[i];
