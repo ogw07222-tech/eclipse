@@ -3,6 +3,7 @@
 from pathlib import Path
 import hashlib,json
 from PIL import Image,ImageDraw
+from knight_sprint import SPRINT_ROWS, SPRINT_START_ROW, sprint_poses
 ROOT=Path(__file__).resolve().parents[1]
 MASTER=ROOT/'Art/knight/redesign/knight_64x94_master.png'
 OUT=ROOT/'Assets/Resources/Eclipse/knight_motion.png'
@@ -140,7 +141,7 @@ def bake():
     source=Image.open(MASTER)
     if source.mode!='P':raise ValueError('Master must use the approved indexed pixel palette')
     if source.size!=(1024,2538):raise ValueError('Master must be 16x27 cells of 64x94')
-    atlas=Image.new('P',source.size,source.getpixel((0,0)));atlas.putpalette(source.getpalette('RGBA'),rawmode='RGBA');atlas.info['transparency']=source.getpixel((0,0));metadata=[]
+    atlas=Image.new('P',(source.width,(SPRINT_START_ROW+SPRINT_ROWS)*94),source.getpixel((0,0)));atlas.putpalette(source.getpalette('RGBA'),rawmode='RGBA');atlas.info['transparency']=source.getpixel((0,0));metadata=[]
     review=ROOT/'native-engine/review';review.mkdir(parents=True,exist_ok=True)
     for name,start,count,duration,source_count in CLIPS:
         row=start//16;frames=[];indices=[];loop=name in ('idle','walk','run')
@@ -150,7 +151,14 @@ def bake():
             if not cell.convert('RGBA').getchannel('A').getbbox():raise ValueError((name,index,'empty source'))
             atlas.paste(cell,(i*64,row*94));frames.append(cell.convert('RGBA'));indices.append(index)
         metadata.append(dict(name=name,start=start,count=count,duration=duration,loop=loop,source_count=source_count,source_indices=indices))
-        if name not in ('weak_slash','hurt'):
+        if name=='run':
+            frames=[]
+            for i,cell in enumerate(sprint_poses(source)):
+                atlas.paste(cell,((i%16)*64,(SPRINT_START_ROW+i//16)*94))
+                frames.append(cell.convert('RGBA'))
+            # Retain the old row as source artwork.
+            atlas.paste(source.crop((0,13*94,1024,14*94)),(0,13*94))
+        elif name not in ('weak_slash','hurt'):
             midpoint_row=(13 if name=='run' else 14+row)*94
             midpoints=[source.crop((i*64,midpoint_row,(i+1)*64,midpoint_row+94))
                        for i in range(count)]
@@ -169,11 +177,11 @@ def bake():
     (ROOT/'Art/knight/rig/clips.json').write_text(json.dumps(metadata,indent=2)+'\n')
     (review/'motion.json').write_text(json.dumps(metadata,indent=2)+'\n')
     bake_trails(metadata)
-    inputs=[ROOT/'Art/knight/redesign/blade_paths.json',MASTER,Path(__file__).resolve(),ROOT/'Art/knight/rig/clips.json']
+    inputs=[ROOT/'Tools/knight_sprint.py',ROOT/'Art/knight/redesign/blade_paths.json',MASTER,Path(__file__).resolve(),ROOT/'Art/knight/rig/clips.json']
     outputs=[OUT,ROOT/'native-engine/src/motion.hpp',ROOT/'native-engine/src/sword_trails.hpp']
     digest=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
     stamp={'inputs':{str(p.relative_to(ROOT)):digest(p) for p in inputs},'outputs':{str(p.relative_to(ROOT)):digest(p) for p in outputs}}
     (ROOT/'Art/knight/rig/build.json').write_text(json.dumps(stamp,indent=2)+'\n')
-    print('Packed knight key poses and midpoints; 64x94 cells; 1024x2538 atlas.')
+    print('Packed knight key poses and midpoints; 64x94 cells; 1024x2914 atlas.')
 if __name__=='__main__':bake()
 
