@@ -1264,8 +1264,21 @@ public:
                 frame=row*columns+index;
             }
         }
-        // Use the original sprint poses so the planted foot stays in sequence.
-        if(p.form==0&&a.midpoint&&a.state!=1&&a.state!=4){
+        float footOffset=0.f;
+        if(p.form==0&&a.state==1){
+            constexpr int key=motionClips[1].start;
+            constexpr int leftPlant=knightRunMidpointStart+4;
+            constexpr int rightPlant=knightRunMidpointStart+9;
+            constexpr int poses[]={
+                key,key+1,key+2,key+3,key+4,leftPlant,key+5,key+6,key+7,
+                key+8,key+9,key+10,rightPlant,key+11,key+12,key+13,key+14,key+15
+            };
+            constexpr int count=sizeof(poses)/sizeof(poses[0]);
+            frame=poses[std::clamp(static_cast<int>(a.travelPhase*count),0,count-1)];
+            // Register both additional foot plants to the original sole height.
+            if(frame==leftPlant)footOffset=motionScale;
+            if(frame==rightPlant)footOffset=-motionScale;
+        }else if(p.form==0&&a.midpoint&&a.state!=4){
             if(isSkillMotion(a.state)){
                 if(knightSkillMotion_)frame+=skillMotionColumns*(skillMotionRows/2);
             }else{
@@ -1275,7 +1288,7 @@ public:
         afterimages(g,a,actorTexture,frame,columns);
         if(actorTexture){
             SDL_FRect source{static_cast<float>(frame%columns*width),static_cast<float>(frame/columns*motionHeight),static_cast<float>(width),motionHeight};
-            SDL_FRect dest{std::round(p.x-offset-(p.facing>0?pivotX:width-pivotX)*motionScale),std::round(p.y-motionPivotY*motionScale),width*motionScale,motionHeight*motionScale};
+            SDL_FRect dest{std::round(p.x-offset-(p.facing>0?pivotX:width-pivotX)*motionScale),std::round(p.y-motionPivotY*motionScale+footOffset),width*motionScale,motionHeight*motionScale};
             const bool white=p.hurtTint>.13f,red=p.hurtTint>0&&!white;
             if(red)SDL_SetTextureColorMod(actorTexture,255,125,140);
             SDL_RenderTextureRotated(renderer,actorTexture,&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
