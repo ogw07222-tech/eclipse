@@ -944,7 +944,7 @@ public:
             constexpr const char* labels[]={"START","VACODE","SETTINGS","EXIT"};
             for(int i=0;i<4;++i){
                 const auto& target=titleButtons[i];
-                const SDL_FRect source{0.f,float(i*60),224.f,60.f};
+                const SDL_FRect source{0.f,float(i*30),112.f,30.f};
                 SDL_SetTextureAlphaMod(titleMenu_,static_cast<Uint8>(230+25*std::sin(seconds*2.4f+i*.8f)));
                 SDL_RenderTexture(renderer,titleMenu_,&source,&target);
                 const size_t length=std::strlen(labels[i]);
