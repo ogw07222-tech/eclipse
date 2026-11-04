@@ -70,6 +70,7 @@ class Presentation {
         for(;*s;++s){if(const char* g=glyph(*s)){bool digit=*s>='0'&&*s<='9';int cols=digit?3:5,rows=digit?5:7;
                 for(int row=0;row<rows;++row)for(int col=0;col<cols;++col)if(g[row*cols+col]=='1')rect(x+col*scale,y+row*scale,scale,scale,rgb);
             }else if(*s=='-')rect(x,y+3*scale,4*scale,scale,rgb);
+            else if(*s=='/')for(int i=0;i<5;++i)rect(x+(4-i)*scale,y+i*scale,scale,scale,rgb);
             x+=6*scale;
         }
     }
@@ -514,28 +515,37 @@ class Presentation {
     }
     void skillButton(const ControlRect& b,const char* label,float remaining,float duration,
                      bool pressed,unsigned accent,bool enabled=true,int art=-1){
+        const float ready=remaining>0&&duration>0
+            ?1.f-std::clamp(remaining/duration,0.f,1.f):1.f;
         if(art>=0&&art<3&&knightSkillTextures_[art]){
             SDL_Texture* image=knightSkillTextures_[art];
-            SDL_FRect target{std::round(b.x),std::round(b.y),std::round(b.size),std::round(b.size)};
-            SDL_SetTextureAlphaMod(image,pressed?240:205);
-            SDL_SetTextureColorMod(image,pressed?255:220,pressed?255:225,pressed?255:230);
-            SDL_RenderTexture(renderer,image,nullptr,&target);
-            SDL_SetTextureColorMod(image,255,255,255);
-            SDL_SetTextureAlphaMod(image,255);
-            if(remaining>0&&duration>0){
-                const float progress=std::clamp(remaining/duration,0.f,1.f);
-                const float top=b.y+b.size*(1-progress);
-                const float inset=b.size*.18f;
-                if(top<b.y+b.size-inset)
-                    rect(b.x+inset,std::max(top,b.y+inset),b.size-2*inset,
-                         b.y+b.size-inset-std::max(top,b.y+inset),0x111725,155);
-                number(static_cast<int>(std::ceil(remaining)),b.x+b.size*.39f,b.y+b.size*.6f,
-                       b.size>=85?3:2,0xe5e2dc);
-            }else rect(b.x+b.size*.39f,b.y+b.size*.83f,b.size*.22f,3,accent,210);
-            return;
+            float width=0,height=0;
+            if(SDL_GetTextureSize(image,&width,&height)){
+                const float size=std::round(b.size);
+                SDL_FRect target{std::round(b.x),std::round(b.y),size,size};
+                SDL_SetTextureAlphaMod(image,pressed?240:205);
+                const float filled=std::round(size*ready);
+                const float sourceFill=height*filled/size;
+                if(filled<size){
+                    const SDL_FRect source{0,0,width,height-sourceFill};
+                    const SDL_FRect mask{target.x,target.y,size,size-filled};
+                    SDL_SetTextureColorMod(image,95,99,110);
+                    SDL_RenderTexture(renderer,image,&source,&mask);
+                }
+                if(filled>0){
+                    const SDL_FRect source{0,height-sourceFill,width,sourceFill};
+                    const SDL_FRect fill{target.x,target.y+size-filled,size,filled};
+                    SDL_SetTextureColorMod(image,pressed?255:220,pressed?255:225,pressed?255:230);
+                    SDL_RenderTexture(renderer,image,&source,&fill);
+                }
+                SDL_SetTextureColorMod(image,255,255,255);
+                SDL_SetTextureAlphaMod(image,255);
+                if(ready>=1.f)rect(b.x+b.size*.39f,b.y+b.size*.83f,b.size*.22f,3,accent,210);
+                return;
+            }
         }
 
-        // Pixel octagon, with a bottom-up cooldown fill inside its inset.
+        // The lower portion brightens as the skill becomes available.
         const float unit=std::max(2.f,std::floor(b.size/18.f));
         const float cut=3*unit;
         const Uint8 alpha=enabled?(pressed?240:206):85;
@@ -544,15 +554,58 @@ class Presentation {
             const float h=std::min(unit,b.size-y);
             rect(b.x+inset,b.y+y,b.size-inset*2,h,accent,alpha);
             if(y<unit||y+h>=b.size)continue;
-            const bool cooling=remaining>0&&y>=b.size*(1-std::clamp(remaining/duration,0.f,1.f));
+            const bool cooling=y<b.size*(1.f-ready);
             rect(b.x+inset+unit,b.y+y,b.size-(inset+unit)*2,h,
-                 cooling?0x3f303e:pressed?0x354650:0x15202b,alpha);
+                 cooling?0x12121c:pressed?0x536675:0x354650,alpha);
         }
         const int scale=b.size>=85?3:2;
         const float width=std::char_traits<char>::length(label)*6.f*scale;
         text(label,b.x+(b.size-width)/2,b.y+b.size*.25f,scale,enabled?0xe8e1d7:0x6d7079);
-        if(enabled&&remaining>0)number(static_cast<int>(std::ceil(remaining)),b.x+b.size*.38f,b.y+b.size*.59f,scale,accent);
-        else if(enabled)rect(b.x+b.size*.34f,b.y+b.size*.69f,b.size*.32f,3,accent,alpha);
+        if(enabled&&ready>=1.f)rect(b.x+b.size*.34f,b.y+b.size*.69f,b.size*.32f,3,accent,alpha);
+    }
+    void playerHealthBar(const Player& p){
+        constexpr float x=22,y=18,barX=x+49,barY=y+12,barWidth=230;
+        rect(x+4,y+6,284,46,0x090b12,220);
+        rect(x+6,y,276,46,0x17131b);
+        rect(x,y+6,288,34,0x17131b);
+        rect(x+9,y+3,270,40,0x75533b);
+        rect(x+3,y+9,282,28,0x75533b);
+        rect(x+10,y+3,268,3,0xd9a46b);
+        rect(x+10,y+40,268,3,0x4b3130);
+        rect(x+44,y+8,239,30,0x271c24);
+        rect(barX,barY,barWidth,22,0x16131d);
+
+        const float hp=std::clamp(float(p.health)/p.maxHealth(),0.f,1.f);
+        const float trail=std::clamp(p.trailingHealth/p.maxHealth(),hp,1.f);
+        const float liveWidth=std::round(barWidth*hp);
+        const float trailWidth=std::round(barWidth*trail)-liveWidth;
+        if(liveWidth>0){
+            rect(barX,barY,liveWidth,22,0x96414a);
+            rect(barX,barY,liveWidth,3,0xe28380);
+            rect(barX,barY+19,liveWidth,3,0x672b3d);
+        }
+        if(trailWidth>0){
+            rect(barX+liveWidth,barY,trailWidth,22,0xffa441);
+            rect(barX+liveWidth,barY,trailWidth,3,0xffd38a);
+        }
+
+        // Stepped metal badge with an eclipse at its center.
+        rect(x+10,y+5,29,36,0x30232b);
+        rect(x+7,y+10,35,26,0x30232b);
+        rect(x+13,y+7,23,32,0xb78050);
+        rect(x+10,y+12,29,22,0xb78050);
+        rect(x+15,y+10,19,26,0x201927);
+        rect(x+12,y+15,25,16,0x201927);
+        disk(x+24,y+22,8,0xffbb70,2);
+        disk(x+27,y+19,7,0x201927,2);
+        rect(x+282,y+19,3,8,0xe8ae73);
+        rect(x+279,y+22,9,2,0xe8ae73);
+
+        char label[24];
+        std::snprintf(label,sizeof(label),"HP %d / %d",p.health,p.maxHealth());
+        const float labelX=barX+(barWidth-12.f*std::char_traits<char>::length(label)+2.f)*.5f;
+        text(label,labelX+2,barY+6,2,0x21131c);
+        text(label,labelX,barY+4,2,0xffeee1);
     }
     void skillSlot(const ControlRect& box,int slot,const char* label,float remaining,float duration,
                    bool pressed,unsigned accent,bool enabled,int art){
@@ -563,24 +616,9 @@ class Presentation {
     }
     void hud(const Combat& g,Actions held,const ControlLayout& layout,std::array<float,2> stick){
         const auto& p=g.player;
-        const float hpRate=std::clamp(float(p.health)/p.maxHealth(),0.f,1.f);
-        const float bx=360.f,by=18.f,bw=378.f,bh=44.f;
-        rect(bx,by,bw,bh,0x0b1017);rect(bx+3,by+3,bw-6,bh-6,0x697887);
-        rect(bx+6,by+6,bw-12,bh-12,0x19232b);
-        const float fill=std::floor((bw-18)*hpRate/3.f)*3.f;
-        if(fill>0){
-            rect(bx+9,by+9,fill,bh-18,p.health*4<=p.maxHealth()?0xa54456:0x638d80);
-            rect(bx+9,by+9,fill,4,p.health*4<=p.maxHealth()?0xdb7a87:0xaad4c1);
-        }
-        char hpLabel[36];
-        std::snprintf(hpLabel,sizeof(hpLabel),"HP %d / %d",p.health,p.maxHealth());
-        text(hpLabel,bx+78,by+15,2,0x0a111a);text(hpLabel,bx+76,by+13,2,0xf0eee6);
-        if(p.form==0&&p.preparation>0){
-            text("READY",365,76,2,0xe3bd72);
-            rect(431,78,166*p.preparation/preparationDuration,7,0xe3bd72);
-        }
+        playerHealthBar(p);
         for(int i=0;i<4;++i){rect(765+i*74,21,66,61,0x080d17);rect(771+i*74,27,54,49,0x667482);rect(777+i*74,33,42,37,0x222c3d);}
-        text("GEAR",780,44,2);text(p.form==0?"BLADE":"FIRE",235,48,3,0x9ed7ff);number(g.foes(),1180,43,5,0xece7d2);text("FOES",1090,25,2);
+        text("GEAR",780,44,2);text(p.form==0?"BLADE":"FIRE",28,73,2,0x9ed7ff);number(g.foes(),1180,43,5,0xece7d2);text("FOES",1090,25,2);
         const auto& c=layout.buttons;
         const auto& js=c[ControlLayout::Stick];
         const bool stickActive=held.left||held.right||held.jump;
@@ -597,6 +635,10 @@ class Presentation {
             knight?p.skillCooldown:p.mageSkillCooldown,knight?thrustCooldown:4.1f,held.skill,0xcaa2a4,true,knight?0:-1);
         skillSlot(c[ControlLayout::Sweep],2,knight?"SWEEP":"-",p.sweepReady,sweepCooldown,held.skillSweep,0x92b5ce,knight,knight?1:-1);
         skillSlot(c[ControlLayout::Buff],3,knight?"PREP":"-",p.buffReady,buffCooldown,held.skillBuff,0xe3bd72,knight,knight?2:-1);
+        if(knight&&p.preparation>0){
+            const auto& buff=c[ControlLayout::Buff];
+            rect(buff.x+buff.size*.25f,buff.y+buff.size*.88f,buff.size*.5f*p.preparation/preparationDuration,3,0xffdc91);
+        }
         if(p.swapCooldown>0)number(static_cast<int>(std::ceil(p.swapCooldown)),c[ControlLayout::Swap].x+20,c[ControlLayout::Swap].y+25,3,0xffd277);
         if(g.inventory){rect(46,135,460,340,0xe3bd72);rect(50,139,452,332,0x1c2a34);text("EQUIPMENT",66,153,3);
             for(int i=0;i<3;++i){text(p.gear.name(i),66,200+i*42,2);rect(66+i*143,413,132,45,0x304039);text(i==0?"WEAPON":i==1?"ARMOR":"CHARM",75+i*143,428,2);}
