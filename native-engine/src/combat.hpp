@@ -4,6 +4,7 @@
 #include <cmath>
 #include <vector>
 #include <limits>
+#include <random>
 #include "motion.hpp"
 #include "forest_layers.hpp"
 #include "slime_motion.hpp"
@@ -37,11 +38,19 @@ constexpr int bleedMaxStacks=10,bleedSlowStacks=5;
 constexpr float bleedDuration=3.f,bleedTickInterval=.75f;
 enum class SwordStrike {Basic,Thrust,Sweep};
 
+enum class WhiteMove { None, Slash, Rush, Command, Blink, Verdict };
+struct WhiteClip {int start,count;float duration,contact;};
+constexpr WhiteClip whiteClips[]={{0,1,1,0},{16,15,.46f,.184f},{31,12,.50f,.125f},
+    {43,12,.46f,.23f},{55,12,.36f,.15f},{67,20,1.12f,.728f}};
 struct Player {
     Equipment gear;
     float x=140,y=floorY,vx=0,vy=0;
     int health=100,form=0,facing=1,combo=0,attackSerial=0,hurtSerial=0,landingSerial=0;
-    bool grounded=true;
+    bool grounded=true,whiteNight=false;
+    WhiteMove whiteMove=WhiteMove::None;
+    float whiteAge=0,whiteBoost=0;
+    size_t whiteTarget=0;
+    unsigned whiteRushHits=0;
     float takeoffLock=0;
     float dashLeft=0,dashCooldown=0,attackCooldown=0,skillCooldown=0,swapCooldown=0;
     float invulnerable=0,coyote=0,jumpBuffer=0,attackFlash=0,comboWindow=0,hitStop=0,swapFlash=0;
@@ -73,12 +82,16 @@ struct Enemy {
     float trailingHealth=-1.f,healthTrailHold=0.f;
     int facing=-1;
     int bleedStacks=0;
+    float lightMark=0;
     bool boss=false;
     float knockbackResistance() const {return boss?1.f:slimeSpec(kind).knockbackResistance;}
     Enemy(int type=0,float at=0):kind(std::clamp(type,0,2)),health(slimeSpec(kind).health),maxHealth(health),damage(slimeSpec(kind).damage),x(at),speed(slimeSpec(kind).speed){}
     bool dead()const{return health<=0;}
 };
 struct Projectile {float x,y;int facing,damage;bool empowered;float life=1.6f,remainingDrop=0;};
+struct LightLance {size_t target;float x,y,life=.65f;float offset=0,angle=90;bool verdict=false;};
+enum class LightFx { Impact, Slash, Rush, Command, Depart, Arrive, Verdict };
+struct LightBurst {float x,y,life=.24f;LightFx kind=LightFx::Impact;int facing=1;};
 enum class DamageKind{Normal,Fire,Bleed,Execute};
 struct BleedSpread {float fromX,fromY,toX,toY,life=.23f;};
 struct Popup{float x,y;int amount;DamageKind kind;float age=0;};
@@ -140,13 +153,31 @@ class Combat {
         e.health=std::max(0,e.health-amount);if(!dot)e.hitFlash=.18f;
         popups.push_back({e.x,e.y-86,amount,kind});
     }
+    void launchLightLance(){
+        if(!player.whiteNight)return;
+        const float left=cameraCenter-viewWidth*.5f;
+        std::array<size_t,4> candidates{};
+        size_t count=0;
+        for(size_t i=0;i<enemies.size();++i){
+            const auto& e=enemies[i];
+            if(!e.dead()&&e.x>=left&&e.x<=left+viewWidth)candidates[count++]=i;
+        }
+        if(count==0)return;
+        static std::mt19937 random{std::random_device{}()};
+        const size_t target=candidates[std::uniform_int_distribution<size_t>{0,count-1}(random)];
+        const auto& e=enemies[target];
+        lightLances.push_back({target,e.x,enemyBounds(e).top-170.f});
+    }
     void melee(int damage,int bleed,float reach){
         const BodyRect strike=player.facing>0?BodyRect{player.x-9,player.y-102,player.x+reach,player.y+2}:
             BodyRect{player.x-reach,player.y-102,player.x+9,player.y+2};
+        bool connected=false;
         for(auto& e:enemies){
             if(e.dead()||!enemyOverlaps(e,strike))continue;
             hit(e,damage,false,bleed);player.hitStop=std::max(player.hitStop,damage<20?.045f:.075f);
+            connected=true;
         }
+        if(connected)launchLightLance();
     }
     static void addBleed(Enemy& e,int stacks) {
         if(e.dead()||stacks<=0)return;
@@ -171,12 +202,14 @@ class Combat {
             if(nearest){
                 hit(*nearest,p.meleeDamage,false,2);
                 p.hitStop=.075f;
+                launchLightLance();
             }
             return;
         }
 
         const float reach=p.meleeReach,centerY=p.y-43;
         std::array<bool,4> sources{};
+        bool connected=false;
         for(size_t i=0;i<enemies.size();++i){
             auto& e=enemies[i];
             if(e.dead())continue;
@@ -187,10 +220,12 @@ class Combat {
                 return dx*dx+dy*dy<=1.f;
             });
             if(!intersects)continue;
+            connected=true;
             sources[i]=e.bleedStacks>0;
             hit(e,p.meleeDamage,false);
             p.hitStop=.065f;
         }
+        if(connected)launchLightLance();
         // Snapshot sources before applying any spread so newly affected enemies cannot relay it.
         for(size_t i=0;i<enemies.size();++i){
             auto& target=enemies[i];
@@ -218,6 +253,7 @@ class Combat {
         bool connected=false;
         for(auto& e:enemies){if(e.dead()||!enemyOverlaps(e,strike))continue;
             hit(e,24+p.gear.attack(),false,0,true);connected=true;}
+        if(connected)launchLightLance();
         p.hitStop=std::max(p.hitStop,connected?.065f:.025f);
     }
     void basic(){
@@ -248,6 +284,87 @@ class Combat {
         if(thrust)p.skillCooldown=thrustCooldown;
         else p.sweepReady=sweepCooldown;
     }
+    size_t farthestLightMark()const{
+        size_t target=enemies.size();
+        float distance=-1;
+        const float left=cameraCenter-viewWidth*.5f;
+        for(size_t i=0;i<enemies.size();++i){
+            const auto& e=enemies[i];
+            const float dx=std::abs(e.x-player.x);
+            if(!e.dead()&&e.lightMark>0&&e.x>=left&&e.x<=left+viewWidth&&dx>distance){
+                target=i;distance=dx;
+            }
+        }
+        return target;
+    }
+    void whiteEffect(LightFx kind,float x,float y){
+        lightBursts.push_back({x,y,.24f,kind,player.facing});
+    }
+    bool stepWhiteMove(float dt,const Actions& a){
+        auto& p=player;
+        if(p.whiteMove==WhiteMove::None){
+            if(!p.grounded||p.dashLeft>0||p.slamRecover>0||!canAttack())return false;
+            if(a.skill&&p.skillCooldown<=0){p.whiteMove=WhiteMove::Rush;p.skillCooldown=2.2f;}
+            else if(a.skillSweep&&p.sweepReady<=0){p.whiteMove=WhiteMove::Command;p.sweepReady=5.f;}
+            else if((a.skillBuff&&p.buffReady<=0)||(a.swap&&p.swapCooldown<=0)){
+                p.whiteTarget=farthestLightMark();
+                if(p.whiteTarget==enemies.size())return false;
+                if(a.skillBuff&&p.buffReady<=0){p.whiteMove=WhiteMove::Blink;p.buffReady=2.5f;}
+                else {p.whiteMove=WhiteMove::Verdict;p.swapCooldown=9.f;}
+            }else if(a.attack&&p.attackCooldown<=0){p.whiteMove=WhiteMove::Slash;p.attackCooldown=.46f/p.basicSpeed();}
+            else return false;
+            p.whiteAge=0;p.whiteRushHits=0;p.vx=0;p.vy=0;
+        }
+        const auto move=p.whiteMove;
+        const auto clip=whiteClips[static_cast<int>(move)];
+        const float speed=move==WhiteMove::Slash?p.basicSpeed():1.f;
+        const float old=p.whiteAge;
+        p.whiteAge=std::min(clip.duration,old+dt*speed);
+        if(old<clip.contact&&p.whiteAge>=clip.contact){
+            if(move==WhiteMove::Slash){
+                whiteEffect(LightFx::Slash,p.x+p.facing*42,p.y-48);
+                melee(15+p.gear.attack(),0,105*p.gear.range());
+            }else if(move==WhiteMove::Command){
+                p.whiteBoost=3.5f;whiteEffect(LightFx::Command,p.x,p.y-42);
+            }else if(move==WhiteMove::Blink&&!enemies[p.whiteTarget].dead()){
+                auto& e=enemies[p.whiteTarget];
+                whiteEffect(LightFx::Depart,p.x,p.y-48);
+                const float side=e.x>=p.x?1.f:-1.f;
+                p.x=std::clamp(e.x+side*58,25.f,1550.f);p.y=floorY;
+                p.facing=e.x>=p.x?1:-1;
+                whiteEffect(LightFx::Arrive,p.x,p.y-48);
+            }else if(move==WhiteMove::Verdict&&!enemies[p.whiteTarget].dead()){
+                const auto& e=enemies[p.whiteTarget];
+                whiteEffect(LightFx::Slash,p.x+p.facing*42,p.y-48);
+                whiteEffect(LightFx::Verdict,e.x,e.y-45);
+                for(int i=0;i<6;++i){
+                    const float offset=(i-2.5f)*38;
+                    lightLances.push_back({p.whiteTarget,e.x+offset,enemyBounds(e).top-165.f,.65f,offset,90.f,true});
+                }
+            }
+        }
+        if(move==WhiteMove::Rush){
+            const float travel=std::max(0.f,std::min(.36f,p.whiteAge)-std::max(clip.contact,old));
+            if(travel>0){
+                const float from=p.x;
+                p.x=std::clamp(from+p.facing*1080*travel,25.f,1550.f);
+                if(static_cast<int>(old*60)%2==0)whiteEffect(LightFx::Rush,p.x,p.y-47);
+                const BodyRect strike{std::min(from,p.x)-18,p.y-83,std::max(from,p.x)+18,p.y+2};
+                const bool hadHit=p.whiteRushHits!=0;
+                for(size_t i=0;i<enemies.size();++i){
+                    auto& e=enemies[i];
+                    if(e.dead()||(p.whiteRushHits&(1u<<i))||!enemyOverlaps(e,strike))continue;
+                    p.whiteRushHits|=1u<<i;
+                    hit(e,18+p.gear.attack(),false);
+                    if(!e.dead())e.lightMark=5.f;
+                    whiteEffect(LightFx::Impact,e.x,e.y-38);
+                }
+                if(!hadHit&&p.whiteRushHits)launchLightLance();
+            }
+        }
+        if(p.whiteAge>=clip.duration)p.whiteMove=WhiteMove::None;
+        return true;
+    }
     void stepPlayer(float dt,Actions a){
         auto& p=player;
         p.dashLeft=down(p.dashLeft,dt);p.dashCooldown=down(p.dashCooldown,dt);p.attackCooldown=down(p.attackCooldown,dt);
@@ -257,7 +374,13 @@ class Combat {
         p.buffReady=down(p.buffReady,dt);
         p.preparation=down(p.preparation,dt);p.swapCooldown=down(p.swapCooldown,dt);p.invulnerable=down(p.invulnerable,dt);
         p.attackFlash=down(p.attackFlash,dt);p.comboWindow=down(p.comboWindow,dt);p.swapFlash=down(p.swapFlash,dt);
+        p.whiteBoost=down(p.whiteBoost,dt);
         if(p.hitStop>0){p.hitStop=down(p.hitStop,dt);return;}
+        if(p.whiteNight&&stepWhiteMove(dt,a))return;
+        if(p.whiteNight){
+            a.skill=a.skillSweep=a.skillBuff=a.swap=false;
+            if(p.grounded)a.attack=false;
+        }
         p.takeoffLock=down(p.takeoffLock,dt);
         p.slamRecover=down(p.slamRecover,dt);p.slamImpact=down(p.slamImpact,dt);
         if(p.comboWindow<=0)p.combo=0;
@@ -273,7 +396,7 @@ class Combat {
                 launchJump();
         }
         const bool attackAllowed=canAttack();
-        if(a.swap&&p.swapCooldown<=0&&p.slamRecover<=0){
+        if(a.swap&&!p.whiteNight&&p.swapCooldown<=0&&p.slamRecover<=0){
             cancelAirSlam();cancelMageCast();p.meleeLeft=0;p.form=1-p.form;p.swapCooldown=1;
             p.attackFlash=.22f;p.combo=0;p.comboWindow=0;p.attackPose=0;p.swapFlash=.24f;
             if(attackAllowed){
@@ -351,6 +474,7 @@ class Combat {
     }
     void stepEnemy(Enemy& e,float dt){
         if(e.dead())return;
+        e.lightMark=down(e.lightMark,dt);
         e.attackTimer=down(e.attackTimer,dt);e.hitFlash=down(e.hitFlash,dt);e.reactionFlash=down(e.reactionFlash,dt);e.stagger=down(e.stagger,dt);e.knockback=toward(e.knockback,650*dt);
         // DOT ticks keep adding to the same white damage segment; after the hold
         // it shrinks at a bounded, frame-rate-independent speed.
@@ -413,6 +537,39 @@ class Combat {
         if(body.left<0)e.x-=body.left;
         if(body.right>worldWidth)e.x-=body.right-worldWidth;
     }
+    void stepLightLances(float dt){
+        lightLances.erase(std::remove_if(lightLances.begin(),lightLances.end(),[&](LightLance& lance){
+            if((lance.life-=dt)<=0)return true;
+            const auto& target=enemies[lance.target];
+            if(lance.verdict&&target.dead())return true;
+            const float previousX=lance.x,previousY=lance.y;
+            const float speed=player.whiteBoost>0?1890.f:1050.f;
+            lance.y+=speed*dt;
+            if(!target.dead()){
+                const float spread=lance.verdict?std::clamp((enemyBounds(target).top-lance.y)/165.f,0.f,1.f):0.f;
+                lance.x=target.x+lance.offset*spread;
+            }
+            lance.angle=std::atan2(lance.y-previousY,lance.x-previousX)*57.29578f;
+            Enemy* first=nullptr;
+            float contact=lance.y;
+            for(auto& e:enemies){
+                if(e.dead())continue;
+                enemyAnyBand(e,[&](BodyRect band){
+                    const float entry=std::max(previousY,band.top);
+                    if(lance.x>=band.left&&lance.x<=band.right&&entry<=band.bottom&&entry<=lance.y&&(!first||entry<contact)){
+                        first=&e;
+                        contact=entry;
+                    }
+                    return false;
+                });
+            }
+            if(!first)return lance.y>viewHeight;
+            damageEnemy(*first,(lance.verdict?8:10)+player.gear.attack(),DamageKind::Normal,false);
+            if(!first->dead())first->lightMark=5.f;
+            lightBursts.push_back({lance.x,contact});
+            return true;
+        }),lightLances.end());
+    }
     void stepProjectiles(float dt){
         for(int i=static_cast<int>(projectiles.size())-1;i>=0;--i){auto& b=projectiles[i];float old=b.x;b.x+=b.facing*(b.empowered?440:540)*dt;b.life-=dt;bool remove=b.life<=0;
             const float drop=std::min(b.remainingDrop,740.f*dt);
@@ -430,12 +587,15 @@ public:
     std::vector<GroundSurface> platforms;
     std::array<Enemy,4> enemies;
     std::vector<Projectile> projectiles;
+    std::vector<LightLance> lightLances;
+    std::vector<LightBurst> lightBursts;
+    float cameraCenter=viewWidth*.5f;
     std::vector<Popup> popups;
     std::vector<BleedSpread> bleedSpreads;
     bool ended=false,won=false,inventory=false;
     float clock=0;
     Combat(){projectiles.reserve(16);popups.reserve(32);restart();}
-    void restart(){player={};enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};projectiles.clear();popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=0;}
+    void restart(){player={};enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};projectiles.clear();lightLances.clear();lightBursts.clear();cameraCenter=viewWidth*.5f;popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=0;}
     int foes()const{int count=0;for(const auto& e:enemies)if(!e.dead())++count;return count;}
     void hit(Enemy& e,int amount,bool fire,int bleed=0,bool slam=false){
         if(e.dead()||ended)return;
@@ -464,6 +624,9 @@ public:
         if(a.restart){restart();return;}
         clock+=dt;
         player.hurtTint=down(player.hurtTint,dt);
+        for(auto& burst:lightBursts)burst.life-=dt;
+        lightBursts.erase(std::remove_if(lightBursts.begin(),lightBursts.end(),
+            [](const LightBurst& burst){return burst.life<=0;}),lightBursts.end());
         stepHealthTrail(player,player.maxHealth(),dt);
         for(auto& effect:bleedSpreads)effect.life-=dt;
         bleedSpreads.erase(std::remove_if(bleedSpreads.begin(),bleedSpreads.end(),
@@ -476,7 +639,7 @@ public:
         if(a.armor)player.equip(1);
         if(a.charm)player.equip(2);
         stepPlayer(dt,a);for(auto& enemy:enemies){stepEnemy(enemy,dt);if(ended)break;}
-        if(!ended)stepProjectiles(dt);
+        if(!ended){stepProjectiles(dt);stepLightLances(dt);}
         if(!ended&&foes()==0){ended=true;won=true;inventory=false;}
     }
 };
