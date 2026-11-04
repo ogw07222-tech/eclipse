@@ -482,7 +482,7 @@ class Presentation {
         }
 
         rect(0,0,1280,720,0x080b12,184);
-        menuTile(328,86,888,549,0x121b29,0x536172);
+        // PNG frame and side scroll carry the artwork; use SDL only for live overlays.
         if(settingsPanel_){
             SDL_FRect frame{ControlLayout::menuX,ControlLayout::menuY,ControlLayout::menuWidth,ControlLayout::menuHeight};
             SDL_RenderTexture(renderer,settingsPanel_,nullptr,&frame);
@@ -490,7 +490,15 @@ class Presentation {
         if(settingsWindow_){
             SDL_FRect frame{328,86,888,549};
             SDL_RenderTexture(renderer,settingsWindow_,nullptr,&frame);
+        }else menuTile(328,86,888,549,0x121b29,0x536172);
+        // Etched metallic corner ornaments, translucent to preserve PNG details.
+        for(int corner=0;corner<4;++corner){
+            const float x=(corner&1)?1180.f:347.f;
+            const float y=(corner&2)?598.f:101.f;
+            rect(x,y,16,3,0xc7a575,170);rect(x,y,3,16,0xc7a575,170);
+            rect(x+5,y+5,3,3,0xb6d9e4,130);
         }
+        rect(360,612,800,2,0x716b65,120);
 
         const char* tabs[]={"SOUND","CONTROLS","GAME","EXIT"};
         if(!settingsPanel_){
@@ -509,28 +517,37 @@ class Presentation {
             if(active){
                 constexpr unsigned blue=0xa4daef;
                 const float w=ControlLayout::tabWidth,h=ControlLayout::tabHeight;
-                rect(x+9,y,w-18,3,blue);
-                rect(x+9,y+h-3,w-18,3,blue);
-                rect(x,y+10,3,h-20,blue);
-                rect(x+w-3,y+10,3,h-20,blue);
+                rect(x+13,y+5,w-26,2,blue,230);
+                rect(x+13,y+h-7,w-26,2,blue,230);
+                rect(x+4,y+11,5,h-22,blue);
+                rect(x+w-12,y+14,3,h-28,gold,210);
+                rect(x+13,y+13,10,4,gold);
+                rect(x+13,y+h-17,10,4,gold);
             }
         }
 
         menuTile(376,107,716,67,0x172331,0x596878);
-        text(tabs[layout.page],398,126,4,ink);
+        rect(389,117,5,46,gold);
+        rect(400,116,670,2,0xc1e4ec,105);
+        text(tabs[layout.page],407,126,4,ink);
+        rect(399,175,230,2,gold,150);
         rect(389,187,755,2,0x596878);
         menuTile(ControlLayout::backX,ControlLayout::backY,
                  ControlLayout::backWidth,ControlLayout::backHeight,0x213242,0x596878);
+        rect(ControlLayout::backX+7,ControlLayout::backY+8,3,48,0xc1e4ec);
         text("BACK",ControlLayout::backX+10,ControlLayout::backY+22,3,ink);
 
         if(layout.page==ControlLayout::Controls){
             text("TOUCH BUTTON POSITION AND SIZE",390,218,2,muted);
             menuTile(440,280,600,74,0x304b58,gold);
+            rect(453,291,6,52,0xc1e4ec);
+            rect(470,292,553,2,0xc8d8de,140);
             text("EDIT ON SCREEN",614,306,3,ink);
             text("SELECTED CONTROL",440,365,2,muted);
             menuTile(440,385,100,68,0x213242,0x596878);
             rect(477,416,26,4,ink);
             menuTile(550,385,390,68,0x0f1926,0x465363);
+            rect(561,394,4,50,gold,185);
             text(names[layout.selected],579,410,3,ink);
             number(static_cast<int>(std::round(layout.buttons[layout.selected].size)),791,409,3,gold);
             text("PX",854,411,2,muted);
@@ -538,8 +555,10 @@ class Presentation {
             rect(987,416,26,4,ink);
             rect(998,405,4,26,ink);
             menuTile(445,485,285,68,0x302832,0x705d68);
+            rect(454,495,4,46,0xa77b83);
             text("RESET",544,509,3,ink);
             menuTile(750,485,285,68,0x213242,0x596878);
+            rect(759,495,4,46,0xc1e4ec);
             text("SAVE",856,509,3,ink);
             text("DRAG TO MOVE  PINCH TO RESIZE",440,565,2,muted);
         }else if(layout.page==ControlLayout::Sound){
@@ -549,8 +568,15 @@ class Presentation {
                 const float y=i==0?270.f:390.f;
                 text(i==0?"BGM":"SFX",390,y+20,3,ink);
                 menuTile(460,y,575,58,0x0f1926,0x465363);
-                for(int tick=0;tick<20;++tick)
-                    rect(470+tick*28,y+17,23,25,tick*5<level?0x749eae:0x263747);
+                rect(466,y+6,563,2,0x8da9b7,100);
+                for(int tick=0;tick<20;++tick){
+                    const bool filled=tick*5<level;
+                    const float px=470+tick*28;
+                    rect(px,y+17,23,25,filled?0x688f9d:0x263747);
+                    rect(px,y+17,23,3,filled?0xc1e4ec:0x34495b,filled?205:130);
+                    if(filled)rect(px+3,y+39,17,2,0x243846);
+                }
+                rect(470+std::clamp(level/5,0,19)*28.f,y+12,23,3,gold);
                 number(level,1052,y+20,3,gold);
             }
         }else{
@@ -559,8 +585,11 @@ class Presentation {
                 const bool on=i==0?layout.screenShake:layout.showNumbers;
                 const float y=285.f+i*100.f;
                 menuTile(440,y,600,75,0x1b2838,0x465363);
+                rect(452,y+11,5,53,on?0xc1e4ec:0x7c626c);
+                rect(464,y+10,425,2,0x8da9b7,115);
                 text(i==0?"SCREEN SHAKE":"DAMAGE NUMBERS",467,y+26,3,ink);
                 menuTile(905,y+14,106,46,on?0x304b58:0x302832,on?gold:0x705d68);
+                rect(912,y+21,4,32,on?0xc1e4ec:0x815f6b);
                 text(on?"ON":"OFF",928,y+25,3,on?ink:muted);
             }
         }
