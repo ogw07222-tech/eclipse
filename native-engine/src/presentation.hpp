@@ -9,6 +9,7 @@
 #include "knight_skill_blades.hpp"
 #include "forest_generator.hpp"
 #include "forest_layers.hpp"
+#include "demon_castle_entrance.hpp"
 
 namespace eclipse {
 class Presentation {
@@ -32,6 +33,8 @@ class Presentation {
     std::array<SDL_Texture*,6> forestV3Textures_{};
     bool forestV3Ready_=false;
     bool forestEntranceReady_=false;
+    DemonCastleEntrance castleEntrance_{};
+    bool castleEntranceActive_=false;
     struct Ghost {
         float x,y,time;int frame,columns,facing;SDL_Texture* texture;bool slam;
     };
@@ -258,6 +261,7 @@ class Presentation {
         }
     }
     void forest(const Combat& g,float camera) {
+        if(castleEntranceActive_ && castleEntrance_.ready()) {castleEntrance_.draw(camera);return;}
         if(forestV3Ready_) {
             // Layer art only: no scene randomization or NPC occupancy changes.
             // Every asset's native dimensions and world-ground height are fixed.
@@ -751,6 +755,8 @@ public:
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestV3Textures_)if(texture)SDL_DestroyTexture(texture);}
     void setForestSettings(ForestSettings settings) {forestGenerator_.regenerate(settings);}
+    void setDemonCastleEntrance(bool enabled) {castleEntranceActive_=enabled && castleEntrance_.ready();}
+    bool demonCastleEntranceReady() const {return castleEntrance_.ready();}
     const ForestGenerator& forestGenerator() const {return forestGenerator_;}
     static std::string asset(const char* name){
 #ifdef SDL_PLATFORM_ANDROID
@@ -771,6 +777,10 @@ public:
 #endif
     }
     bool load(){
+        // Castle entrance PNGs are optional until the tutorial scene is integrated.
+        // Incomplete packs do not replace the established forest scene.
+        const bool castleLoaded=castleEntrance_.load(renderer,[&](const char* name){return asset(name);});
+        SDL_Log("ECLIPSE demon castle entrance assets: %s",castleLoaded?"ready":"not installed");
         constexpr const char* files[]={"knight_motion.png","ui/attack_states.png","ui/dash_states.png","ui/swap_skill_states.png","ui/joystick_arrows_new.png"};
         for(int i=0;i<5;++i){const auto path=asset(files[i]);SDL_Surface* image=IMG_Load(path.c_str());
             if(!image){SDL_Log("Required PNG missing or invalid: %s (%s)",path.c_str(),SDL_GetError());return false;}
