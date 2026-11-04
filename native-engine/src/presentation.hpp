@@ -16,6 +16,8 @@ class Presentation {
     SDL_Texture* enemyBarFrame_=nullptr;
     SDL_Texture* executeIcon_=nullptr;
     float offset=0;
+    SDL_Texture* mageRun_=nullptr;
+    SDL_Texture* mageMotion_=nullptr;
     SDL_Texture* settingsGear_=nullptr;
     SDL_Texture* settingsPanel_=nullptr;
     SDL_Texture* settingsWindow_=nullptr;
@@ -566,7 +568,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -612,20 +614,23 @@ public:
             SDL_SetTextureScaleMode(slimeTextures_[i],SDL_SCALEMODE_NEAREST);
             SDL_SetTextureBlendMode(slimeTextures_[i],SDL_BLENDMODE_BLEND);
         }
-        // Optional standalone pixel PNGs for the native settings overlay.
-        auto loadSettingsTexture=[&](const char* name)->SDL_Texture* {
+        // Optional sprite textures allow older asset packs to keep rendering.
+        auto loadOptionalTexture=[&](const char* name,int width=0,int height=0)->SDL_Texture* {
             const auto path=asset(name);SDL_Surface* image=IMG_Load(path.c_str());
             if(!image)return nullptr;
+            if(width&&(image->w!=width||image->h!=height)){SDL_DestroySurface(image);return nullptr;}
             SDL_Texture* texture=SDL_CreateTextureFromSurface(renderer,image);
             SDL_DestroySurface(image);
             if(texture){SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(texture,SDL_BLENDMODE_BLEND);}
             return texture;
         };
-        settingsGear_=loadSettingsTexture("ui/settings_gear.png");
-        settingsPanel_=loadSettingsTexture("ui/settings_menu_panel.png");
-        settingsWindow_=loadSettingsTexture("ui/settings_window.png");
-        enemyBarFrame_=loadSettingsTexture("ui/enemy_bar_frame.png");
-        executeIcon_=loadSettingsTexture("ui/execute_skull.png");
+        mageRun_=loadOptionalTexture("mage_run.png",motionWidth*motionColumns,motionHeight);
+        mageMotion_=loadOptionalTexture("mage_motion.png",motionWidth*mageMotionColumns,motionHeight*mageMotionRows);
+        settingsGear_=loadOptionalTexture("ui/settings_gear.png");
+        settingsPanel_=loadOptionalTexture("ui/settings_menu_panel.png");
+        settingsWindow_=loadOptionalTexture("ui/settings_window.png");
+        enemyBarFrame_=loadOptionalTexture("ui/enemy_bar_frame.png");
+        executeIcon_=loadOptionalTexture("ui/execute_skull.png");
         // Optional sprite library: the procedural renderer remains functional without it.
         // Only startup loads textures; no per-frame filesystem work.
         constexpr const char* forestFiles[40]={
@@ -743,7 +748,14 @@ public:
     void draw(const Combat& g,const Animation& a,float camera,Actions held,const char* capture=nullptr,const char* reviewLabel=nullptr,const ControlLayout* customLayout=nullptr,std::array<float,2> stick={}){
         offset=std::round(camera)-640;SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);SDL_SetRenderDrawColor(renderer,21,35,52,255);SDL_RenderClear(renderer);
         forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.clock);
-        for(const auto& b:g.projectiles){disk(b.x-offset,b.y,b.empowered?14:8,0xf16b32);disk(b.x-offset,b.y,b.empowered?7:4,0xffe7a1);}
+        for(const auto& b:g.projectiles){
+            const int radius=b.empowered?14:8;
+            const float x=b.x-offset;
+            rect(x-b.facing*radius*1.5f-3,b.y-2,6,4,0xa33524);
+            disk(x-b.facing*radius,b.y,radius*0.6f,0xdb4825);
+            disk(x,b.y,radius,0xf16b32);
+            disk(x+b.facing*2,b.y,b.empowered?7:4,0xffe7a1);
+        }
         const auto& p=g.player;
         for(const auto& effect:g.bleedSpreads){
             const float progress=1-effect.life/.23f;
@@ -756,8 +768,32 @@ public:
         }
         slamShockwave(p);
         if(p.form==0)swordTrail(p,a);
-        if(p.form==0){SDL_FRect source{static_cast<float>(a.frame%motionColumns*motionWidth),static_cast<float>(a.frame/motionColumns*motionHeight),motionWidth,motionHeight},dest{std::round(p.x-offset-(p.facing>0?motionPivotX:motionWidth-motionPivotX)*motionScale),std::round(p.y-motionPivotY*motionScale),motionWidth*motionScale,motionHeight*motionScale};
-            SDL_RenderTextureRotated(renderer,textures[0],&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
+        SDL_Texture* actorTexture=textures[0];
+        int columns=motionColumns,frame=a.frame;
+        if(p.form!=0){
+            actorTexture=nullptr;
+            if(a.state==1&&mageRun_&&p.mageCastLeft<=0){
+                actorTexture=mageRun_;
+                frame-=motionClips[1].start;
+            }else if(mageMotion_&&a.state>=0){
+                // The mage atlas stores eight poses per clip. Sprint uses its own 16-frame strip.
+                constexpr int rows[]={0,1,2,3,8,8,8,5,6,7,4,1,3};
+                const auto clip=motionClips[a.state];
+                const bool basicCast=p.mageCastLeft>0;
+                const int row=(basicCast||(a.state>=4&&a.state<=6))?
+                    (p.grounded?mageGroundCastRow:mageAirCastRow):rows[a.state];
+                const int index=basicCast?
+                    std::clamp(static_cast<int>((1-p.mageCastLeft/mageCastDuration)*mageMotionColumns),0,mageMotionColumns-1):
+                    (a.frame-clip.start)*(mageMotionColumns-1)/std::max(1,clip.count-1);
+                actorTexture=mageMotion_;
+                columns=mageMotionColumns;
+                frame=row*columns+index;
+            }
+        }
+        if(actorTexture){
+            SDL_FRect source{static_cast<float>(frame%columns*motionWidth),static_cast<float>(frame/columns*motionHeight),motionWidth,motionHeight};
+            SDL_FRect dest{std::round(p.x-offset-(p.facing>0?motionPivotX:motionWidth-motionPivotX)*motionScale),std::round(p.y-motionPivotY*motionScale),motionWidth*motionScale,motionHeight*motionScale};
+            SDL_RenderTextureRotated(renderer,actorTexture,&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
         }else mage(p);
         if(p.swapFlash>0)ring(p.x-offset,p.y-36,44,0xe3bd72);
         static const ControlLayout defaultLayout{};

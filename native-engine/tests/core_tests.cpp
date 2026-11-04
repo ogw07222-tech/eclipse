@@ -157,7 +157,9 @@ int main(){int failed=0,total=0;
         Actions a;a.attack=true;g.step(1.f/60,a);for(int i=0;i<60&&g.player.airSlam;++i)g.step(1.f/60,{});
         check(e.health==55&&g.player.slamImpact>0,"Ground wave hit empty space under airborne enemy");
         auto mage=arena();mage.player.form=1;mage.player.grounded=false;mage.player.y=floorY-100;mage.step(1.f/60,a);
-        check(!mage.player.airSlam&&mage.projectiles.size()==1,"Mage attack became a sword slam");
+        check(!mage.player.airSlam&&mage.projectiles.empty(),"Mage attack skipped the staff wind-up");
+        wait(mage,8);
+        check(mage.projectiles.size()==1,"Mage air attack did not release a fireball");
     });
     test("Repeated air attack input cannot restart the falling slam",[]{
         auto g=arena();g.player.y=floorY-900;g.player.grounded=false;Actions a;a.attack=true;

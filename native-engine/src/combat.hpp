@@ -46,6 +46,8 @@ struct Player {
     float invulnerable=0,coyote=0,jumpBuffer=0,attackFlash=0,comboWindow=0,hitStop=0,swapFlash=0;
     bool airSlam=false;
     float slamAge=0,slamRecover=0,slamImpact=0,slamImpactX=0,slamImpactY=floorY;
+    float mageCastLeft=0;
+    int mageCastDamage=0;
     float meleeLeft=0,meleeReach=0;
     int meleeDamage=0,meleeBleed=0,attackPose=0;
     SwordStrike strike=SwordStrike::Basic;
@@ -66,7 +68,7 @@ struct Enemy {
     Enemy(int type=0,float at=0):kind(std::clamp(type,0,2)),health(slimeSpec(kind).health),maxHealth(health),damage(slimeSpec(kind).damage),x(at),speed(slimeSpec(kind).speed){}
     bool dead()const{return health<=0;}
 };
-struct Projectile {float x,y;int facing,damage;bool empowered;float life=1.6f;};
+struct Projectile {float x,y;int facing,damage;bool empowered;float life=1.6f,remainingDrop=0;};
 enum class DamageKind{Normal,Fire,Bleed,Execute};
 struct BleedSpread {float fromX,fromY,toX,toY,life=.23f;};
 struct Popup{float x,y;int amount;DamageKind kind;float age=0;};
@@ -184,6 +186,7 @@ class Combat {
         }
     }
     void projectile(int damage,bool empowered){projectiles.push_back({player.x+player.facing*27,player.y-33,player.facing,damage,empowered});}
+    void cancelMageCast(){player.mageCastLeft=0;player.mageCastDamage=0;}
     void cancelAirSlam(){player.airSlam=false;player.slamAge=0;player.slamRecover=0;}
     void landAirSlam(){
         auto& p=player;p.airSlam=false;p.slamRecover=airSlamRecovery;
@@ -207,7 +210,7 @@ class Combat {
             p.attackCooldown=(p.combo==1?.23f:p.combo==2?.25f:.42f)/p.basicSpeed();
             const auto clip=motionClips[3+p.combo];p.meleeLeft=clip.duration*clip.contact/p.basicSpeed();
             p.meleeDamage=(p.combo==1?12:p.combo==2?15:23)+p.gear.attack();p.meleeBleed=p.combo==3?2:0;p.meleeReach=(p.combo==3?115:96)*p.gear.range();
-        }else{p.combo=0;p.attackCooldown=.47f;projectile(11+p.gear.attack(),false);}
+        }else{p.combo=0;p.attackCooldown=.47f;p.mageCastLeft=mageCastDuration;p.mageCastDamage=11+p.gear.attack();}
     }
     void swordSkill(SwordStrike strike) {
         auto& p=player;
@@ -241,7 +244,7 @@ class Combat {
         p.coyote=p.grounded?.11f:down(p.coyote,dt);p.jumpBuffer=a.jump?.13f:down(p.jumpBuffer,dt);
         float axis=static_cast<float>(a.right)-static_cast<float>(a.left);
         if(axis!=0&&!p.airSlam&&p.slamRecover<=0&&(p.meleeLeft<=0||p.strike==SwordStrike::Basic))p.facing=axis>0?1:-1;
-        if(a.dash&&p.dashCooldown<=0){cancelAirSlam();p.meleeLeft=0;p.dashLeft=.15f;p.dashCooldown=.85f;p.invulnerable=std::max(p.invulnerable,.15f);}
+        if(a.dash&&p.dashCooldown<=0){cancelAirSlam();cancelMageCast();p.meleeLeft=0;p.dashLeft=.15f;p.dashCooldown=.85f;p.invulnerable=std::max(p.invulnerable,.15f);}
         if(p.dashLeft>0){p.vx=780*p.facing*p.gear.speed();p.vy=0;}
         else {
             p.vx=axis*280*p.gear.speed();
@@ -251,7 +254,7 @@ class Combat {
         }
         const bool attackAllowed=canAttack();
         if(a.swap&&p.swapCooldown<=0){
-            cancelAirSlam();p.meleeLeft=0;p.form=1-p.form;p.swapCooldown=1;
+            cancelAirSlam();cancelMageCast();p.meleeLeft=0;p.form=1-p.form;p.swapCooldown=1;
             p.attackFlash=.22f;p.combo=0;p.comboWindow=0;p.attackPose=0;p.swapFlash=.24f;
             if(attackAllowed){
                 ++p.attackSerial;
@@ -272,7 +275,7 @@ class Combat {
                 }
                 else if(!windingUp&&a.skillSweep&&p.sweepReady<=0&&p.grounded)swordSkill(SwordStrike::Sweep);
             }else if(a.skill&&p.mageSkillCooldown<=0){
-                cancelAirSlam();
+                cancelMageCast();
                 p.meleeLeft=0;p.attackPose=0;p.attackFlash=.28f;++p.attackSerial;
                 p.mageSkillCooldown=4.1f;
                 projectile(25+p.gear.attack(),true);
@@ -299,6 +302,17 @@ class Combat {
                 if(p.airSlam)landAirSlam();
                 if((a.jumpHeld||p.jumpBuffer>0)&&p.dashLeft<=0&&p.slamRecover<=0)
                     launchJump();
+            }
+        }
+        if(p.mageCastLeft>0){
+            p.mageCastLeft=down(p.mageCastLeft,dt);
+            if(p.mageCastDamage>0&&p.mageCastLeft<=mageCastDuration-mageCastReleaseAge){
+                const float tipOffsetY=(mageCastTipY-motionPivotY)*motionScale;
+                projectiles.push_back({p.x+p.facing*(mageCastTipX-motionPivotX)*motionScale,
+                                       p.y+tipOffsetY,p.facing,p.mageCastDamage,false});
+                // Ground casts angle down from the staff to the usual projectile height.
+                if(p.grounded)projectiles.back().remainingDrop=std::max(0.f,-33.f-tipOffsetY);
+                p.mageCastDamage=0;
             }
         }
         if(p.meleeLeft>0){
@@ -372,6 +386,9 @@ class Combat {
     }
     void stepProjectiles(float dt){
         for(int i=static_cast<int>(projectiles.size())-1;i>=0;--i){auto& b=projectiles[i];float old=b.x;b.x+=b.facing*(b.empowered?440:540)*dt;b.life-=dt;bool remove=b.life<=0;
+            const float drop=std::min(b.remainingDrop,740.f*dt);
+            b.y+=drop;
+            b.remainingDrop-=drop;
             for(auto& e:enemies){if(remove||e.dead())continue;
                 float r=b.empowered?14:8;
                 if(enemySweptDisc(e,old,b.x,b.y,r)){hit(e,b.damage,true);remove=true;}
@@ -400,7 +417,7 @@ public:
     }
     void damagePlayer(int amount){
         auto& p=player;if(ended||p.invulnerable>0||p.health<=0)return;
-        p.health=std::max(0,p.health-std::max(1,amount-p.gear.defense()));cancelAirSlam();p.meleeLeft=0;p.invulnerable=.7f;p.attackFlash=.28f;++p.hurtSerial;p.combo=0;p.comboWindow=0;
+        p.health=std::max(0,p.health-std::max(1,amount-p.gear.defense()));cancelAirSlam();cancelMageCast();p.meleeLeft=0;p.invulnerable=.7f;p.attackFlash=.28f;++p.hurtSerial;p.combo=0;p.comboWindow=0;
         if(p.health==0){ended=true;won=false;inventory=false;}
     }
     void step(float dt,Actions a){
@@ -431,7 +448,7 @@ struct Animation {
         float distance=initialized?std::abs(p.x-lastX):0;lastX=p.x;initialized=true;
         if(retrigger){attackSerial=p.attackSerial;combo=p.attackPose>0?p.attackPose-3:std::clamp(p.combo,1,3);
             attackDuration=p.attackPose>0?motionClips[p.attackPose].duration:
-                p.form==0&&p.combo>0?motionClips[3+combo].duration/p.basicSpeed():.36f;attackTime=p.hitStop>0?attackDuration*(1-motionClips[3+combo].contact):attackDuration;}
+                p.form==0&&p.combo>0?motionClips[3+combo].duration/p.basicSpeed():p.mageCastLeft>0?mageCastDuration:.36f;attackTime=p.hitStop>0?attackDuration*(1-motionClips[3+combo].contact):attackDuration;}
         if(p.hurtSerial!=hurtSerial){hurtSerial=p.hurtSerial;hurtTime=.23f;}
         if(p.dashLeft>0||hurtTime>0||p.airSlam||p.slamRecover>0||(!p.grounded&&p.form==0))attackTime=0;
         if(p.hitStop>0&&!wasHitStopped&&attackTime>0)attackTime=attackDuration*(1-motionClips[3+combo].contact);
