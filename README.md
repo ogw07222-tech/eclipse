@@ -23,6 +23,10 @@ The production ECLIPSE Game remains in this repository. **ECLIPSE Studio has bee
 
 A shared repository is **not a shared application**. If independent repository access and history become necessary, repository splitting is a separate migration; do not silently duplicate game C++ sources and allow gameplay forks to diverge.
 
+## Game design
+
+- [기사 스킬과 상태이상 스택 설계](Docs/COMBAT_SKILLS_AND_STATUS_DESIGN.md)
+
 ## Archived versions
 
 - [Legacy/Unity/](Legacy/Unity/README.md) — Unity 6.3 snapshot
