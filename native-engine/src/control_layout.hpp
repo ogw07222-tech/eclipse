@@ -26,7 +26,7 @@ public:
     int pinchButton=-1;
     int bgm=80,sfx=90;
     bool screenShake=true,showNumbers=true;
-    static constexpr float gearX=1194,gearY=16,gearSize=66;
+    static constexpr float gearX=1218,gearY=18,gearSize=48;
     static bool inside(float x,float y,float bx,float by,float w,float h){return x>=bx&&x<bx+w&&y>=by&&y<by+h;}
     int hit(float x,float y) const {
         for(int i=Count-1;i>=0;--i)if(inside(x,y,buttons[i].x,buttons[i].y,buttons[i].size,buttons[i].size))return i;
@@ -73,9 +73,9 @@ public:
         return std::sqrt(dx*dx+dy*dy);
     }
     // Modal settings input. SDL passes unique finger identifiers and logical 1280x720 coordinates.
-    bool pointer(std::int64_t id,float x,float y,bool down){
+    bool pointer(std::int64_t id,float x,float y,bool down,bool motion=false){
         if(!editing){
-            if(down&&inside(x,y,gearX,gearY,gearSize,gearSize)){
+            if(down&&!motion&&inside(x,y,gearX,gearY,gearSize,gearSize)){
                 editing=true;page=Controls;reposition=false;clearTouches();return true;
             }
             return false;
@@ -87,6 +87,7 @@ public:
                 if(pinchButton>=0){pinchButton=-1;pinchStart=0;}
                 save();return true;
             }
+            if(motion&&touchIds[0]!=id&&touchIds[1]!=id)return true;
             int slot=-1;
             for(int t=0;t<2;++t)if(touchIds[t]==id)slot=t;
             if(slot<0)for(int t=0;t<2;++t)if(touchIds[t]==-999){slot=t;touchIds[t]=id;break;}
@@ -106,18 +107,20 @@ public:
                 return true;
             }
             if(dragging==id&&slot>=0){auto& b=buttons[selected];b.x=x-grabX;b.y=y-grabY;clamp(selected);return true;}
-            if(inside(x,y,1030,80,205,65)){finishReposition();return true;}
+            if(!motion&&inside(x,y,1030,80,205,65)){finishReposition();return true;}
             int which=hit(x,y);
             if(which>=0){selected=which;dragging=id;grabX=x-buttons[which].x;grabY=y-buttons[which].y;}
             return true;
         }
         if(!down)return true;
-        // Left vertical navigation.
-        if(inside(x,y,25,210,245,72)){page=Sound;return true;}
-        if(inside(x,y,25,292,245,72)){page=Controls;return true;}
-        if(inside(x,y,25,374,245,72)){page=Game;return true;}
-        if(inside(x,y,25,456,245,72)){close();return true;}
-        if(inside(x,y,1120,103,90,65)){close();return true;}
+        // Motion only updates sliders or an active touch layout gesture.
+        if(!motion){
+            if(inside(x,y,25,210,245,72)){page=Sound;return true;}
+            if(inside(x,y,25,292,245,72)){page=Controls;return true;}
+            if(inside(x,y,25,374,245,72)){page=Game;return true;}
+            if(inside(x,y,25,456,245,72)){close();return true;}
+            if(inside(x,y,1120,103,90,65)){close();return true;}
+        }else if(page!=Sound)return true;
         if(page==Controls){
             if(inside(x,y,440,280,600,74)){startReposition();return true;}
             if(inside(x,y,440,385,100,68)){buttons[selected].size-=10;clamp(selected);save();return true;}
