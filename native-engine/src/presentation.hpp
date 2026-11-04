@@ -16,6 +16,7 @@ class Presentation {
     std::array<SDL_Texture*,3> slimeTextures_{};
     SDL_Texture* enemyBarFrame_=nullptr;
     SDL_Texture* executeIcon_=nullptr;
+    std::array<SDL_Texture*,3> knightSkillTextures_{};
     float offset=0;
     SDL_Texture* settingsGear_=nullptr;
     SDL_Texture* settingsPanel_=nullptr;
@@ -446,7 +447,27 @@ class Presentation {
         SDL_SetTextureAlphaMod(textures[texture],255);
     }
     void skillButton(const ControlRect& b,const char* label,float remaining,float duration,
-                     bool pressed,unsigned accent,bool enabled=true){
+                     bool pressed,unsigned accent,bool enabled=true,int art=-1){
+        if(art>=0&&art<3&&knightSkillTextures_[art]){
+            SDL_Texture* image=knightSkillTextures_[art];
+            SDL_FRect target{std::round(b.x),std::round(b.y),std::round(b.size),std::round(b.size)};
+            SDL_SetTextureAlphaMod(image,pressed?240:205);
+            SDL_SetTextureColorMod(image,pressed?255:220,pressed?255:225,pressed?255:230);
+            SDL_RenderTexture(renderer,image,nullptr,&target);
+            SDL_SetTextureColorMod(image,255,255,255);
+            SDL_SetTextureAlphaMod(image,255);
+            if(remaining>0&&duration>0){
+                const float progress=std::clamp(remaining/duration,0.f,1.f);
+                const float top=b.y+b.size*(1-progress);
+                const float inset=b.size*.18f;
+                if(top<b.y+b.size-inset)
+                    rect(b.x+inset,std::max(top,b.y+inset),b.size-2*inset,
+                         b.y+b.size-inset-std::max(top,b.y+inset),0x111725,155);
+                number(static_cast<int>(std::ceil(remaining)),b.x+b.size*.39f,b.y+b.size*.6f,
+                       b.size>=85?3:2,0xe5e2dc);
+            }else rect(b.x+b.size*.39f,b.y+b.size*.83f,b.size*.22f,3,accent,210);
+            return;
+        }
         // Pixel octagon, with a bottom-up cooldown fill inside its inset.
         const float unit=std::max(2.f,std::floor(b.size/18.f));
         const float cut=3*unit;
@@ -488,9 +509,9 @@ class Presentation {
         icon(3,0,0,c[ControlLayout::Swap].x,c[ControlLayout::Swap].y,c[ControlLayout::Swap].size,held.swap);
         const bool knight=p.form==0;
         skillButton(c[ControlLayout::Skill],knight?"STAB":"FIRE",
-            knight?p.skillCooldown:p.mageSkillCooldown,knight?thrustCooldown:4.1f,held.skill,0xcaa2a4);
-        skillButton(c[ControlLayout::Sweep],"SWEEP",p.sweepReady,sweepCooldown,held.skillSweep,0x92b5ce,knight);
-        skillButton(c[ControlLayout::Buff],"PREP",p.buffReady,buffCooldown,held.skillBuff,0xe3bd72,knight);
+            knight?p.skillCooldown:p.mageSkillCooldown,knight?thrustCooldown:4.1f,held.skill,0xcaa2a4,true,knight?0:-1);
+        skillButton(c[ControlLayout::Sweep],"SWEEP",p.sweepReady,sweepCooldown,held.skillSweep,0x92b5ce,knight,knight?1:-1);
+        skillButton(c[ControlLayout::Buff],"PREP",p.buffReady,buffCooldown,held.skillBuff,0xe3bd72,knight,knight?2:-1);
         if(p.swapCooldown>0)number(static_cast<int>(std::ceil(p.swapCooldown)),c[ControlLayout::Swap].x+20,c[ControlLayout::Swap].y+25,3,0xffd277);
         if(g.inventory){rect(46,135,460,340,0xe3bd72);rect(50,139,452,332,0x1c2a34);text("EQUIPMENT",66,153,3);
             for(int i=0;i<3;++i){text(p.gear.name(i),66,200+i*42,2);rect(66+i*143,413,132,45,0x304039);text(i==0?"WEAPON":i==1?"ARMOR":"CHARM",75+i*143,428,2);}
@@ -616,7 +637,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){for(auto* texture:knightSkillTextures_)if(texture)SDL_DestroyTexture(texture);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -676,6 +697,9 @@ public:
         settingsWindow_=loadSettingsTexture("ui/settings_window.png");
         enemyBarFrame_=loadSettingsTexture("ui/enemy_bar_frame.png");
         executeIcon_=loadSettingsTexture("ui/execute_skull.png");
+        knightSkillTextures_[0]=loadSettingsTexture("ui/knight_skill_stab.png");
+        knightSkillTextures_[1]=loadSettingsTexture("ui/knight_skill_sweep.png");
+        knightSkillTextures_[2]=loadSettingsTexture("ui/knight_skill_prep.png");
         // Optional sprite library: the procedural renderer remains functional without it.
         // Only startup loads textures; no per-frame filesystem work.
         constexpr const char* forestFiles[40]={
