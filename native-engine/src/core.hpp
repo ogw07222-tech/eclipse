@@ -29,7 +29,7 @@ class Input {
         return Region::None;
     }
     static void merge(Actions& a,Actions b){
-        a.left|=b.left;a.right|=b.right;a.jump|=b.jump;a.attack|=b.attack;a.dash|=b.dash;a.skill|=b.skill;a.swap|=b.swap;
+        a.jumpHeld|=b.jumpHeld;a.left|=b.left;a.right|=b.right;a.jump|=b.jump;a.attack|=b.attack;a.dash|=b.dash;a.skill|=b.skill;a.swap|=b.swap;
         a.restart|=b.restart;a.inventory|=b.inventory;a.weapon|=b.weapon;a.armor|=b.armor;a.charm|=b.charm;
     }
     void latch(Actions now,Actions before){
@@ -51,7 +51,7 @@ public:
             float dx=x-(b.x+b.size*.5f),dy=y-(b.y+b.size*.5f),radius=b.size*.39f,length=std::sqrt(dx*dx+dy*dy);
             if(length>radius){dx*=radius/length;dy*=radius/length;}
             stickX_=dx;stickY_=dy;
-            now.left=dx< -radius*.23f;now.right=dx>radius*.23f;now.jump=dy< -radius*.52f;
+            now.left=dx< -radius*.23f;now.right=dx>radius*.23f;now.jump=dy< -radius*.52f;now.jumpHeld=now.jump;
         }else if(region(x,y,ended,inventory)==slot->region){
             switch(slot->region){case Region::Attack:now.attack=true;break;case Region::Dash:now.dash=true;break;case Region::Skill:now.skill=true;break;
                 case Region::Swap:now.swap=true;break;case Region::Inventory:now.inventory=true;break;case Region::Weapon:now.weapon=true;break;
@@ -60,7 +60,7 @@ public:
         latch(now,slot->held);slot->held=now;
     }
     Actions held()const{Actions a=keys;for(const auto& p:pointers)if(p.used)merge(a,p.held);return a;}
-    Actions sample(){Actions a=pending,h=held();a.left=h.left;a.right=h.right;pending={};return a;}
+    Actions sample(){Actions a=pending,h=held();a.left=h.left;a.right=h.right;a.jumpHeld=h.jumpHeld;pending={};return a;}
     void reset(){keys={};pending={};pointers={};stickX_=stickY_=0;}
 };
 }

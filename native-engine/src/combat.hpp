@@ -3,6 +3,7 @@
 #include <array>
 #include <cmath>
 #include <vector>
+#include <limits>
 #include "motion.hpp"
 #include "forest_layers.hpp"
 #include "slime_motion.hpp"
@@ -14,6 +15,7 @@ constexpr float viewWidth=1280,viewHeight=720,floorY=ForestLayerScene::floorY,wo
 struct Actions {
     bool left=false,right=false,jump=false,attack=false,dash=false,skill=false,swap=false;
     bool restart=false,inventory=false,weapon=false,armor=false,charm=false;
+    bool jumpHeld=false;
 };
 struct Equipment {
     std::array<int,3> selected{};
@@ -31,8 +33,9 @@ struct Equipment {
 struct Player {
     Equipment gear;
     float x=140,y=floorY,vx=0,vy=0;
-    int health=100,form=0,facing=1,combo=0,attackSerial=0,hurtSerial=0;
+    int health=100,form=0,facing=1,combo=0,attackSerial=0,hurtSerial=0,landingSerial=0;
     bool grounded=true;
+    float takeoffLock=0;
     float dashLeft=0,dashCooldown=0,attackCooldown=0,skillCooldown=0,swapCooldown=0;
     float invulnerable=0,coyote=0,jumpBuffer=0,attackFlash=0,comboWindow=0,hitStop=0,swapFlash=0;
     bool airSlam=false;
@@ -52,7 +55,44 @@ struct Enemy {
 struct Projectile {float x,y;int facing,damage;bool empowered;float life=1.6f;};
 enum class DamageKind{Normal,Fire,Bleed};
 struct Popup{float x,y;int amount;DamageKind kind;float age=0;};
+// Horizontal one-way surfaces share the same descending foot-contact rule.
+struct GroundSurface {
+    float left,right,y;
+    bool covers(float x) const {return x>=left&&x<=right;}
+};
+
 class Combat {
+    float surfaceBelow(float x,float y) const {
+        float nearest=y<=floorY?floorY:std::numeric_limits<float>::infinity();
+        for(const auto& surface:platforms)
+            if(surface.covers(x)&&surface.y>=y)nearest=std::min(nearest,surface.y);
+        return nearest;
+    }
+    float crossedGround(float x,float y,float nextX,float nextY) const {
+        if(nextY<y)return std::numeric_limits<float>::infinity();
+        float contact=y<=floorY&&nextY>=floorY?floorY:std::numeric_limits<float>::infinity();
+        for(const auto& surface:platforms){
+            if(surface.y<y||surface.y>nextY||surface.y>=contact)continue;
+            const float t=surface.y>y?(surface.y-y)/(nextY-y):1.f;
+            if(surface.covers(x+(nextX-x)*t))contact=surface.y;
+        }
+        return contact;
+    }
+    void launchJump() {
+        auto& p=player;
+        p.grounded=false;
+        p.vy=-650;
+        p.coyote=p.jumpBuffer=p.meleeLeft=0;
+        p.takeoffLock=.085f;
+    }
+    bool canAttack() const {
+        const auto& p=player;
+        if(p.takeoffLock>0)return false;
+        if(p.grounded)return true;
+        const float clearance=surfaceBelow(p.x,p.y)-p.y;
+        // Leave room to show the slam wind-up before reaching a surface.
+        return clearance>=std::max(48.f,std::max(0.f,p.vy)*.10f+6.25f);
+    }
     static float down(float value,float dt){return std::max(0.f,value-dt);}
     static float toward(float value,float step){return value>0?std::max(0.f,value-step):std::min(0.f,value+step);}
     void damageEnemy(Enemy& e,int amount,DamageKind kind,bool dot){
@@ -84,7 +124,7 @@ class Combat {
     }
     void basic(){
         auto& p=player;p.attackFlash=.16f;++p.attackSerial;
-        if(p.form==0&&(!p.grounded||p.vy<0)){
+        if(p.form==0&&!p.grounded){
             p.airSlam=true;p.slamAge=0;p.slamRecover=0;p.combo=0;p.comboWindow=0;p.meleeLeft=0;
             p.jumpBuffer=p.coyote=0;p.attackCooldown=.55f/p.gear.speed();return;
         }
@@ -104,26 +144,52 @@ class Combat {
         p.skillCooldown=down(p.skillCooldown,dt);p.swapCooldown=down(p.swapCooldown,dt);p.invulnerable=down(p.invulnerable,dt);
         p.attackFlash=down(p.attackFlash,dt);p.comboWindow=down(p.comboWindow,dt);p.swapFlash=down(p.swapFlash,dt);
         if(p.hitStop>0){p.hitStop=down(p.hitStop,dt);return;}
+        p.takeoffLock=down(p.takeoffLock,dt);
         p.slamRecover=down(p.slamRecover,dt);p.slamImpact=down(p.slamImpact,dt);
         if(p.comboWindow<=0)p.combo=0;
         p.coyote=p.grounded?.11f:down(p.coyote,dt);p.jumpBuffer=a.jump?.13f:down(p.jumpBuffer,dt);
         float axis=static_cast<float>(a.right)-static_cast<float>(a.left);
         if(axis!=0&&!p.airSlam&&p.slamRecover<=0)p.facing=axis>0?1:-1;
-        if(a.swap&&p.swapCooldown<=0){cancelAirSlam();p.meleeLeft=0;p.form=1-p.form;p.swapCooldown=1;p.attackFlash=.22f;p.combo=0;p.comboWindow=0;p.swapFlash=.24f;++p.attackSerial;
-            if(p.form==0)melee(13,false,112);else projectile(14,false);
-        }
         if(a.dash&&p.dashCooldown<=0){cancelAirSlam();p.meleeLeft=0;p.dashLeft=.15f;p.dashCooldown=.85f;p.invulnerable=std::max(p.invulnerable,.15f);}
         if(p.dashLeft>0){p.vx=780*p.facing*p.gear.speed();p.vy=0;}
-        else{p.vx=axis*280*p.gear.speed();p.vy+=1250*dt;
-            if(p.jumpBuffer>0&&p.coyote>0&&!p.airSlam&&p.slamRecover<=0){p.vy=-650;p.coyote=p.jumpBuffer=0;}
+        else {
+            p.vx=axis*280*p.gear.speed();
+            p.vy+=1250*dt;
+            if((p.jumpBuffer>0||(a.jumpHeld&&p.grounded))&&p.coyote>0&&!p.airSlam&&p.slamRecover<=0)
+                launchJump();
         }
-        if(a.attack&&p.attackCooldown<=0&&p.dashLeft<=0&&!p.airSlam&&p.slamRecover<=0)basic();
-        if(a.skill&&p.skillCooldown<=0)skill();
+        const bool attackAllowed=canAttack();
+        if(a.swap&&p.swapCooldown<=0){
+            cancelAirSlam();p.meleeLeft=0;p.form=1-p.form;p.swapCooldown=1;
+            p.attackFlash=.22f;p.combo=0;p.comboWindow=0;p.swapFlash=.24f;
+            if(attackAllowed){
+                ++p.attackSerial;
+                if(p.form==0)melee(13,false,112);else projectile(14,false);
+            }
+        }
+        if(attackAllowed&&a.attack&&p.attackCooldown<=0&&p.dashLeft<=0&&!p.airSlam&&p.slamRecover<=0)basic();
+        if(attackAllowed&&a.skill&&p.skillCooldown<=0)skill();
         if(p.airSlam){p.slamAge+=dt;p.vx=axis*120.f;
             if(p.slamAge>=airSlamWindup)p.vy=std::max(p.vy,airSlamDropSpeed);}
         else if(p.slamRecover>0)p.vx=0;
-        p.x=std::clamp(p.x+p.vx*dt,25.f,1550.f);p.y+=p.vy*dt;p.grounded=p.y>=floorY;
-        if(p.grounded){p.y=floorY;p.vy=0;if(p.airSlam)landAirSlam();}
+
+        const float nextX=std::clamp(p.x+p.vx*dt,25.f,1550.f);
+        const float nextY=p.y+p.vy*dt;
+        const float contact=crossedGround(p.x,p.y,nextX,nextY);
+        const bool landed=std::isfinite(contact)&&(!p.grounded||p.y!=contact);
+        if(p.grounded&&!std::isfinite(contact))p.meleeLeft=0;
+        p.x=nextX;
+        p.grounded=std::isfinite(contact);
+        p.y=p.grounded?contact:nextY;
+        if(p.grounded){
+            p.vy=0;
+            if(landed){
+                ++p.landingSerial;
+                if(p.airSlam)landAirSlam();
+                if((a.jumpHeld||p.jumpBuffer>0)&&p.dashLeft<=0&&p.slamRecover<=0)
+                    launchJump();
+            }
+        }
         if(p.meleeLeft>0){p.meleeLeft=down(p.meleeLeft,dt);if(p.meleeLeft==0){melee(p.meleeDamage,p.meleeBleed,p.meleeReach);if(p.combo==2&&p.hitStop>0)p.hitStop=std::max(p.hitStop,.065f);}}
     }
     void stepEnemy(Enemy& e,float dt){
@@ -180,6 +246,7 @@ class Combat {
     }
 public:
     Player player;
+    std::vector<GroundSurface> platforms;
     std::array<Enemy,4> enemies;
     std::vector<Projectile> projectiles;
     std::vector<Popup> popups;
@@ -216,9 +283,9 @@ public:
     }
 };
 struct Animation {
-    int state=-1,frame=0,attackSerial=0,hurtSerial=0,combo=1;
+    int state=-1,frame=0,attackSerial=0,hurtSerial=0,landingSerial=0,combo=1;
     float time=0,attackTime=0,attackDuration=.36f,hurtTime=0,landTime=0,travelPhase=0,lastX=140;
-    bool wasGrounded=true,initialized=false,wasHitStopped=false;
+    bool initialized=false,wasHitStopped=false;
     void reset(){*this=Animation{};}
     void step(const Player& p,float dt){
         bool retrigger=p.attackSerial!=attackSerial;
@@ -226,14 +293,16 @@ struct Animation {
         if(retrigger){attackSerial=p.attackSerial;combo=std::clamp(p.combo,1,3);
             attackDuration=p.form==0&&p.combo>0?motionClips[3+combo].duration/p.gear.speed():.36f;attackTime=p.hitStop>0?attackDuration*(1-motionClips[3+combo].contact):attackDuration;}
         if(p.hurtSerial!=hurtSerial){hurtSerial=p.hurtSerial;hurtTime=.23f;}
-        if(p.dashLeft>0||hurtTime>0||p.airSlam||p.slamRecover>0)attackTime=0;
+        if(p.dashLeft>0||hurtTime>0||p.airSlam||p.slamRecover>0||(!p.grounded&&p.form==0))attackTime=0;
         if(p.hitStop>0&&!wasHitStopped&&attackTime>0)attackTime=attackDuration*(1-motionClips[3+combo].contact);
         wasHitStopped=p.hitStop>0;
-        if(!wasGrounded&&p.grounded&&p.health>0)landTime=std::abs(p.vx)>20?.06f:.12f;
-        wasGrounded=p.grounded;
+        const bool landed=p.landingSerial!=landingSerial;
+        landingSerial=p.landingSerial;
+        if(!p.grounded)landTime=0;
+        else if(landed)landTime=motionClips[10].duration;
         // Freeze visual action during a gameplay hit-stop, except death/hurt feedback.
         float visualDt=p.hitStop>0&&p.health>0&&hurtTime<=0?0:dt;
-        attackTime=std::max(0.f,attackTime-visualDt);hurtTime=std::max(0.f,hurtTime-dt);landTime=std::max(0.f,landTime-dt);
+        attackTime=std::max(0.f,attackTime-visualDt);hurtTime=std::max(0.f,hurtTime-dt);if(!landed)landTime=std::max(0.f,landTime-visualDt);
         int next=p.health<=0?9:hurtTime>0?8:p.dashLeft>0?7:(p.airSlam||p.slamRecover>0)?12:attackTime>0?3+combo:!p.grounded?(p.vy<0?2:3):landTime>0?10:std::abs(p.vx)>20?(std::abs(p.vx)<180?11:1):0;
         if(next!=state||retrigger){state=next;time=0;}else time+=visualDt;
         const auto clip=motionClips[next];int index=0;
@@ -249,7 +318,7 @@ struct Animation {
         else if(next>=4&&next<=6)index=static_cast<int>((1-attackTime/attackDuration)*clip.count);
         else if(next==7)index=static_cast<int>((1-std::clamp(p.dashLeft/.15f,0.f,1.f))*clip.count);
         else if(next==8)index=static_cast<int>((1-hurtTime/.23f)*clip.count);
-        else if(next==10)index=static_cast<int>((1-landTime/.12f)*clip.count);
+        else if(next==10)index=static_cast<int>((1-landTime/clip.duration)*clip.count);
         else index=static_cast<int>(time/clip.duration*clip.count);
         frame=clip.start+std::clamp(index,0,clip.count-1);
     }

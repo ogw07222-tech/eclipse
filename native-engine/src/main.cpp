@@ -25,12 +25,12 @@ void events(){
         if(foreground&&(e.type==SDL_EVENT_KEY_DOWN||e.type==SDL_EVENT_KEY_UP)&&e.key.scancode>=0&&e.key.scancode<SDL_SCANCODE_COUNT){
             keyState[e.key.scancode]=e.type==SDL_EVENT_KEY_DOWN;updateKeyboard();
         }
-        if(e.type==SDL_EVENT_KEY_DOWN&&e.key.scancode==SDL_SCANCODE_ESCAPE){running=false;continue;}
+        if(e.type==SDL_EVENT_KEY_DOWN&&e.key.scancode==SDL_SCANCODE_ESCAPE){if(layout.editing){layout.close();input.reset();}else running=false;continue;}
         if(e.type==SDL_EVENT_FINGER_DOWN||e.type==SDL_EVENT_FINGER_MOTION||e.type==SDL_EVENT_FINGER_UP){
             if(e.tfinger.touchID==SDL_MOUSE_TOUCHID)continue;
             if(SDL_ConvertEventToRenderCoordinates(renderer,&e)){
                 bool wasEditing=layout.editing;
-                bool consumed=layout.pointer(e.tfinger.fingerID,e.tfinger.x,e.tfinger.y,e.type!=SDL_EVENT_FINGER_UP);
+                bool consumed=layout.pointer(e.tfinger.fingerID,e.tfinger.x,e.tfinger.y,e.type!=SDL_EVENT_FINGER_UP,e.type==SDL_EVENT_FINGER_MOTION);
                 if(consumed){if(!wasEditing||!layout.editing)input.reset();}
                 else input.pointer(e.tfinger.fingerID,e.tfinger.x,e.tfinger.y,e.type!=SDL_EVENT_FINGER_UP,game.ended,game.inventory);
             }
@@ -44,7 +44,7 @@ void events(){
             }
         }else if(e.type==SDL_EVENT_MOUSE_MOTION&&e.motion.which!=SDL_TOUCH_MOUSEID&&(e.motion.state&SDL_BUTTON_LMASK)){
             if(SDL_ConvertEventToRenderCoordinates(renderer,&e)){
-                if(!layout.pointer(-1,e.motion.x,e.motion.y,true))
+                if(!layout.pointer(-1,e.motion.x,e.motion.y,true,true))
                     input.pointer(-1,e.motion.x,e.motion.y,true,game.ended,game.inventory);
             }
         }
