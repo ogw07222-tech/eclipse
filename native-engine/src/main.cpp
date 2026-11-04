@@ -12,6 +12,7 @@ std::array<bool,SDL_SCANCODE_COUNT> keyState{};
 void updateKeyboard(){const auto& k=keyState;eclipse::Actions a;
         a.left=k[SDL_SCANCODE_A]||k[SDL_SCANCODE_LEFT];a.right=k[SDL_SCANCODE_D]||k[SDL_SCANCODE_RIGHT];a.jump=k[SDL_SCANCODE_SPACE]||k[SDL_SCANCODE_W]||k[SDL_SCANCODE_UP];
         a.attack=k[SDL_SCANCODE_J]||k[SDL_SCANCODE_Z];a.skill=k[SDL_SCANCODE_K]||k[SDL_SCANCODE_X];a.swap=k[SDL_SCANCODE_L]||k[SDL_SCANCODE_C]||k[SDL_SCANCODE_TAB];
+        a.skillSweep=k[SDL_SCANCODE_U];a.skillBuff=k[SDL_SCANCODE_O];
         a.dash=k[SDL_SCANCODE_LSHIFT]||k[SDL_SCANCODE_RSHIFT];a.restart=k[SDL_SCANCODE_R];a.inventory=k[SDL_SCANCODE_I];a.weapon=k[SDL_SCANCODE_1];a.armor=k[SDL_SCANCODE_2];a.charm=k[SDL_SCANCODE_3];input.keyboard(a);
 }
 void events(){
@@ -147,7 +148,7 @@ int main(int argc,char** argv){
         game.restart();animation.reset();camera=640;game.player.x=450;game.enemies[0].x=520;
         for(int n=0;n<420;++n){
             eclipse::Actions action{};action.right=n<45;action.jump=n==15;action.dash=n==60;
-            action.attack=n==95||n==120||n==150;action.skill=n==190||n==285;action.swap=n==245;action.restart=n==390;
+            action.attack=n==95||n==120||n==150;action.skill=n==190||n==285;action.skillSweep=n==218;action.skillBuff=n==90;action.swap=n==245;action.restart=n==390;
             if(n==345)game.damagePlayer(999);
             tick(action);if(n%5)continue;
             char filename[64];std::snprintf(filename,sizeof(filename),"/frame-%04d.bmp",captureIndex++);
