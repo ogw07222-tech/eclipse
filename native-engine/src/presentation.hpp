@@ -17,6 +17,7 @@ class Presentation {
     std::array<SDL_Texture*,5> textures{};
     SDL_Texture* titleTexture_=nullptr;
     SDL_Texture* titleCape_=nullptr;
+    SDL_Texture* titleMenu_=nullptr;
     std::array<SDL_Texture*,3> slimeTextures_{};
     SDL_Texture* enemyBarFrame_=nullptr;
     SDL_Texture* executeIcon_=nullptr;
@@ -793,7 +794,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -864,13 +865,17 @@ public:
         }
         SDL_SetTextureScaleMode(titleTexture_,SDL_SCALEMODE_NEAREST);
         SDL_SetTextureBlendMode(titleTexture_,SDL_BLENDMODE_BLEND);
+        titleMenu_=IMG_LoadTexture(renderer,asset("ui/title_menu.png").c_str());
+        if(!titleMenu_){SDL_SetError("ECLIPSE ASSET ERROR: ui/title_menu.png missing or invalid");return false;}
+        SDL_SetTextureScaleMode(titleMenu_,SDL_SCALEMODE_NEAREST);
+        SDL_SetTextureBlendMode(titleMenu_,SDL_BLENDMODE_BLEND);
         return true;
     }
 
-    static constexpr SDL_FRect titleButton{534,630,212,48};
+    static constexpr std::array<SDL_FRect,4> titleButtons{{{166,626,224,60},{407,626,224,60},{648,626,224,60},{889,626,224,60}}};
     static constexpr float titleReadyTime=0.85f;
 
-    void drawTitle(float seconds){
+    void drawTitle(float seconds,bool showSettings=false){
         constexpr float width=1280, height=720;
         constexpr float logoBand=195;
         const SDL_FRect lowerScene{0,logoBand,width,height-logoBand};
@@ -936,14 +941,25 @@ public:
         const int strip[]={0,1,2,1,3,2,2,3,4,3,5,4};
         SDL_RenderGeometry(renderer,titleTexture_,logo,6,strip,12);
         if(seconds>=titleReadyTime){
-            const auto& b=titleButton;
-            rect(b.x,b.y,b.w,b.h,0x11101d,235);
-            const auto glow=static_cast<Uint8>(174+38*std::sin(seconds*2.6f));
-            rect(b.x,b.y,b.w,2,0xb5a7ce,glow);
-            rect(b.x,b.y+b.h-2,b.w,2,0x817491,glow);
-            rect(b.x,b.y,2,b.h,0x817491,glow);
-            rect(b.x+b.w-2,b.y,2,b.h,0x817491,glow);
-            text("START",b.x+(b.w-87)/2,b.y+(b.h-21)/2,3,0xe9e1f3);
+            constexpr const char* labels[]={"START","VACODE","SETTINGS","EXIT"};
+            for(int i=0;i<4;++i){
+                const auto& target=titleButtons[i];
+                const SDL_FRect source{0.f,float(i*60),224.f,60.f};
+                SDL_SetTextureAlphaMod(titleMenu_,static_cast<Uint8>(230+25*std::sin(seconds*2.4f+i*.8f)));
+                SDL_RenderTexture(renderer,titleMenu_,&source,&target);
+                const size_t length=std::strlen(labels[i]);
+                text(labels[i],target.x+(target.w-length*18.f)*.5f,target.y+19,3,i==0?0xffe2b7:0xe1e0ef);
+            }
+            SDL_SetTextureAlphaMod(titleMenu_,255);
+            if(showSettings){
+                rect(335,404,610,176,0x080a16,241);
+                rect(335,404,610,3,0xb09ac9);
+                rect(335,577,610,3,0x7d729d);
+                text("SETTINGS",550,424,3,0xf0d5aa);
+                text("CONTROLS AVAILABLE IN GAME",392,470,2,0xe2d9e8);
+                text("VACODE LOGIN IS OPTIONAL",392,503,2,0xbbaccb);
+                text("TAP SETTINGS TO CLOSE",404,536,2,0xc8c4d3);
+            }
         }
         SDL_RenderPresent(renderer);
     }
