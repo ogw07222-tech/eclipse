@@ -3,11 +3,31 @@
 #include "presentation.hpp"
 #include <memory>
 #include <fstream>
+#ifdef SDL_PLATFORM_ANDROID
+#include <jni.h>
+#endif
 
 namespace {
 SDL_Window* window=nullptr;SDL_Renderer* renderer=nullptr;
 eclipse::Combat game;eclipse::Animation animation;eclipse::Input input;eclipse::ControlLayout layout;
-bool running=true,foreground=true;float camera=640;
+bool running=true,foreground=true,titleSettings=false;float camera=640;
+void requestVacodeLogin(){
+#ifdef SDL_PLATFORM_ANDROID
+    auto* env=static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
+    auto activity=static_cast<jobject>(SDL_GetAndroidActivity());
+    if(!env||!activity){SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"VACODE JNI unavailable");return;}
+    jclass clazz=env->GetObjectClass(activity);
+    if(clazz){
+        jmethodID method=env->GetMethodID(clazz,"showVacodeLogin","()V");
+        if(method)env->CallVoidMethod(activity,method);
+        if(env->ExceptionCheck()){env->ExceptionDescribe();env->ExceptionClear();}
+        env->DeleteLocalRef(clazz);
+    }
+    env->DeleteLocalRef(activity);
+#else
+    SDL_Log("VACODE login is available in Android APK only");
+#endif
+}
 std::array<bool,SDL_SCANCODE_COUNT> keyState{};
 void updateKeyboard(){const auto& k=keyState;eclipse::Actions a;
         a.left=k[SDL_SCANCODE_A]||k[SDL_SCANCODE_LEFT];a.right=k[SDL_SCANCODE_D]||k[SDL_SCANCODE_RIGHT];a.jump=k[SDL_SCANCODE_SPACE]||k[SDL_SCANCODE_W]||k[SDL_SCANCODE_UP];
@@ -25,21 +45,29 @@ void events(bool& titleActive,float titleSeconds){
         if(wasTitle){
             if(!foreground)continue;
             if(e.type==SDL_EVENT_KEY_DOWN&&e.key.scancode==SDL_SCANCODE_ESCAPE){
-                running=false;continue;
+                if(titleSettings)titleSettings=false;
+                else running=false;
+                continue;
             }
             if(titleSeconds<eclipse::Presentation::titleReadyTime)continue;
-            bool start=e.type==SDL_EVENT_KEY_DOWN&&!e.key.repeat&&
-                (e.key.scancode==SDL_SCANCODE_RETURN||e.key.scancode==SDL_SCANCODE_KP_ENTER||
-                 e.key.scancode==SDL_SCANCODE_SPACE);
-            const bool finger=e.type==SDL_EVENT_FINGER_DOWN&&e.tfinger.touchID!=SDL_MOUSE_TOUCHID;
-            const bool mouse=e.type==SDL_EVENT_MOUSE_BUTTON_DOWN&&e.button.which!=SDL_TOUCH_MOUSEID&&
-                e.button.button==SDL_BUTTON_LEFT;
-            if((finger||mouse)&&SDL_ConvertEventToRenderCoordinates(renderer,&e)){
-                const SDL_FPoint position=finger?SDL_FPoint{e.tfinger.x,e.tfinger.y}:
-                    SDL_FPoint{e.button.x,e.button.y};
-                start=SDL_PointInRectFloat(&position,&eclipse::Presentation::titleButton);
+            int selection=-1;
+            if(e.type==SDL_EVENT_KEY_DOWN&&!e.key.repeat){
+                if(e.key.scancode==SDL_SCANCODE_RETURN||e.key.scancode==SDL_SCANCODE_KP_ENTER||e.key.scancode==SDL_SCANCODE_SPACE)selection=0;
+                if(e.key.scancode==SDL_SCANCODE_ESCAPE){titleSettings=false;continue;}
             }
-            if(start)titleActive=false;
+            const bool finger=e.type==SDL_EVENT_FINGER_DOWN&&e.tfinger.touchID!=SDL_MOUSE_TOUCHID;
+            const bool mouse=e.type==SDL_EVENT_MOUSE_BUTTON_DOWN&&e.button.which!=SDL_TOUCH_MOUSEID&&e.button.button==SDL_BUTTON_LEFT;
+            if((finger||mouse)&&SDL_ConvertEventToRenderCoordinates(renderer,&e)){
+                const SDL_FPoint position=finger?SDL_FPoint{e.tfinger.x,e.tfinger.y}:SDL_FPoint{e.button.x,e.button.y};
+                for(int i=0;i<4;++i)if(SDL_PointInRectFloat(&position,&eclipse::Presentation::titleButtons[i]))selection=i;
+            }
+            switch(selection){
+                case 0: titleActive=false;titleSettings=false;break;
+                case 1: requestVacodeLogin();break;
+                case 2: titleSettings=!titleSettings;break;
+                case 3: running=false;break;
+                default:break;
+            }
             continue;
         }
         if((e.type==SDL_EVENT_KEY_DOWN||e.type==SDL_EVENT_KEY_UP)&&e.key.scancode==SDL_SCANCODE_R)
@@ -211,7 +239,7 @@ int main(int argc,char** argv){
         const double elapsed=std::min((start-last)/1e9,.1);last=start;
         if(titleActive){
             titleSeconds+=static_cast<float>(elapsed);
-            view->drawTitle(titleSeconds);
+            view->drawTitle(titleSeconds,titleSettings);
         }else{
             accumulator+=elapsed;
             while(accumulator>=eclipse::fixedStep){if(!layout.editing)tick(input.sample());accumulator-=eclipse::fixedStep;}
