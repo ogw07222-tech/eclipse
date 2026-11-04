@@ -19,6 +19,7 @@ public:
     std::array<ControlRect,Count> buttons=defaultButtons;
     std::string storagePath;
     bool editing=false;             // compatibility with current game pause/render loop
+    bool exitRequested=false;
     bool reposition=false;          // overlay for on-screen button manipulation
     Page page=Controls;
     int selected=Stick;
@@ -31,6 +32,7 @@ public:
     int bgm=80,sfx=90;
     bool screenShake=true,showNumbers=true;
     static constexpr float gearX=1198,gearY=18,gearSize=64;
+    static constexpr float backX=1120,backY=103,backWidth=90,backHeight=65;
     static constexpr float menuX=12,menuY=47,menuScale=.8f;
     static constexpr float menuWidth=344*menuScale,menuHeight=783*menuScale;
     static constexpr float tabX=menuX+49*menuScale,tabWidth=250*menuScale,tabHeight=86*menuScale;
@@ -127,10 +129,10 @@ public:
         // Motion only updates sliders or an active touch layout gesture.
         if(!motion){
             if(inside(x,y,gearX,gearY,gearSize,gearSize)||
-               inside(x,y,1120,103,90,65)){close();return true;}
+               inside(x,y,backX,backY,backWidth,backHeight)){close();return true;}
             for(int i=0;i<4;++i){
                 if(!inside(x,y,tabX,tabY[i],tabWidth,tabHeight))continue;
-                if(i==3)close();
+                if(i==3){close();exitRequested=true;}
                 else page=static_cast<Page>(i);
                 return true;
             }
