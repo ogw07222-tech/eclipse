@@ -231,6 +231,20 @@ int main(int argc,char** argv){
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"ECLIPSE TITLE ASSET ERROR",reason.c_str(),window);
         view.reset();cleanup();return 1;
     }
+    // First playable scene: use the demon castle entrance as the temporary
+    // combat playtest backdrop. After validation this becomes the tutorial.
+    // Never silently fall back to the forest if the requested scene is missing.
+    if(!view->demonCastleEntranceReady()){
+        const std::string reason=SDL_GetError();
+        const std::string message=reason.empty()
+            ? "Demon castle entrance PNGs were not loaded. Check Assets/Resources/Eclipse/demon_castle/entrance."
+            : reason;
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"ECLIPSE CASTLE ASSET ERROR: %s",message.c_str());
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"ECLIPSE CASTLE ASSET ERROR",message.c_str(),window);
+        view.reset();cleanup();return 1;
+    }
+    view->setDemonCastleEntrance(true);
+    SDL_Log("ECLIPSE first playable scene: demon castle entrance (combat playtest; tutorial later)");
     float titleSeconds=0;
     Uint64 last=SDL_GetTicksNS();double accumulator=0;
     while(running){Uint64 start=SDL_GetTicksNS();events(titleActive,titleSeconds);
