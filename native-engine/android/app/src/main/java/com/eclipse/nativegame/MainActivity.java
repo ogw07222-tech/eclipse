@@ -49,17 +49,14 @@ public final class MainActivity extends SDLActivity {
     }
 
     // Invoked only by the SDL title VACODE button; no Android overlay obscures the art.
+    public boolean isVacodeSignedIn() {
+        return signedInUserId != null && accessToken != null && !accessToken.isEmpty();
+    }
+
     public void showVacodeLogin() {
         runOnUiThread(() -> {
             if (authenticating) return;
-            if (signedInUserId != null) {
-                signedInUserId = null;
-                accessToken = null;
-                refreshToken = null;
-                Toast.makeText(this, "VACODE 로그아웃", Toast.LENGTH_SHORT).show();
-            } else {
-                signInWithVacode();
-            }
+            if (signedInUserId == null) signInWithVacode();
         });
     }
 
