@@ -3,6 +3,7 @@
 #include <SDL3_image/SDL_image.h>
 #include <string>
 #include <cstdio>
+#include <cstring>
 #include <vector>
 #include "core.hpp"
 #include "sword_trails.hpp"
