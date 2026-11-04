@@ -66,7 +66,7 @@ public final class MainActivity extends SDLActivity {
         accountButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xBB252637));
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT,
-            Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+            Gravity.TOP | Gravity.END);
         params.topMargin = Math.round(6 * getResources().getDisplayMetrics().density);
         addContentView(accountButton, params);
         accountButton.setOnClickListener(v -> {
