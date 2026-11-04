@@ -531,7 +531,8 @@ struct Animation {
         else phase=time/clip.duration*clip.count;
         const int key=std::clamp(static_cast<int>(phase),0,clip.count-1);
         frame=clip.start+key;
-        midpoint=(loop||key+1<clip.count)&&phase-key>=.5f;
+        // Keep the original silhouettes during the jump-to-fall transition.
+        midpoint=next!=2&&next!=3&&(loop||key+1<clip.count)&&phase-key>=.5f;
     }
 };
 }

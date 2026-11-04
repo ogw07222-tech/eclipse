@@ -629,10 +629,20 @@ class Presentation {
         const auto& js=c[ControlLayout::Stick];
         const bool stickActive=held.left||held.right||held.jump;
         icon(4,0,0,js.x,js.y,js.size,stickActive);
-        float thumb=js.size*.36f,tx=js.x+(js.size-thumb)*.5f+stick[0],ty=js.y+(js.size-thumb)*.5f+stick[1];
-        rect(tx-3,ty-3,thumb+6,thumb+6,0x101923,stickActive?165:130);
-        rect(tx,ty,thumb,thumb,stickActive?0xe3bd72:0x91b4bb,stickActive?191:153);
-        rect(tx+thumb*.22f,ty+thumb*.22f,thumb*.56f,thumb*.56f,0x304f61,stickActive?170:135);
+        const float thumb=js.size*.29f;
+        const float tx=js.x+js.size*.5f+stick[0],ty=js.y+js.size*.5f+stick[1];
+        auto thumbLayer=[&](float size,unsigned color,Uint8 alpha){
+            const float unit=size/7;
+            const float x=std::round(tx-size*.5f),y=std::round(ty-size*.5f);
+            rect(x+2*unit,y,3*unit,unit,color,alpha);
+            rect(x+unit,y+unit,5*unit,unit,color,alpha);
+            rect(x,y+2*unit,size,3*unit,color,alpha);
+            rect(x+unit,y+5*unit,5*unit,unit,color,alpha);
+            rect(x+2*unit,y+6*unit,3*unit,unit,color,alpha);
+        };
+        thumbLayer(thumb+4,0x101923,165);
+        thumbLayer(thumb,stickActive?0xb8c8cf:0x91a8b4,stickActive?191:153);
+        thumbLayer(thumb*.58f,0x304353,174);
         icon(1,held.attack?1:0,0,c[ControlLayout::Attack].x,c[ControlLayout::Attack].y,c[ControlLayout::Attack].size,held.attack);
         icon(2,held.dash?1:0,0,c[ControlLayout::Dash].x,c[ControlLayout::Dash].y,c[ControlLayout::Dash].size,held.dash);
         icon(3,0,0,c[ControlLayout::Swap].x,c[ControlLayout::Swap].y,c[ControlLayout::Swap].size,held.swap);
