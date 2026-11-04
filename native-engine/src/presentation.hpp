@@ -245,6 +245,48 @@ class Presentation {
         }
     }
     void forest(const Combat& g,float camera) {
+        if(forestEntranceReady_) {
+            // Fixed forest entrance art correction. These remain original authored PNGs:
+            // only the image compositing, size and tint differ. NPC / floor untouched.
+            // Ground is drawn before tree bases to avoid cutting roots at the grass line.
+            constexpr int drawOrder[]{0,1,2,4,3,5};
+            for(int index : drawOrder) {
+                SDL_Texture* image=forestV3Textures_[index];
+                const float shift=(camera-640.f)*ForestLayerScene::layersEntrance[index].parallax;
+                Uint8 r=255,g=255,b=255;
+                if(index==2){r=214;g=214;b=220;} // mountain depth
+                if(index==4){r=204;g=188;b=204;} // darken/desaturate bright grass
+                if(index==3){r=238;g=237;b=235;} // trees remain legible in moonlight
+                if(index==5){r=214;g=214;b=214;} // de-emphasize foreground rocks
+                SDL_SetTextureColorMod(image,r,g,b);
+                if(index==5) {
+                    // Crop each edge decoration separately to preserve the NPC
+                    // corridors and avoid dragging rocks into the combat center.
+                    constexpr float scale=.82f;
+                    constexpr float anchorY=585.f;
+                    constexpr SDL_FRect leftSrc{0.f,0.f,450.f,720.f};
+                    constexpr SDL_FRect rightSrc{1050.f,0.f,550.f,720.f};
+                    SDL_FRect leftDst{-shift,anchorY-anchorY*scale,
+                                      leftSrc.w*scale,720.f*scale};
+                    SDL_FRect rightDst{1600.f-rightSrc.w*scale-shift,
+                                       anchorY-anchorY*scale,
+                                       rightSrc.w*scale,720.f*scale};
+                    SDL_RenderTexture(renderer,image,&leftSrc,&leftDst);
+                    SDL_RenderTexture(renderer,image,&rightSrc,&rightDst);
+                } else {
+                    float width=0.f,height=0.f;
+                    if(SDL_GetTextureSize(image,&width,&height)) {
+                        // Art originally ended above the physical grass; slide the
+                        // trees down to align the roots with the fixed y=585 floor.
+                        SDL_FRect dest{std::round(-shift),index==3?50.f:0.f,
+                                       width,height};
+                        SDL_RenderTexture(renderer,image,nullptr,&dest);
+                    }
+                }
+                SDL_SetTextureColorMod(image,255,255,255);
+            }
+            return;
+        }
         if(forestV3Ready_) {
             // Layer art only: no scene randomization or NPC occupancy changes.
             // Every asset's native dimensions and world-ground height are fixed.
