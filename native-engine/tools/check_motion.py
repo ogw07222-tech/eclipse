@@ -10,7 +10,7 @@ for section in stamp.values():
         assert hashlib.sha256((ROOT/name).read_bytes()).hexdigest()==digest,('Repack motion after changing',name)
 im=Image.open(ROOT/'Assets/Resources/Eclipse/knight_motion.png').convert('RGBA')
 master=Image.open(ROOT/'Art/knight/redesign/knight_64x94_master.png').convert('RGBA')
-assert im.size==(1024,1222)
+assert im.size==(1024,1316)
 assert set(im.getchannel('A').get_flattened_data())=={0,255},'Alpha must be binary'
 clips=json.loads((ROOT/'Art/knight/rig/clips.json').read_text())
 assert [c['count'] for c in clips]==[8,8,16,6,6,6,8,16,10,10,6,12,8]
@@ -29,7 +29,7 @@ for i in range(208):
     if i not in occupied:
         assert not im.crop((i%16*64,i//16*94,(i%16+1)*64,(i//16+1)*94)).getchannel('A').getbbox(),('unused cell',i)
 header=(ROOT/'native-engine/src/motion.hpp').read_text()
-for key,value in [('motionWidth',64),('motionHeight',94),('motionColumns',16),('motionRows',13),('motionPivotX',28),('motionPivotY',88)]:
+for key,value in [('motionWidth',64),('motionHeight',94),('motionColumns',16),('motionRows',14),('motionPivotX',28),('motionPivotY',88)]:
     assert re.search(r'\b'+key+r'\s*=\s*'+str(value)+r'\b',header),key
 assert len(occupied)==120 and len(unique)==120
 assert all(c['source_count']==c['count'] for c in clips),'Every motion must retain authored detail at every runtime frame'
@@ -37,7 +37,16 @@ assert len({p for p in im.get_flattened_data() if p[3]})<=95,'Motions must share
 for start in (0,16,96,112,128,144,160,176):
     box=im.crop((0,start//16*94,64,(start//16+1)*94)).getchannel('A').getbbox()
     assert 50<=box[3]-box[1]<=56,('Inconsistent ready-pose body height',start)
-results=dict(atlas_pixels=list(im.size),cell_pixels=[64,94],clips=13,frames=len(occupied),unique_poses=len(unique),alpha=[0,255],pivot=[28,88],world_scale=1.85,source='120 authored PNG poses; shared 96-color palette and ready-pose scale')
+for i in range(16):
+    box=(i*64,1222,(i+1)*64,1316)
+    cell=im.crop(box)
+    assert cell.tobytes()==master.crop(box).tobytes(),('run midpoint',i,'packing mismatch')
+    bounds=cell.getchannel('A').getbbox()
+    assert bounds and bounds[0]>=1 and bounds[2]<=63 and bounds[3]<=89,('run midpoint',i,'invalid silhouette')
+    occupied.add(208+i)
+    unique.add(cell.tobytes())
+assert len(unique)==136
+results=dict(atlas_pixels=list(im.size),cell_pixels=[64,94],clips=13,frames=len(occupied),unique_poses=len(unique),alpha=[0,255],pivot=[28,88],world_scale=1.85,source='120 base PNG poses and 16 run midpoints; shared 96-color palette and ready-pose scale')
 # Blade annotations are checked against the ACTUAL steel pixels, not a retired rig.
 import importlib.util,math
 spec=importlib.util.spec_from_file_location('knight_bake',ROOT/'Tools/bake_knight_motion.py')
