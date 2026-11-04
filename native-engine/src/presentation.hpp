@@ -1256,11 +1256,10 @@ public:
                 frame=row*columns+index;
             }
         }
-        if(p.form==0&&a.midpoint&&a.state!=4){
+        // Use the original sprint poses so the planted foot stays in sequence.
+        if(p.form==0&&a.midpoint&&a.state!=1&&a.state!=4){
             if(isSkillMotion(a.state)){
                 if(knightSkillMotion_)frame+=skillMotionColumns*(skillMotionRows/2);
-            }else if(a.state==1){
-                frame=knightRunMidpointStart+frame-motionClips[1].start;
             }else{
                 frame+=knightMidpointStart;
             }
