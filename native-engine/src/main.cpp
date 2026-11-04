@@ -102,7 +102,7 @@ int main(int argc,char** argv){
     layout.load();input.setLayout(&layout);
     if(!view->load()){SDL_Log("ECLIPSE asset load failed: %s",SDL_GetError());view.reset();cleanup();return 1;}
     // Manual local artwork preview only; main gameplay still uses the forest by default.
-    // Run eclipse_engine --castle-preview with the optional five-PNG castle entrance pack.
+    // The castle asset pack is mandatory and validated during Presentation::load().
     if(argc>1 && std::string(argv[1])=="--castle-preview") view->setDemonCastleEntrance(true);
     SDL_Log("ECLIPSE ready: five UI/knight textures, three slime atlases, combat scene, 1280x720");
     if(argc>2&&std::string(argv[1])=="--slime-review"){
@@ -184,7 +184,7 @@ int main(int argc,char** argv){
         view.reset();cleanup();return 0;
     }
     bool titleActive=view->loadTitle();
-    if(!titleActive)SDL_Log("ECLIPSE title asset unavailable: %s",SDL_GetError());
+    if(!titleActive){SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",SDL_GetError());view.reset();cleanup();return 1;}
     float titleSeconds=0;
     Uint64 last=SDL_GetTicksNS();double accumulator=0;
     while(running){Uint64 start=SDL_GetTicksNS();events(titleActive,titleSeconds);
