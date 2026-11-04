@@ -44,6 +44,7 @@ struct Player {
     float takeoffLock=0;
     float dashLeft=0,dashCooldown=0,attackCooldown=0,skillCooldown=0,swapCooldown=0;
     float invulnerable=0,coyote=0,jumpBuffer=0,attackFlash=0,comboWindow=0,hitStop=0,swapFlash=0;
+    float trailingHealth=-1.f,healthTrailHold=0.f;
     float hurtTint=0; // visual-only: short white flash and muted-red impact
     bool airSlam=false;
     float slamAge=0,slamRecover=0,slamImpact=0,slamImpactX=0,slamImpactY=floorY;
@@ -55,7 +56,13 @@ struct Player {
     float sweepReady=0,buffReady=0,mageSkillCooldown=0,preparation=0;
     float basicSpeed() const {return gear.speed()*(preparation>0?1.20f:1.f);}
     int maxHealth()const{return 100+gear.hp();}
-    void equip(int slot){int before=maxHealth();gear.cycle(slot);health=std::clamp(health+maxHealth()-before,1,maxHealth());}
+    void equip(int slot){
+        const int before=maxHealth();
+        gear.cycle(slot);
+        const int previousHealth=health;
+        health=std::clamp(health+maxHealth()-before,1,maxHealth());
+        if(trailingHealth>=0)trailingHealth=std::clamp(trailingHealth+health-previousHealth,float(health),float(maxHealth()));
+    }
 };
 struct Enemy {
     int kind=0,health=55,maxHealth=55,damage=9;
@@ -114,11 +121,21 @@ class Combat {
     }
     static float down(float value,float dt){return std::max(0.f,value-dt);}
     static float toward(float value,float step){return value>0?std::max(0.f,value-step):std::min(0.f,value+step);}
+    template<class Character>
+    static void holdHealthTrail(Character& character,float hold){
+        character.trailingHealth=std::max(character.trailingHealth,float(character.health));
+        character.healthTrailHold=std::max(character.healthTrailHold,hold);
+    }
+    template<class Character>
+    static void stepHealthTrail(Character& character,int maxHealth,float dt){
+        if(character.trailingHealth<0)character.trailingHealth=float(character.health);
+        character.healthTrailHold=down(character.healthTrailHold,dt);
+        if(character.healthTrailHold<=0)
+            character.trailingHealth=std::max(float(character.health),character.trailingHealth-maxHealth*dt/.20f);
+    }
     void damageEnemy(Enemy& e,int amount,DamageKind kind,bool dot){
         if(e.dead())return;
-        if(e.trailingHealth<0)e.trailingHealth=static_cast<float>(e.health);
-        e.trailingHealth=std::max(e.trailingHealth,static_cast<float>(e.health));
-        e.healthTrailHold=std::max(e.healthTrailHold,dot?.35f:.12f);
+        holdHealthTrail(e,dot?.35f:.12f);
         e.health=std::max(0,e.health-amount);if(!dot)e.hitFlash=.18f;
         popups.push_back({e.x,e.y-86,amount,kind});
     }
@@ -332,9 +349,7 @@ class Combat {
         e.attackTimer=down(e.attackTimer,dt);e.hitFlash=down(e.hitFlash,dt);e.reactionFlash=down(e.reactionFlash,dt);e.stagger=down(e.stagger,dt);e.knockback=toward(e.knockback,650*dt);
         // DOT ticks keep adding to the same white damage segment; after the hold
         // it shrinks at a bounded, frame-rate-independent speed.
-        if(e.trailingHealth<0)e.trailingHealth=static_cast<float>(e.health);
-        e.healthTrailHold=down(e.healthTrailHold,dt);
-        if(e.healthTrailHold<=0)e.trailingHealth=std::max(static_cast<float>(e.health),e.trailingHealth-e.maxHealth*dt/.20f);
+        stepHealthTrail(e,e.maxHealth,dt);
         if(e.bleedStacks>0){
             e.bleedTick+=std::min(dt,e.bleed);
             e.bleed=down(e.bleed,dt);
@@ -432,6 +447,7 @@ public:
     }
     void damagePlayer(int amount){
         auto& p=player;if(ended||p.invulnerable>0||p.health<=0)return;
+        holdHealthTrail(p,.12f);
         p.health=std::max(0,p.health-std::max(1,amount-p.gear.defense()));p.hurtTint=.18f;cancelAirSlam();cancelMageCast();p.meleeLeft=0;p.invulnerable=.7f;p.attackFlash=.28f;++p.hurtSerial;p.combo=0;p.comboWindow=0;
         if(p.health==0){ended=true;won=false;inventory=false;}
     }
@@ -439,6 +455,7 @@ public:
         if(a.restart){restart();return;}
         clock+=dt;
         player.hurtTint=down(player.hurtTint,dt);
+        stepHealthTrail(player,player.maxHealth(),dt);
         for(auto& effect:bleedSpreads)effect.life-=dt;
         bleedSpreads.erase(std::remove_if(bleedSpreads.begin(),bleedSpreads.end(),
             [](const BleedSpread& effect){return effect.life<=0;}),bleedSpreads.end());
