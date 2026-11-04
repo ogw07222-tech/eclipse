@@ -809,6 +809,25 @@ public:
         // Fall back to the APK AssetManager when an override is absent.
         const char* storage = SDL_GetAndroidInternalStoragePath();
         if (storage && *storage) {
+            // The installed Studio APK accepts ui/ but not root-level mage
+            // sprites or demon_castle/. Prefer compatible aliases from its
+            // imported asset pack, then retain the original APK fallback.
+            const std::string logicalName(name);
+            std::string studioAlias;
+            if (logicalName=="mage_run.png" || logicalName=="mage_motion.png" ||
+                logicalName=="knight_skill_motion.png") {
+                studioAlias="ui/"+logicalName;
+            } else if (logicalName.rfind("demon_castle/entrance/",0)==0) {
+                studioAlias="ui/demon_castle_entrance_"+
+                    logicalName.substr(sizeof("demon_castle/entrance/")-1);
+            }
+            if (!studioAlias.empty()) {
+                const std::string aliasedPath=std::string(storage)+"/game_assets/"+studioAlias;
+                if (FILE* file=std::fopen(aliasedPath.c_str(),"rb")) {
+                    std::fclose(file);
+                    return aliasedPath;
+                }
+            }
             const std::string overridePath = std::string(storage) + "/game_assets/" + name;
             if (FILE* file = std::fopen(overridePath.c_str(), "rb")) {
                 std::fclose(file);
