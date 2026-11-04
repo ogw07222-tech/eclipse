@@ -870,13 +870,18 @@ public:
         if(!titleMenu_){SDL_SetError("ECLIPSE ASSET ERROR: ui/title_menu.png missing or invalid");return false;}
         SDL_SetTextureScaleMode(titleMenu_,SDL_SCALEMODE_NEAREST);
         SDL_SetTextureBlendMode(titleMenu_,SDL_BLENDMODE_BLEND);
+        if(!settingsGear_)settingsGear_=IMG_LoadTexture(renderer,asset("ui/settings_gear.png").c_str());
+        if(!settingsGear_){SDL_SetError("ECLIPSE ASSET ERROR: ui/settings_gear.png missing or invalid");return false;}
+        SDL_SetTextureScaleMode(settingsGear_,SDL_SCALEMODE_NEAREST);
         return true;
     }
 
-    static constexpr std::array<SDL_FRect,4> titleButtons{{{166,626,224,60},{407,626,224,60},{648,626,224,60},{889,626,224,60}}};
+    static constexpr std::array<SDL_FRect,2> titleOptions{{{404,552,472,62},{404,624,472,62}}};
+    static constexpr SDL_FRect titleGear{1204,24,52,52};
+    static constexpr SDL_FRect titleBack{26,25,190,50};
     static constexpr float titleReadyTime=0.85f;
 
-    void drawTitle(float seconds,bool showSettings=false){
+    void drawTitle(float seconds,int page=0,bool loggingIn=false){
         constexpr float width=1280, height=720;
         constexpr float logoBand=195;
         const SDL_FRect lowerScene{0,logoBand,width,height-logoBand};
@@ -942,24 +947,41 @@ public:
         const int strip[]={0,1,2,1,3,2,2,3,4,3,5,4};
         SDL_RenderGeometry(renderer,titleTexture_,logo,6,strip,12);
         if(seconds>=titleReadyTime){
-            constexpr const char* labels[]={"START","VACODE","SETTINGS","EXIT"};
-            for(int i=0;i<4;++i){
-                const auto& target=titleButtons[i];
-                const SDL_FRect source{0.f,float(i*30),112.f,30.f};
-                SDL_SetTextureAlphaMod(titleMenu_,static_cast<Uint8>(230+25*std::sin(seconds*2.4f+i*.8f)));
-                SDL_RenderTexture(renderer,titleMenu_,&source,&target);
-                const size_t length=std::strlen(labels[i]);
-                text(labels[i],target.x+(target.w-length*18.f)*.5f,target.y+19,3,i==0?0xffe2b7:0xe1e0ef);
+            // The same PNG button atlas is reused for both menu levels.
+            // 0 = initial START; 1 = login/guest; 2 = gear menu; 3 = settings.
+            const char* primary=page==0?"START":page==1?"VACODE LOGIN":page==2?"SETTINGS":"BACK";
+            const char* secondary=page==1?"PLAY AS GUEST":page==2?"EXIT":nullptr;
+            auto button=[&](int index,const char* label){
+                const auto& dst=titleOptions[index];
+                const SDL_FRect src{0.f,float((index==0?0:1)*30),112.f,30.f};
+                SDL_SetTextureAlphaMod(titleMenu_,static_cast<Uint8>(230+25*std::sin(seconds*2.4f+index*.8f)));
+                SDL_RenderTexture(renderer,titleMenu_,&src,&dst);
+                const size_t length=std::strlen(label);
+                text(label,dst.x+(dst.w-length*18.f)*.5f,dst.y+19,3,index==0?0xffe2b7:0xe1e0ef);
+            };
+            if(page==1||page==2||page==3){
+                rect(390,500,500,195,0x080a16,156);
+                rect(390,500,500,2,0x9284ae,195);
             }
+            button(0,primary);
+            if(secondary)button(1,secondary);
             SDL_SetTextureAlphaMod(titleMenu_,255);
-            if(showSettings){
-                rect(335,404,610,176,0x080a16,241);
-                rect(335,404,610,3,0xb09ac9);
-                rect(335,577,610,3,0x7d729d);
-                text("SETTINGS",550,424,3,0xf0d5aa);
-                text("CONTROLS AVAILABLE IN GAME",392,470,2,0xe2d9e8);
-                text("VACODE LOGIN IS OPTIONAL",392,503,2,0xbbaccb);
-                text("TAP SETTINGS TO CLOSE",404,536,2,0xc8c4d3);
+            if(settingsGear_){
+                SDL_RenderTexture(renderer,settingsGear_,nullptr,&titleGear);
+            }
+            if(page!=0){
+                text("BACK",35,40,2,0xe1d4bf);
+                if(page==1){
+                    text("CHOOSE YOUR JOURNEY",423,516,2,0xbeb2d9);
+                    if(loggingIn)text("VERIFYING VACODE ACCOUNT",425,478,2,0xf0d5aa);
+                }else if(page==2)text("OPTIONS",576,516,2,0xbeb2d9);
+                else{
+                    rect(344,325,592,164,0x080a16,245);
+                    rect(344,325,592,3,0xb09ac9);
+                    text("SETTINGS",555,345,3,0xf0d5aa);
+                    text("CONTROL SETTINGS AVAILABLE IN GAME",389,406,2,0xe2d9e8);
+                    text("PRESS BACK TO RETURN",442,442,2,0xbbaccb);
+                }
             }
         }
         SDL_RenderPresent(renderer);
@@ -1007,7 +1029,7 @@ public:
             skillMotionWidth*skillMotionColumns,motionHeight*skillMotionRows);
         mageRun_=loadOptionalTexture("mage_run.png",motionWidth*motionColumns,motionHeight);
         mageMotion_=loadOptionalTexture("mage_motion.png",motionWidth*mageMotionColumns,motionHeight*mageMotionRows);
-        settingsGear_=loadOptionalTexture("ui/settings_gear.png");
+        if(!settingsGear_)settingsGear_=loadOptionalTexture("ui/settings_gear.png");
         settingsPanel_=loadOptionalTexture("ui/settings_menu_panel.png");
         settingsWindow_=loadOptionalTexture("ui/settings_window.png");
         enemyBarFrame_=loadOptionalTexture("ui/enemy_bar_frame.png");
