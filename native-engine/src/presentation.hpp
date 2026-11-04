@@ -863,10 +863,13 @@ public:
                 const float edge=std::sin(3.141593f*u)*std::sin(3.141593f*v);
                 const float center=0.92f-0.57f*u;
                 const float cloth=std::clamp(1-std::abs(v-center)*3.4f,0.f,1.f);
+                // Modest extra flutter: the shoulder stays fixed while the
+                // loose cloth gets a slightly stronger, slower traveling wave.
                 const float wave=edge*cloth*(1-u);
-                const float phase=seconds*2.7f+u*7+v*2;
-                vertices[row*(columns+1)+col]={{x+wave*1.5f*std::sin(phase+1),y+wave*4.5f*std::sin(phase)},
-                    {1,1,1,1},{x/width,y/height}};
+                const float phase=seconds*2.45f+u*7+v*2;
+                const float flutter=std::sin(phase)+0.20f*std::sin(phase*1.7f+v*3.0f);
+                vertices[row*(columns+1)+col]={{x+wave*2.4f*std::sin(phase+1),
+                    y+wave*7.5f*flutter},{1,1,1,1},{x/width,y/height}};
             }
         }
         static const auto indices=[]{
