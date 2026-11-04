@@ -45,7 +45,9 @@ void events(bool& titleActive,float titleSeconds){
         if(wasTitle){
             if(!foreground)continue;
             if(e.type==SDL_EVENT_KEY_DOWN&&e.key.scancode==SDL_SCANCODE_ESCAPE){
-                running=false;continue;
+                if(titleSettings)titleSettings=false;
+                else running=false;
+                continue;
             }
             if(titleSeconds<eclipse::Presentation::titleReadyTime)continue;
             int selection=-1;
