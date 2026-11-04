@@ -5,6 +5,8 @@
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 #include <array>
+#include <algorithm>
+#include <cstddef>
 #include <cmath>
 #include <string>
 namespace eclipse {
