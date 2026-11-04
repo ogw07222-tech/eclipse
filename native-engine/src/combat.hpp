@@ -483,7 +483,7 @@ public:
 struct Animation {
     int state=-1,frame=0,attackSerial=0,hurtSerial=0,landingSerial=0,combo=1,attackState=4;
     float time=0,attackTime=0,attackDuration=.36f,hurtTime=0,landTime=0,travelPhase=0,lastX=140;
-    bool initialized=false,wasHitStopped=false;
+    bool initialized=false,wasHitStopped=false,midpoint=false;
     void reset(){*this=Animation{};}
     void step(const Player& p,float dt){
         bool retrigger=p.attackSerial!=attackSerial;
@@ -510,21 +510,28 @@ struct Animation {
         attackTime=std::max(0.f,attackTime-visualDt);hurtTime=std::max(0.f,hurtTime-dt);if(!landed)landTime=std::max(0.f,landTime-visualDt);
         int next=p.health<=0?9:p.dashLeft>0?7:(p.airSlam||p.slamRecover>0)?12:attackTime>0?attackState:!p.grounded?(p.vy<0?2:3):landTime>0?10:std::abs(p.vx)>20?(std::abs(p.vx)<180?11:1):0;
         if(next!=state||retrigger){state=next;time=0;}else time+=visualDt;
-        const auto clip=motionClips[next];int index=0;
-        if(next==0)index=static_cast<int>(time/clip.duration*clip.count)%clip.count;
-        else if(next==1||next==11){travelPhase=std::fmod(travelPhase+distance/clip.stride,1.f);index=static_cast<int>(travelPhase*clip.count);}
-        else if(next==2)index=static_cast<int>((1-std::clamp(-p.vy/650.f,0.f,1.f))*(clip.count-1));
-        else if(next==3)index=static_cast<int>(std::clamp(p.vy/700.f,0.f,1.f)*(clip.count-1));
-        else if(next==12){
-            if(p.airSlam)index=p.slamAge<airSlamWindup?std::min(2,static_cast<int>(p.slamAge/airSlamWindup*3)):
-                3+std::min(1,static_cast<int>((p.slamAge-airSlamWindup)/.08f));
-            else index=5+std::min(2,static_cast<int>((1-p.slamRecover/airSlamRecovery)*3));
+        const auto clip=motionClips[next];
+        const bool loop=next==0||next==1||next==11;
+        float phase=0;
+        if(next==0)phase=std::fmod(time/clip.duration*clip.count,static_cast<float>(clip.count));
+        else if(next==1||next==11){
+            travelPhase=std::fmod(travelPhase+distance/clip.stride,1.f);
+            phase=travelPhase*clip.count;
         }
-        else if((next>=4&&next<=6)||isSkillMotion(next))index=static_cast<int>((1-attackTime/attackDuration)*clip.count);
-        else if(next==7)index=static_cast<int>((1-std::clamp(p.dashLeft/.15f,0.f,1.f))*clip.count);
-        else if(next==10)index=static_cast<int>((1-landTime/clip.duration)*clip.count);
-        else index=static_cast<int>(time/clip.duration*clip.count);
-        frame=clip.start+std::clamp(index,0,clip.count-1);
+        else if(next==2)phase=(1-std::clamp(-p.vy/650.f,0.f,1.f))*(clip.count-1);
+        else if(next==3)phase=std::clamp(p.vy/700.f,0.f,1.f)*(clip.count-1);
+        else if(next==12){
+            if(p.airSlam)phase=p.slamAge<airSlamWindup?std::min(2.999f,p.slamAge/airSlamWindup*3):
+                3+std::min(1.999f,(p.slamAge-airSlamWindup)/.08f);
+            else phase=5+std::min(2.999f,(1-p.slamRecover/airSlamRecovery)*3);
+        }
+        else if((next>=4&&next<=6)||isSkillMotion(next))phase=(1-attackTime/attackDuration)*clip.count;
+        else if(next==7)phase=(1-std::clamp(p.dashLeft/.15f,0.f,1.f))*clip.count;
+        else if(next==10)phase=(1-landTime/clip.duration)*clip.count;
+        else phase=time/clip.duration*clip.count;
+        const int key=std::clamp(static_cast<int>(phase),0,clip.count-1);
+        frame=clip.start+key;
+        midpoint=(loop||key+1<clip.count)&&phase-key>=.5f;
     }
 };
 }

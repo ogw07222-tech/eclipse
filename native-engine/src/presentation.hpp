@@ -1179,10 +1179,14 @@ public:
                 frame=row*columns+index;
             }
         }
-        if(p.form==0&&a.state==1){
-            const float phase=a.travelPhase*motionClips[1].count;
-            const int subframe=static_cast<int>(phase*2);
-            if(subframe%2==1)frame=knightRunMidpointStart+subframe/2;
+        if(p.form==0&&a.midpoint&&a.state!=4){
+            if(isSkillMotion(a.state)){
+                if(knightSkillMotion_)frame+=skillMotionColumns*(skillMotionRows/2);
+            }else if(a.state==1){
+                frame=knightRunMidpointStart+frame-motionClips[1].start;
+            }else{
+                frame+=knightMidpointStart;
+            }
         }
         afterimages(g,a,actorTexture,frame,columns);
         if(actorTexture){
