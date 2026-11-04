@@ -94,35 +94,69 @@ public:
             return false;
         }
         if(reposition){
+            // The settings panel is hidden. Only the HUD controls and the top
+            // editing banner are interactive while this modal editor is open.
             if(!down){
                 for(int t=0;t<2;++t)if(touchIds[t]==id)touchIds[t]=-999;
                 if(dragging==id)dragging=-999;
-                if(pinchButton>=0){pinchButton=-1;pinchStart=0;}
-                save();return true;
+                if(pinchButton>=0){
+                    pinchButton=-1;pinchStart=0;
+                    // Do not jump the remaining finger into a drag after pinching.
+                    dragging=-999;
+                }
+                save();
+                return true;
             }
-            if(motion&&touchIds[0]!=id&&touchIds[1]!=id)return true;
+            if(!motion&&inside(x,y,1030,80,205,65)){
+                finishReposition();return true;
+            }
             int slot=-1;
             for(int t=0;t<2;++t)if(touchIds[t]==id)slot=t;
-            if(slot<0)for(int t=0;t<2;++t)if(touchIds[t]==-999){slot=t;touchIds[t]=id;break;}
-            if(slot>=0)touchPoints[slot]={{x,y}};
+            if(slot<0){
+                if(motion)return true; // Never start a gesture from stray motion.
+                for(int t=0;t<2;++t)if(touchIds[t]==-999){slot=t;touchIds[t]=id;break;}
+            }
+            if(slot<0)return true;
+            touchPoints[slot]={{x,y}};
             if(touchIds[0]!=-999&&touchIds[1]!=-999){
                 if(pinchButton<0){
-                    int a=hit(touchPoints[0][0],touchPoints[0][1]);
-                    int b=hit(touchPoints[1][0],touchPoints[1][1]);
-                    if(a>=0&&a==b){pinchButton=a;selected=a;pinchStart=distance();pinchSize=buttons[a].size;}
+                    const int first=hit(touchPoints[0][0],touchPoints[0][1]);
+                    const int second=hit(touchPoints[1][0],touchPoints[1][1]);
+                    // Accept two fingers on one button, or the second finger
+                    // near the selected button. This remains a true pinch.
+                    const int target=(first>=0&&first==second)?first:
+                        (first==selected&&second<0)?first:
+                        (second==selected&&first<0)?second:-1;
+                    if(target>=0){
+                        pinchButton=target;selected=target;
+                        pinchStart=distance();pinchSize=buttons[target].size;
+                    }
+                    dragging=-999;
                 }
                 if(pinchButton>=0&&pinchStart>8){
-                    auto& b=buttons[pinchButton];
-                    float cx=b.x+b.size*.5f,cy=b.y+b.size*.5f;
-                    b.size=std::clamp(pinchSize*distance()/pinchStart,60.f,230.f);
-                    b.x=cx-b.size*.5f;b.y=cy-b.size*.5f;clamp(pinchButton);
+                    auto& button=buttons[pinchButton];
+                    const float cx=button.x+button.size*.5f;
+                    const float cy=button.y+button.size*.5f;
+                    button.size=std::clamp(pinchSize*distance()/pinchStart,60.f,230.f);
+                    button.x=cx-button.size*.5f;
+                    button.y=cy-button.size*.5f;
+                    clamp(pinchButton);
                 }
                 return true;
             }
-            if(dragging==id&&slot>=0){auto& b=buttons[selected];b.x=x-grabX;b.y=y-grabY;clamp(selected);return true;}
-            if(!motion&&inside(x,y,1030,80,205,65)){finishReposition();return true;}
-            int which=hit(x,y);
-            if(which>=0){selected=which;dragging=id;grabX=x-buttons[which].x;grabY=y-buttons[which].y;}
+            if(pinchButton>=0)return true;
+            if(motion){
+                if(dragging==id){
+                    auto& button=buttons[selected];
+                    button.x=x-grabX;button.y=y-grabY;clamp(selected);
+                }
+                return true;
+            }
+            const int which=hit(x,y);
+            if(which>=0){
+                selected=which;dragging=id;
+                grabX=x-buttons[which].x;grabY=y-buttons[which].y;
+            }
             return true;
         }
         if(!down)return true;
@@ -139,8 +173,6 @@ public:
         }else if(page!=Sound)return true;
         if(page==Controls){
             if(inside(x,y,440,280,600,74)){startReposition();return true;}
-            if(inside(x,y,440,385,100,68)){buttons[selected].size-=10;clamp(selected);save();return true;}
-            if(inside(x,y,950,385,100,68)){buttons[selected].size+=10;clamp(selected);save();return true;}
             if(inside(x,y,445,485,285,68)){defaults();return true;}
             if(inside(x,y,750,485,285,68)){save();return true;}
         }else if(page==Sound){
