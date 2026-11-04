@@ -825,9 +825,10 @@ public:
         // Standalone Game APKs keep their original title/ asset paths.
         titleTexture_=IMG_LoadTexture(renderer,asset("ui/title_eclipse.png").c_str());
         if(!titleTexture_)titleTexture_=IMG_LoadTexture(renderer,asset("title/eclipse.png").c_str());
-        if(!titleTexture_)return false;
+        if(!titleTexture_){SDL_SetError("ECLIPSE ASSET ERROR: title background missing or invalid (ui/title_eclipse.png or title/eclipse.png)");return false;}
         titleCape_=IMG_LoadTexture(renderer,asset("ui/title_cape.png").c_str());
         if(!titleCape_)titleCape_=IMG_LoadTexture(renderer,asset("title/cape.png").c_str());
+        if(!titleCape_){SDL_SetError("ECLIPSE ASSET ERROR: title cape missing or invalid (ui/title_cape.png or title/cape.png)");return false;}
         if(titleCape_){
             SDL_SetTextureScaleMode(titleCape_,SDL_SCALEMODE_NEAREST);
             SDL_SetTextureBlendMode(titleCape_,SDL_BLENDMODE_BLEND);
@@ -919,10 +920,13 @@ public:
     }
 
     bool load(){
-        // Castle entrance PNGs are optional until the tutorial scene is integrated.
-        // Incomplete packs do not replace the established forest scene.
-        const bool castleLoaded=castleEntrance_.load(renderer,[&](const char* name){return asset(name);});
-        SDL_Log("ECLIPSE demon castle entrance assets: %s",castleLoaded?"ready":"not installed");
+        // Required asset pack. A missing, corrupt or incorrectly sized layer is fatal:
+        // never silently render the forest when the castle pack fails to load.
+        if(!castleEntrance_.load(renderer,[&](const char* name){return asset(name);})) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",SDL_GetError());
+            return false;
+        }
+        SDL_Log("ECLIPSE demon castle entrance assets: ready");
         constexpr const char* files[]={"knight_motion.png","ui/attack_states.png","ui/dash_states.png","ui/swap_skill_states.png","ui/joystick_arrows_new.png"};
         for(int i=0;i<5;++i){const auto path=asset(files[i]);SDL_Surface* image=IMG_Load(path.c_str());
             if(!image){SDL_Log("Required PNG missing or invalid: %s (%s)",path.c_str(),SDL_GetError());return false;}
