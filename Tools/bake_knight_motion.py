@@ -139,7 +139,7 @@ def bake_trails(metadata):
 def bake():
     source=Image.open(MASTER)
     if source.mode!='P':raise ValueError('Master must use the approved indexed pixel palette')
-    if source.size!=(1024,1316):raise ValueError('Master must be 16x14 cells of 64x94')
+    if source.size!=(1024,2538):raise ValueError('Master must be 16x27 cells of 64x94')
     atlas=Image.new('P',source.size,source.getpixel((0,0)));atlas.putpalette(source.getpalette('RGBA'),rawmode='RGBA');atlas.info['transparency']=source.getpixel((0,0));metadata=[]
     review=ROOT/'native-engine/review';review.mkdir(parents=True,exist_ok=True)
     for name,start,count,duration,source_count in CLIPS:
@@ -150,13 +150,13 @@ def bake():
             if not cell.convert('RGBA').getchannel('A').getbbox():raise ValueError((name,index,'empty source'))
             atlas.paste(cell,(i*64,row*94));frames.append(cell.convert('RGBA'));indices.append(index)
         metadata.append(dict(name=name,start=start,count=count,duration=duration,loop=loop,source_count=source_count,source_indices=indices))
-        if name=='run':
-            midpoint_row=13*94
+        if name not in ('weak_slash','hurt'):
+            midpoint_row=(13 if name=='run' else 14+row)*94
             midpoints=[source.crop((i*64,midpoint_row,(i+1)*64,midpoint_row+94))
                        for i in range(count)]
             for i,cell in enumerate(midpoints):
                 if not cell.convert('RGBA').getchannel('A').getbbox():
-                    raise ValueError(('run midpoint',i,'empty source'))
+                    raise ValueError((name,i,'empty midpoint'))
                 atlas.paste(cell,(i*64,midpoint_row))
             frames=[frame for pair in zip(frames,map(lambda cell:cell.convert('RGBA'),midpoints))
                     for frame in pair]
@@ -174,6 +174,6 @@ def bake():
     digest=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
     stamp={'inputs':{str(p.relative_to(ROOT)):digest(p) for p in inputs},'outputs':{str(p.relative_to(ROOT)):digest(p) for p in outputs}}
     (ROOT/'Art/knight/rig/build.json').write_text(json.dumps(stamp,indent=2)+'\n')
-    print('Packed 120 base frames and 16 run midpoints; 64x94 cells; 1024x1316 atlas.')
+    print('Packed knight key poses and midpoints; 64x94 cells; 1024x2538 atlas.')
 if __name__=='__main__':bake()
 

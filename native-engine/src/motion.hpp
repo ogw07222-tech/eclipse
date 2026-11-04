@@ -2,7 +2,7 @@
 namespace eclipse {
 struct MotionClip{int start,count;float duration,contact,stride;};
 constexpr int thrustSkillState=13,sweepSkillState=14,prepSkillState=15;
-constexpr int skillMotionColumns=4,skillMotionRows=3,skillMotionStart=208;
+constexpr int skillMotionColumns=4,skillMotionRows=6,skillMotionStart=208;
 constexpr int skillMotionWidth=112,skillMotionPivotX=44;
 constexpr bool isSkillMotion(int state){return state>=thrustSkillState&&state<=prepSkillState;}
 constexpr MotionClip motionClips[]={
@@ -23,8 +23,9 @@ constexpr MotionClip motionClips[]={
     {212,4,.415f,.50f,0.f},  // sweep contact matches the downswing
     {216,4,.40f,.50f,0.f},  // raise the sword, brace, recover
 };
-constexpr int motionWidth=64,motionHeight=94,motionColumns=16,motionRows=14,motionPivotX=28,motionPivotY=88;
+constexpr int motionWidth=64,motionHeight=94,motionColumns=16,motionRows=27,motionPivotX=28,motionPivotY=88;
 constexpr int knightRunMidpointStart=13*motionColumns;
+constexpr int knightMidpointStart=14*motionColumns;
 constexpr float motionScale=1.85f;
 constexpr int mageMotionColumns=8,mageMotionRows=10,mageGroundCastRow=8,mageAirCastRow=9;
 constexpr int mageCastTipX=55,mageCastTipY=50;
