@@ -426,6 +426,114 @@ class Presentation {
             text("ATK",66,340,2);number(p.gear.attack(),120,340,2);text("DEF",200,340,2);number(p.gear.defense(),250,340,2);text("MAX HP",66,373,2);number(p.maxHealth(),160,373,2);
         }
     }
+    void menuTile(float x,float y,float w,float h,unsigned fill,unsigned edge){
+        rect(x+4,y+4,w,h,0x070b12);
+        rect(x,y,w,h,edge);
+        rect(x+3,y+3,w-6,h-6,fill);
+        rect(x+6,y+6,w-12,2,edge,160);
+        rect(x+6,y+h-8,w-12,2,0x0a1019);
+    }
+    void settings(const ControlLayout& layout){
+        constexpr unsigned ink=0xe4dfd1,muted=0x9eacba,gold=0xc7a575;
+        const char* names[]={"JOYSTICK","ATTACK","DASH","SWAP","SKILL"};
+        if(layout.reposition){
+            rect(0,0,1280,720,0x07101b,54);
+            menuTile(45,26,730,110,0x172331,0x596878);
+            text("EDIT TOUCH LAYOUT",64,43,3,ink);
+            text("DRAG TO MOVE  PINCH TO RESIZE",64,80,2,muted);
+            text(names[layout.selected],64,109,2,gold);
+            number(static_cast<int>(std::round(layout.buttons[layout.selected].size)),188,109,2,gold);
+            text("PX",228,109,2,gold);
+            const auto& b=layout.buttons[layout.selected];
+            for(float y:{b.y-4,b.y+b.size+1}){
+                rect(b.x-4,y,17,3,gold);
+                rect(b.x+b.size-13,y,17,3,gold);
+            }
+            for(float x:{b.x-4,b.x+b.size+1}){
+                rect(x,b.y-4,3,17,gold);
+                rect(x,b.y+b.size-13,3,17,gold);
+            }
+            menuTile(1030,80,205,65,0x304b58,gold);
+            text("DONE",1094,102,3,ink);
+            return;
+        }
+
+        rect(0,0,1280,720,0x080b12,184);
+        menuTile(12,86,280,549,0x121b29,0x536172);
+        menuTile(328,86,888,549,0x121b29,0x536172);
+        if(settingsPanel_){
+            SDL_FRect frame{12,86,280,549};
+            SDL_RenderTexture(renderer,settingsPanel_,nullptr,&frame);
+        }
+        if(settingsWindow_){
+            SDL_FRect frame{328,86,888,549};
+            SDL_RenderTexture(renderer,settingsWindow_,nullptr,&frame);
+        }
+
+        menuTile(34,110,234,79,0x172331,0x596878);
+        text("ECLIPSE",48,122,4,ink);
+        text("SETTINGS",49,163,2,gold);
+        rect(42,192,214,2,0x596878);
+        const char* tabs[]={"SOUND","CONTROLS","GAME","BACK"};
+        for(int i=0;i<4;++i){
+            const float y=210.f+i*82.f;
+            const bool active=i==static_cast<int>(layout.page);
+            menuTile(25,y,245,68,active?0x2c414d:0x1b2838,active?gold:0x465363);
+            if(active)rect(31,y+13,4,42,gold);
+            text(tabs[i],49,y+23,3,active?ink:muted);
+        }
+        menuTile(36,559,228,43,0x172331,0x465363);
+        text("AUTO SAVE",54,572,2,muted);
+
+        menuTile(376,107,716,67,0x172331,0x596878);
+        text(tabs[layout.page],398,126,4,ink);
+        rect(389,187,755,2,0x596878);
+        menuTile(1120,103,90,65,0x302832,0x705d68);
+        text("X",1157,123,4,ink);
+
+        if(layout.page==ControlLayout::Controls){
+            text("TOUCH BUTTON POSITION AND SIZE",390,218,2,muted);
+            menuTile(440,280,600,74,0x304b58,gold);
+            text("EDIT ON SCREEN",614,306,3,ink);
+            text("SELECTED CONTROL",440,365,2,muted);
+            menuTile(440,385,100,68,0x213242,0x596878);
+            rect(477,416,26,4,ink);
+            menuTile(550,385,390,68,0x0f1926,0x465363);
+            text(names[layout.selected],579,410,3,ink);
+            number(static_cast<int>(std::round(layout.buttons[layout.selected].size)),791,409,3,gold);
+            text("PX",854,411,2,muted);
+            menuTile(950,385,100,68,0x213242,0x596878);
+            rect(987,416,26,4,ink);
+            rect(998,405,4,26,ink);
+            menuTile(445,485,285,68,0x302832,0x705d68);
+            text("RESET",544,509,3,ink);
+            menuTile(750,485,285,68,0x213242,0x596878);
+            text("SAVE",856,509,3,ink);
+            text("DRAG TO MOVE  PINCH TO RESIZE",440,565,2,muted);
+        }else if(layout.page==ControlLayout::Sound){
+            text("MUSIC AND COMBAT EFFECT LEVELS",390,218,2,muted);
+            for(int i=0;i<2;++i){
+                const int level=i==0?layout.bgm:layout.sfx;
+                const float y=i==0?270.f:390.f;
+                text(i==0?"BGM":"SFX",390,y+20,3,ink);
+                menuTile(460,y,575,58,0x0f1926,0x465363);
+                for(int tick=0;tick<20;++tick)
+                    rect(470+tick*28,y+17,23,25,tick*5<level?0x749eae:0x263747);
+                number(level,1052,y+20,3,gold);
+            }
+        }else{
+            text("COMBAT FEEDBACK",390,218,2,muted);
+            for(int i=0;i<2;++i){
+                const bool on=i==0?layout.screenShake:layout.showNumbers;
+                const float y=285.f+i*100.f;
+                menuTile(440,y,600,75,0x1b2838,0x465363);
+                text(i==0?"SCREEN SHAKE":"DAMAGE NUMBERS",467,y+26,3,ink);
+                menuTile(905,y+14,106,46,on?0x304b58:0x302832,on?gold:0x705d68);
+                text(on?"ON":"OFF",928,y+25,3,on?ink:muted);
+            }
+        }
+    }
+
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
     ~Presentation(){if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
@@ -611,85 +719,16 @@ public:
             SDL_RenderTextureRotated(renderer,textures[0],&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
         }else mage(p);
         if(p.swapFlash>0)ring(p.x-offset,p.y-36,44,0xe3bd72);
-        for(const auto& popup:g.popups)number(popup.amount,popup.x-offset-12,popup.y,3,popup.kind==DamageKind::Fire?0xff9155:popup.kind==DamageKind::Bleed?0xe76878:0xf2d48c);
         static const ControlLayout defaultLayout{};
         const ControlLayout& layout=customLayout?*customLayout:defaultLayout;
+        if(layout.showNumbers)for(const auto& popup:g.popups)number(popup.amount,popup.x-offset-12,popup.y,3,popup.kind==DamageKind::Fire?0xff9155:popup.kind==DamageKind::Bleed?0xe76878:0xf2d48c);
         hud(g,held,layout,stick);
         // PNG-backed gothic gear and vertical menu. All actions use ControlLayout hitboxes.
         if(settingsGear_){
             SDL_FRect gear{ControlLayout::gearX,ControlLayout::gearY,ControlLayout::gearSize,ControlLayout::gearSize};
             SDL_RenderTexture(renderer,settingsGear_,nullptr,&gear);
         }else{rect(ControlLayout::gearX,ControlLayout::gearY,ControlLayout::gearSize,ControlLayout::gearSize,0x243746);text("CFG",1208,38,3); }
-        if(layout.editing){
-            rect(0,0,1280,720,0x060b16,165);
-            // Main navigation is a separate reusable PNG, not a CSS-style rectangle.
-            if(settingsPanel_){SDL_FRect dst{12,90,280,550};SDL_RenderTexture(renderer,settingsPanel_,nullptr,&dst);}
-            else{rect(12,90,280,550,0x111923);rect(20,99,264,533,0x252b39);}
-            text("SETTINGS",48,145,3,0xe4e8ed);
-            const char* items[]={"SOUND","CONTROLS","GAME","EXIT"};
-            for(int i=0;i<4;++i){
-                const float y=210.f+i*82.f;
-                bool active=(i==0&&layout.page==ControlLayout::Sound)||(i==1&&layout.page==ControlLayout::Controls)||(i==2&&layout.page==ControlLayout::Game);
-                rect(28,y,241,68,active?0x87adbd:0x69727e);
-                rect(32,y+4,233,60,active?0x344e66:i==3?0x50363b:0x222b39);
-                text(items[i],i==1?51:71,y+20,3,active?0xeaf5ff:0xd9dce3);
-            }
-            rect(328,86,888,549,0x697381);rect(335,93,874,535,0x101923);
-            if(settingsWindow_){
-                SDL_FRect frame{328,86,888,549};
-                SDL_RenderTexture(renderer,settingsWindow_,nullptr,&frame);
-            }
-            rect(356,113,824,72,0x2d3646);rect(363,120,810,58,0x1b2838);
-            text("SETTINGS",570,131,4,0xe6e6ef);
-            rect(1120,103,90,65,0x4d586a);text("X",1155,124,4);
-            if(layout.page==ControlLayout::Controls){
-                text("CONTROLS",614,207,3,0xa9cede);
-                text("DRAG BUTTONS AND PINCH TO RESIZE",417,245,2);
-                rect(440,280,600,74,0x48637b);rect(445,285,590,64,0x24394b);
-                text("REPOSITION CONTROLS",475,302,3);
-                text("BUTTON SIZE",470,366,2);
-                rect(440,385,100,68,0x3c4b5a);text("-",473,405,4);
-                rect(550,385,390,68,0x293c4c);
-                text("SELECT IN EDIT MODE",575,404,2,0xb5cfdf);
-                rect(950,385,100,68,0x3c4b5a);text("+",983,405,4);
-                rect(445,485,285,68,0x3c4b5a);text("RESET",495,505,3);
-                rect(750,485,285,68,0x355a72);text("SAVE",821,505,3);
-                text("TOUCH TWO FINGERS ON THE SAME BUTTON",415,583,2);
-            }else if(layout.page==ControlLayout::Sound){
-                text("SOUND",660,207,3,0xa9cede);
-                text("BGM",400,275,3);
-                text("SFX",400,395,3);
-                for(int i=0;i<2;++i){
-                    int level=i==0?layout.bgm:layout.sfx;float y=i==0?270.f:390.f;
-                    rect(460,y,575,50,0x303744);rect(466,y+6,563,38,0x0f1927);
-                    rect(470,y+11,static_cast<float>(level)*5.55f,28,0x7296b3);
-                    number(level,1050,y+10,3,0xe9e7db);
-                }
-                text("AUDIO LEVELS ARE SAVED",470,535,2);
-            }else{
-                text("GAME",666,207,3,0xa9cede);
-                rect(440,285,600,75,0x2d4050);text("SCREEN SHAKE",462,309,3);
-                text(layout.screenShake?"ON":"OFF",940,309,3,0xbce0f2);
-                rect(440,385,600,75,0x2d4050);text("DAMAGE NUMBERS",462,410,3);
-                text(layout.showNumbers?"ON":"OFF",940,410,3,0xbce0f2);
-            }
-            if(layout.reposition){
-                rect(0,0,1280,720,0x07101b,90);
-                const char* names[]={"JOYSTICK","ATTACK","DASH","SWAP","SKILL"};
-                text("DRAG TO MOVE  PINCH TO RESIZE",180,30,3,0xe6d2a9);
-                text(names[layout.selected],55,89,3,0xa4d4e8);
-                for(int i=0;i<ControlLayout::Count;++i){
-                    const auto& button=layout.buttons[i];
-                    if(i==layout.selected){
-                        rect(button.x-5,button.y-5,button.size+10,5,0xe3bd72);
-                        rect(button.x-5,button.y+button.size,button.size+10,5,0xe3bd72);
-                        rect(button.x-5,button.y,5,button.size,0xe3bd72);
-                        rect(button.x+button.size,button.y,5,button.size,0xe3bd72);
-                    }
-                }
-                rect(1030,80,205,65,0x395b70);text("DONE",1061,101,3);
-            }
-        }
+        if(layout.editing)settings(layout);
         if(reviewLabel)text(reviewLabel,470,120,3);
         if(g.ended){rect(0,0,1280,720,0x111a28,240);text(g.won?"STAGE CLEAR":"GAME OVER",390,260,7,g.won?0x8be4b5:0xff8d99);text("TAP RETRY OR PRESS R",410,350,3);
             rect(510,412,260,65,0xe3bd72);rect(514,416,252,57,0x304039);text("RETRY",548,433,4);

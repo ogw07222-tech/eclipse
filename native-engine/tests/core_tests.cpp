@@ -127,10 +127,11 @@ int main(){int failed=0,total=0;
         check(e.health==31&&g.player.slamImpact>0&&g.player.slamRecover>0,"Landing strike missing");
         wait(g,45);check(e.health==31,"Slam dealt repeated damage");
     });
-    test("Very low air slams still land once without waiting for an air timer",[]{
+    test("Attack just before contact is rejected and does not buffer",[]{
         auto g=arena();g.player.y=floorY-1;g.player.grounded=false;g.player.vy=80;
         auto& e=g.enemies[0];e=Enemy(0,g.player.x+20);e.speed=0;e.attackTimer=1000;
-        Actions a;a.attack=true;g.step(1.f/60,a);check(!g.player.airSlam&&g.player.slamImpact>0&&e.health==31,"Low slam skipped actual landing");
+        Actions a;a.attack=true;g.step(1.f/60,a);check(g.player.grounded&&!g.player.airSlam&&g.player.slamImpact==0,"Attack started too near the floor");
+        wait(g,15);check(e.health==55&&g.player.attackSerial==0,"Rejected attack fired on landing");
     });
     test("Air slam cancels on dash swap skill damage and restart without ghost hit",[]{
         for(int mode=0;mode<5;++mode){auto g=arena();g.player.y=floorY-220;g.player.grounded=false;g.player.vy=0;
@@ -174,6 +175,30 @@ int main(){int failed=0,total=0;
     });
 
     test("Movement facing walls",[]{auto g=arena();Actions a;a.right=true;g.step(1.f/60,a);near(g.player.x,140+280.f/60);g.player.x=1549;g.step(1.f/60,a);near(g.player.x,1550);a={};a.left=true;g.player.x=26;g.step(1.f/60,a);near(g.player.x,25);check(g.player.facing== -1,"Facing");});
+    test("Held touch jumps again on the contact tick and stops after release",[]{
+        Input in;auto g=arena();Animation anim;
+        in.pointer(1,99,610,true);
+        g.step(1.f/60,in.sample());
+        check(!g.player.grounded&&g.player.vy<0,"Initial touch jump missing");
+        for(int i=0;i<100&&g.player.landingSerial==0;++i)g.step(1.f/60,in.sample());
+        check(g.player.landingSerial==1&&!g.player.grounded&&g.player.vy<0,"Contact did not immediately launch another jump");
+        anim.step(g.player,1.f/60);check(anim.state==2,"Bounce incorrectly showed a landing pose");
+        in.pointer(1,99,610,false);
+        for(int i=0;i<100;++i)g.step(1.f/60,in.sample());
+        check(g.player.grounded&&g.player.landingSerial==2,"Jump continued after stick release");
+    });
+    test("One-way ledge landing uses crossed surface instead of world floor",[]{
+        auto g=arena();g.platforms={{100,200,floorY-70},{100,200,floorY-100}};
+        Actions a;a.jump=a.attack=true;g.step(1.f/60,a);
+        check(g.player.attackSerial==0,"Attack started on takeoff");
+        a={};a.attack=true;g.step(1.f/60,a);
+        check(g.player.attackSerial==0,"Takeoff lock was skipped");
+        wait(g,80);
+        near(g.player.y,floorY-100);check(g.player.grounded&&g.player.landingSerial==1,"Missed upper ledge contact");
+        a={};a.right=true;
+        for(int i=0;i<45;++i)g.step(1.f/60,a);
+        near(g.player.y,floorY);check(g.player.landingSerial==2,"Walking off ledge lost the lower landing event");
+    });
     test("Jump apex and landing",[]{auto g=arena();Actions a;a.jump=true;g.step(1.f/60,a);check(!g.player.grounded&&g.player.vy<0,"Jump");float highest=g.player.y;for(int i=0;i<90;++i){g.step(1.f/60,{});highest=std::min(highest,g.player.y);}check(floorY-highest>160&&floorY-highest<180,"Apex");check(g.player.grounded&&g.player.vy==0,"Landing");});
     test("Dash immunity and cooldown",[]{auto g=arena();Actions a;a.dash=true;g.step(1.f/60,a);near(g.player.vx,780);g.damagePlayer(15);check(g.player.health==100,"Dash immunity");wait(g,12);float cooldown=g.player.dashCooldown;g.step(1.f/60,a);check(g.player.dashLeft==0&&g.player.dashCooldown<cooldown,"Cooldown");wait(g,60);g.step(1.f/60,a);check(g.player.dashLeft>0,"Reactivation");});
     test("Three hit combo damage lands at the blade contact",[]{auto g=arena();auto& e=g.enemies[0];Actions a;a.attack=true;int health=55;
@@ -199,12 +224,12 @@ int main(){int failed=0,total=0;
     test("Rear and vertical melee excluded",[]{auto g=arena();g.enemies[0].x=g.player.x-200;Actions a;a.attack=true;g.step(1.f/60,a);check(g.enemies[0].health==55,"Rear hit");wait(g,18);g.player.y=400;g.player.grounded=false;g.enemies[0].x=200;a={};a.skill=true;g.step(1.f/60,a);check(g.enemies[0].health==55,"Vertical hit");});
     test("Multitouch independent keyboard ownership",[]{Input in;in.pointer(1,60,650,true);in.pointer(2,1160,590,true);auto a=in.sample();check(a.left&&a.attack,"Move plus attack");check(!in.sample().attack,"Held attack edge");in.pointer(2,0,0,false);check(in.sample().left,"Attack up retains movement");Actions k;k.right=true;in.keyboard(k);in.pointer(1,0,0,false);check(in.sample().right,"Keyboard retained");in.reset();check(!in.sample().right,"Reset");});
     test("Fast tap buffered between simulation steps",[]{Input in;in.pointer(1,1160,590,true);in.pointer(1,0,0,false);check(in.sample().attack,"Fast touch lost");check(!in.sample().attack,"Single consume");});
-    test("Joystick upward jump and focus reset",[]{Input in;in.pointer(1,99,610,true);check(in.sample().jump,"Up jump");check(!in.sample().jump,"Held jump repeated");in.reset();check(!in.sample().jump,"Focus clear");});
+    test("Joystick upward jump and focus reset",[]{Input in;in.pointer(1,99,610,true);check(in.sample().jump,"Up jump");auto held=in.sample();check(!held.jump&&held.jumpHeld,"Held up must survive sampling without another edge");in.reset();check(!in.sample().jump,"Focus clear");});
     test("Inventory equip and retry touch targets",[]{Input in;in.pointer(1,800,40,true);check(in.sample().inventory,"Inventory");in.reset();in.pointer(2,90,430,true,false,true);check(in.sample().weapon,"Weapon");in.reset();in.pointer(3,600,440,true,true,false);check(in.sample().restart,"Retry");});
     test("Animation attack retrigger and death bounds",[]{Player p;Animation a;++p.attackSerial;p.combo=3;a.step(p,1.f/60);check(a.frame>=144&&a.frame<154,"Third attack atlas");p.health=0;for(int i=0;i<100;++i)a.step(p,1.f/60);check(a.frame==187,"Death last frame");});
     test("Every combo reaches its final frame and recovers",[]{for(int combo=1;combo<=3;++combo){Player p;p.combo=combo;++p.attackSerial;Animation a;int largest=0;for(int i=0;i<70;++i){a.step(p,1.f/60);if(a.state==3+combo)largest=std::max(largest,a.frame);}const auto clip=motionClips[3+combo];check(largest==clip.start+clip.count-1&&a.state==0,"Truncated clip");}});
     test("Run cycle follows actual world travel without wall skating",[]{Player p;p.vx=280;Animation a;a.step(p,1.f/60);int first=a.frame;for(int i=0;i<16;++i){p.x+=7.5f;a.step(p,1.f/60);}check(a.frame==first,"Stride distance mismatch");for(int i=0;i<30;++i)a.step(p,1.f/60);check(a.frame==first,"Stationary feet animated");});
-    test("Jump apex fall and landing use distinct clips",[]{Player p;Animation a;p.grounded=false;p.vy=-650;a.step(p,1.f/60);check(a.state==2&&a.frame==48,"Takeoff");p.vy=350;a.step(p,1.f/60);check(a.state==3&&a.frame>=64,"Fall");p.grounded=true;p.vy=0;a.step(p,1.f/60);check(a.state==10,"Landing missing");for(int i=0;i<12;++i)a.step(p,1.f/60);check(a.state==0,"Landing stuck");});
+    test("Jump apex fall and landing use distinct clips",[]{Player p;Animation a;p.grounded=false;p.vy=-650;a.step(p,1.f/60);check(a.state==2&&a.frame==48,"Takeoff");p.vy=350;a.step(p,1.f/60);check(a.state==3&&a.frame>=64,"Fall");p.grounded=true;p.vy=0;++p.landingSerial;a.step(p,1.f/60);check(a.state==10,"Landing missing");for(int i=0;i<12;++i)a.step(p,1.f/60);check(a.state==0,"Landing stuck");});
     test("Hit-stop holds the contact pose then resumes",[]{Player p;p.combo=2;++p.attackSerial;p.hitStop=.075f;Animation a;a.step(p,1.f/60);const int contact=a.frame;check(contact>=133,"Hit froze before contact");a.step(p,1.f/60);check(a.frame==contact,"Hit-stop pose advanced");p.hitStop=0;a.step(p,.05f);check(a.frame>contact,"Contact did not resume");});
     test("Forest entrance authored PNG contract",[]{
         check(ForestLayerScene::layersEntrance.size()==6,"Entrance layer count");
