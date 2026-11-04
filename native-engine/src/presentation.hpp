@@ -6,6 +6,7 @@
 #include <vector>
 #include "core.hpp"
 #include "sword_trails.hpp"
+#include "knight_skill_blades.hpp"
 #include "forest_generator.hpp"
 #include "forest_layers.hpp"
 
@@ -18,6 +19,7 @@ class Presentation {
     SDL_Texture* executeIcon_=nullptr;
     std::array<SDL_Texture*,3> knightSkillTextures_{};
     float offset=0;
+    SDL_Texture* knightSkillMotion_=nullptr;
     SDL_Texture* mageRun_=nullptr;
     SDL_Texture* mageMotion_=nullptr;
     SDL_Texture* settingsGear_=nullptr;
@@ -429,6 +431,76 @@ class Presentation {
             rect(x-offset,p.y+(s.y-motionPivotY)*motionScale,s.width*motionScale,motionScale,swordTrailColors[s.shade],static_cast<Uint8>(swordTrailAlpha[s.shade]*frame.alpha/255));
         }
     }
+    void knightSkillEffect(const Player& p,const Animation& a){
+        if(!isSkillMotion(a.state)||p.health<=0)return;
+        const auto& clip=motionClips[a.state];
+        const int pose=std::clamp(a.frame-clip.start,0,clip.count-1);
+        const auto blade=skillBlades[clip.start-skillMotionStart+pose];
+        const float hx=(blade.handX-skillMotionPivotX)*motionScale;
+        const float hy=(blade.handY-motionPivotY)*motionScale;
+        const float tx=(blade.tipX-skillMotionPivotX)*motionScale;
+        const float ty=(blade.tipY-motionPivotY)*motionScale;
+        auto dot=[&](float x,float y,float size,unsigned color,Uint8 alpha){
+            rect(std::round(p.x-offset+p.facing*x-size/2),
+                 std::round(p.y+y-size/2),size,size,color,alpha);
+        };
+        auto streak=[&](float x,float y,float endX,float endY,float size,unsigned color,Uint8 alpha){
+            const int steps=std::max(1,static_cast<int>(std::ceil(std::hypot(endX-x,endY-y)/2)));
+            for(int i=0;i<=steps;++i){
+                const float t=static_cast<float>(i)/steps;
+                dot(x+(endX-x)*t,y+(endY-y)*t,size,color,alpha);
+            }
+        };
+
+        if(a.state==prepSkillState){
+            if(pose==0)return;
+            streak(hx,hy,tx,ty,4,0xffd58b,pose==3?110:225);
+            for(int i=0;i<9;++i){
+                const float angle=i*.698f;
+                const float radius=9.f+pose*6.f+i%3*4.f;
+                dot(tx+std::cos(angle)*radius,ty+std::sin(angle)*radius,3,
+                    i%2?0xd9a35b:0xffefb4,pose==3?80:210);
+            }
+            return;
+        }
+        if(a.state==thrustSkillState){
+            if(pose!=1&&pose!=2)return;
+            const float length=std::hypot(tx-hx,ty-hy);
+            const float dx=(tx-hx)/length,dy=(ty-hy)/length;
+            const float extension=std::max(10.f,p.meleeReach-tx);
+            const Uint8 alpha=pose==1?240:130;
+            for(int side:{-1,1}){
+                streak(hx,hy,tx-dy*side*10,ty+dx*side*10,5,0x9c4056,alpha);
+                streak(tx-dy*side*10,ty+dx*side*10,tx+dx*extension,ty+dy*extension,
+                       3,0xf88d9c,alpha);
+            }
+            streak(hx,hy,tx+dx*extension,ty+dy*extension,3,0xffe8df,alpha);
+            return;
+        }
+        if(pose<2)return;
+        // The contact frame sweeps from overhead into the registered steel tip.
+        const SkillBlade contact=skillBlades[motionClips[sweepSkillState].start-skillMotionStart+2];
+        const float cx=(contact.handX-skillMotionPivotX)*motionScale;
+        const float cy=(contact.handY-motionPivotY)*motionScale;
+        const float bladeX=(contact.tipX-contact.handX)*motionScale;
+        const float bladeY=(contact.tipY-contact.handY)*motionScale;
+        const float endAngle=std::atan2(bladeY,bladeX);
+        const float bladeLength=std::hypot(bladeX,bladeY);
+        const Uint8 alpha=pose==2?230:85;
+        for(int i=0;i<=52;++i){
+            const float t=i/52.f;
+            const float angle=endAngle-(1-t)*2.12f;
+            const float radius=bladeLength+(std::max(bladeLength,p.meleeReach-cx)-bladeLength)*std::sin(t*3.141593f);
+            const float dx=std::cos(angle),dy=std::sin(angle);
+            dot(cx+dx*radius,cy+dy*radius,3,0xd2f4ff,alpha);
+            for(int layer=1;layer<=4;++layer){
+                const float inner=radius-layer*(2.f+3.f*std::sin(t*3.141593f));
+                dot(cx+dx*inner,cy+dy*inner,5,layer==1?0x8ecbfa:0x4075b3,
+                    static_cast<Uint8>(alpha*(layer<=2?.7f:.36f)));
+            }
+            if(i%8==3)dot(cx+dx*(radius+7),cy+dy*(radius+7),3,0xf58e99,alpha);
+        }
+    }
     void icon(int texture,int col,int row,float x,float y,float size,bool down){
         SDL_FRect source{col*128.f,row*128.f,128,128},target{x,y,size,size};
         SDL_SetTextureColorMod(textures[texture],down?180:255,down?180:255,down?180:255);
@@ -478,6 +550,13 @@ class Presentation {
         if(enabled&&remaining>0)number(static_cast<int>(std::ceil(remaining)),b.x+b.size*.38f,b.y+b.size*.59f,scale,accent);
         else if(enabled)rect(b.x+b.size*.34f,b.y+b.size*.69f,b.size*.32f,3,accent,alpha);
     }
+    void skillSlot(const ControlRect& box,int slot,const char* label,float remaining,float duration,
+                   bool pressed,unsigned accent,bool enabled,int art){
+        skillButton(box,label,remaining,duration,pressed,accent,enabled,art);
+        const float x=std::round(box.x+box.size*.14f),y=std::round(box.y+box.size*.12f);
+        rect(x-3,y-2,16,15,0x121922,enabled?215:135);
+        number(slot,x,y,2,enabled?0xe6ddd0:0x89909a);
+    }
     void hud(const Combat& g,Actions held,const ControlLayout& layout,std::array<float,2> stick){
         const auto& p=g.player;
         const float hpRate=std::clamp(float(p.health)/p.maxHealth(),0.f,1.f);
@@ -510,10 +589,10 @@ class Presentation {
         icon(2,held.dash?1:0,0,c[ControlLayout::Dash].x,c[ControlLayout::Dash].y,c[ControlLayout::Dash].size,held.dash);
         icon(3,0,0,c[ControlLayout::Swap].x,c[ControlLayout::Swap].y,c[ControlLayout::Swap].size,held.swap);
         const bool knight=p.form==0;
-        skillButton(c[ControlLayout::Skill],knight?"STAB":"FIRE",
+        skillSlot(c[ControlLayout::Skill],1,knight?"STAB":"FIRE",
             knight?p.skillCooldown:p.mageSkillCooldown,knight?thrustCooldown:4.1f,held.skill,0xcaa2a4,true,knight?0:-1);
-        skillButton(c[ControlLayout::Sweep],"SWEEP",p.sweepReady,sweepCooldown,held.skillSweep,0x92b5ce,knight,knight?1:-1);
-        skillButton(c[ControlLayout::Buff],"PREP",p.buffReady,buffCooldown,held.skillBuff,0xe3bd72,knight,knight?2:-1);
+        skillSlot(c[ControlLayout::Sweep],2,knight?"SWEEP":"-",p.sweepReady,sweepCooldown,held.skillSweep,0x92b5ce,knight,knight?1:-1);
+        skillSlot(c[ControlLayout::Buff],3,knight?"PREP":"-",p.buffReady,buffCooldown,held.skillBuff,0xe3bd72,knight,knight?2:-1);
         if(p.swapCooldown>0)number(static_cast<int>(std::ceil(p.swapCooldown)),c[ControlLayout::Swap].x+20,c[ControlLayout::Swap].y+25,3,0xffd277);
         if(g.inventory){rect(46,135,460,340,0xe3bd72);rect(50,139,452,332,0x1c2a34);text("EQUIPMENT",66,153,3);
             for(int i=0;i<3;++i){text(p.gear.name(i),66,200+i*42,2);rect(66+i*143,413,132,45,0x304039);text(i==0?"WEAPON":i==1?"ARMOR":"CHARM",75+i*143,428,2);}
@@ -529,7 +608,7 @@ class Presentation {
     }
     void settings(const ControlLayout& layout){
         constexpr unsigned ink=0xe4dfd1,muted=0x9eacba,gold=0xc7a575;
-        const char* names[]={"JOYSTICK","ATTACK","DASH","SWAP","STAB","SWEEP","PREP"};
+        const char* names[]={"JOYSTICK","ATTACK","DASH","SWAP","SKILL 1","SKILL 2","SKILL 3"};
         if(layout.reposition){
             // Fullscreen editing: leave the gameplay and HUD visible. The entire
             // settings window is suppressed until DONE is pressed.
@@ -666,7 +745,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -722,6 +801,8 @@ public:
             if(texture){SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(texture,SDL_BLENDMODE_BLEND);}
             return texture;
         };
+        knightSkillMotion_=loadOptionalTexture("knight_skill_motion.png",
+            skillMotionWidth*skillMotionColumns,motionHeight*skillMotionRows);
         mageRun_=loadOptionalTexture("mage_run.png",motionWidth*motionColumns,motionHeight);
         mageMotion_=loadOptionalTexture("mage_motion.png",motionWidth*mageMotionColumns,motionHeight*mageMotionRows);
         settingsGear_=loadOptionalTexture("ui/settings_gear.png");
@@ -868,15 +949,37 @@ public:
             }
         }
         slamShockwave(p);
-        if(p.form==0)swordTrail(p,a);
+        if(p.form==0){
+            if(isSkillMotion(a.state)&&knightSkillMotion_)knightSkillEffect(p,a);
+            else if(isSkillMotion(a.state)&&a.state!=prepSkillState){
+                Animation fallback=a;
+                fallback.state=a.state==thrustSkillState?6:5;
+                const auto& clip=motionClips[fallback.state];
+                fallback.frame=clip.start+static_cast<int>(clip.contact*clip.count);
+                if(a.frame>=motionClips[a.state].start+2)swordTrail(p,fallback);
+            }else swordTrail(p,a);
+        }
         SDL_Texture* actorTexture=textures[0];
-        int columns=motionColumns,frame=a.frame;
+        int columns=motionColumns,frame=a.frame,width=motionWidth,pivotX=motionPivotX;
+        if(p.form==0&&isSkillMotion(a.state)){
+            if(knightSkillMotion_){
+                actorTexture=knightSkillMotion_;
+                columns=skillMotionColumns;
+                frame-=skillMotionStart;
+                width=skillMotionWidth;
+                pivotX=skillMotionPivotX;
+            }else{
+                const auto& clip=motionClips[a.state];
+                const auto& fallback=motionClips[a.state==thrustSkillState?6:a.state==sweepSkillState?5:0];
+                frame=fallback.start+(frame-clip.start)*(fallback.count-1)/(clip.count-1);
+            }
+        }
         if(p.form!=0){
             actorTexture=nullptr;
             if(a.state==1&&mageRun_&&p.mageCastLeft<=0){
                 actorTexture=mageRun_;
                 frame-=motionClips[1].start;
-            }else if(mageMotion_&&a.state>=0){
+            }else if(mageMotion_&&a.state>=0&&!isSkillMotion(a.state)){
                 // The mage atlas stores eight poses per clip. Sprint uses its own 16-frame strip.
                 constexpr int rows[]={0,1,2,3,8,8,8,5,6,7,4,1,3};
                 const auto clip=motionClips[a.state];
@@ -893,8 +996,8 @@ public:
         }
         afterimages(g,a,actorTexture,frame,columns);
         if(actorTexture){
-            SDL_FRect source{static_cast<float>(frame%columns*motionWidth),static_cast<float>(frame/columns*motionHeight),motionWidth,motionHeight};
-            SDL_FRect dest{std::round(p.x-offset-(p.facing>0?motionPivotX:motionWidth-motionPivotX)*motionScale),std::round(p.y-motionPivotY*motionScale),motionWidth*motionScale,motionHeight*motionScale};
+            SDL_FRect source{static_cast<float>(frame%columns*width),static_cast<float>(frame/columns*motionHeight),static_cast<float>(width),motionHeight};
+            SDL_FRect dest{std::round(p.x-offset-(p.facing>0?pivotX:width-pivotX)*motionScale),std::round(p.y-motionPivotY*motionScale),width*motionScale,motionHeight*motionScale};
             const bool white=p.hurtTint>.13f,red=p.hurtTint>0&&!white;
             if(red)SDL_SetTextureColorMod(actorTexture,255,125,140);
             SDL_RenderTextureRotated(renderer,actorTexture,&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
