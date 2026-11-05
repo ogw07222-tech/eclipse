@@ -660,9 +660,9 @@ class Presentation {
         icon(2,held.dash?1:0,0,c[ControlLayout::Dash].x,c[ControlLayout::Dash].y,c[ControlLayout::Dash].size,held.dash);
         icon(3,0,0,c[ControlLayout::Swap].x,c[ControlLayout::Swap].y,c[ControlLayout::Swap].size,held.swap);
         if(p.whiteNight){
-            skillSlot(c[ControlLayout::Skill],1,"RUSH",p.skillCooldown,2.2f,held.skill,0xb4d8ee,true,-1);
-            skillSlot(c[ControlLayout::Sweep],2,"BOOST",p.sweepReady,5.f,held.skillSweep,0x9bb9d6,true,-1);
-            skillSlot(c[ControlLayout::Buff],3,"BLINK",p.buffReady,2.5f,held.skillBuff,0xd9ecf5,true,-1);
+            skillSlot(c[ControlLayout::Skill],1,"RUSH",p.skillCooldown,3.f,held.skill,0xb4d8ee,true,-1);
+            skillSlot(c[ControlLayout::Sweep],2,"RELEASE",p.sweepReady,1.f,held.skillSweep,0x9bb9d6,true,-1);
+            skillSlot(c[ControlLayout::Buff],3,"BLINK",p.buffReady,1.5f,held.skillBuff,0xd9ecf5,true,-1);
             skillSlot(c[ControlLayout::Swap],4,"VERDICT",p.swapCooldown,9.f,held.swap,0xc4d7ed,true,-1);
         }else{
             const bool knight=p.form==0;
@@ -1285,6 +1285,12 @@ public:
         offset=std::round(camera)-640;SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);SDL_SetRenderDrawColor(renderer,21,35,52,255);SDL_RenderClear(renderer);
         forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.clock);
         const auto& caster=g.player;
+        const bool verdictFreeze=caster.whiteNight&&caster.whiteMove==WhiteMove::Verdict&&
+            caster.whiteAge>=.12f&&caster.whiteAge<.66f;
+        if(verdictFreeze){
+            // Desaturating veil; targets and their animations are frozen in the combat step.
+            rect(0,0,1280,720,0x101728,148);
+        }
         // Stored light lances visibly orbit the player until skill 2 launches them.
         if(whiteNightLance_&&caster.whiteNight&&caster.storedLightLances>0){
             for(int i=0;i<caster.storedLightLances;++i){
@@ -1394,6 +1400,10 @@ public:
             if(p.whiteMove!=WhiteMove::None){
                 const auto clip=whiteClips[static_cast<int>(p.whiteMove)];
                 whiteFrame=clip.start+std::min(clip.count-1,static_cast<int>(p.whiteAge*clip.count/clip.duration));
+                if(p.whiteMove==WhiteMove::Command&&p.whiteAge>=.18f&&p.whiteAge<=.36f)
+                    whiteFrame=clip.start+6; // Hold the sword-pointing release silhouette.
+                if(p.whiteMove==WhiteMove::Verdict&&p.whiteAge>=.23f&&p.whiteAge<.70f)
+                    whiteFrame=clip.start+9; // Hold the off-hand fist during the time stop.
             }else if(a.state==7){
                 whiteFrame=3;
             }else if(!p.grounded){
@@ -1421,6 +1431,18 @@ public:
             }else if(p.hurtTint>0)SDL_SetTextureColorMod(whiteNightMotion_,255,150,160);
             SDL_RenderTextureRotated(renderer,whiteNightMotion_,&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
             SDL_SetTextureColorMod(whiteNightMotion_,255,255,255);
+            if(p.whiteMove==WhiteMove::Verdict&&p.whiteAge>=.23f&&p.whiteAge<.91f&&whiteFxTextures_[3]){
+                // PNG glow layer at the opposite (left) hand. The spherical light contracts
+                // when the fist closes, then flares as every marked target is struck.
+                const float t=std::clamp((p.whiteAge-.23f)/.68f,0.f,1.f);
+                const float size=t<.70f?48.f-12.f*t:39.f+28.f*(t-.70f)/.30f;
+                const SDL_FRect glowSrc{0,0,96,96};
+                const SDL_FRect glowDst{std::round(p.x-p.facing*24.f-offset-size*.5f),
+                    std::round(p.y-57.f-size*.5f),size,size};
+                SDL_SetTextureAlphaMod(whiteFxTextures_[3],static_cast<Uint8>(190+65*t));
+                SDL_RenderTexture(renderer,whiteFxTextures_[3],&glowSrc,&glowDst);
+                SDL_SetTextureAlphaMod(whiteFxTextures_[3],255);
+            }
             if(p.whiteBoost>0 && whiteFxTextures_[3]){
                 const SDL_FRect glowSrc{0,0,96,96};
                 const SDL_FRect glowDst{p.x-offset-48,p.y-62,96,96};
