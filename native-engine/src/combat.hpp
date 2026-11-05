@@ -49,7 +49,7 @@ struct Player {
     int storedLightLances=0;
     bool grounded=true,whiteNight=false;
     WhiteMove whiteMove=WhiteMove::None;
-    float whiteAge=0,whiteBoost=0;
+    float whiteAge=0,whiteBoost=0,whiteSlashSpeed=1.f;
     size_t whiteTarget=0;
     unsigned whiteRushHits=0;
     float takeoffLock=0;
@@ -68,7 +68,10 @@ struct Player {
     // Class archetypes: ranged 80%, melee 100%, assassin 125% of base run speed.
     // Keep this separate from attack speed and dash/skill movement.
     float movementMultiplier() const {return whiteNight?1.25f:form==1?.80f:1.f;}
-    float basicSpeed() const {return gear.speed()*(preparation>0?1.20f:1.f);}
+    // Each stored light orb empowers basic sword attacks, creating a choice
+    // between retaining up to +40% attack speed and spending the orbs on marks.
+    float basicSpeed() const {return gear.speed()*(preparation>0?1.20f:1.f)*
+        (whiteNight?1.f+.08f*std::clamp(storedLightLances,0,5):1.f);}
     int maxHealth()const{return 100+gear.hp();}
     void equip(int slot){
         const int before=maxHealth();
@@ -93,7 +96,7 @@ struct Enemy {
     bool dead()const{return health<=0;}
 };
 struct Projectile {float x,y;int facing,damage;bool empowered;float life=1.6f,remainingDrop=0;};
-struct LightLance {size_t target;float x,y,life=.65f;float offset=0,angle=90;bool verdict=false,seeking=false,markOnHit=false;float delay=0;};
+struct LightLance {size_t target;float x,y,life=.65f;float offset=0,angle=90;bool verdict=false,seeking=false,markOnHit=false;float delay=0,morphTotal=0;};
 enum class LightFx { Impact, Slash, Rush, Command, Depart, Arrive, Verdict };
 struct LightBurst {float x,y,life=.24f;LightFx kind=LightFx::Impact;int facing=1;};
 struct RiftScar {float x,y,angle,life=.16f;bool slash=false;};
@@ -176,7 +179,12 @@ class Combat {
         for(int i=0;i<total;++i){
             const size_t target=candidates[std::uniform_int_distribution<size_t>{0,count-1}(random)];
             const float spread=(i-(total-1)*.5f)*16.f;
-            lightLances.push_back({target,p.x+p.facing*48.f,p.y-65.f+spread,1.3f,spread,0.f,false,true,true,i*.035f});
+            const float phase=clock*2.8f+i*6.2831853f/total;
+            const float orbX=p.x+std::cos(phase)*57.f;
+            const float orbY=p.y-61.f+std::sin(phase)*37.f;
+            // A stationary orb stretches into a spear before accelerating.
+            const float morph=.11f;
+            lightLances.push_back({target,orbX,orbY,1.4f,spread,0.f,false,true,true,morph,morph});
         }
         p.storedLightLances=0;
     }
@@ -338,10 +346,11 @@ class Combat {
             }else if(a.attack&&p.attackCooldown<=0){p.whiteMove=WhiteMove::Slash;p.attackCooldown=.46f/p.basicSpeed();}
             else return false;
             p.whiteAge=0;p.whiteRushHits=0;p.vx=0;p.vy=0;
+            if(p.whiteMove==WhiteMove::Slash)p.whiteSlashSpeed=p.basicSpeed();
         }
         const auto move=p.whiteMove;
         const auto clip=whiteClips[static_cast<int>(move)];
-        const float speed=move==WhiteMove::Slash?p.basicSpeed():1.f;
+        const float speed=move==WhiteMove::Slash?p.whiteSlashSpeed:1.f;
         const float old=p.whiteAge;
         p.whiteAge=std::min(clip.duration,old+dt*speed);
         if(old<clip.contact&&p.whiteAge>=clip.contact){
@@ -561,8 +570,11 @@ class Combat {
             const auto& target=enemies[lance.target];
             if(lance.seeking){
                 if(target.dead())return true;
-                if(lance.delay>0){lance.delay-=dt;return false;}
                 const auto bounds=enemyBounds(target);
+                const float aimX=target.x-lance.x;
+                const float aimY=(bounds.top+bounds.bottom)*.5f-lance.y;
+                lance.angle=std::atan2(aimY,aimX)*57.29578f;
+                if(lance.delay>0){lance.delay=std::max(0.f,lance.delay-dt);return false;}
                 const float tx=target.x,ty=(bounds.top+bounds.bottom)*.5f;
                 const float dx=tx-lance.x,dy=ty-lance.y;
                 const float distance=std::hypot(dx,dy);
