@@ -607,9 +607,9 @@ public:
     std::vector<Popup> popups;
     std::vector<BleedSpread> bleedSpreads;
     bool ended=false,won=false,inventory=false;
-    float clock=0;
+    float clock=0,enemyVisualClock=0;
     Combat(){projectiles.reserve(16);popups.reserve(32);restart();}
-    void restart(){player={};enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};projectiles.clear();lightLances.clear();lightBursts.clear();cameraCenter=viewWidth*.5f;popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=0;}
+    void restart(){player={};enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};projectiles.clear();lightLances.clear();lightBursts.clear();cameraCenter=viewWidth*.5f;popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=enemyVisualClock=0;}
     int foes()const{int count=0;for(const auto& e:enemies)if(!e.dead())++count;return count;}
     void hit(Enemy& e,int amount,bool fire,int bleed=0,bool slam=false){
         if(e.dead()||ended)return;
@@ -653,6 +653,7 @@ public:
         const bool verdictFreeze=player.whiteNight&&player.whiteMove==WhiteMove::Verdict&&
             player.whiteAge>=.12f&&player.whiteAge<.66f;
         if(!verdictFreeze){
+            enemyVisualClock+=dt;
             for(auto& enemy:enemies){stepEnemy(enemy,dt);if(ended)break;}
             if(!ended)stepProjectiles(dt);
         }
