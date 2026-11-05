@@ -986,19 +986,31 @@ public:
         SDL_SetTextureScaleMode(motion,SDL_SCALEMODE_NEAREST);
         whiteNightLance_=texture;
         whiteNightMotion_=motion;
-        // Authored gold PNG effect pack; keep existing assets as fallback.
-        auto loadGold=[&](SDL_Texture*& destination,const char* name){
-            if(destination)return;
-            destination=IMG_LoadTexture(renderer,asset(name).c_str());
-            if(destination){
-                SDL_SetTextureScaleMode(destination,SDL_SCALEMODE_NEAREST);
-                SDL_SetTextureBlendMode(destination,SDL_BLENDMODE_BLEND);
-            }else SDL_Log("Optional White Night gold PNG not installed: %s",name);
+        // Gold/white effects are mandatory game assets, not optional decoration.
+        // Validate dimensions so Studio and APK fail visibly instead of drawing fake fallbacks.
+        auto loadGold=[&](SDL_Texture*& destination,const char* name,float expectedW,float expectedH)->bool{
+            if(destination)return true;
+            const std::string file=asset(name);
+            destination=IMG_LoadTexture(renderer,file.c_str());
+            if(!destination){
+                SDL_SetError("ECLIPSE ASSET ERROR: required PNG %s missing or invalid",file.c_str());
+                return false;
+            }
+            float w=0,h=0;
+            if(!SDL_GetTextureSize(destination,&w,&h)||w!=expectedW||h!=expectedH){
+                SDL_SetError("ECLIPSE ASSET ERROR: %s expected %.0fx%.0f, got %.0fx%.0f",
+                    file.c_str(),expectedW,expectedH,w,h);
+                SDL_DestroyTexture(destination);destination=nullptr;
+                return false;
+            }
+            SDL_SetTextureScaleMode(destination,SDL_SCALEMODE_NEAREST);
+            SDL_SetTextureBlendMode(destination,SDL_BLENDMODE_BLEND);
+            return true;
         };
-        loadGold(goldLance_,"ui/lance_gold.png");
-        loadGold(goldTrail_,"ui/trail_gold.png");
-        loadGold(goldOrb_,"ui/orb_gold.png");
-        loadGold(goldImpact_,"ui/impact_gold.png");
+        if(!loadGold(goldLance_,"ui/lance_gold.png",96,24)||
+           !loadGold(goldTrail_,"ui/trail_gold.png",128,32)||
+           !loadGold(goldOrb_,"ui/orb_gold.png",64,64)||
+           !loadGold(goldImpact_,"ui/impact_gold.png",96,96))return false;
         return true;
     }
 
@@ -1298,6 +1310,50 @@ public:
         }
         return true;
     }
+    // Pixel VFX use only authored PNG textures, transformed in SDL.
+    // No runtime-drawn particles, circles, or procedural placeholder geometry.
+    void goldenSprite(SDL_Texture* texture,float x,float y,float w,float h,
+                      double angle=0,Uint8 alpha=255){
+        if(!texture||w<=0||h<=0)return;
+        const SDL_FRect dest{std::round(x-w*.5f),std::round(y-h*.5f),
+                             std::round(w),std::round(h)};
+        SDL_SetTextureAlphaMod(texture,alpha);
+        SDL_RenderTextureRotated(renderer,texture,nullptr,&dest,angle,nullptr,SDL_FLIP_NONE);
+        SDL_SetTextureAlphaMod(texture,255);
+    }
+    void goldenImpactParticles(const LightBurst& burst){
+        if(!goldImpact_||!goldOrb_||!goldTrail_)return;
+        constexpr float tau=6.28318530718f;
+        const float t=std::clamp(1.f-burst.life/.24f,0.f,1.f);
+        const float fade=1.f-t;
+        const float x=burst.x-offset,y=burst.y;
+        const float scale=burst.kind==LightFx::Verdict?1.6f:
+                          burst.kind==LightFx::Command?1.20f:1.f;
+        const float size=(38.f+85.f*t)*scale;
+        goldenSprite(goldImpact_,x,y,size,size,0,
+                     static_cast<Uint8>(235*fade));
+        goldenSprite(goldImpact_,x,y,size*.73f,size*.73f,45,
+                     static_cast<Uint8>(195*fade));
+        goldenSprite(goldOrb_,x,y,28.f*scale*(1.f-t*.6f),
+                     28.f*scale*(1.f-t*.6f),0,
+                     static_cast<Uint8>(255*fade));
+        // Twelve stable gold-white sparks and six streaks, each an actual PNG.
+        // Fixed per-event phases prevent random-frame flicker.
+        for(int i=0;i<12;++i){
+            const float angle=tau*(i/12.f)+.25f;
+            const float radial=(12.f+91.f*t)*scale*(i%3==0?1.13f:.83f);
+            const float px=x+std::cos(angle)*radial;
+            const float py=y+std::sin(angle)*radial;
+            const float r=(i%3==0?15.f:9.f)*scale*(1.f-.48f*t);
+            goldenSprite(goldOrb_,px,py,r,r,0,
+                         static_cast<Uint8>(215*fade));
+            if(i%2==0){
+                goldenSprite(goldTrail_,px,py,37.f*scale*(1.f-.6f*t),
+                             8.f*scale,angle*57.29578f,
+                             static_cast<Uint8>(180*fade));
+            }
+        }
+    }
     void draw(const Combat& g,const Animation& a,float camera,Actions held,const char* capture=nullptr,const char* reviewLabel=nullptr,const ControlLayout* customLayout=nullptr,std::array<float,2> stick={}){
         offset=std::round(camera)-640;SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);SDL_SetRenderDrawColor(renderer,21,35,52,255);SDL_RenderClear(renderer);
         forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.clock);
@@ -1315,14 +1371,13 @@ public:
                 const float phase=g.clock*2.8f+i*6.2831853f/caster.storedLightLances;
                 const float x=caster.x+std::cos(phase)*57.f-offset;
                 const float y=caster.y-61.f+std::sin(phase)*37.f;
-                const float w=goldLance_?96.f:38.f,h=goldLance_?24.f:3.f;
-                const SDL_FRect dest{x-w*.5f,y-h*.5f,w,h};
-                SDL_RenderTextureRotated(renderer,lanceArt,nullptr,&dest,phase*57.29578+90.,nullptr,SDL_FLIP_NONE);
-                if(goldOrb_){
-                    const SDL_FRect aura{x-17,y-17,34,34};
-                    SDL_SetTextureAlphaMod(goldOrb_,110);
-                    SDL_RenderTexture(renderer,goldOrb_,nullptr,&aura);
-                    SDL_SetTextureAlphaMod(goldOrb_,255);
+                goldenSprite(goldOrb_,x,y,46,46,0,145);
+                goldenSprite(lanceArt,x,y,90,23,phase*57.29578+90.,255);
+                // Tiny orbiting light fragments are also sampled from the orb PNG.
+                for(int j=0;j<3;++j){
+                    const float sparkPhase=phase+j*2.0943951f;
+                    goldenSprite(goldOrb_,x+std::cos(sparkPhase)*24.f,
+                        y+std::sin(sparkPhase)*24.f,9,9,0,155);
                 }
             }
         }
@@ -1330,26 +1385,31 @@ public:
             const float x=lance.x-offset,y=lance.y;
             const float angle=lance.angle*.017453293f;
             const float dx=std::cos(angle),dy=std::sin(angle);
-            if(goldTrail_&&lance.delay<=0){
-                const SDL_FRect tail{x-dx*84.f-64.f,y-dy*84.f-16.f,128,32};
-                SDL_SetTextureAlphaMod(goldTrail_,225);
-                SDL_RenderTextureRotated(renderer,goldTrail_,nullptr,&tail,lance.angle,nullptr,SDL_FLIP_NONE);
-                SDL_SetTextureAlphaMod(goldTrail_,255);
+            const bool launched=lance.delay<=0;
+            if(launched){
+                // Four layered PNG trails create a bright white center and a long gold wake.
+                for(int i=0;i<4;++i){
+                    const float distance=34.f+i*38.f;
+                    goldenSprite(goldTrail_,x-dx*distance,y-dy*distance,
+                        130.f+31.f*i,32.f-i*4.f,lance.angle,
+                        static_cast<Uint8>(210-i*44));
+                }
+                // Spatial particles persist behind each moving spear.
+                for(int i=0;i<5;++i){
+                    const float distance=28.f+i*28.f;
+                    const float sideways=std::sin(g.clock*19.f+i*2.4f)*(7.f+i*2.f);
+                    const float sx=x-dx*distance-dy*sideways;
+                    const float sy=y-dy*distance+dx*sideways;
+                    goldenSprite(goldOrb_,sx,sy,13.f-i,13.f-i,0,
+                        static_cast<Uint8>(225-i*32));
+                }
             }
-            const float w=goldLance_?96.f:38.f,h=goldLance_?24.f:3.f;
-            const SDL_FRect dest{x-dx*22.f-w*.5f,y-dy*22.f-h*.5f,w,h};
-            SDL_RenderTextureRotated(renderer,lanceArt,nullptr,&dest,lance.angle,nullptr,SDL_FLIP_NONE);
+            goldenSprite(goldOrb_,x-dx*19,y-dy*19,50,50,0,150);
+            goldenSprite(lanceArt,x-dx*10,y-dy*10,96,24,lance.angle);
         }
         for(const auto& burst:g.lightBursts){
-            drawWhiteEffect(burst);
-            if(goldImpact_&&(burst.kind==LightFx::Impact||burst.kind==LightFx::Verdict)){
-                const float t=std::clamp(1.f-burst.life/.24f,0.f,1.f);
-                const float size=(burst.kind==LightFx::Verdict?190.f:120.f)*(1.f+.35f*t);
-                const SDL_FRect dest{burst.x-offset-size*.5f,burst.y-size*.5f,size,size};
-                SDL_SetTextureAlphaMod(goldImpact_,static_cast<Uint8>(255.f*(1.f-t*.75f)));
-                SDL_RenderTexture(renderer,goldImpact_,nullptr,&dest);
-                SDL_SetTextureAlphaMod(goldImpact_,255);
-            }
+            // Golden particle overlays replace blue/cyan code-generated effects.
+            goldenImpactParticles(burst);
         }
         for(const auto& b:g.projectiles){
             const int radius=b.empowered?14:8;
