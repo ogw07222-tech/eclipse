@@ -639,6 +639,7 @@ struct Animation {
     int state=-1,frame=0,attackSerial=0,hurtSerial=0,landingSerial=0,combo=1,attackState=4;
     float time=0,attackTime=0,attackDuration=.36f,hurtTime=0,landTime=0,travelPhase=0,lastX=140;
     bool initialized=false,wasHitStopped=false,midpoint=false;
+    float posePhase=0; // Continuous visual phase, before integer atlas selection.
     void reset(){*this=Animation{};}
     void step(const Player& p,float dt){
         bool retrigger=p.attackSerial!=attackSerial;
@@ -670,7 +671,8 @@ struct Animation {
         float phase=0;
         if(next==0)phase=std::fmod(time/clip.duration*clip.count,static_cast<float>(clip.count));
         else if(next==1||next==11){
-            travelPhase=std::fmod(travelPhase+distance/clip.stride,1.f);
+            const float stride=p.whiteNight?whiteNightRunStride:clip.stride;
+            travelPhase=std::fmod(travelPhase+distance/stride,1.f);
             phase=travelPhase*clip.count;
         }
         else if(next==2)phase=(1-std::clamp(-p.vy/650.f,0.f,1.f))*(clip.count-1);
@@ -684,6 +686,7 @@ struct Animation {
         else if(next==7)phase=(1-std::clamp(p.dashLeft/.15f,0.f,1.f))*clip.count;
         else if(next==10)phase=(1-landTime/clip.duration)*clip.count;
         else phase=time/clip.duration*clip.count;
+        posePhase=std::clamp(phase/((next==2||next==3)?clip.count-1.f:float(clip.count)),0.f,1.f);
         const int key=std::clamp(static_cast<int>(phase),0,clip.count-1);
         frame=clip.start+key;
         // Keep the original silhouettes during the jump-to-fall transition.
