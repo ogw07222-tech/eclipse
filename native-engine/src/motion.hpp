@@ -27,6 +27,7 @@ constexpr int motionWidth=64,motionHeight=94,motionColumns=16,motionRows=31,moti
 constexpr int knightRunMidpointStart=13*motionColumns;
 constexpr int knightMidpointStart=14*motionColumns;
 constexpr int knightSprintStart=27*motionColumns,knightSprintFrames=54;
+constexpr int whiteNightRunStart=88,whiteNightRunFrames=32;
 constexpr float motionScale=1.85f;
 constexpr int mageMotionColumns=8,mageMotionRows=10,mageGroundCastRow=8,mageAirCastRow=9;
 constexpr int mageCastTipX=55,mageCastTipY=50;
