@@ -5,7 +5,7 @@
 - Cells: **64 × 96**, 8 columns × 15 rows. Indexing starts at zero.
 - Run cycle: **88–119**, exactly **32** frames, ordered left to right, top to bottom.
 - Walking is removed for this character: all grounded movement above the existing deadzone uses the run state, including slow analog input.
-- Cycle phase is driven by distance traveled (120 world units per cycle), shared across movement speeds. It is not restarted when crossing the former walk/run speed threshold.
+- Cycle phase is driven by distance traveled (**280 world units per cycle**), shared across movement speeds. At the default 280 units/s this is 1 second / 32 pose updates per second (previous main actually inherited the normal knight's 196-unit stride: .7 seconds / 45.71 FPS; the old 120-unit description was stale). It is not restarted when crossing the former walk/run speed threshold. Ground contact and sliding at this new cadence still require owner playback review; no claim of visual acceptance is made.
 - Frames 0–87 remain unchanged, including jump, attacks and skills. Frames 0–7 are legacy run poses retained for existing dash-frame references.
 - The former walk cells 88–95 are replaced by the beginning of the new run cycle.
 - Runtime source rectangle: `(index % 8 * 64, index / 8 * 96, 64, 96)`.

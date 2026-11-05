@@ -445,7 +445,11 @@ class Presentation {
 
     void swordTrail(const Player& p,const Animation& a){
         if(p.health<=0||((a.state<4||a.state>6)&&a.state!=12))return;
-        const auto frame=swordTrailFrames[a.frame];
+        // The weak slash's actor and blade effect must use the same PNG pose.
+        // a.frame remains the original gameplay-independent clip key.
+        const int displayedFrame=p.form==0&&!p.whiteNight&&a.state==4?
+            knightWeakFrame(a.posePhase):a.frame;
+        const auto frame=swordTrailFrames[displayedFrame];
         for(int i=frame.start;i<frame.start+frame.count;++i){const auto s=swordTrailSpans[i];
             float x=p.facing>0?p.x+(s.x-motionPivotX)*motionScale:p.x-(s.x+s.width-motionPivotX)*motionScale;
             rect(x-offset,p.y+(s.y-motionPivotY)*motionScale,s.width*motionScale,motionScale,swordTrailColors[s.shade],static_cast<Uint8>(swordTrailAlpha[s.shade]*frame.alpha/255));
@@ -1364,13 +1368,17 @@ public:
                     (p.grounded?mageGroundCastRow:mageAirCastRow):rows[a.state];
                 const int index=basicCast?
                     std::clamp(static_cast<int>((1-p.mageCastLeft/mageCastDuration)*mageMotionColumns),0,mageMotionColumns-1):
+                    (a.state==2||a.state==3)?
+                    mageAirPose(a.posePhase):
                     (a.frame-clip.start)*(mageMotionColumns-1)/std::max(1,clip.count-1);
                 actorTexture=mageMotion_;
                 columns=mageMotionColumns;
                 frame=row*columns+index;
             }
         }
-        if(p.form==0&&a.state==1){
+        if(p.form==0&&a.state==4){
+            frame=knightWeakFrame(a.posePhase);
+        }else if(p.form==0&&a.state==1){
             const int playbackFrame=std::clamp(
                 static_cast<int>(a.travelPhase*knightSprintPlaybackFrames),0,knightSprintPlaybackFrames-1);
             frame=knightSprintStart+std::clamp(

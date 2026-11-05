@@ -1,0 +1,25 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ECLIPSE 애니메이션 비교</title>
+<style>body{background:#11141b;color:#e6e8ee;font:16px system-ui;margin:auto;max-width:1100px;padding:20px}button,select,input{font:inherit;padding:10px;background:#262d3b;color:inherit;border:1px solid #667086;border-radius:5px}header,nav{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.panels{display:grid;grid-template-columns:1fr 1fr;gap:16px}canvas{width:100%;background:#1e2632;image-rendering:pixelated}article{min-width:0}#scrub{width:95%}.warn{color:#ffcb82}small{display:block;line-height:1.6;color:#aeb9cc}#error{color:#ff8585}@media(max-width:650px){.panels{grid-template-columns:1fr}}
+</style><h1>ECLIPSE 애니메이션 비교</h1><p class="warn">미완료 초안 · PNG 클립 비교용 · 실제 게임 재생 검증 아님</p><small>기본 장비·기본 이동속도에서 표시 순서 비교. 이동은 제자리, 점프·낙하는 선형 위상 샘플이다. 물리 궤적·히트스톱·충돌·공격 중단·이펙트를 재현하지 않는다.</small>
+<header><select id="actor" aria-label="캐릭터"></select><select id="clip" aria-label="동작"></select></header><nav><button id="play">일시정지</button><button id="prev">이전 자세</button><button id="next">다음 자세</button><select id="speed" aria-label="재생 속도"><option value="1">1배속</option><option value="0.5">0.5배속</option><option value="0.25">0.25배속</option></select><label><input type="checkbox" id="grid" checked> 기준선</label></nav>
+<div class="panels"><article><h2>기존 main</h2><canvas id="before" width="500" height="350"></canvas><small id="bm"></small></article><article><h2>변경안</h2><canvas id="after" width="500" height="350"></canvas><small id="am"></small></article></div><p><input type="range" id="scrub" min="0" max="1000" value="0" aria-label="재생 위치"></p><p id="note"></p><p id="error" role="alert"></p><small>초록 선: 고정 피벗. 주황: 셀 경계. 주황 선에 닿는 픽셀은 잘림 검토 대상. 반복 재생은 비교용이며 실제 단발 공격의 반복 설정을 변경하지 않는다.</small>
+<script>
+const $=id=>document.getElementById(id);let data,current,images={},playing=true,elapsed=0,last=0;
+function selectActor(){const clips=data.clips.filter(c=>c.actor===$('actor').value);$('clip').replaceChildren(...clips.map(c=>new Option(c.name,c.name)));selectClip()}
+function selectClip(){current=data.clips.find(c=>c.actor===$('actor').value&&c.name===$('clip').value);elapsed=0;$('note').textContent=current.note;draw()}
+function paint(side,id){const c=current,s=c[side],duration=side==='before'?c.duration:c.after_duration;
+ const cycle=Math.max(c.duration,c.after_duration),phase=['대기','달리기','이동'].includes(c.name)?(elapsed%duration)/duration:(elapsed%cycle)/duration;
+ const at=Math.min(s.frames.length-1,Math.floor(phase*s.frames.length)),index=s.frames[at],img=images[c.path],canvas=$(id),ctx=canvas.getContext('2d');ctx.clearRect(0,0,500,350);ctx.imageSmoothingEnabled=false;
+ const [w,h]=c.cell,z=2,[px,py]=c.pivot,x=250-px*z,y=285-py*z;
+ if(img.complete)ctx.drawImage(img,index%c.columns*w,Math.floor(index/c.columns)*h,w,h,x,y,w*z,h*z);
+ if($('grid').checked){ctx.strokeStyle='#db9f56';ctx.strokeRect(x,y,w*z,h*z);ctx.strokeStyle='#62a58a';ctx.beginPath();ctx.moveTo(0,285.5);ctx.lineTo(500,285.5);ctx.moveTo(250.5,0);ctx.lineTo(250.5,350);ctx.stroke()}
+ $(side==='before'?'bm':'am').textContent=`${s.slots}표시 슬롯 / ${s.unique}고유 PNG · 기준 ${duration.toFixed(3)}초 · ${c.variable?'속도 기반 · ':''}${(s.slots/duration).toFixed(2)}슬롯/초 · 현재 atlas ${index}`;
+}
+function draw(){if(!current)return;paint('before','before');paint('after','after');const cycle=Math.max(current.duration,current.after_duration);$('scrub').value=(elapsed%cycle)/cycle*1000}
+$('actor').onchange=selectActor;$('clip').onchange=selectClip;$('grid').onchange=draw;
+$('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'일시정지':'재생'};
+function step(dir){playing=false;$('play').textContent='재생';const cycle=Math.max(current.duration,current.after_duration),n=current.after.frames.length;elapsed=(elapsed+dir*current.after_duration/n+cycle)%cycle;draw()}
+$('prev').onclick=()=>step(-1);$('next').onclick=()=>step(1);
+$('scrub').oninput=()=>{playing=false;$('play').textContent='재생';elapsed=$('scrub').value/1000*Math.max(current.duration,current.after_duration);draw()};
+(async()=>{try{const response=await fetch('../animation-audit/animation-audit.json');if(!response.ok)throw Error('보고서 로드 실패: '+response.status);data=await response.json();await Promise.all([...new Set(data.clips.map(c=>c.path))].map(path=>new Promise((resolve,reject)=>{const img=new Image();images[path]=img;img.onload=resolve;img.onerror=()=>reject(Error('PNG 로드 실패: '+path));img.src='../../Assets/Resources/Eclipse/'+path})));$('actor').replaceChildren(...[...new Set(data.clips.map(c=>c.actor))].map(a=>new Option(a,a)));selectActor();requestAnimationFrame(function tick(now){if(last&&playing)elapsed+=(now-last)/1000*Number($('speed').value);last=now;draw();requestAnimationFrame(tick)})}catch(e){$('error').textContent=e.message+' · 저장소 루트에서 로컬 HTTP 서버로 열어줘.'}})();
+</script></html>
