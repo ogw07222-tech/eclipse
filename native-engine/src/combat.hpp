@@ -671,7 +671,7 @@ struct Animation {
         // Freeze visual action during a gameplay hit-stop, except death/hurt feedback.
         float visualDt=p.hitStop>0&&p.health>0&&hurtTime<=0?0:dt;
         attackTime=std::max(0.f,attackTime-visualDt);hurtTime=std::max(0.f,hurtTime-dt);if(!landed)landTime=std::max(0.f,landTime-visualDt);
-        int next=p.health<=0?9:p.dashLeft>0?7:(p.airSlam||p.slamRecover>0)?12:attackTime>0?attackState:!p.grounded?(p.vy<0?2:3):landTime>0?10:std::abs(p.vx)>20?(std::abs(p.vx)<180?11:1):0;
+        int next=p.health<=0?9:p.dashLeft>0?7:(p.airSlam||p.slamRecover>0)?12:attackTime>0?attackState:!p.grounded?(p.vy<0?2:3):landTime>0?10:std::abs(p.vx)>20?(!p.whiteNight&&std::abs(p.vx)<180?11:1):0;
         if(next!=state||retrigger){state=next;time=0;}else time+=visualDt;
         const auto clip=motionClips[next];
         const bool loop=next==0||next==1||next==11;

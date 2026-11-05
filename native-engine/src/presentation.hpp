@@ -969,10 +969,10 @@ public:
             SDL_SetError("ECLIPSE ASSET ERROR: %s: %s",motionPath.c_str(),cause.c_str());
             return false;
         }
-        if(!SDL_GetTextureSize(motion,&width,&height)||width!=512||height!=1152){
+        if(!SDL_GetTextureSize(motion,&width,&height)||width!=512||height!=1440){
             SDL_DestroyTexture(motion);
             SDL_DestroyTexture(texture);
-            SDL_SetError("ECLIPSE ASSET ERROR: %s expected 512x1152, got %.0fx%.0f",motionPath.c_str(),width,height);
+            SDL_SetError("ECLIPSE ASSET ERROR: %s expected 512x1440, got %.0fx%.0f",motionPath.c_str(),width,height);
             return false;
         }
         SDL_SetTextureScaleMode(motion,SDL_SCALEMODE_NEAREST);
@@ -1395,8 +1395,9 @@ public:
             }else if(a.state==10){
                 whiteFrame=15;
             }else if(a.state==1||a.state==11){
-                const int start=a.state==11?88:0;
-                whiteFrame=start+std::clamp(static_cast<int>(a.travelPhase*8),0,7);
+                // One distance-driven 32-frame run cycle at every movement speed.
+                whiteFrame=whiteNightRunStart+std::clamp(
+                    static_cast<int>(a.travelPhase*whiteNightRunFrames),0,whiteNightRunFrames-1);
             }
             const SDL_FRect source{float(whiteFrame%8*64),float(whiteFrame/8*96),64,96};
             const SDL_FRect dest{std::round(p.x-offset-32*motionScale),std::round(p.y-88*motionScale),64*motionScale,96*motionScale};
