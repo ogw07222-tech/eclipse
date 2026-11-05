@@ -26,14 +26,14 @@ def main():
  authored=Image.open(ART/'run_alternating_source.png').convert('RGBA')
  if atlas.size!=(512,1440) or reference.size!=(512,384):raise ValueError('Unexpected native atlas/reference dimensions')
  authored=authored.resize(reference.size,Image.Resampling.NEAREST)
- auth=np.array(authored);auth[:,:,3]=np.where(auth[:,:,3]>=220,255,0)
+ auth=np.array(authored);auth[:,:,3]=np.where(auth[:,:,3]>=128,255,0)
  auth[auth[:,:,3]==0]=0
  before=np.array(atlas).copy();out=np.array(atlas).copy();ref=np.array(reference);counts=[]
  for i in range(32):
   x,y=i%8*64,i//8*96;old=ref[y:y+96,x:x+64].copy();mask=leg_mask(old)
-  # Recover toes spilling across the generated grid boundary, then normalize
-  # every pose with ONE horizontal scale around the unchanged hip. No per-pose
-  # recentering, bounding-box sizing or limb-path interpolation.
+  # Recover toes spilling across the generated grid boundary, without shrinking
+  # any limb. Use the native grid at1:1 below; no per-pose recentering,
+  # bounding-box sizing, directional scaling or limb-path interpolation.
   roi=np.zeros((96,80,4),dtype=np.uint8)
   lo,hi=max(0,x-8),min(512,x+72)
   roi[:,lo-(x-8):hi-(x-8)]=auth[y:y+96,lo:hi]
@@ -53,7 +53,7 @@ def main():
   for xx,yy in seen:isolated[yy,xx]=roi[yy,xx]
   new=np.zeros((96,64,4),dtype=np.uint8)
   for xx in range(64):
-   sx=round(35+(xx-35)/.84)+8
+   sx=xx+8
    if 0<=sx<80:new[:,xx]=isolated[:,sx]
   if new[74:,0,3].any() or new[74:,-1,3].any() or new[-1,:,3].any():raise ValueError(('Leg clipping',i))
   old[mask]=new[mask]
@@ -72,7 +72,7 @@ def main():
  leg_unique=len(set(leg_hashes))
  if unique!=32 or leg_unique!=32 or not all(counts):raise ValueError('Missing/duplicate run leg poses')
  Image.fromarray(out).save(ASSET,optimize=True)
- (ART/'run_pack.json').write_text(json.dumps({'asset':str(ASSET.relative_to(ROOT)),'cell':[64,96],'start':88,'count':32,'stride_world':240,'source':'run_alternating_source.png','reference':'run_upper_reference.png','source_sha256':hashlib.sha256((ART/'run_alternating_source.png').read_bytes()).hexdigest(),'asset_sha256':hashlib.sha256(ASSET.read_bytes()).hexdigest(),'distinct_frames':unique,'distinct_leg_layers':leg_unique,'leg_horizontal_scale':.84,'leg_scale_origin_x':35,'changed_pixels_by_pose':counts,'unchanged':'frames0..87 and all reference run pixels outside lower-leg mask; original torso,hair,cape,hand,sword retained','visual_acceptance':'not device/runtime verified'},indent=2)+'\n')
+ (ART/'run_pack.json').write_text(json.dumps({'asset':str(ASSET.relative_to(ROOT)),'cell':[64,96],'start':88,'count':32,'stride_world':240,'source':'run_alternating_source.png','reference':'run_upper_reference.png','source_sha256':hashlib.sha256((ART/'run_alternating_source.png').read_bytes()).hexdigest(),'asset_sha256':hashlib.sha256(ASSET.read_bytes()).hexdigest(),'distinct_frames':unique,'distinct_leg_layers':leg_unique,'leg_horizontal_scale':1.0,'leg_scale_origin_x':35,'changed_pixels_by_pose':counts,'unchanged':'frames0..87 and all reference run pixels outside lower-leg mask; original torso,hair,cape,hand,sword retained','visual_acceptance':'not device/runtime verified'},indent=2)+'\n')
  print('Packed32 distinct poses; original non-run frames and pixels outside the leg mask unchanged.')
 
 if __name__=='__main__':main()

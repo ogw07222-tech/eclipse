@@ -1,5 +1,5 @@
 {
-  "source_asset_sha256": "6b900ebfd42d6b158f5328cca5272609c73e52a162502c15509fcd42b44a62a6",
+  "source_asset_sha256": "b881cd9ba631d1e497a0b9829686502e744cd0dee604be1ebb950afe08555b21",
   "frames": 32,
   "cycle_world_units": 240,
   "base_speed": 280,
@@ -10,17 +10,17 @@
       "frame": 88,
       "markers": {
         "right": [
-          49,
+          48,
           85
         ],
         "left": [
-          23,
-          73
+          24,
+          77
         ]
       },
       "ankle_patch_luminance": {
-        "right": 170.44317777777778,
-        "left": 94.0760142857143
+        "right": 121.68178571428571,
+        "left": 61.05317777777777
       },
       "right_is_forward": true
     },
@@ -28,105 +28,112 @@
       "frame": 104,
       "markers": {
         "right": [
-          23,
-          73
+          24,
+          77
         ],
         "left": [
-          49,
+          48,
           85
         ]
       },
       "ankle_patch_luminance": {
-        "right": 163.60284285714286,
-        "left": 113.65814545454545
+        "right": 108.53030434782609,
+        "left": 100.40246666666668
       },
       "right_is_forward": false
     }
   ],
+  "fold_followup": {
+    "leg_axis_scale": 1.0,
+    "guide_thigh_length": 15,
+    "guide_shin_length": 15,
+    "guide_lift_max": 9,
+    "note": "Guide targets, not automatically measured actual PNG bone lengths"
+  },
   "marker_basis": "Guide-projected ankle estimates, visually checked against all32 authored poses; roughly +/-2 source pixels. Occluded crossings omitted. These are not automatic ground-truth joint measurements.",
   "markers": [
     {
       "right": [
-        49,
+        48,
         85
       ],
       "left": [
-        23,
-        73
+        24,
+        77
       ]
     },
     {
       "right": [
-        45,
-        85
-      ],
-      "left": [
-        26,
-        71
-      ]
-    },
-    {
-      "right": [
-        41,
-        85
-      ],
-      "left": [
-        29,
-        71
-      ]
-    },
-    {
-      "right": [
-        37,
-        85
-      ],
-      "left": [
-        33,
-        70
-      ]
-    },
-    {
-      "right": [
-        33,
-        85
-      ],
-      "left": null
-    },
-    {
-      "right": [
-        29,
-        85
-      ],
-      "left": null
-    },
-    {
-      "right": [
-        25,
-        85
-      ],
-      "left": [
         44,
-        71
-      ]
-    },
-    {
-      "right": [
-        21,
         85
       ],
       "left": [
-        47,
-        73
+        27,
+        77
       ]
     },
     {
       "right": [
-        18,
+        40,
+        85
+      ],
+      "left": [
+        31,
+        76
+      ]
+    },
+    {
+      "right": [
+        36,
+        85
+      ],
+      "left": [
+        34,
+        77
+      ]
+    },
+    {
+      "right": [
+        32,
+        85
+      ],
+      "left": null
+    },
+    {
+      "right": [
+        28,
+        85
+      ],
+      "left": null
+    },
+    {
+      "right": [
+        24,
+        85
+      ],
+      "left": [
+        45,
+        82
+      ]
+    },
+    {
+      "right": [
+        20,
+        85
+      ],
+      "left": [
+        48,
+        83
+      ]
+    },
+    {
+      "right": [
+        17,
         85
       ],
       "left": [
         50,
-        74
+        83
       ]
     },
     {
@@ -135,8 +142,8 @@
         84
       ],
       "left": [
-        52,
-        76
+        53,
+        84
       ]
     },
     {
@@ -146,43 +153,13 @@
       ],
       "left": [
         54,
-        78
+        84
       ]
     },
     {
       "right": [
         14,
         82
-      ],
-      "left": [
-        56,
-        80
-      ]
-    },
-    {
-      "right": [
-        14,
-        80
-      ],
-      "left": [
-        56,
-        82
-      ]
-    },
-    {
-      "right": [
-        16,
-        78
-      ],
-      "left": [
-        56,
-        83
-      ]
-    },
-    {
-      "right": [
-        18,
-        76
       ],
       "left": [
         55,
@@ -191,102 +168,132 @@
     },
     {
       "right": [
-        20,
-        74
+        15,
+        81
       ],
       "left": [
-        52,
+        56,
         85
       ]
     },
     {
       "right": [
-        23,
-        73
+        17,
+        80
       ],
       "left": [
-        49,
+        55,
         85
       ]
     },
     {
       "right": [
-        26,
-        71
+        19,
+        79
       ],
       "left": [
-        45,
+        54,
         85
       ]
     },
     {
       "right": [
-        29,
-        71
-      ],
-      "left": [
-        41,
-        85
-      ]
-    },
-    {
-      "right": [
-        33,
-        70
-      ],
-      "left": [
-        37,
-        85
-      ]
-    },
-    {
-      "right": null,
-      "left": [
-        33,
-        85
-      ]
-    },
-    {
-      "right": null,
-      "left": [
-        29,
-        85
-      ]
-    },
-    {
-      "right": [
-        44,
-        71
-      ],
-      "left": [
-        25,
-        85
-      ]
-    },
-    {
-      "right": [
-        47,
-        73
-      ],
-      "left": [
         21,
+        78
+      ],
+      "left": [
+        51,
+        85
+      ]
+    },
+    {
+      "right": [
+        24,
+        77
+      ],
+      "left": [
+        48,
+        85
+      ]
+    },
+    {
+      "right": [
+        27,
+        77
+      ],
+      "left": [
+        44,
+        85
+      ]
+    },
+    {
+      "right": [
+        31,
+        76
+      ],
+      "left": [
+        40,
+        85
+      ]
+    },
+    {
+      "right": [
+        34,
+        77
+      ],
+      "left": [
+        36,
+        85
+      ]
+    },
+    {
+      "right": null,
+      "left": [
+        32,
+        85
+      ]
+    },
+    {
+      "right": null,
+      "left": [
+        28,
+        85
+      ]
+    },
+    {
+      "right": [
+        45,
+        82
+      ],
+      "left": [
+        24,
+        85
+      ]
+    },
+    {
+      "right": [
+        48,
+        83
+      ],
+      "left": [
+        20,
         85
       ]
     },
     {
       "right": [
         50,
-        74
+        83
       ],
       "left": [
-        18,
+        17,
         85
       ]
     },
     {
       "right": [
-        52,
-        76
+        53,
+        84
       ],
       "left": [
         15,
@@ -296,41 +303,11 @@
     {
       "right": [
         54,
-        78
+        84
       ],
       "left": [
         14,
         83
-      ]
-    },
-    {
-      "right": [
-        56,
-        80
-      ],
-      "left": [
-        14,
-        82
-      ]
-    },
-    {
-      "right": [
-        56,
-        82
-      ],
-      "left": [
-        14,
-        80
-      ]
-    },
-    {
-      "right": [
-        56,
-        83
-      ],
-      "left": [
-        16,
-        78
       ]
     },
     {
@@ -339,22 +316,52 @@
         84
       ],
       "left": [
-        18,
-        76
+        14,
+        82
       ]
     },
     {
       "right": [
-        52,
+        56,
         85
       ],
       "left": [
-        20,
-        74
+        15,
+        81
+      ]
+    },
+    {
+      "right": [
+        55,
+        85
+      ],
+      "left": [
+        17,
+        80
+      ]
+    },
+    {
+      "right": [
+        54,
+        85
+      ],
+      "left": [
+        19,
+        79
+      ]
+    },
+    {
+      "right": [
+        51,
+        85
+      ],
+      "left": [
+        21,
+        78
       ]
     }
   ],
-  "loop_pixel_difference": 0.0346,
+  "loop_pixel_difference": 0.0402,
   "full_game_runtime": "NOT RUN",
   "real_time_video_viewing": "NOT CLAIMED"
 }
