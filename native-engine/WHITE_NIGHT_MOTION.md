@@ -5,7 +5,7 @@
 - Cells: **64 × 96**, 8 columns × 15 rows. Indexing starts at zero.
 - Run cycle: **88–119**, exactly **32** frames, ordered left to right, top to bottom.
 - Walking is removed for this character: all grounded movement above the existing deadzone uses the run state, including slow analog input.
-- Cycle phase is driven by distance traveled (**280 world units per cycle**), shared across movement speeds. At the default 280 units/s this is 1 second / 32 pose updates per second (previous main actually inherited the normal knight's 196-unit stride: .7 seconds / 45.71 FPS; the old 120-unit description was stale). It is not restarted when crossing the former walk/run speed threshold. Ground contact and sliding at this new cadence still require owner playback review; no claim of visual acceptance is made.
+- Cycle phase is driven by distance traveled (**240 world units per cycle**), shared across movement speeds. At default280 units/s this is **0.8571 seconds / 37.33 pose updates per second**. This is a documented fast-run exception to16–32FPS: the new PNG planted-foot retreat is about52–54 world units over7/32 of a cycle, matching a240-unit stride. The prior280-unit stride made those planted feet slide forward. Movement velocity is unchanged. Device playback remains unverified.
 - Frames 0–87 remain unchanged, including jump, attacks and skills. Frames 0–7 are legacy run poses retained for existing dash-frame references.
 - The former walk cells 88–95 are replaced by the beginning of the new run cycle.
 - Runtime source rectangle: `(index % 8 * 64, index / 8 * 96, 64, 96)`.
@@ -18,3 +18,17 @@ Created with the built-in image generator using the approved silver-armored run 
 The selected source is sampled into native cells using one uniform scale and placement for all frames. Alpha is reduced to hard edges. No frame duplication or crossfading is used to inflate the count.
 
 Builds, tests and device playback were not run; owner verification is required.
+
+## Alternating-leg correction
+
+The former run repeated a bright leading leg. The new32 PNG poses preserve identity by brightness: **bright = right leg**, **dark violet-gray = left leg**. At pose88 the bright right ankle is forward; at104 the dark left ankle is forward while the bright right ankle recovers behind. Crossing does not reassign brightness.
+
+Only the lower-leg region of88–119 is replaced. The original RGBA pixels above local y66 and original sword pixels under the hip are copied from an immutable approved reference. The full non-run0–87 region remains byte-for-byte equal as decoded pixels. The atlas remains512×1440, cells64×96, pivot32/88; existing packaging/loader paths and runtime count/start stay the same.
+
+See [art source and validation](../Art/white-night/README.md). The earlier source paragraph describes the superseded run. The current source is `Art/white-night/run_alternating_source.png`, generated from an explicit two-leg joint guide and packed with `Tools/pack_white_night_run.py`. It contains authored leg pixels, not duplicated old frames.
+
+The previous animation audit/replay artifacts are historical for their recorded revisions; their old white-run FPS is superseded by this240-unit stride. No game/APK build, owner test suite, GitHub Actions, device play, or real-time video viewing is claimed.
+
+### Folded-leg follow-up
+
+The first alternating revision compressed the legs horizontally by0.84 during packing, making folded shins read shorter. That scaling is removed. A new15px thigh/15px shin guide with lower heel recovery was used to redraw the legs; these are guide targets, not measured proof of every PNG bone length. Original upper-body/sword/non-run pixels remain protected. Runtime phase/start/count/240-unit stride and all gameplay values are unchanged by this follow-up. Current comparison videos use the preceding alternating revision at the same cadence on both sides.

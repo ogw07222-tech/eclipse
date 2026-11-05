@@ -1,0 +1,367 @@
+{
+  "source_asset_sha256": "b881cd9ba631d1e497a0b9829686502e744cd0dee604be1ebb950afe08555b21",
+  "frames": 32,
+  "cycle_world_units": 240,
+  "base_speed": 280,
+  "cycle_seconds": 0.8571428571428571,
+  "base_pose_fps": 37.333333333333336,
+  "identity_checks": [
+    {
+      "frame": 88,
+      "markers": {
+        "right": [
+          48,
+          85
+        ],
+        "left": [
+          24,
+          77
+        ]
+      },
+      "ankle_patch_luminance": {
+        "right": 121.68178571428571,
+        "left": 61.05317777777777
+      },
+      "right_is_forward": true
+    },
+    {
+      "frame": 104,
+      "markers": {
+        "right": [
+          24,
+          77
+        ],
+        "left": [
+          48,
+          85
+        ]
+      },
+      "ankle_patch_luminance": {
+        "right": 108.53030434782609,
+        "left": 100.40246666666668
+      },
+      "right_is_forward": false
+    }
+  ],
+  "fold_followup": {
+    "leg_axis_scale": 1.0,
+    "guide_thigh_length": 15,
+    "guide_shin_length": 15,
+    "guide_lift_max": 9,
+    "note": "Guide targets, not automatically measured actual PNG bone lengths"
+  },
+  "marker_basis": "Guide-projected ankle estimates, visually checked against all32 authored poses; roughly +/-2 source pixels. Occluded crossings omitted. These are not automatic ground-truth joint measurements.",
+  "markers": [
+    {
+      "right": [
+        48,
+        85
+      ],
+      "left": [
+        24,
+        77
+      ]
+    },
+    {
+      "right": [
+        44,
+        85
+      ],
+      "left": [
+        27,
+        77
+      ]
+    },
+    {
+      "right": [
+        40,
+        85
+      ],
+      "left": [
+        31,
+        76
+      ]
+    },
+    {
+      "right": [
+        36,
+        85
+      ],
+      "left": [
+        34,
+        77
+      ]
+    },
+    {
+      "right": [
+        32,
+        85
+      ],
+      "left": null
+    },
+    {
+      "right": [
+        28,
+        85
+      ],
+      "left": null
+    },
+    {
+      "right": [
+        24,
+        85
+      ],
+      "left": [
+        45,
+        82
+      ]
+    },
+    {
+      "right": [
+        20,
+        85
+      ],
+      "left": [
+        48,
+        83
+      ]
+    },
+    {
+      "right": [
+        17,
+        85
+      ],
+      "left": [
+        50,
+        83
+      ]
+    },
+    {
+      "right": [
+        15,
+        84
+      ],
+      "left": [
+        53,
+        84
+      ]
+    },
+    {
+      "right": [
+        14,
+        83
+      ],
+      "left": [
+        54,
+        84
+      ]
+    },
+    {
+      "right": [
+        14,
+        82
+      ],
+      "left": [
+        55,
+        84
+      ]
+    },
+    {
+      "right": [
+        15,
+        81
+      ],
+      "left": [
+        56,
+        85
+      ]
+    },
+    {
+      "right": [
+        17,
+        80
+      ],
+      "left": [
+        55,
+        85
+      ]
+    },
+    {
+      "right": [
+        19,
+        79
+      ],
+      "left": [
+        54,
+        85
+      ]
+    },
+    {
+      "right": [
+        21,
+        78
+      ],
+      "left": [
+        51,
+        85
+      ]
+    },
+    {
+      "right": [
+        24,
+        77
+      ],
+      "left": [
+        48,
+        85
+      ]
+    },
+    {
+      "right": [
+        27,
+        77
+      ],
+      "left": [
+        44,
+        85
+      ]
+    },
+    {
+      "right": [
+        31,
+        76
+      ],
+      "left": [
+        40,
+        85
+      ]
+    },
+    {
+      "right": [
+        34,
+        77
+      ],
+      "left": [
+        36,
+        85
+      ]
+    },
+    {
+      "right": null,
+      "left": [
+        32,
+        85
+      ]
+    },
+    {
+      "right": null,
+      "left": [
+        28,
+        85
+      ]
+    },
+    {
+      "right": [
+        45,
+        82
+      ],
+      "left": [
+        24,
+        85
+      ]
+    },
+    {
+      "right": [
+        48,
+        83
+      ],
+      "left": [
+        20,
+        85
+      ]
+    },
+    {
+      "right": [
+        50,
+        83
+      ],
+      "left": [
+        17,
+        85
+      ]
+    },
+    {
+      "right": [
+        53,
+        84
+      ],
+      "left": [
+        15,
+        84
+      ]
+    },
+    {
+      "right": [
+        54,
+        84
+      ],
+      "left": [
+        14,
+        83
+      ]
+    },
+    {
+      "right": [
+        55,
+        84
+      ],
+      "left": [
+        14,
+        82
+      ]
+    },
+    {
+      "right": [
+        56,
+        85
+      ],
+      "left": [
+        15,
+        81
+      ]
+    },
+    {
+      "right": [
+        55,
+        85
+      ],
+      "left": [
+        17,
+        80
+      ]
+    },
+    {
+      "right": [
+        54,
+        85
+      ],
+      "left": [
+        19,
+        79
+      ]
+    },
+    {
+      "right": [
+        51,
+        85
+      ],
+      "left": [
+        21,
+        78
+      ]
+    }
+  ],
+  "loop_pixel_difference": 0.0402,
+  "full_game_runtime": "NOT RUN",
+  "real_time_video_viewing": "NOT CLAIMED"
+}
