@@ -1,0 +1,112 @@
+{
+  "id": "void_lord_v3",
+  "name": "공허의 군주",
+  "status": "concept_key_pose_atlas_not_runtime_integrated",
+  "source": "Docs/CURRENT_CLASS_DESIGN.md",
+  "cell": {
+    "character": [
+      64,
+      96
+    ],
+    "grimoire": [
+      64,
+      96
+    ],
+    "effects": [
+      96,
+      96
+    ]
+  },
+  "layout": {
+    "columns": 8,
+    "frameCount": 27,
+    "order": "row-major"
+  },
+  "pivot": {
+    "character": [
+      32,
+      84
+    ],
+    "effects": [
+      48,
+      70
+    ]
+  },
+  "layers": [
+    "character.png",
+    "grimoire.png",
+    "effects.png"
+  ],
+  "motions": [
+    {
+      "name": "idle",
+      "start": 0,
+      "count": 3,
+      "duration": 0.9,
+      "target_fps": 8,
+      "key_pose_only": true
+    },
+    {
+      "name": "run",
+      "start": 3,
+      "count": 4,
+      "duration": 0.7,
+      "target_fps": 24,
+      "key_pose_only": true
+    },
+    {
+      "name": "attack",
+      "start": 7,
+      "count": 4,
+      "duration": 0.44,
+      "target_fps": 32,
+      "key_pose_only": true
+    },
+    {
+      "name": "flight",
+      "start": 11,
+      "count": 3,
+      "duration": 0.65,
+      "target_fps": 16,
+      "key_pose_only": true
+    },
+    {
+      "name": "gravity_field",
+      "start": 14,
+      "count": 3,
+      "duration": 0.5,
+      "target_fps": 24,
+      "key_pose_only": true
+    },
+    {
+      "name": "dimensional_spikes",
+      "start": 17,
+      "count": 3,
+      "duration": 0.55,
+      "target_fps": 24,
+      "key_pose_only": true
+    },
+    {
+      "name": "repulsion",
+      "start": 20,
+      "count": 3,
+      "duration": 0.42,
+      "target_fps": 32,
+      "key_pose_only": true
+    },
+    {
+      "name": "singularity",
+      "start": 23,
+      "count": 4,
+      "duration": 2,
+      "target_fps": 24,
+      "key_pose_only": true
+    }
+  ],
+  "caveats": [
+    "Current PNGs are newly authored draft silhouettes based on uploaded reference; not validated as 24–48 unique production poses.",
+    "Separate transparent book and FX layers need renderer registration and anchoring before gameplay.",
+    "Existing fire mage logic and assets are not replaced.",
+    "Gameplay parameters remain as defined in Docs/CURRENT_CLASS_DESIGN.md."
+  ]
+}
