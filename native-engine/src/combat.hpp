@@ -96,6 +96,7 @@ struct Projectile {float x,y;int facing,damage;bool empowered;float life=1.6f,re
 struct LightLance {size_t target;float x,y,life=.65f;float offset=0,angle=90;bool verdict=false,seeking=false,markOnHit=false;float delay=0;};
 enum class LightFx { Impact, Slash, Rush, Command, Depart, Arrive, Verdict };
 struct LightBurst {float x,y,life=.24f;LightFx kind=LightFx::Impact;int facing=1;};
+struct RiftScar {float x,y,angle,life=.16f;bool slash=false;};
 enum class DamageKind{Normal,Fire,Bleed,Execute};
 struct BleedSpread {float fromX,fromY,toX,toY,life=.23f;};
 struct Popup{float x,y;int amount;DamageKind kind;float age=0;};
@@ -346,6 +347,7 @@ class Combat {
         if(old<clip.contact&&p.whiteAge>=clip.contact){
             if(move==WhiteMove::Slash){
                 whiteEffect(LightFx::Slash,p.x+p.facing*42,p.y-48);
+                riftScars.push_back({p.x+p.facing*100.f,p.y-52.f,p.facing>0?-14.f:194.f,.21f,true});
                 melee(15+p.gear.attack(),0,105*p.gear.range());
             }else if(move==WhiteMove::Command){
                 // The forward-pointing sword pose is the shared release frame for the entire volley.
@@ -572,8 +574,14 @@ class Combat {
                     lightBursts.push_back({tx,ty});
                     return true;
                 }
-                lance.x+=dx/distance*movement;
-                lance.y+=dy/distance*movement;
+                const float traveled=std::min(movement,distance);
+                const float oldX=lance.x,oldY=lance.y;
+                lance.x+=dx/distance*traveled;
+                lance.y+=dy/distance*traveled;
+                // Persist a paper-thin white spatial incision behind the light spear.
+                if(riftScars.size()<160&&traveled>3.f)
+                    riftScars.push_back({(oldX+lance.x)*.5f,(oldY+lance.y)*.5f,
+                        lance.angle,.15f,false});
                 return false;
             }
             const float previousX=lance.x,previousY=lance.y;
@@ -603,13 +611,14 @@ public:
     std::vector<Projectile> projectiles;
     std::vector<LightLance> lightLances;
     std::vector<LightBurst> lightBursts;
+    std::vector<RiftScar> riftScars;
     float cameraCenter=viewWidth*.5f;
     std::vector<Popup> popups;
     std::vector<BleedSpread> bleedSpreads;
     bool ended=false,won=false,inventory=false;
     float clock=0,enemyVisualClock=0;
     Combat(){projectiles.reserve(16);popups.reserve(32);restart();}
-    void restart(){player={};enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};projectiles.clear();lightLances.clear();lightBursts.clear();cameraCenter=viewWidth*.5f;popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=enemyVisualClock=0;}
+    void restart(){player={};enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};projectiles.clear();lightLances.clear();lightBursts.clear();riftScars.clear();cameraCenter=viewWidth*.5f;popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=enemyVisualClock=0;}
     int foes()const{int count=0;for(const auto& e:enemies)if(!e.dead())++count;return count;}
     void hit(Enemy& e,int amount,bool fire,int bleed=0,bool slam=false){
         if(e.dead()||ended)return;
@@ -633,6 +642,9 @@ public:
         if(a.restart){restart();return;}
         clock+=dt;
         player.hurtTint=down(player.hurtTint,dt);
+        for(auto& scar:riftScars)scar.life-=dt;
+        riftScars.erase(std::remove_if(riftScars.begin(),riftScars.end(),
+            [](const RiftScar& scar){return scar.life<=0;}),riftScars.end());
         for(auto& burst:lightBursts)burst.life-=dt;
         lightBursts.erase(std::remove_if(lightBursts.begin(),lightBursts.end(),
             [](const LightBurst& burst){return burst.life<=0;}),lightBursts.end());
