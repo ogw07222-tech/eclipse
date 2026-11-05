@@ -1,0 +1,10 @@
+{
+  "media_tag": "83f767c6",
+  "decoded_frames": 126,
+  "closer_to_new_png": 126,
+  "mean_rgb_error_current_previous": [
+    1.7097620081018527,
+    6.765956392421236
+  ],
+  "scope": "Encoded frames match current PNG, not a natural-motion acceptance"
+}

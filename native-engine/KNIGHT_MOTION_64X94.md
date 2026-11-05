@@ -44,3 +44,9 @@ Validation checks actual PNG dimensions, all 112 distinct occupied cells, transp
 The prompt direction for every new motion was the same attack reference, matching helmet/armor/body detail, realistic adult proportions, navy cape and a blade about 40% of standing height. All approved poses were produced using built-in image generation and then normalized into exact game cells. The committed master is the reproducible authoring source; the runtime loads the packed PNG directly.
 
 Previews: `Art/knight/redesign/unified_motion_preview.gif` and `sword_fx_preview.gif`. Local validation: 57 core tests, real SDL compilation, PNG render smoke and left/right attack rendering. Android installation is not covered by these art checks.
+
+## Standard knight sprint update —24 authored poses
+
+The current sprint override uses **24 newly baked distinct PNG poses**, not24 selected from54. They occupy432–455, preserving the existing1024×2914/64×94/16-column atlas contract and original28/88 pivot. At base speed280, the196-unit distance cycle remains0.7s /34.29 pose FPS (the approved exception). Internal16-slot run phase metadata and the legacy source row remain separate from actual display metadata.
+
+The existing editable sprint renderer now uses196 units of contact travel per cycle,14px thigh/shin lengths and lower heel recovery. Original opaque upper-body/weapon pixels and all non-sprint0–431 decoded pixels are preserved. No gameplay parameters or other motions are changed. See [sprint source and review](../Art/knight/sprint/README.md). Full game/device playback and owner tests were not run; no Actions workflow was dispatched.

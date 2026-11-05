@@ -39,7 +39,7 @@
     "name": "run",
     "start": 32,
     "count": 16,
-    "duration": 0.428571,
+    "duration": 0.7,
     "loop": true,
     "source_count": 16,
     "source_indices": [
@@ -59,7 +59,12 @@
       13,
       14,
       15
-    ]
+    ],
+    "stride": 196,
+    "display_start": 432,
+    "display_count": 24,
+    "display_source_count": 24,
+    "display_source": "Art/knight/sprint/authored_run_24.png"
   },
   {
     "name": "jump",
