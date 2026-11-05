@@ -159,7 +159,7 @@ class Combat {
     }
     // Basic hits build a visible stock of light lances instead of firing automatically.
     void chargeLightLance(){
-        if(player.whiteNight)player.storedLightLances=std::min(6,player.storedLightLances+1);
+        if(player.whiteNight)player.storedLightLances=std::min(5,player.storedLightLances+1);
     }
     void releaseStoredLances(){
         auto& p=player;
@@ -184,8 +184,8 @@ class Combat {
         for(size_t target=0;target<enemies.size();++target){
             const auto& e=enemies[target];
             if(e.dead()||e.lightMark<=0)continue;
-            for(int i=0;i<6;++i){
-                const float spread=(i-2.5f)*18.f;
+            for(int i=0;i<3;++i){
+                const float spread=(i-1.f)*28.f;
                 lightLances.push_back({target,p.x+p.facing*(55.f+i*9.f),p.y-65.f+spread,1.3f,spread,0.f,true,true,false,i*.028f});
             }
         }
@@ -326,12 +326,12 @@ class Combat {
         auto& p=player;
         if(p.whiteMove==WhiteMove::None){
             if(!p.grounded||p.dashLeft>0||p.slamRecover>0||!canAttack())return false;
-            if(a.skill&&p.skillCooldown<=0){p.whiteMove=WhiteMove::Rush;p.skillCooldown=2.2f;}
-            else if(a.skillSweep&&p.sweepReady<=0&&p.storedLightLances>0){p.whiteMove=WhiteMove::Command;p.sweepReady=5.f;}
+            if(a.skill&&p.skillCooldown<=0){p.whiteMove=WhiteMove::Rush;p.skillCooldown=3.f;}
+            else if(a.skillSweep&&p.sweepReady<=0&&p.storedLightLances>0){p.whiteMove=WhiteMove::Command;p.sweepReady=1.f;}
             else if((a.skillBuff&&p.buffReady<=0)||(a.swap&&p.swapCooldown<=0)){
                 p.whiteTarget=farthestLightMark();
                 if(p.whiteTarget==enemies.size())return false;
-                if(a.skillBuff&&p.buffReady<=0){p.whiteMove=WhiteMove::Blink;p.buffReady=2.5f;}
+                if(a.skillBuff&&p.buffReady<=0){p.whiteMove=WhiteMove::Blink;p.buffReady=1.5f;}
                 else {p.whiteMove=WhiteMove::Verdict;p.swapCooldown=9.f;}
             }else if(a.attack&&p.attackCooldown<=0){p.whiteMove=WhiteMove::Slash;p.attackCooldown=.46f/p.basicSpeed();}
             else return false;
