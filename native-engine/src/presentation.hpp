@@ -1285,15 +1285,14 @@ public:
         offset=std::round(camera)-640;SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);SDL_SetRenderDrawColor(renderer,21,35,52,255);SDL_RenderClear(renderer);
         forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.clock);
         const auto& caster=g.player;
-        if(whiteNightLance_&&caster.whiteMove==WhiteMove::Verdict&&
-           caster.whiteAge>.30f&&caster.whiteAge<whiteClips[5].contact&&
-           caster.whiteTarget<g.enemies.size()&&!g.enemies[caster.whiteTarget].dead()){
-            const auto& enemy=g.enemies[caster.whiteTarget];
-            const float y=enemyBounds(enemy).top-165.f;
-            for(int i=0;i<6;++i){
-                const float spread=(i-2.5f)*38;
-                const SDL_FRect dest{enemy.x+spread-offset-19,y-20.5f,38,3};
-                const double angle=std::atan2(165.f,-spread)*57.29578;
+        // Stored light lances visibly orbit the player until skill 2 launches them.
+        if(whiteNightLance_&&caster.whiteNight&&caster.storedLightLances>0){
+            for(int i=0;i<caster.storedLightLances;++i){
+                const float phase=g.clock*2.8f+i*6.2831853f/caster.storedLightLances;
+                const float x=caster.x+std::cos(phase)*57.f-offset;
+                const float y=caster.y-61.f+std::sin(phase)*37.f;
+                const SDL_FRect dest{x-19.f,y-1.5f,38.f,3.f};
+                const double angle=phase*57.29578+90.;
                 SDL_RenderTextureRotated(renderer,whiteNightLance_,nullptr,&dest,angle,nullptr,SDL_FLIP_NONE);
             }
         }
