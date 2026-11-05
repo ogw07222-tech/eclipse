@@ -27,6 +27,8 @@ class Presentation {
     SDL_Texture* goldTrail_=nullptr;
     SDL_Texture* goldOrb_=nullptr;
     SDL_Texture* goldImpact_=nullptr;
+    SDL_Texture* riftSlash_=nullptr;
+    SDL_Texture* riftTrace_=nullptr;
     std::array<SDL_Texture*,5> whiteFxTextures_{};
     std::array<SDL_Texture*,3> slimeTextures_{};
     SDL_Texture* enemyBarFrame_=nullptr;
@@ -856,7 +858,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_})if(fx)SDL_DestroyTexture(fx);for(auto* fx:whiteFxTextures_)if(fx)SDL_DestroyTexture(fx);if(whiteNightMotion_)SDL_DestroyTexture(whiteNightMotion_);if(whiteNightLance_)SDL_DestroyTexture(whiteNightLance_);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleBg_)SDL_DestroyTexture(titleBg_);if(titleKnightFg_)SDL_DestroyTexture(titleKnightFg_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_,riftSlash_,riftTrace_})if(fx)SDL_DestroyTexture(fx);for(auto* fx:whiteFxTextures_)if(fx)SDL_DestroyTexture(fx);if(whiteNightMotion_)SDL_DestroyTexture(whiteNightMotion_);if(whiteNightLance_)SDL_DestroyTexture(whiteNightLance_);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleBg_)SDL_DestroyTexture(titleBg_);if(titleKnightFg_)SDL_DestroyTexture(titleKnightFg_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -1010,7 +1012,9 @@ public:
         if(!loadGold(goldLance_,"ui/lance_gold.png",96,24)||
            !loadGold(goldTrail_,"ui/trail_gold.png",128,32)||
            !loadGold(goldOrb_,"ui/orb_gold.png",64,64)||
-           !loadGold(goldImpact_,"ui/impact_gold.png",96,96))return false;
+           !loadGold(goldImpact_,"ui/impact_gold.png",96,96)||
+           !loadGold(riftSlash_,"ui/rift_slash.png",192,64)||
+           !loadGold(riftTrace_,"ui/rift_trace.png",256,32))return false;
         return true;
     }
 
@@ -1364,6 +1368,17 @@ public:
             // Desaturating veil; targets and their animations are frozen in the combat step.
             rect(0,0,1280,720,0x18140f,154);
         }
+        // Authored PNG spatial cuts remain for a few frames; the incision
+        // contracts rather than exploding into a diffuse magical glow.
+        if(caster.whiteNight){
+            for(const auto& scar:g.riftScars){
+                const float progress=std::clamp(scar.life/(scar.slash?.21f:.15f),0.f,1.f);
+                const float width=(scar.slash?230.f:91.f)*(0.35f+.65f*progress);
+                const float height=(scar.slash?78.f:13.f)*(.4f+.6f*progress);
+                goldenSprite(scar.slash?riftSlash_:riftTrace_,scar.x-offset,scar.y,
+                    width,height,scar.angle,static_cast<Uint8>(255.f*std::min(1.f,progress*2.4f)));
+            }
+        }
         // Persistent yellow-white PNG markers show exactly which enemies
         // will be struck by the three-lance ultimate.
         if(caster.whiteNight&&goldOrb_&&goldImpact_){
@@ -1404,12 +1419,16 @@ public:
             const float dx=std::cos(angle),dy=std::sin(angle);
             const bool launched=lance.delay<=0;
             if(launched){
+                // A narrow, almost-white spatial cut travels with the spear.
+                // The broader golden wake stays secondary to the clean incision.
+                goldenSprite(riftTrace_,x-dx*93.f,y-dy*93.f,225.f,17.f,
+                    lance.angle,235);
                 // Four layered PNG trails create a bright white center and a long gold wake.
-                for(int i=0;i<4;++i){
-                    const float distance=34.f+i*38.f;
+                for(int i=0;i<2;++i){
+                    const float distance=34.f+i*39.f;
                     goldenSprite(goldTrail_,x-dx*distance,y-dy*distance,
-                        130.f+31.f*i,32.f-i*4.f,lance.angle,
-                        static_cast<Uint8>(210-i*44));
+                        120.f+27.f*i,21.f-i*5.f,lance.angle,
+                        static_cast<Uint8>(95-i*35));
                 }
                 // Spatial particles persist behind each moving spear.
                 for(int i=0;i<5;++i){
@@ -1425,8 +1444,15 @@ public:
             goldenSprite(lanceArt,x-dx*10,y-dy*10,96,24,lance.angle);
         }
         for(const auto& burst:g.lightBursts){
-            // Golden particle overlays replace blue/cyan code-generated effects.
-            goldenImpactParticles(burst);
+            if(burst.kind==LightFx::Slash){
+                const float t=std::clamp(1.f-burst.life/.24f,0.f,1.f);
+                goldenSprite(riftSlash_,burst.x-offset+burst.facing*47.f,
+                    burst.y-4.f,235.f*(1.f-.22f*t),72.f*(1.f-.4f*t),
+                    burst.facing>0?-14.f:194.f,
+                    static_cast<Uint8>(230*(1.f-t)));
+            }else{
+                goldenImpactParticles(burst);
+            }
         }
         for(const auto& b:g.projectiles){
             const int radius=b.empowered?14:8;
