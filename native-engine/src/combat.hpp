@@ -64,6 +64,9 @@ struct Player {
     int meleeDamage=0,meleeBleed=0,attackPose=0;
     SwordStrike strike=SwordStrike::Basic;
     float sweepReady=0,buffReady=0,mageSkillCooldown=0,preparation=0;
+    // Class archetypes: ranged 80%, melee 100%, assassin 125% of base run speed.
+    // Keep this separate from attack speed and dash/skill movement.
+    float movementMultiplier() const {return whiteNight?1.25f:form==1?.80f:1.f;}
     float basicSpeed() const {return gear.speed()*(preparation>0?1.20f:1.f);}
     int maxHealth()const{return 100+gear.hp();}
     void equip(int slot){
@@ -390,7 +393,7 @@ class Combat {
         if(a.dash&&p.dashCooldown<=0&&p.slamRecover<=0){cancelAirSlam();cancelMageCast();p.meleeLeft=0;p.dashLeft=.15f;p.dashCooldown=.85f;p.invulnerable=std::max(p.invulnerable,.15f);}
         if(p.dashLeft>0){p.vx=780*p.facing*p.gear.speed();p.vy=0;}
         else {
-            p.vx=axis*280*p.gear.speed();
+            p.vx=axis*280*p.gear.speed()*p.movementMultiplier();
             p.vy+=1250*dt;
             if((p.jumpBuffer>0||(a.jumpHeld&&p.grounded))&&p.coyote>0&&!p.airSlam&&p.slamRecover<=0)
                 launchJump();
