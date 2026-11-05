@@ -1544,6 +1544,22 @@ public:
             }else if(p.hurtTint>0)SDL_SetTextureColorMod(whiteNightMotion_,255,150,160);
             SDL_RenderTextureRotated(renderer,whiteNightMotion_,&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
             SDL_SetTextureColorMod(whiteNightMotion_,255,255,255);
+            if(p.whiteMove==WhiteMove::Command&&p.whiteAge>=.08f&&p.whiteAge<.46f&&goldOrb_){
+                // A sword-tip flash builds while the blade extends, then the
+                // stored lances all release on the authored contact frame.
+                const float local=p.whiteAge;
+                const float strength=local<.23f?local/.23f:std::max(0.f,1.f-(local-.23f)/.23f);
+                const float x=p.x+p.facing*92.f-offset,y=p.y-59.f;
+                goldenSprite(goldOrb_,x,y,48.f+32.f*strength,48.f+32.f*strength,0,
+                             static_cast<Uint8>(180*strength));
+                for(int i=0;i<5;++i){
+                    const float angle=(i-2.f)*.46f;
+                    const float distance=24.f+47.f*strength;
+                    goldenSprite(goldTrail_,x+p.facing*distance,y+std::sin(angle)*distance,
+                        49.f+40.f*strength,10.f,p.facing>0?angle*57.29578:180-angle*57.29578,
+                        static_cast<Uint8>(160*strength));
+                }
+            }
             if(p.whiteMove==WhiteMove::Verdict&&p.whiteAge>=.23f&&p.whiteAge<.91f&&(goldOrb_||whiteFxTextures_[3])){
                 // PNG glow layer at the opposite (left) hand. The spherical light contracts
                 // when the fist closes, then flares as every marked target is struck.
@@ -1556,6 +1572,20 @@ public:
                 SDL_SetTextureAlphaMod(orb,static_cast<Uint8>(190+65*t));
                 SDL_RenderTexture(renderer,orb,goldOrb_?nullptr:&glowSrc,&glowDst);
                 SDL_SetTextureAlphaMod(orb,255);
+                // Golden spear fragments spiral into the clenched off-hand;
+                // on release they radiate outwards from the white orb.
+                for(int i=0;i<10;++i){
+                    const float a=i*.62831853f+p.whiteAge*7.5f;
+                    const float radius=t<.72f?43.f-t*23.f:27.f+(t-.72f)*160.f;
+                    const float x=p.x-p.facing*24.f-offset+std::cos(a)*radius;
+                    const float y=p.y-57.f+std::sin(a)*radius*.78f;
+                    goldenSprite(goldOrb_,x,y,11.f+4.f*(1.f-t),11.f+4.f*(1.f-t),
+                        0,static_cast<Uint8>(210*(1.f-t*.65f)));
+                    if(t>.55f){
+                        goldenSprite(goldTrail_,x,y,36.f+25.f*t,8.f,a*57.29578f,
+                            static_cast<Uint8>(150*(1.f-t*.65f)));
+                    }
+                }
             }
             if(p.whiteBoost>0 && whiteFxTextures_[3]){
                 const SDL_FRect glowSrc{0,0,96,96};
