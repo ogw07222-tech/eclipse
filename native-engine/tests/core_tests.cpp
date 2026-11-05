@@ -50,6 +50,24 @@ int main(){int failed=0,total=0;
     test("Initial four enemy wave",[]{Combat g;check(g.foes()==4&&g.player.health==100&&!g.ended,"Initial wave");check(g.enemies[0].health==55&&g.enemies[1].health==85,"Enemy types");near(g.enemies[3].x,1285);});
     test("Slime strength increases green red purple",[]{Combat g;check(g.enemies[3].kind==2,"Purple elite missing");check(!g.enemies[3].boss&&g.enemies[3].knockbackResistance()==.65f,"Purple elite must not be boss immune");for(int i=0;i<2;++i){check(slimeSpecs[i].health<slimeSpecs[i+1].health&&slimeSpecs[i].damage<slimeSpecs[i+1].damage,"Tier order");}});
     test("Slime bite waits for contact and hits only once",[]{for(int kind=0;kind<3;++kind){auto g=arena();auto& e=g.enemies[0];e=Enemy(kind,g.player.x+40);g.step(1.f/60,{});check(e.attackAge==0&&g.player.health==100,"Instant bite");const float contact=slimeSpec(kind).attackDuration*slimeSpec(kind).contact;while(e.attackAge+1.f/60<contact)g.step(1.f/60,{});check(g.player.health==100,"Hit before contact");g.step(1.f/60,{});check(g.player.health==100-e.damage,"Missing contact hit");int hp=g.player.health;wait(g,35);check(g.player.health==hp,"Repeated contact");}});
+    test("Knockback displaces enemies without interrupting attack windup or recovery",[]{
+        for(int kind=0;kind<3;++kind){
+            auto g=arena();auto& e=g.enemies[0];
+            e=Enemy(kind,g.player.x+40);
+            g.step(1.f/60,{});
+            check(e.attackAge==0,"Attack did not begin");
+            const float timer=e.attackTimer;
+            const float initialX=e.x;
+            g.hit(e,0,false,0,true);
+            check(e.attackAge==0,"Knockback cancelled the active attack");
+            check(e.stagger==0,"Knockback applied attack-locking stagger");
+            check(e.attackTimer==timer,"Knockback extended enemy attack cooldown");
+            check(e.knockback!=0,"Knockback displacement was removed");
+            g.step(1.f/60,{});
+            check(e.attackAge>0,"Attack failed to advance while knocked back");
+            check(e.x!=initialX,"Enemy failed to move during knockback");
+        }
+    });
     test("Slime telegraph can be escaped and facing stays locked",[]{auto g=arena();auto& e=g.enemies[0];e=Enemy(0,g.player.x+40);g.step(1.f/60,{});check(e.facing==-1,"Facing");g.player.x=e.x+30;wait(g,25);check(g.player.health==100&&e.facing==-1,"Bite hit behind locked jaw");});
     test("Slime animation uses motion and bounded one-shot clips",[]{auto g=arena();auto& e=g.enemies[0];float phase=e.travelPhase;wait(g,8);check(e.travelPhase!=phase,"Walk frozen");check(slimeFrame(0,-1,0)==0&&slimeFrame(.99f,-1,0)==7,"Walk bounds");for(int kind=0;kind<3;++kind){check(slimeFrame(0,0,kind)==8&&slimeFrame(0,slimeSpec(kind).attackDuration*.5f,kind)==12&&slimeFrame(0,100,kind)==15,"Bite atlas range");}});
     test("Animated monster bodies use their outer silhouette in both directions",[]{

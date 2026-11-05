@@ -499,10 +499,7 @@ class Combat {
         if(e.dead())return;
         const float dx=player.x-e.x;float vx=0;
         const auto& spec=slimeSpec(e.kind);
-        if(e.stagger>0){
-            // Knocked-back enemies cannot wind up or land an already-started attack.
-            e.attackAge=-1;e.y=floorY;
-        }else if(e.attackAge>=0){
+        if(e.attackAge>=0){
             const float before=e.attackAge;e.attackAge+=dt;
             const float phase=std::min(1.f,e.attackAge/spec.attackDuration);
             if(e.kind==1){
@@ -600,16 +597,11 @@ public:
     void hit(Enemy& e,int amount,bool fire,int bleed=0,bool slam=false){
         if(e.dead()||ended)return;
         if(fire){e.burn=3;e.burnTick=0;if(e.bleed>0){amount+=22;e.bleed=0;e.bleedStacks=0;e.bleedTick=0;e.reactionFlash=.5f;}}
-        // Every monster has a resistance coefficient; full resistance
-        // (the existing boss default) means no displacement or interruption.
+        // Knockback resistance only scales displacement; being pushed does not interrupt attacks.
         const float impulse=(slam?315.f:e.reactionFlash>0?210.f:135.f)*
             (1.f-std::clamp(e.knockbackResistance(),0.f,1.f));
         if(impulse>0.f){
             e.knockback=(e.x>=player.x?1.f:-1.f)*impulse;
-            e.stagger=std::max(e.stagger,slam?.32f:.16f);
-            e.attackAge=-1; // Cancel wind-up and active attack when pushed.
-            e.y=floorY; // Reset the red slime's airborne attack pose.
-            e.attackTimer=std::max(e.attackTimer,slam?.42f:.22f);
         }
         damageEnemy(e,amount,fire?DamageKind::Fire:DamageKind::Normal,false);
         addBleed(e,bleed);
