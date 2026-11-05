@@ -46,6 +46,7 @@ struct Player {
     Equipment gear;
     float x=140,y=floorY,vx=0,vy=0;
     int health=100,form=0,facing=1,combo=0,attackSerial=0,hurtSerial=0,landingSerial=0;
+    int storedLightLances=0;
     bool grounded=true,whiteNight=false;
     WhiteMove whiteMove=WhiteMove::None;
     float whiteAge=0,whiteBoost=0;
@@ -92,7 +93,7 @@ struct Enemy {
     bool dead()const{return health<=0;}
 };
 struct Projectile {float x,y;int facing,damage;bool empowered;float life=1.6f,remainingDrop=0;};
-struct LightLance {size_t target;float x,y,life=.65f;float offset=0,angle=90;bool verdict=false;};
+struct LightLance {size_t target;float x,y,life=.65f;float offset=0,angle=90;bool verdict=false,seeking=false,markOnHit=false;float delay=0;};
 enum class LightFx { Impact, Slash, Rush, Command, Depart, Arrive, Verdict };
 struct LightBurst {float x,y,life=.24f;LightFx kind=LightFx::Impact;int facing=1;};
 enum class DamageKind{Normal,Fire,Bleed,Execute};
@@ -156,20 +157,39 @@ class Combat {
         e.health=std::max(0,e.health-amount);if(!dot)e.hitFlash=.18f;
         popups.push_back({e.x,e.y-86,amount,kind});
     }
-    void launchLightLance(){
-        if(!player.whiteNight)return;
-        const float left=cameraCenter-viewWidth*.5f;
+    // Basic hits build a visible stock of light lances instead of firing automatically.
+    void chargeLightLance(){
+        if(player.whiteNight)player.storedLightLances=std::min(6,player.storedLightLances+1);
+    }
+    void releaseStoredLances(){
+        auto& p=player;
+        if(p.storedLightLances<=0)return;
         std::array<size_t,4> candidates{};
         size_t count=0;
-        for(size_t i=0;i<enemies.size();++i){
-            const auto& e=enemies[i];
-            if(!e.dead()&&e.x>=left&&e.x<=left+viewWidth)candidates[count++]=i;
-        }
+        const float left=cameraCenter-viewWidth*.5f;
+        for(size_t i=0;i<enemies.size();++i)
+            if(!enemies[i].dead()&&enemies[i].x>=left&&enemies[i].x<=left+viewWidth)candidates[count++]=i;
         if(count==0)return;
         static std::mt19937 random{std::random_device{}()};
-        const size_t target=candidates[std::uniform_int_distribution<size_t>{0,count-1}(random)];
-        const auto& e=enemies[target];
-        lightLances.push_back({target,e.x,enemyBounds(e).top-170.f});
+        const int total=p.storedLightLances;
+        for(int i=0;i<total;++i){
+            const size_t target=candidates[std::uniform_int_distribution<size_t>{0,count-1}(random)];
+            const float spread=(i-(total-1)*.5f)*16.f;
+            lightLances.push_back({target,p.x+p.facing*48.f,p.y-65.f+spread,1.3f,spread,0.f,false,true,true,i*.035f});
+        }
+        p.storedLightLances=0;
+    }
+    void launchVerdictLances(){
+        auto& p=player;
+        const float left=cameraCenter-viewWidth*.5f;
+        for(size_t target=0;target<enemies.size();++target){
+            const auto& e=enemies[target];
+            if(e.dead()||e.lightMark<=0||e.x<left||e.x>left+viewWidth)continue;
+            for(int i=0;i<6;++i){
+                const float spread=(i-2.5f)*18.f;
+                lightLances.push_back({target,p.x+p.facing*(55.f+i*9.f),p.y-65.f+spread,1.3f,spread,0.f,true,true,false,i*.028f});
+            }
+        }
     }
     void melee(int damage,int bleed,float reach){
         const BodyRect strike=player.facing>0?BodyRect{player.x-9,player.y-102,player.x+reach,player.y+2}:
@@ -180,7 +200,7 @@ class Combat {
             hit(e,damage,false,bleed);player.hitStop=std::max(player.hitStop,damage<20?.045f:.075f);
             connected=true;
         }
-        if(connected)launchLightLance();
+        if(connected)chargeLightLance();
     }
     static void addBleed(Enemy& e,int stacks) {
         if(e.dead()||stacks<=0)return;
@@ -205,7 +225,7 @@ class Combat {
             if(nearest){
                 hit(*nearest,p.meleeDamage,false,2);
                 p.hitStop=.075f;
-                launchLightLance();
+                chargeLightLance();
             }
             return;
         }
@@ -228,7 +248,7 @@ class Combat {
             hit(e,p.meleeDamage,false);
             p.hitStop=.065f;
         }
-        if(connected)launchLightLance();
+        if(connected)chargeLightLance();
         // Snapshot sources before applying any spread so newly affected enemies cannot relay it.
         for(size_t i=0;i<enemies.size();++i){
             auto& target=enemies[i];
@@ -256,7 +276,7 @@ class Combat {
         bool connected=false;
         for(auto& e:enemies){if(e.dead()||!enemyOverlaps(e,strike))continue;
             hit(e,24+p.gear.attack(),false,0,true);connected=true;}
-        if(connected)launchLightLance();
+        if(connected)chargeLightLance();
         p.hitStop=std::max(p.hitStop,connected?.065f:.025f);
     }
     void basic(){
@@ -308,7 +328,7 @@ class Combat {
         if(p.whiteMove==WhiteMove::None){
             if(!p.grounded||p.dashLeft>0||p.slamRecover>0||!canAttack())return false;
             if(a.skill&&p.skillCooldown<=0){p.whiteMove=WhiteMove::Rush;p.skillCooldown=2.2f;}
-            else if(a.skillSweep&&p.sweepReady<=0){p.whiteMove=WhiteMove::Command;p.sweepReady=5.f;}
+            else if(a.skillSweep&&p.sweepReady<=0&&p.storedLightLances>0){p.whiteMove=WhiteMove::Command;p.sweepReady=5.f;}
             else if((a.skillBuff&&p.buffReady<=0)||(a.swap&&p.swapCooldown<=0)){
                 p.whiteTarget=farthestLightMark();
                 if(p.whiteTarget==enemies.size())return false;
@@ -328,7 +348,7 @@ class Combat {
                 whiteEffect(LightFx::Slash,p.x+p.facing*42,p.y-48);
                 melee(15+p.gear.attack(),0,105*p.gear.range());
             }else if(move==WhiteMove::Command){
-                p.whiteBoost=3.5f;whiteEffect(LightFx::Command,p.x,p.y-42);
+                releaseStoredLances();whiteEffect(LightFx::Command,p.x,p.y-42);
             }else if(move==WhiteMove::Blink&&!enemies[p.whiteTarget].dead()){
                 auto& e=enemies[p.whiteTarget];
                 whiteEffect(LightFx::Depart,p.x,p.y-48);
@@ -336,14 +356,11 @@ class Combat {
                 p.x=std::clamp(e.x+side*58,25.f,1550.f);p.y=floorY;
                 p.facing=e.x>=p.x?1:-1;
                 whiteEffect(LightFx::Arrive,p.x,p.y-48);
-            }else if(move==WhiteMove::Verdict&&!enemies[p.whiteTarget].dead()){
-                const auto& e=enemies[p.whiteTarget];
+            }else if(move==WhiteMove::Verdict){
                 whiteEffect(LightFx::Slash,p.x+p.facing*42,p.y-48);
-                whiteEffect(LightFx::Verdict,e.x,e.y-45);
-                for(int i=0;i<6;++i){
-                    const float offset=(i-2.5f)*38;
-                    lightLances.push_back({p.whiteTarget,e.x+offset,enemyBounds(e).top-165.f,.65f,offset,90.f,true});
-                }
+                for(const auto& e:enemies)
+                    if(!e.dead()&&e.lightMark>0)whiteEffect(LightFx::Verdict,e.x,e.y-45);
+                launchVerdictLances();
             }
         }
         if(move==WhiteMove::Rush){
@@ -359,10 +376,9 @@ class Combat {
                     if(e.dead()||(p.whiteRushHits&(1u<<i))||!enemyOverlaps(e,strike))continue;
                     p.whiteRushHits|=1u<<i;
                     hit(e,18+p.gear.attack(),false);
-                    if(!e.dead())e.lightMark=5.f;
                     whiteEffect(LightFx::Impact,e.x,e.y-38);
                 }
-                if(!hadHit&&p.whiteRushHits)launchLightLance();
+                // Rush is the mark setup movement; only basic attacks charge stored lances.
             }
         }
         if(p.whiteAge>=clip.duration)p.whiteMove=WhiteMove::None;
@@ -541,33 +557,31 @@ class Combat {
         lightLances.erase(std::remove_if(lightLances.begin(),lightLances.end(),[&](LightLance& lance){
             if((lance.life-=dt)<=0)return true;
             const auto& target=enemies[lance.target];
-            if(lance.verdict&&target.dead())return true;
+            if(lance.seeking){
+                if(target.dead())return true;
+                if(lance.delay>0){lance.delay-=dt;return false;}
+                const auto bounds=enemyBounds(target);
+                const float tx=target.x,ty=(bounds.top+bounds.bottom)*.5f;
+                const float dx=tx-lance.x,dy=ty-lance.y;
+                const float distance=std::hypot(dx,dy);
+                const float movement=(lance.verdict?2700.f:2100.f)*dt;
+                lance.angle=std::atan2(dy,dx)*57.29578f;
+                if(distance<=movement+12.f){
+                    damageEnemy(enemies[lance.target],(lance.verdict?8:10)+player.gear.attack(),DamageKind::Normal,false);
+                    if(lance.markOnHit&&!enemies[lance.target].dead())enemies[lance.target].lightMark=5.f;
+                    lightBursts.push_back({tx,ty});
+                    return true;
+                }
+                lance.x+=dx/distance*movement;
+                lance.y+=dy/distance*movement;
+                return false;
+            }
             const float previousX=lance.x,previousY=lance.y;
-            const float speed=player.whiteBoost>0?1890.f:1050.f;
+            const float speed=1050.f;
             lance.y+=speed*dt;
-            if(!target.dead()){
-                const float spread=lance.verdict?std::clamp((enemyBounds(target).top-lance.y)/165.f,0.f,1.f):0.f;
-                lance.x=target.x+lance.offset*spread;
-            }
+            if(!target.dead())lance.x=target.x+lance.offset;
             lance.angle=std::atan2(lance.y-previousY,lance.x-previousX)*57.29578f;
-            Enemy* first=nullptr;
-            float contact=lance.y;
-            for(auto& e:enemies){
-                if(e.dead())continue;
-                enemyAnyBand(e,[&](BodyRect band){
-                    const float entry=std::max(previousY,band.top);
-                    if(lance.x>=band.left&&lance.x<=band.right&&entry<=band.bottom&&entry<=lance.y&&(!first||entry<contact)){
-                        first=&e;
-                        contact=entry;
-                    }
-                    return false;
-                });
-            }
-            if(!first)return lance.y>viewHeight;
-            damageEnemy(*first,(lance.verdict?8:10)+player.gear.attack(),DamageKind::Normal,false);
-            if(!first->dead())first->lightMark=5.f;
-            lightBursts.push_back({lance.x,contact});
-            return true;
+            return lance.y>viewHeight;
         }),lightLances.end());
     }
     void stepProjectiles(float dt){
