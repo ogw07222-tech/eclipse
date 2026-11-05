@@ -23,6 +23,10 @@ class Presentation {
     SDL_Texture* titleMenu_=nullptr;
     SDL_Texture* whiteNightLance_=nullptr;
     SDL_Texture* whiteNightMotion_=nullptr;
+    SDL_Texture* goldLance_=nullptr;
+    SDL_Texture* goldTrail_=nullptr;
+    SDL_Texture* goldOrb_=nullptr;
+    SDL_Texture* goldImpact_=nullptr;
     std::array<SDL_Texture*,5> whiteFxTextures_{};
     std::array<SDL_Texture*,3> slimeTextures_{};
     SDL_Texture* enemyBarFrame_=nullptr;
@@ -852,7 +856,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){for(auto* fx:whiteFxTextures_)if(fx)SDL_DestroyTexture(fx);if(whiteNightMotion_)SDL_DestroyTexture(whiteNightMotion_);if(whiteNightLance_)SDL_DestroyTexture(whiteNightLance_);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleBg_)SDL_DestroyTexture(titleBg_);if(titleKnightFg_)SDL_DestroyTexture(titleKnightFg_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_})if(fx)SDL_DestroyTexture(fx);for(auto* fx:whiteFxTextures_)if(fx)SDL_DestroyTexture(fx);if(whiteNightMotion_)SDL_DestroyTexture(whiteNightMotion_);if(whiteNightLance_)SDL_DestroyTexture(whiteNightLance_);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleBg_)SDL_DestroyTexture(titleBg_);if(titleKnightFg_)SDL_DestroyTexture(titleKnightFg_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -982,6 +986,19 @@ public:
         SDL_SetTextureScaleMode(motion,SDL_SCALEMODE_NEAREST);
         whiteNightLance_=texture;
         whiteNightMotion_=motion;
+        // Authored gold PNG effect pack; keep existing assets as fallback.
+        auto loadGold=[&](SDL_Texture*& destination,const char* name){
+            if(destination)return;
+            destination=IMG_LoadTexture(renderer,asset(name).c_str());
+            if(destination){
+                SDL_SetTextureScaleMode(destination,SDL_SCALEMODE_NEAREST);
+                SDL_SetTextureBlendMode(destination,SDL_BLENDMODE_BLEND);
+            }else SDL_Log("Optional White Night gold PNG not installed: %s",name);
+        };
+        loadGold(goldLance_,"ui/lance_gold.png");
+        loadGold(goldTrail_,"ui/trail_gold.png");
+        loadGold(goldOrb_,"ui/orb_gold.png");
+        loadGold(goldImpact_,"ui/impact_gold.png");
         return true;
     }
 
@@ -1291,30 +1308,49 @@ public:
             // Desaturating veil; targets and their animations are frozen in the combat step.
             rect(0,0,1280,720,0x101728,148);
         }
-        // Stored light lances visibly orbit the player until skill 2 launches them.
-        if(whiteNightLance_&&caster.whiteNight&&caster.storedLightLances>0){
+        // Gold-white light effects are sourced from PNG textures.
+        SDL_Texture* lanceArt=goldLance_?goldLance_:whiteNightLance_;
+        if(lanceArt&&caster.whiteNight&&caster.storedLightLances>0){
             for(int i=0;i<caster.storedLightLances;++i){
                 const float phase=g.clock*2.8f+i*6.2831853f/caster.storedLightLances;
                 const float x=caster.x+std::cos(phase)*57.f-offset;
                 const float y=caster.y-61.f+std::sin(phase)*37.f;
-                const SDL_FRect dest{x-19.f,y-1.5f,38.f,3.f};
-                const double angle=phase*57.29578+90.;
-                SDL_RenderTextureRotated(renderer,whiteNightLance_,nullptr,&dest,angle,nullptr,SDL_FLIP_NONE);
+                const float w=goldLance_?96.f:38.f,h=goldLance_?24.f:3.f;
+                const SDL_FRect dest{x-w*.5f,y-h*.5f,w,h};
+                SDL_RenderTextureRotated(renderer,lanceArt,nullptr,&dest,phase*57.29578+90.,nullptr,SDL_FLIP_NONE);
+                if(goldOrb_){
+                    const SDL_FRect aura{x-17,y-17,34,34};
+                    SDL_SetTextureAlphaMod(goldOrb_,110);
+                    SDL_RenderTexture(renderer,goldOrb_,nullptr,&aura);
+                    SDL_SetTextureAlphaMod(goldOrb_,255);
+                }
             }
         }
-        if(whiteNightLance_)for(const auto& lance:g.lightLances){
+        if(lanceArt)for(const auto& lance:g.lightLances){
             const float x=lance.x-offset,y=lance.y;
             const float angle=lance.angle*.017453293f;
             const float dx=std::cos(angle),dy=std::sin(angle);
-            for(int i=2;i<18;++i){
-                const float distance=19.f+i*3.f;
-                rect(x-dx*distance-1,y-dy*distance-1,3,i<7?3:2,
-                     i<8?0xf0f9ff:0x8fb5cf,static_cast<Uint8>(230-i*11));
+            if(goldTrail_&&lance.delay<=0){
+                const SDL_FRect tail{x-dx*84.f-64.f,y-dy*84.f-16.f,128,32};
+                SDL_SetTextureAlphaMod(goldTrail_,225);
+                SDL_RenderTextureRotated(renderer,goldTrail_,nullptr,&tail,lance.angle,nullptr,SDL_FLIP_NONE);
+                SDL_SetTextureAlphaMod(goldTrail_,255);
             }
-            const SDL_FRect dest{x-dx*19-19,y-dy*19-1.5f,38,3};
-            SDL_RenderTextureRotated(renderer,whiteNightLance_,nullptr,&dest,lance.angle,nullptr,SDL_FLIP_NONE);
+            const float w=goldLance_?96.f:38.f,h=goldLance_?24.f:3.f;
+            const SDL_FRect dest{x-dx*22.f-w*.5f,y-dy*22.f-h*.5f,w,h};
+            SDL_RenderTextureRotated(renderer,lanceArt,nullptr,&dest,lance.angle,nullptr,SDL_FLIP_NONE);
         }
-        for(const auto& burst:g.lightBursts)drawWhiteEffect(burst);
+        for(const auto& burst:g.lightBursts){
+            drawWhiteEffect(burst);
+            if(goldImpact_&&(burst.kind==LightFx::Impact||burst.kind==LightFx::Verdict)){
+                const float t=std::clamp(1.f-burst.life/.24f,0.f,1.f);
+                const float size=(burst.kind==LightFx::Verdict?190.f:120.f)*(1.f+.35f*t);
+                const SDL_FRect dest{burst.x-offset-size*.5f,burst.y-size*.5f,size,size};
+                SDL_SetTextureAlphaMod(goldImpact_,static_cast<Uint8>(255.f*(1.f-t*.75f)));
+                SDL_RenderTexture(renderer,goldImpact_,nullptr,&dest);
+                SDL_SetTextureAlphaMod(goldImpact_,255);
+            }
+        }
         for(const auto& b:g.projectiles){
             const int radius=b.empowered?14:8;
             const float x=b.x-offset;
@@ -1431,17 +1467,18 @@ public:
             }else if(p.hurtTint>0)SDL_SetTextureColorMod(whiteNightMotion_,255,150,160);
             SDL_RenderTextureRotated(renderer,whiteNightMotion_,&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
             SDL_SetTextureColorMod(whiteNightMotion_,255,255,255);
-            if(p.whiteMove==WhiteMove::Verdict&&p.whiteAge>=.23f&&p.whiteAge<.91f&&whiteFxTextures_[3]){
+            if(p.whiteMove==WhiteMove::Verdict&&p.whiteAge>=.23f&&p.whiteAge<.91f&&(goldOrb_||whiteFxTextures_[3])){
                 // PNG glow layer at the opposite (left) hand. The spherical light contracts
                 // when the fist closes, then flares as every marked target is struck.
                 const float t=std::clamp((p.whiteAge-.23f)/.68f,0.f,1.f);
                 const float size=t<.70f?48.f-12.f*t:39.f+28.f*(t-.70f)/.30f;
                 const SDL_FRect glowSrc{0,0,96,96};
+                SDL_Texture* orb=goldOrb_?goldOrb_:whiteFxTextures_[3];
                 const SDL_FRect glowDst{std::round(p.x-p.facing*24.f-offset-size*.5f),
                     std::round(p.y-57.f-size*.5f),size,size};
-                SDL_SetTextureAlphaMod(whiteFxTextures_[3],static_cast<Uint8>(190+65*t));
-                SDL_RenderTexture(renderer,whiteFxTextures_[3],&glowSrc,&glowDst);
-                SDL_SetTextureAlphaMod(whiteFxTextures_[3],255);
+                SDL_SetTextureAlphaMod(orb,static_cast<Uint8>(190+65*t));
+                SDL_RenderTexture(renderer,orb,goldOrb_?nullptr:&glowSrc,&glowDst);
+                SDL_SetTextureAlphaMod(orb,255);
             }
             if(p.whiteBoost>0 && whiteFxTextures_[3]){
                 const SDL_FRect glowSrc{0,0,96,96};
