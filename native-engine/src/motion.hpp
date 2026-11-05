@@ -42,9 +42,10 @@ constexpr int knightWeakFrame(float phase){
     return motionClips[4].start+knightWeakPlayback[index];
 }
 constexpr int whiteNightRunStart=88,whiteNightRunFrames=32;
-// 32 poses / 1 second at the default 280 world units/s. Distance-driven,
-// so gear and analog movement still scale cadence without changing velocity.
-constexpr float whiteNightRunStride=280.f;
+// Match the new planted-foot PNG travel: about 240 world units per cycle.
+// At base speed280 this is .857s / 37.33 pose updates per second: a documented
+// fast-run exception chosen for foot registration, without changing velocity.
+constexpr float whiteNightRunStride=240.f;
 constexpr float motionScale=1.85f;
 constexpr int mageMotionColumns=8,mageMotionRows=10,mageGroundCastRow=8,mageAirCastRow=9;
 constexpr int mageAirPose(float phase){
