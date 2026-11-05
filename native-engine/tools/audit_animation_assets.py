@@ -5,7 +5,7 @@ Preview sequences are isolated clip samples at default speed, without hit-stop,
 state interruption, terrain or velocity curves. They are not runtime evidence.
 """
 from pathlib import Path
-import hashlib, json, math
+import hashlib, json, math, re
 from PIL import Image
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / 'native-engine/animation-audit'
@@ -53,8 +53,8 @@ def main():
     run=[432+i*54//24 for i in range(24)]
     add('일반 기사','달리기',knight,cell,16,pivot,run,.7,note='승인 예외 24표시/0.7초. PNG는 기존 54장; 새 24장 제작 아님. 이동 거리 기반.',variable=True)
     add('일반 기사','약베기',knight,cell,16,pivot,list(range(112,128)),.23,
-        after=[112+i for i in (0,1,3,4,6,8,10,11,12,14,15)],code=True,
-        note='16→11 기존 자세 선택. 접촉 위상 .43에서 원래 6번 자세. 타격/트레일/게임플레이 타이밍 유지. 기본 속도 기준; 장비/강화/히트스톱은 실제 속도에 영향.')
+        after=[112+int(i) for i in re.search(r'knightWeakPlayback\[\]=\{([^}]+)\}',(ROOT/'native-engine/src/motion.hpp').read_text()).group(1).split(',')],code=True,
+        note='16→11 기존 자세 선택. 접촉 위상 .43에서 원래 6번 자세. 타격/게임플레이 타이밍 유지. 검 궤적은 표시 PNG 자세와 동기화. 기본 속도 기준; 장비/강화/히트스톱은 실제 속도에 영향.')
     for i,(name,d) in enumerate([('스킬1 찌르기',.48),('스킬2 휩쓸기',.415),('스킬3 준비',.40)]):
         add('일반 기사',name,'knight_skill_motion.png',(112,94),4,(44,88),doubled(i*4,4,12),d,
             note=f'4키+3중간=7고유 자세. 24~48FPS에는 {math.ceil(d*24)}~{math.floor(d*48)}고유 자세 필요. 생성 2회 모두 검 길이/디자인/픽셀 일관성 미달로 미반영. 새 PNG 제작 미완료.')
@@ -81,7 +81,7 @@ def main():
     OUT.mkdir(parents=True,exist_ok=True)
     (OUT/'animation-audit.json').write_text('{\n  "base":"d223a65",\n  "status":"INCOMPLETE — static inspection and partial presentation fixes only",\n  "clips":[\n'+',\n'.join(json.dumps(c,ensure_ascii=False) for c in CLIPS)+'\n]}\n')
     lines=['# 캐릭터 애니메이션 점검 — 미완료','',
-           '기준 main: `d223a65`. PNG 범위·빈 프레임·RGBA 해시를 정적으로 확인했다. 빌드/게임 실행/테스트/GitHub Actions는 실행하지 않았다. 자연스러움·발 접촉·반짝임·전환·기기 재생은 검증하지 않았다. 새 PNG는 채택하지 않았다. 전체 최적화 완료가 아니다.','',
+           '기준 main: `d223a65`. PNG 범위·빈 프레임·RGBA 해시를 정적으로 확인했다. 빌드/게임 실행/테스트/GitHub Actions는 실행하지 않았다. 자연스러움·발 접촉·반짝임·전환·기기 재생은 검증하지 않았다. 새 PNG는 채택하지 않았다. 전체 최적화 완료가 아니다. 후속 변경 검토는 [CHANGED_MOTION_REVIEW.md](CHANGED_MOTION_REVIEW.md)를 참고한다.','',
            'FPS는 기본 이동속도 280·기본 장비·히트스톱 없는 조건의 표시 슬롯/초다. 기존 보고의 키 프레임 수에는 중간 PNG 자세가 빠져 있었다. 중간 자세를 사용하는 모션은 슬롯 수와 고유 이미지 수를 함께 적었다. 마지막 자세 홀드 슬롯은 중복이며 새 제작 프레임으로 계산하지 않는다. 60Hz 표시에서는 60FPS 초과 슬롯 일부가 보이지 않을 수 있다. 점프/낙하는 속도 기반이라 표의 FPS를 고정 재생속도로 해석하면 안 된다.','',
            '| 캐릭터 | 동작 | 기존 프레임(슬롯/고유) | 기존 FPS | 변경 프레임(슬롯/고유) | 변경 FPS | 새 PNG | 코드 반영 | 미검증/남은 작업 |',
            '|---|---|---:|---:|---:|---:|---|---|---|']
@@ -89,7 +89,7 @@ def main():
         b,a=c['before'],c['after'];var=c['name'] in ('점프','낙하','점프·낙하','내려찍기')
         bf='가변' if var else f"{b['slots']/c['duration']:.2f}"
         af='가변' if var else f"{a['slots']/c['after_duration']:.2f}"
-        lines.append(f"|{c['actor']}|{c['name']}|{b['slots']}/{b['unique']}|{bf}|{a['slots']}/{a['unique']}|{af}|아니오|{'로컬 변경' if c['code'] else '유지'}|{c['note']} 실제 재생 미검증.|")
+        lines.append(f"|{c['actor']}|{c['name']}|{b['slots']}/{b['unique']}|{bf}|{a['slots']}/{a['unique']}|{af}|아니오|{'변경' if c['code'] else '유지'}|{c['note']} 실제 재생 미검증.|")
     lines += ['', '## 정적 확인 범위', '',
               '- 위 표의 모든 참조 프레임이 실제 PNG 안에 있는지 확인했다. 백야 점멸59번은 완전 투명하며 나머지 참조 프레임은 비어 있지 않다. 59번은 접촉 직전(.12~.15초) 소멸 연출로 추정되지만 실제 의도와 연결은 미검증이다. `animation-audit.json`에 각 자세의 경계와 고유 수를 기록했다.',
               '- PNG 파일과 충돌 판정 데이터는 변경하지 않았다. 이동속도·대미지·쿨타임·공격 판정 타이머는 변경하지 않았다.',
