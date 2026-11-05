@@ -1,5 +1,0 @@
-{
-  "name": "Eclipse.Editor",
-  "references": ["Eclipse.Core", "Eclipse.Runtime"],
-  "includePlatforms": ["Editor"]
-}

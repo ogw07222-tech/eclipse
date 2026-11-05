@@ -1,5 +1,0 @@
-{
-  "name": "Eclipse.Runtime",
-  "rootNamespace": "Eclipse",
-  "references": ["Eclipse.Core", "Unity.ugui"]
-}

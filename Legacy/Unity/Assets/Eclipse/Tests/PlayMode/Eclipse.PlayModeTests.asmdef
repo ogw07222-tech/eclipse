@@ -1,5 +1,0 @@
-{
-  "name": "Eclipse.PlayModeTests",
-  "references": ["Eclipse.Core", "Eclipse.Runtime", "Unity.ugui"],
-  "optionalUnityReferences": ["TestAssemblies"]
-}
