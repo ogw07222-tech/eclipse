@@ -1364,13 +1364,18 @@ public:
                     (p.grounded?mageGroundCastRow:mageAirCastRow):rows[a.state];
                 const int index=basicCast?
                     std::clamp(static_cast<int>((1-p.mageCastLeft/mageCastDuration)*mageMotionColumns),0,mageMotionColumns-1):
+                    (a.state==2||a.state==3)?
+                    std::clamp(static_cast<int>(a.posePhase*mageMotionColumns),0,mageMotionColumns-1):
                     (a.frame-clip.start)*(mageMotionColumns-1)/std::max(1,clip.count-1);
                 actorTexture=mageMotion_;
                 columns=mageMotionColumns;
                 frame=row*columns+index;
             }
         }
-        if(p.form==0&&a.state==1){
+        if(p.form==0&&a.state==4){
+            const int index=std::clamp(static_cast<int>(a.posePhase*knightWeakPlaybackFrames),0,knightWeakPlaybackFrames-1);
+            frame=motionClips[4].start+knightWeakPlayback[index];
+        }else if(p.form==0&&a.state==1){
             const int playbackFrame=std::clamp(
                 static_cast<int>(a.travelPhase*knightSprintPlaybackFrames),0,knightSprintPlaybackFrames-1);
             frame=knightSprintStart+std::clamp(
