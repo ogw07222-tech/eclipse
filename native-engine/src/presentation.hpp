@@ -1403,8 +1403,11 @@ public:
                 const float phase=g.clock*2.8f+i*6.2831853f/caster.storedLightLances;
                 const float x=caster.x+std::cos(phase)*57.f-offset;
                 const float y=caster.y-61.f+std::sin(phase)*37.f;
-                goldenSprite(goldOrb_,x,y,46,46,0,145);
-                goldenSprite(lanceArt,x,y,90,23,phase*57.29578+90.,255);
+                // Idle stock is a compact sphere, never an already-formed spear.
+                // Five bright cores communicate the full +40% basic-speed passive.
+                const float pulse=1.f+.08f*std::sin(g.clock*5.f+i*1.7f);
+                goldenSprite(goldOrb_,x,y,37.f*pulse,37.f*pulse,0,225);
+                goldenSprite(goldOrb_,x,y,16.f,16.f,0,255);
                 // Tiny orbiting light fragments are also sampled from the orb PNG.
                 for(int j=0;j<3;++j){
                     const float sparkPhase=phase+j*2.0943951f;
@@ -1417,6 +1420,22 @@ public:
             const float x=lance.x-offset,y=lance.y;
             const float angle=lance.angle*.017453293f;
             const float dx=std::cos(angle),dy=std::sin(angle);
+            // Newly released light remains an orb while rotating toward its
+            // target, then stretches in place to full spear length over 0.11s.
+            if(lance.morphTotal>0.f&&lance.delay>0.f){
+                const float phase=std::clamp(1.f-lance.delay/lance.morphTotal,0.f,1.f);
+                const float eased=phase*phase*(3.f-2.f*phase);
+                const float bodyW=14.f+82.f*eased;
+                const float bodyH=27.f-3.f*eased;
+                goldenSprite(goldOrb_,x,y,38.f-15.f*eased,38.f-15.f*eased,0,245);
+                goldenSprite(lanceArt,x,y,bodyW,bodyH,lance.angle,
+                             static_cast<Uint8>(25+230*eased));
+                if(eased>.35f)
+                    goldenSprite(riftTrace_,x-std::cos(angle)*bodyW*.3f,
+                        y-std::sin(angle)*bodyW*.3f,bodyW*.75f,8.f,
+                        lance.angle,static_cast<Uint8>(160*eased));
+                continue;
+            }
             const bool launched=lance.delay<=0;
             if(launched){
                 // A narrow, almost-white spatial cut travels with the spear.
