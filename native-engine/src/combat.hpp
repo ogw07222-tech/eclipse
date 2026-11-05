@@ -181,10 +181,9 @@ class Combat {
     }
     void launchVerdictLances(){
         auto& p=player;
-        const float left=cameraCenter-viewWidth*.5f;
         for(size_t target=0;target<enemies.size();++target){
             const auto& e=enemies[target];
-            if(e.dead()||e.lightMark<=0||e.x<left||e.x>left+viewWidth)continue;
+            if(e.dead()||e.lightMark<=0)continue;
             for(int i=0;i<6;++i){
                 const float spread=(i-2.5f)*18.f;
                 lightLances.push_back({target,p.x+p.facing*(55.f+i*9.f),p.y-65.f+spread,1.3f,spread,0.f,true,true,false,i*.028f});
@@ -370,7 +369,6 @@ class Combat {
                 p.x=std::clamp(from+p.facing*1080*travel,25.f,1550.f);
                 if(static_cast<int>(old*60)%2==0)whiteEffect(LightFx::Rush,p.x,p.y-47);
                 const BodyRect strike{std::min(from,p.x)-18,p.y-83,std::max(from,p.x)+18,p.y+2};
-                const bool hadHit=p.whiteRushHits!=0;
                 for(size_t i=0;i<enemies.size();++i){
                     auto& e=enemies[i];
                     if(e.dead()||(p.whiteRushHits&(1u<<i))||!enemyOverlaps(e,strike))continue;
@@ -378,7 +376,6 @@ class Combat {
                     hit(e,18+p.gear.attack(),false);
                     whiteEffect(LightFx::Impact,e.x,e.y-38);
                 }
-                // Rush is the mark setup movement; only basic attacks charge stored lances.
             }
         }
         if(p.whiteAge>=clip.duration)p.whiteMove=WhiteMove::None;
