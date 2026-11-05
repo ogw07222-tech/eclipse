@@ -1356,13 +1356,30 @@ public:
     }
     void draw(const Combat& g,const Animation& a,float camera,Actions held,const char* capture=nullptr,const char* reviewLabel=nullptr,const ControlLayout* customLayout=nullptr,std::array<float,2> stick={}){
         offset=std::round(camera)-640;SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);SDL_SetRenderDrawColor(renderer,21,35,52,255);SDL_RenderClear(renderer);
-        forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.clock);
+        forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.enemyVisualClock);
         const auto& caster=g.player;
         const bool verdictFreeze=caster.whiteNight&&caster.whiteMove==WhiteMove::Verdict&&
             caster.whiteAge>=.12f&&caster.whiteAge<.66f;
         if(verdictFreeze){
             // Desaturating veil; targets and their animations are frozen in the combat step.
-            rect(0,0,1280,720,0x101728,148);
+            rect(0,0,1280,720,0x18140f,154);
+        }
+        // Persistent yellow-white PNG markers show exactly which enemies
+        // will be struck by the three-lance ultimate.
+        if(caster.whiteNight&&goldOrb_&&goldImpact_){
+            for(const auto& e:g.enemies){
+                if(e.dead()||e.lightMark<=0)continue;
+                const float x=e.x-offset;
+                const float y=enemyBounds(e).top-18.f;
+                const float pulse=1.f+.12f*std::sin(g.enemyVisualClock*8.f);
+                goldenSprite(goldOrb_,x,y,34.f*pulse,34.f*pulse,0,210);
+                goldenSprite(goldImpact_,x,y,49.f*pulse,49.f*pulse,0,105);
+                for(int i=0;i<4;++i){
+                    const float angle=i*1.5707963f+g.enemyVisualClock*1.7f;
+                    goldenSprite(goldOrb_,x+std::cos(angle)*26.f,
+                        y+std::sin(angle)*20.f,9,9,0,175);
+                }
+            }
         }
         // Gold-white light effects are sourced from PNG textures.
         SDL_Texture* lanceArt=goldLance_?goldLance_:whiteNightLance_;
@@ -1517,7 +1534,7 @@ public:
             const SDL_FRect source{float(whiteFrame%8*64),float(whiteFrame/8*96),64,96};
             const SDL_FRect dest{std::round(p.x-offset-32*motionScale),std::round(p.y-88*motionScale),64*motionScale,96*motionScale};
             if(p.whiteMove==WhiteMove::Rush&&p.whiteAge>=.125f&&p.whiteAge<.36f){
-                SDL_SetTextureColorMod(whiteNightMotion_,194,223,245);
+                SDL_SetTextureColorMod(whiteNightMotion_,255,245,173);
                 for(int i=3;i>0;--i){
                     SDL_FRect ghost=dest;ghost.x-=p.facing*i*18;
                     SDL_SetTextureAlphaMod(whiteNightMotion_,static_cast<Uint8>(120-i*24));
