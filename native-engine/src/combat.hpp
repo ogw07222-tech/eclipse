@@ -179,6 +179,7 @@ class Combat {
         }
         p.storedLightLances=0;
     }
+    // The ultimate releases new lances from the off-hand light sphere, independent of stored charges.
     void launchVerdictLances(){
         auto& p=player;
         for(size_t target=0;target<enemies.size();++target){
@@ -186,7 +187,7 @@ class Combat {
             if(e.dead()||e.lightMark<=0)continue;
             for(int i=0;i<3;++i){
                 const float spread=(i-1.f)*28.f;
-                lightLances.push_back({target,p.x+p.facing*(55.f+i*9.f),p.y-65.f+spread,1.3f,spread,0.f,true,true,false,i*.028f});
+                lightLances.push_back({target,p.x-p.facing*24.f,p.y-57.f+spread*.18f,1.3f,spread,0.f,true,true,false,i*.028f});
             }
         }
     }
@@ -347,7 +348,8 @@ class Combat {
                 whiteEffect(LightFx::Slash,p.x+p.facing*42,p.y-48);
                 melee(15+p.gear.attack(),0,105*p.gear.range());
             }else if(move==WhiteMove::Command){
-                releaseStoredLances();whiteEffect(LightFx::Command,p.x,p.y-42);
+                // The forward-pointing sword pose is the shared release frame for the entire volley.
+                releaseStoredLances();whiteEffect(LightFx::Command,p.x+p.facing*52.f,p.y-55.f);
             }else if(move==WhiteMove::Blink&&!enemies[p.whiteTarget].dead()){
                 auto& e=enemies[p.whiteTarget];
                 whiteEffect(LightFx::Depart,p.x,p.y-48);
@@ -356,7 +358,8 @@ class Combat {
                 p.facing=e.x>=p.x?1:-1;
                 whiteEffect(LightFx::Arrive,p.x,p.y-48);
             }else if(move==WhiteMove::Verdict){
-                whiteEffect(LightFx::Slash,p.x+p.facing*42,p.y-48);
+                // A clenched off-hand releases the accumulated light from its sphere.
+                whiteEffect(LightFx::Arrive,p.x-p.facing*24.f,p.y-57.f);
                 for(const auto& e:enemies)
                     if(!e.dead()&&e.lightMark>0)whiteEffect(LightFx::Verdict,e.x,e.y-45);
                 launchVerdictLances();
@@ -644,8 +647,16 @@ public:
         if(a.weapon)player.equip(0);
         if(a.armor)player.equip(1);
         if(a.charm)player.equip(2);
-        stepPlayer(dt,a);for(auto& enemy:enemies){stepEnemy(enemy,dt);if(ended)break;}
-        if(!ended){stepProjectiles(dt);stepLightLances(dt);}
+        stepPlayer(dt,a);
+        // A short cinematic time-stop freezes enemy motion and existing projectiles,
+        // while the executioner's own animation continues to the release frame.
+        const bool verdictFreeze=player.whiteNight&&player.whiteMove==WhiteMove::Verdict&&
+            player.whiteAge>=.12f&&player.whiteAge<.66f;
+        if(!verdictFreeze){
+            for(auto& enemy:enemies){stepEnemy(enemy,dt);if(ended)break;}
+            if(!ended)stepProjectiles(dt);
+        }
+        if(!ended)stepLightLances(dt);
         if(!ended&&foes()==0){ended=true;won=true;inventory=false;}
     }
 };
