@@ -23,6 +23,7 @@ class Presentation {
     SDL_Texture* titleMenu_=nullptr;
     SDL_Texture* whiteNightLance_=nullptr;
     SDL_Texture* whiteNightMotion_=nullptr;
+    std::array<SDL_Texture*,5> whiteFxTextures_{};
     std::array<SDL_Texture*,3> slimeTextures_{};
     SDL_Texture* enemyBarFrame_=nullptr;
     SDL_Texture* executeIcon_=nullptr;
@@ -655,10 +656,10 @@ class Presentation {
         icon(2,held.dash?1:0,0,c[ControlLayout::Dash].x,c[ControlLayout::Dash].y,c[ControlLayout::Dash].size,held.dash);
         icon(3,0,0,c[ControlLayout::Swap].x,c[ControlLayout::Swap].y,c[ControlLayout::Swap].size,held.swap);
         if(p.whiteNight){
-            skillSlot(c[ControlLayout::Skill],1,"RUSH",p.skillCooldown,2.2f,held.skill,0xffbd35,true,-1);
-            skillSlot(c[ControlLayout::Sweep],2,"BOOST",p.sweepReady,5.f,held.skillSweep,0xffdf76,true,-1);
-            skillSlot(c[ControlLayout::Buff],3,"BLINK",p.buffReady,2.5f,held.skillBuff,0xfff0b5,true,-1);
-            skillSlot(c[ControlLayout::Swap],4,"VERDICT",p.swapCooldown,9.f,held.swap,0xffca54,true,-1);
+            skillSlot(c[ControlLayout::Skill],1,"RUSH",p.skillCooldown,2.2f,held.skill,0xb4d8ee,true,-1);
+            skillSlot(c[ControlLayout::Sweep],2,"BOOST",p.sweepReady,5.f,held.skillSweep,0x9bb9d6,true,-1);
+            skillSlot(c[ControlLayout::Buff],3,"BLINK",p.buffReady,2.5f,held.skillBuff,0xd9ecf5,true,-1);
+            skillSlot(c[ControlLayout::Swap],4,"VERDICT",p.swapCooldown,9.f,held.swap,0xc4d7ed,true,-1);
         }else{
             const bool knight=p.form==0;
             skillSlot(c[ControlLayout::Skill],1,knight?"STAB":"FIRE",
@@ -676,47 +677,30 @@ class Presentation {
             text("ATK",66,340,2);number(p.gear.attack(),120,340,2);text("DEF",200,340,2);number(p.gear.defense(),250,340,2);text("MAX HP",66,373,2);number(p.maxHealth(),160,373,2);
         }
     }
+    // Every White Night combat flash is a transparent 4-frame PNG atlas.
+    // No procedural colored rectangles are used for these effects.
     void drawWhiteEffect(const LightBurst& burst){
-        const float t=std::clamp(1-burst.life/.24f,0.f,1.f);
-        const float x=burst.x-offset,y=burst.y;
-        const auto alpha=static_cast<Uint8>(255*(1-t));
-        if(burst.kind==LightFx::Slash){
-            // A tall yellow crescent follows the downward stroke.
-            for(int i=0;i<51;++i){
-                const float u=i/50.f;
-                const float px=x+burst.facing*(12+44*std::sin(u*3.141593f)+t*15);
-                const float py=y-57+114*u;
-                const float width=3+14*std::sin(u*3.141593f)*(1-t);
-                rect(px-width*.5f,py,width,4,0xffac21,alpha);
-                rect(px-2,py,4,3,0xfff2ac,alpha);
-            }
-            return;
+        int kind=0;
+        switch(burst.kind){
+            case LightFx::Slash: kind=0;break;
+            case LightFx::Rush: kind=1;break;
+            case LightFx::Depart: kind=2;break;
+            case LightFx::Arrive: kind=3;break;
+            case LightFx::Verdict: kind=4;break;
+            default: return;
         }
-        if(burst.kind==LightFx::Rush){
-            for(int i=0;i<7;++i){
-                const float length=(i%3+2)*19.f*(1-t);
-                const float tail=burst.facing>0?x-length:x;
-                rect(tail,y-23+i*7,length,i%2?2:4,i%2?0xfff5bf:0xffb42d,alpha);
-            }
-            return;
-        }
-        const bool arrival=burst.kind==LightFx::Arrive||burst.kind==LightFx::Verdict;
-        const bool departure=burst.kind==LightFx::Depart;
-        const float scale=arrival?1.65f:departure?.65f:1.f;
-        const float radius=(departure?1-t:t)*54*scale+5;
-        if(t<.52f){
-            const float h=(arrival?154.f:86.f)*(1-t);
-            rect(x-4*scale,y-h*.5f,8*scale,h,0xffbd28,alpha);
-            rect(x-2*scale,y-h*.5f,4*scale,h,0xfff4bc,alpha);
-            rect(x-17*scale,y-2,34*scale,4,0xffe983,alpha);
-        }
-        for(int i=0;i<(arrival?22:12);++i){
-            const float angle=i*2.399963f;
-            const float distance=radius*(.52f+.16f*(i%4));
-            const float px=x+std::cos(angle)*distance,py=y+std::sin(angle)*distance;
-            rect(px,py,i%3?3:6,i%3?3:2,i%2?0xffc23c:0xfff2a5,alpha);
-        }
-        if(arrival)ring(x,y+44,radius*.62f,0xffc03b,3);
+        SDL_Texture* sheet=whiteFxTextures_[kind];
+        if(!sheet)return;
+        const float t=std::clamp(1.f-burst.life/.24f,0.f,1.f);
+        const int frame=std::clamp(static_cast<int>(t*4.f),0,3);
+        const SDL_FRect source{float(frame*96),0,96,96};
+        const float size=kind==4?270.f:kind==3?232.f:kind==0?220.f:kind==1?205.f:185.f;
+        const SDL_FRect dest{std::round(burst.x-offset-size*.5f),
+                             std::round(burst.y-size*.5f),size,size};
+        SDL_SetTextureAlphaMod(sheet,static_cast<Uint8>(255.f*(1.f-.22f*t)));
+        SDL_RenderTextureRotated(renderer,sheet,&source,&dest,0,nullptr,
+                                 burst.facing<0?SDL_FLIP_HORIZONTAL:SDL_FLIP_NONE);
+        SDL_SetTextureAlphaMod(sheet,255);
     }
     void menuTile(float x,float y,float w,float h,unsigned fill,unsigned edge){
         rect(x+4,y+4,w,h,0x070b12);
@@ -864,7 +848,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){if(whiteNightMotion_)SDL_DestroyTexture(whiteNightMotion_);if(whiteNightLance_)SDL_DestroyTexture(whiteNightLance_);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleBg_)SDL_DestroyTexture(titleBg_);if(titleKnightFg_)SDL_DestroyTexture(titleKnightFg_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){for(auto* fx:whiteFxTextures_)if(fx)SDL_DestroyTexture(fx);if(whiteNightMotion_)SDL_DestroyTexture(whiteNightMotion_);if(whiteNightLance_)SDL_DestroyTexture(whiteNightLance_);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleBg_)SDL_DestroyTexture(titleBg_);if(titleKnightFg_)SDL_DestroyTexture(titleKnightFg_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -1156,6 +1140,17 @@ public:
             if(texture){SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(texture,SDL_BLENDMODE_BLEND);}
             return texture;
         };
+        constexpr const char* whiteFxFiles[]={
+            "ui/white_fx_slash.png","ui/white_fx_rush.png",
+            "ui/white_fx_depart.png","ui/white_fx_arrive.png",
+            "ui/white_fx_verdict.png"};
+        for(int i=0;i<5;++i){
+            whiteFxTextures_[i]=loadOptionalTexture(whiteFxFiles[i],384,96);
+            if(!whiteFxTextures_[i]){
+                SDL_SetError("ECLIPSE ASSET ERROR: required White Night PNG %s missing or invalid (expected 384x96)",whiteFxFiles[i]);
+                return false;
+            }
+        }
         knightSkillMotion_=loadOptionalTexture("knight_skill_motion.png",
             skillMotionWidth*skillMotionColumns,motionHeight*skillMotionRows);
         mageRun_=loadOptionalTexture("mage_run.png",motionWidth*motionColumns,motionHeight);
@@ -1305,7 +1300,7 @@ public:
             for(int i=2;i<18;++i){
                 const float distance=19.f+i*3.f;
                 rect(x-dx*distance-1,y-dy*distance-1,3,i<7?3:2,
-                     i<8?0xffeeaa:0xffb72e,static_cast<Uint8>(230-i*11));
+                     i<8?0xf0f9ff:0x8fb5cf,static_cast<Uint8>(230-i*11));
             }
             const SDL_FRect dest{x-dx*19-19,y-dy*19-1.5f,38,3};
             SDL_RenderTextureRotated(renderer,whiteNightLance_,nullptr,&dest,lance.angle,nullptr,SDL_FLIP_NONE);
@@ -1406,7 +1401,7 @@ public:
             const SDL_FRect source{float(whiteFrame%8*64),float(whiteFrame/8*96),64,96};
             const SDL_FRect dest{std::round(p.x-offset-32*motionScale),std::round(p.y-88*motionScale),64*motionScale,96*motionScale};
             if(p.whiteMove==WhiteMove::Rush&&p.whiteAge>=.125f&&p.whiteAge<.36f){
-                SDL_SetTextureColorMod(whiteNightMotion_,255,205,74);
+                SDL_SetTextureColorMod(whiteNightMotion_,194,223,245);
                 for(int i=3;i>0;--i){
                     SDL_FRect ghost=dest;ghost.x-=p.facing*i*18;
                     SDL_SetTextureAlphaMod(whiteNightMotion_,static_cast<Uint8>(120-i*24));
@@ -1416,7 +1411,13 @@ public:
             }else if(p.hurtTint>0)SDL_SetTextureColorMod(whiteNightMotion_,255,150,160);
             SDL_RenderTextureRotated(renderer,whiteNightMotion_,&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
             SDL_SetTextureColorMod(whiteNightMotion_,255,255,255);
-            if(p.whiteBoost>0)ring(p.x-offset,p.y-12,24,0xffd565,3);
+            if(p.whiteBoost>0 && whiteFxTextures_[3]){
+                const SDL_FRect glowSrc{0,0,96,96};
+                const SDL_FRect glowDst{p.x-offset-48,p.y-62,96,96};
+                SDL_SetTextureAlphaMod(whiteFxTextures_[3],145);
+                SDL_RenderTexture(renderer,whiteFxTextures_[3],&glowSrc,&glowDst);
+                SDL_SetTextureAlphaMod(whiteFxTextures_[3],255);
+            }
         }else{
         afterimages(g,a,actorTexture,frame,columns);
         if(actorTexture){
