@@ -26,8 +26,8 @@ constexpr MotionClip motionClips[]={
 constexpr int motionWidth=64,motionHeight=94,motionColumns=16,motionRows=31,motionPivotX=28,motionPivotY=88;
 constexpr int knightRunMidpointStart=13*motionColumns;
 constexpr int knightMidpointStart=14*motionColumns;
-constexpr int knightSprintStart=27*motionColumns,knightSprintFrames=54;
-// Render 24 evenly distributed distinct poses from the existing 54-pose atlas.
+constexpr int knightSprintStart=27*motionColumns,knightSprintFrames=24;
+//24 newly baked distinct PNG poses, one per displayed slot; .7s at base speed.
 constexpr int knightSprintPlaybackFrames=24;
 // Presentation-only selection: 11 existing authored poses / .23s = 47.83 FPS.
 // Keep the contact pose (source 6 at phase .43) and both ends; combat still

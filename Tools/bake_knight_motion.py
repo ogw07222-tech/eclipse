@@ -3,11 +3,11 @@
 from pathlib import Path
 import hashlib,json
 from PIL import Image,ImageDraw
-from knight_sprint import SPRINT_ROWS, SPRINT_START_ROW, sprint_poses
+from knight_sprint import SPRINT_ROWS, SPRINT_START_ROW, SPRINT_FRAMES, sprint_poses
 ROOT=Path(__file__).resolve().parents[1]
 MASTER=ROOT/'Art/knight/redesign/knight_64x94_master.png'
 OUT=ROOT/'Assets/Resources/Eclipse/knight_motion.png'
-CLIPS=[('idle',0,8,.96,8),('walk',16,8,.60,8),('run',32,16,.428571,16),('jump',48,6,.52,6),('fall',64,6,.65,6),('land',80,6,.12,6),('dash',96,8,.15,8),('weak_slash',112,16,.23,16),('strong_slash',128,10,.34,10),('thrust',144,10,.42,10),('hurt',160,6,.23,6),('death',176,12,.90,12),('air_slam',192,8,.38,8)]
+CLIPS=[('idle',0,8,.96,8),('walk',16,8,.60,8),('run',32,16,.7,16),('jump',48,6,.52,6),('fall',64,6,.65,6),('land',80,6,.12,6),('dash',96,8,.15,8),('weak_slash',112,16,.23,16),('strong_slash',128,10,.34,10),('thrust',144,10,.42,10),('hurt',160,6,.23,6),('death',176,12,.90,12),('air_slam',192,8,.38,8)]
 TRAIL_WINDOWS={'weak_slash':(5,10),'strong_slash':(5,7),'thrust':(4,6),'air_slam':(2,6)}
 
 # Give the effect room on every side of the actor cell, including above the helm.
@@ -152,6 +152,9 @@ def bake():
             atlas.paste(cell,(i*64,row*94));frames.append(cell.convert('RGBA'));indices.append(index)
         metadata.append(dict(name=name,start=start,count=count,duration=duration,loop=loop,source_count=source_count,source_indices=indices))
         if name=='run':
+            metadata[-1].update(duration=.7,stride=196,display_start=SPRINT_START_ROW*16,
+                display_count=SPRINT_FRAMES,display_source_count=SPRINT_FRAMES,
+                display_source='Art/knight/sprint/authored_run_24.png')
             frames=[]
             for i,cell in enumerate(sprint_poses(source)):
                 atlas.paste(cell,((i%16)*64,(SPRINT_START_ROW+i//16)*94))
