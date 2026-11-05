@@ -1371,8 +1371,10 @@ public:
             }
         }
         if(p.form==0&&a.state==1){
+            const int playbackFrame=std::clamp(
+                static_cast<int>(a.travelPhase*knightSprintPlaybackFrames),0,knightSprintPlaybackFrames-1);
             frame=knightSprintStart+std::clamp(
-                static_cast<int>(a.travelPhase*knightSprintFrames),0,knightSprintFrames-1);
+                playbackFrame*knightSprintFrames/knightSprintPlaybackFrames,0,knightSprintFrames-1);
         }else if(p.form==0&&a.midpoint&&a.state!=4){
             if(isSkillMotion(a.state)){
                 if(knightSkillMotion_)frame+=skillMotionColumns*(skillMotionRows/2);
