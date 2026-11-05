@@ -28,3 +28,7 @@ Only the lower-leg region of88–119 is replaced. The original RGBA pixels above
 See [art source and validation](../Art/white-night/README.md). The earlier source paragraph describes the superseded run. The current source is `Art/white-night/run_alternating_source.png`, generated from an explicit two-leg joint guide and packed with `Tools/pack_white_night_run.py`. It contains authored leg pixels, not duplicated old frames.
 
 The previous animation audit/replay artifacts are historical for their recorded revisions; their old white-run FPS is superseded by this240-unit stride. No game/APK build, owner test suite, GitHub Actions, device play, or real-time video viewing is claimed.
+
+### Folded-leg follow-up
+
+The first alternating revision compressed the legs horizontally by0.84 during packing, making folded shins read shorter. That scaling is removed. A new15px thigh/15px shin guide with lower heel recovery was used to redraw the legs; these are guide targets, not measured proof of every PNG bone length. Original upper-body/sword/non-run pixels remain protected. Runtime phase/start/count/240-unit stride and all gameplay values are unchanged by this follow-up. Current comparison videos use the preceding alternating revision at the same cadence on both sides.
