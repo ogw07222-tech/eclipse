@@ -7,7 +7,7 @@ constexpr int skillMotionWidth=112,skillMotionPivotX=44;
 constexpr bool isSkillMotion(int state){return state>=thrustSkillState&&state<=prepSkillState;}
 constexpr MotionClip motionClips[]={
     {0,8,0.960000f,0.500000f,0.000000f},
-    {32,16,0.428571f,0.500000f,120.000000f},
+    {32,16,0.700000f,0.500000f,196.000000f},
     {48,6,0.520000f,0.500000f,0.000000f},
     {64,6,0.650000f,0.500000f,0.000000f},
     {112,16,0.230000f,0.430000f,0.000000f},
@@ -27,6 +27,8 @@ constexpr int motionWidth=64,motionHeight=94,motionColumns=16,motionRows=31,moti
 constexpr int knightRunMidpointStart=13*motionColumns;
 constexpr int knightMidpointStart=14*motionColumns;
 constexpr int knightSprintStart=27*motionColumns,knightSprintFrames=54;
+// Render 24 evenly distributed distinct poses from the existing 54-pose atlas.
+constexpr int knightSprintPlaybackFrames=24;
 constexpr int whiteNightRunStart=88,whiteNightRunFrames=32;
 constexpr float motionScale=1.85f;
 constexpr int mageMotionColumns=8,mageMotionRows=10,mageGroundCastRow=8,mageAirCastRow=9;
