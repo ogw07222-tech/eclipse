@@ -1,0 +1,83 @@
+{
+  "scope": "Manual landmark/ground-row outline diagnostic, not an animation quality pass",
+  "source_sha256": {
+    "knight_motion.png": "b6a2324df9b5ede4697abd6efccb7a54f7f89198b5f5d8da8c0063320c6b3f6c",
+    "mage_motion.png": "11dd5101cfa99ba5330c84994da234639bfdeae167c53c410ceadb4f2fea04da",
+    "ui/white_night_motion.png": "4117c9408c260c73c5d8fbd96985ebeb295696ee9daf8bdbf5a6d057c3dd6647"
+  },
+  "source_uncertainty_px": 2,
+  "speed": 280.0,
+  "stride": 280.0,
+  "motion_scale": 1.85,
+  "contact_segments": [
+    {
+      "indices": [
+        89,
+        90,
+        91
+      ],
+      "toe_x": [
+        57,
+        50,
+        42
+      ],
+      "times": [
+        0.0,
+        0.03333333333333333,
+        0.06666666666666667
+      ],
+      "relative_world_x": [
+        0.0,
+        -3.616666666666667,
+        -9.083333333333332
+      ],
+      "net_world_drift": -9.083333333333332,
+      "assumption": "Rightmost opaque outline pixel at ground row88 approximates toe contact. Boot deformation may move this edge. Geometry diagnostic, not a foot-ground physics measurement."
+    },
+    {
+      "indices": [
+        112,
+        113,
+        114
+      ],
+      "toe_x": [
+        39,
+        38,
+        36
+      ],
+      "times": [
+        0.0,
+        0.016666666666666666,
+        0.05
+      ],
+      "relative_world_x": [
+        0.0,
+        2.816666666666667,
+        8.45
+      ],
+      "net_world_drift": 8.45,
+      "assumption": "Rightmost opaque outline pixel at ground row88 approximates toe contact. Boot deformation may move this edge. Geometry diagnostic, not a foot-ground physics measurement."
+    }
+  ],
+  "visible_marker_counts": {
+    "weak": {
+      "other_wrist": 7,
+      "weapon_wrist": 11,
+      "foot_a": 11,
+      "foot_b": 11
+    },
+    "mage": {
+      "other_wrist": 0,
+      "weapon_wrist": 16,
+      "foot_a": 14,
+      "foot_b": 9
+    },
+    "white": {
+      "other_wrist": 0,
+      "weapon_wrist": 32,
+      "foot_a": 27,
+      "foot_b": 21
+    }
+  },
+  "limits": "Weapon wrist identified visually; other wrist omitted when obscured. Anatomical left/right legs cannot be established reliably from these 2D sheets: foot A/B are provisional local tracks, never anatomical labels. Null breaks a track; do not interpolate or measure derivatives across it."
+}

@@ -1,0 +1,1015 @@
+{
+  "method": "Manual visible landmark estimates in source pixel coordinates, approx +/-2px; not an automatic joint detector or proof of natural motion.",
+  "sides": "Weapon wrist identified visually; other wrist omitted when obscured. Anatomical left/right legs cannot be established reliably from these 2D sheets: foot A/B are provisional local tracks, never anatomical labels. Null breaks a track; do not interpolate or measure derivatives across it.",
+  "colors": {
+    "other_wrist": "#ff4545",
+    "weapon_wrist": "#4488ff",
+    "foot_a": "#36e78a",
+    "foot_b": "#ffe044"
+  },
+  "tracks": [
+    {
+      "name": "weak",
+      "asset": "knight_motion.png",
+      "cell": [
+        64,
+        94
+      ],
+      "columns": 16,
+      "indices": [
+        112,
+        114,
+        116,
+        117,
+        118,
+        119,
+        120,
+        122,
+        124,
+        126,
+        127
+      ],
+      "mode": "one-shot",
+      "duration": 0.23,
+      "points": [
+        {
+          "weapon_wrist": [
+            25,
+            64
+          ],
+          "other_wrist": [
+            39,
+            61
+          ],
+          "foot_a": [
+            20,
+            84
+          ],
+          "foot_b": [
+            36,
+            84
+          ]
+        },
+        {
+          "weapon_wrist": [
+            22,
+            50
+          ],
+          "other_wrist": [
+            42,
+            61
+          ],
+          "foot_a": [
+            18,
+            84
+          ],
+          "foot_b": [
+            37,
+            84
+          ]
+        },
+        {
+          "weapon_wrist": [
+            21,
+            45
+          ],
+          "other_wrist": [
+            42,
+            59
+          ],
+          "foot_a": [
+            18,
+            84
+          ],
+          "foot_b": [
+            37,
+            84
+          ]
+        },
+        {
+          "weapon_wrist": [
+            39,
+            52
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            18,
+            84
+          ],
+          "foot_b": [
+            40,
+            84
+          ]
+        },
+        {
+          "weapon_wrist": [
+            42,
+            55
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            17,
+            84
+          ],
+          "foot_b": [
+            40,
+            84
+          ]
+        },
+        {
+          "weapon_wrist": [
+            43,
+            58
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            16,
+            84
+          ],
+          "foot_b": [
+            40,
+            84
+          ]
+        },
+        {
+          "weapon_wrist": [
+            38,
+            60
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            16,
+            84
+          ],
+          "foot_b": [
+            39,
+            84
+          ]
+        },
+        {
+          "weapon_wrist": [
+            34,
+            61
+          ],
+          "other_wrist": [
+            40,
+            61
+          ],
+          "foot_a": [
+            16,
+            84
+          ],
+          "foot_b": [
+            38,
+            84
+          ]
+        },
+        {
+          "weapon_wrist": [
+            28,
+            62
+          ],
+          "other_wrist": [
+            40,
+            62
+          ],
+          "foot_a": [
+            16,
+            84
+          ],
+          "foot_b": [
+            37,
+            84
+          ]
+        },
+        {
+          "weapon_wrist": [
+            25,
+            64
+          ],
+          "other_wrist": [
+            40,
+            63
+          ],
+          "foot_a": [
+            19,
+            84
+          ],
+          "foot_b": [
+            36,
+            84
+          ]
+        },
+        {
+          "weapon_wrist": [
+            26,
+            65
+          ],
+          "other_wrist": [
+            38,
+            63
+          ],
+          "foot_a": [
+            21,
+            84
+          ],
+          "foot_b": [
+            36,
+            84
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mage",
+      "asset": "mage_motion.png",
+      "cell": [
+        64,
+        94
+      ],
+      "columns": 8,
+      "indices": [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "mode": "velocity",
+      "duration": null,
+      "points": [
+        {
+          "weapon_wrist": [
+            37,
+            60
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            23,
+            83
+          ],
+          "foot_b": [
+            35,
+            83
+          ]
+        },
+        {
+          "weapon_wrist": [
+            37,
+            60
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            22,
+            82
+          ],
+          "foot_b": [
+            35,
+            78
+          ]
+        },
+        {
+          "weapon_wrist": [
+            38,
+            59
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            24,
+            81
+          ],
+          "foot_b": null
+        },
+        {
+          "weapon_wrist": [
+            39,
+            58
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            26,
+            77
+          ],
+          "foot_b": null
+        },
+        {
+          "weapon_wrist": [
+            39,
+            57
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            27,
+            75
+          ],
+          "foot_b": [
+            35,
+            72
+          ]
+        },
+        {
+          "weapon_wrist": [
+            39,
+            57
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            29,
+            75
+          ],
+          "foot_b": [
+            36,
+            71
+          ]
+        },
+        {
+          "weapon_wrist": [
+            39,
+            58
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            30,
+            73
+          ],
+          "foot_b": [
+            37,
+            70
+          ]
+        },
+        {
+          "weapon_wrist": [
+            39,
+            58
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            29,
+            74
+          ],
+          "foot_b": [
+            37,
+            71
+          ]
+        },
+        {
+          "weapon_wrist": [
+            39,
+            58
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            26,
+            76
+          ],
+          "foot_b": [
+            34,
+            72
+          ]
+        },
+        {
+          "weapon_wrist": [
+            39,
+            58
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            23,
+            77
+          ],
+          "foot_b": [
+            38,
+            73
+          ]
+        },
+        {
+          "weapon_wrist": [
+            39,
+            58
+          ],
+          "other_wrist": null,
+          "foot_a": null,
+          "foot_b": null
+        },
+        {
+          "weapon_wrist": [
+            39,
+            58
+          ],
+          "other_wrist": null,
+          "foot_a": null,
+          "foot_b": null
+        },
+        {
+          "weapon_wrist": [
+            39,
+            58
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            24,
+            81
+          ],
+          "foot_b": null
+        },
+        {
+          "weapon_wrist": [
+            38,
+            60
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            25,
+            83
+          ],
+          "foot_b": [
+            34,
+            82
+          ]
+        },
+        {
+          "weapon_wrist": [
+            38,
+            60
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            24,
+            83
+          ],
+          "foot_b": null
+        },
+        {
+          "weapon_wrist": [
+            37,
+            61
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            24,
+            83
+          ],
+          "foot_b": null
+        }
+      ]
+    },
+    {
+      "name": "white",
+      "asset": "ui/white_night_motion.png",
+      "cell": [
+        64,
+        96
+      ],
+      "columns": 8,
+      "indices": [
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119
+      ],
+      "mode": "distance-loop",
+      "duration": 1.0,
+      "points": [
+        {
+          "weapon_wrist": [
+            36,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            56,
+            83
+          ],
+          "foot_b": [
+            6,
+            80
+          ]
+        },
+        {
+          "weapon_wrist": [
+            36,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            51,
+            85
+          ],
+          "foot_b": [
+            12,
+            79
+          ]
+        },
+        {
+          "weapon_wrist": [
+            36,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            44,
+            85
+          ],
+          "foot_b": [
+            23,
+            78
+          ]
+        },
+        {
+          "weapon_wrist": [
+            36,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            36,
+            85
+          ],
+          "foot_b": [
+            29,
+            77
+          ]
+        },
+        {
+          "weapon_wrist": [
+            36,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            30,
+            85
+          ],
+          "foot_b": [
+            32,
+            76
+          ]
+        },
+        {
+          "weapon_wrist": [
+            36,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            28,
+            85
+          ],
+          "foot_b": [
+            32,
+            75
+          ]
+        },
+        {
+          "weapon_wrist": [
+            35,
+            62
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            28,
+            85
+          ],
+          "foot_b": [
+            33,
+            74
+          ]
+        },
+        {
+          "weapon_wrist": [
+            35,
+            62
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            28,
+            85
+          ],
+          "foot_b": [
+            33,
+            74
+          ]
+        },
+        {
+          "weapon_wrist": [
+            35,
+            62
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            24,
+            85
+          ],
+          "foot_b": [
+            20,
+            75
+          ]
+        },
+        {
+          "weapon_wrist": [
+            35,
+            62
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            25,
+            85
+          ],
+          "foot_b": null
+        },
+        {
+          "weapon_wrist": [
+            35,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            17,
+            84
+          ],
+          "foot_b": null
+        },
+        {
+          "weapon_wrist": [
+            35,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            10,
+            82
+          ],
+          "foot_b": [
+            36,
+            77
+          ]
+        },
+        {
+          "weapon_wrist": [
+            35,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            7,
+            81
+          ],
+          "foot_b": [
+            38,
+            75
+          ]
+        },
+        {
+          "weapon_wrist": [
+            35,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            6,
+            80
+          ],
+          "foot_b": [
+            41,
+            76
+          ]
+        },
+        {
+          "weapon_wrist": [
+            35,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": null,
+          "foot_b": null
+        },
+        {
+          "weapon_wrist": [
+            35,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": null,
+          "foot_b": null
+        },
+        {
+          "weapon_wrist": [
+            36,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": null,
+          "foot_b": null
+        },
+        {
+          "weapon_wrist": [
+            36,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": null,
+          "foot_b": null
+        },
+        {
+          "weapon_wrist": [
+            36,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            44,
+            85
+          ],
+          "foot_b": null
+        },
+        {
+          "weapon_wrist": [
+            36,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            36,
+            85
+          ],
+          "foot_b": null
+        },
+        {
+          "weapon_wrist": [
+            35,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            30,
+            85
+          ],
+          "foot_b": [
+            33,
+            76
+          ]
+        },
+        {
+          "weapon_wrist": [
+            35,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            31,
+            85
+          ],
+          "foot_b": [
+            33,
+            76
+          ]
+        },
+        {
+          "weapon_wrist": [
+            35,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            32,
+            85
+          ],
+          "foot_b": [
+            34,
+            75
+          ]
+        },
+        {
+          "weapon_wrist": [
+            35,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            34,
+            85
+          ],
+          "foot_b": [
+            35,
+            75
+          ]
+        },
+        {
+          "weapon_wrist": [
+            35,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            35,
+            85
+          ],
+          "foot_b": [
+            26,
+            73
+          ]
+        },
+        {
+          "weapon_wrist": [
+            35,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            34,
+            85
+          ],
+          "foot_b": null
+        },
+        {
+          "weapon_wrist": [
+            35,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            34,
+            85
+          ],
+          "foot_b": null
+        },
+        {
+          "weapon_wrist": [
+            35,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": null,
+          "foot_b": null
+        },
+        {
+          "weapon_wrist": [
+            36,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            9,
+            84
+          ],
+          "foot_b": [
+            40,
+            79
+          ]
+        },
+        {
+          "weapon_wrist": [
+            36,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            8,
+            83
+          ],
+          "foot_b": [
+            44,
+            80
+          ]
+        },
+        {
+          "weapon_wrist": [
+            36,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            9,
+            81
+          ],
+          "foot_b": [
+            53,
+            81
+          ]
+        },
+        {
+          "weapon_wrist": [
+            36,
+            63
+          ],
+          "other_wrist": null,
+          "foot_a": [
+            10,
+            80
+          ],
+          "foot_b": [
+            51,
+            84
+          ]
+        }
+      ]
+    }
+  ],
+  "omitted_annotations": [
+    {
+      "track": "mage",
+      "frame": 18,
+      "landmark": "foot_b",
+      "reason": "Manual point could not be placed within 2px of visible silhouette; unresolved, not interpolated"
+    },
+    {
+      "track": "mage",
+      "frame": 19,
+      "landmark": "foot_b",
+      "reason": "Manual point could not be placed within 2px of visible silhouette; unresolved, not interpolated"
+    },
+    {
+      "track": "mage",
+      "frame": 26,
+      "landmark": "foot_a",
+      "reason": "Manual point could not be placed within 2px of visible silhouette; unresolved, not interpolated"
+    },
+    {
+      "track": "mage",
+      "frame": 27,
+      "landmark": "foot_a",
+      "reason": "Manual point could not be placed within 2px of visible silhouette; unresolved, not interpolated"
+    },
+    {
+      "track": "mage",
+      "frame": 30,
+      "landmark": "foot_b",
+      "reason": "Manual point could not be placed within 2px of visible silhouette; unresolved, not interpolated"
+    },
+    {
+      "track": "mage",
+      "frame": 31,
+      "landmark": "foot_b",
+      "reason": "Manual point could not be placed within 2px of visible silhouette; unresolved, not interpolated"
+    },
+    {
+      "track": "white",
+      "frame": 97,
+      "landmark": "foot_b",
+      "reason": "Manual point could not be placed within 2px of visible silhouette; unresolved, not interpolated"
+    },
+    {
+      "track": "white",
+      "frame": 106,
+      "landmark": "foot_b",
+      "reason": "Manual point could not be placed within 2px of visible silhouette; unresolved, not interpolated"
+    },
+    {
+      "track": "white",
+      "frame": 107,
+      "landmark": "foot_b",
+      "reason": "Manual point could not be placed within 2px of visible silhouette; unresolved, not interpolated"
+    },
+    {
+      "track": "white",
+      "frame": 113,
+      "landmark": "foot_b",
+      "reason": "Manual point could not be placed within 2px of visible silhouette; unresolved, not interpolated"
+    },
+    {
+      "track": "white",
+      "frame": 114,
+      "landmark": "foot_b",
+      "reason": "Manual point could not be placed within 2px of visible silhouette; unresolved, not interpolated"
+    }
+  ]
+}
