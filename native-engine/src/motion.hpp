@@ -29,7 +29,15 @@ constexpr int knightMidpointStart=14*motionColumns;
 constexpr int knightSprintStart=27*motionColumns,knightSprintFrames=54;
 // Render 24 evenly distributed distinct poses from the existing 54-pose atlas.
 constexpr int knightSprintPlaybackFrames=24;
+// Presentation-only selection: 11 existing authored poses / .23s = 47.83 FPS.
+// Keep the contact pose (source 6 at phase .43) and both ends; combat still
+// uses all original clip timing/contact values and sword-trail indices.
+constexpr int knightWeakPlayback[]={0,1,3,4,6,8,10,11,12,14,15};
+constexpr int knightWeakPlaybackFrames=11;
 constexpr int whiteNightRunStart=88,whiteNightRunFrames=32;
+// 32 poses / 1 second at the default 280 world units/s. Distance-driven,
+// so gear and analog movement still scale cadence without changing velocity.
+constexpr float whiteNightRunStride=280.f;
 constexpr float motionScale=1.85f;
 constexpr int mageMotionColumns=8,mageMotionRows=10,mageGroundCastRow=8,mageAirCastRow=9;
 constexpr int mageCastTipX=55,mageCastTipY=50;
