@@ -1,0 +1,11 @@
+{
+  "revision": "0ceb1ca3eb358c9064f382cccf5fe9b2f4f37d13",
+  "full_video_sha256": "ea53e9cf107570c204c1d96ecedee6ee98406c72398db71dc390eb5f87a04fd4",
+  "quarter_speed_sha256": "b155b3e9c567960c0d5f057827cd287ea5851ca87282a938a4bd80d01f8d7263",
+  "first_frame_right_leg_region_mean_rgb_error": {
+    "against_current_png": 1.9164743134469697,
+    "against_previous_png": 15.002589370265152
+  },
+  "conclusion": "Decoded first-frame right panel matches current PNG more closely; not a motion-quality acceptance",
+  "quarter_speed": "104 source60Hz samples encoded at15FPS, before and after same pose indices"
+}
