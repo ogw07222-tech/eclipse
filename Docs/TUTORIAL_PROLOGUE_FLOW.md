@@ -3,13 +3,36 @@ Status: **approved narrative flow; design specification, NOT implemented**.
 Scope: ECLIPSE game only. Do not conflate with ECLIPSE Studio.
 No GitHub Actions or unattended tests/builds. Owner performs runtime validation.
 
+
+## Nonverbal storytelling — binding creative direction
+
+**ECLIPSE is a dialogue-free game.** Convey story, emotion, character motives, danger, power loss, and reincarnation through acting, pose/silhouette, visual staging, animation, camera, sound, music, lighting, and interactive gameplay. Never depend on spoken dialogue, subtitles, narration, speech bubbles, written exposition, or tutorial instruction sentences for the player to understand the plot.
+
+### Beat-by-beat nonverbal communication
+1. **Controls without dialogue:** brief contextual controller/button glyphs, directional arrows, ghosted input demonstrations, and immediate visual feedback. No tutorial text paragraphs. Let player try each action and then unlock next demonstration. Both legendary classes visibly differ in attack silhouette/effects; class change understood by visual transformation.
+2. **Castle threshold:** camera reveals vast looming entrance, gate reacts to approach, protagonist briefly pauses/looks up; path lights draw attention inward.
+3. **First monsters:** wake-up/arrival animation, hostile targeting, highly legible anticipation and reaction; flying and ground threat differentiated visually.
+4. **Interior + mid-boss:** foes react fearfully or brace; hit-stop, knockback, breakable armor and cinematic recovery reinforce legendary power without character dialogue.
+5. **Castle core:** framing, scale, throne placement, silhouettes and enemy withdrawal imply the final opponent's authority.
+6. **Phase 1 victory:** boss staggers, falls or kneels; attacks cease; brief quiet lets player believe victory.
+7. **Phase 2:** unnatural stillness, armored cracks, energy leaking, changed posture, throne/arena reaction, subdued transformation. Escalating attacks visually communicate an unwinnable disparity without explaining it.
+8. **Death + regression:** legendary class silhouettes/effects flicker and extinguish; time reverses using repeated environmental fragments or animations; no explanatory text. Contrast previously dominant protagonist with powerless figure.
+9. **Forest awakening:** matching pose/visual motif from death to rebirth, missing signature weapons/effects, weak tentative movement; an accessible visual cue introduces progression through reclaimed power.
+
+### Readability safeguards
+- Never gate progression on reading language. UI may retain essential accessibility/settings labels, save/error messages and optional control bindings; these are **interface affordances, not story dialogue**. Prefer universal glyphs and allow remapping/accessibility alternatives where needed.
+- Each key narrative beat must be understandable in silhouette-only/blocking review, then reinforced by animation/sound (audio is supportive, never the only channel).
+- Favor restraint and meaningful pauses over constant particle overload. Maintain the current dark, crisp, pixel-art direction.
+- Do not confuse **zero dialogue** with **zero user feedback**: input, telegraphs, damage, scene transition and failures remain clearly communicated.
+- This is a design specification; no cutscene, scene, UI, or art implementation is asserted by this document.
+
 ## Story and core intent
 The tutorial is a playable prologue showing the protagonist's legendary peak using **섬광의 집행자 (Flash Executioner)** and **공간의 지배자 (Ruler of Space)**. The player experiences unusually powerful attacks and satisfying hit feedback, defeats Demon King phase 1, then inevitably loses in phase 2. The defeat is the first shown reincarnation, cutting to a **starting forest** where a weakened protagonist must recover lost classes and powers. The initial castle enemies are tutorial-weakened variants of intimidating **endgame** enemies, never early-game slimes.
 
 ## Canonical progression
 | # | Scene | Gameplay | Exit / transition |
 |---|---|---|---|
-| 1 | Control practice, **no monsters** | Move, jump, dash, basic attack, skills, ultimate and swap/experience both legendary classes without combat pressure. | All essential prompts demonstrated; permit skipping/replaying help after initial prompts. |
+| 1 | Control practice, **no monsters** | Move, jump, dash, basic attack, skills, ultimate and swap/experience both legendary classes without combat pressure. | All essential icon/animation demonstrations experienced; allow replay/skip of visual guidance. |
 | 2 | Demon Castle Entrance (the **currently used starting screen**) | Enter the castle; atmosphere and anticipation. This is the entrance scene, not the eventual starting forest. | Enter combat trigger. |
 | 3 | Castle entrance: first enemies | Actual combat against castle fodder including ground and flying targets; easy power fantasy. | Clear encounter. |
 | 4 | Castle interior | Fodder waves and a **mid-boss**; intentionally extremely easy, prioritize animation, hit-stop, impact, launches and area clearing. | Mid-boss defeated. |
