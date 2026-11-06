@@ -15,7 +15,7 @@ val gameArt = repositoryRoot.resolve("Assets/Resources/Eclipse")
 val packagedArt = layout.buildDirectory.dir("generated/eclipseAssets")
 val packageEclipseAssets by tasks.registering(Sync::class) {
     from(gameArt) {
-        include("knight_motion.png", "mage_run.png", "mage_motion.png",
+        include("knight_motion.png", "knight_skill_motion.png", "knight_skill_fx_layer.png", "mage_run.png", "mage_motion.png",
             "ui/attack_states.png", "ui/dash_states.png",
             "ui/swap_skill_states.png", "ui/joystick_arrows_new.png",
             "ui/settings_gear.png", "ui/settings_menu_panel.png", "ui/settings_window.png",
