@@ -14,7 +14,7 @@ namespace eclipse {
 constexpr double fixedStep=1.0/60.0;
 constexpr float viewWidth=1280,viewHeight=720,floorY=ForestLayerScene::floorY,worldWidth=1600;
 struct Actions {
-    bool left=false,right=false,jump=false,attack=false,dash=false,skill=false,swap=false;
+    bool left=false,right=false,jump=false,attack=false,dash=false,skill=false,swap=false,ultimate=false;
     bool restart=false,inventory=false,weapon=false,armor=false,charm=false;
     bool jumpHeld=false,skillSweep=false,skillBuff=false;
 };
@@ -53,7 +53,7 @@ struct Player {
     size_t whiteTarget=0;
     unsigned whiteRushHits=0;
     float takeoffLock=0;
-    float dashLeft=0,dashCooldown=0,attackCooldown=0,skillCooldown=0,swapCooldown=0;
+    float dashLeft=0,dashCooldown=0,attackCooldown=0,skillCooldown=0,swapCooldown=0,verdictCooldown=0;
     float invulnerable=0,coyote=0,jumpBuffer=0,attackFlash=0,comboWindow=0,hitStop=0,swapFlash=0;
     float trailingHealth=-1.f,healthTrailHold=0.f;
     float hurtTint=0; // visual-only: short white flash and muted-red impact
@@ -356,11 +356,11 @@ class Combat {
             if(!p.grounded||p.dashLeft>0||p.slamRecover>0||!canAttack())return false;
             if(a.skill&&p.skillCooldown<=0){p.whiteMove=WhiteMove::Rush;p.skillCooldown=3.f;}
             else if(a.skillSweep&&p.sweepReady<=0&&p.storedLightLances>0){p.whiteMove=WhiteMove::Command;p.sweepReady=1.f;}
-            else if((a.skillBuff&&p.buffReady<=0)||(a.swap&&p.swapCooldown<=0)){
+            else if((a.skillBuff&&p.buffReady<=0)||(a.ultimate&&p.verdictCooldown<=0)){
                 p.whiteTarget=farthestLightMark();
                 if(p.whiteTarget==enemies.size())return false;
-                if(a.skillBuff&&p.buffReady<=0){p.whiteMove=WhiteMove::Blink;p.buffReady=1.5f;}
-                else {p.whiteMove=WhiteMove::Verdict;p.swapCooldown=9.f;}
+                if(a.ultimate&&p.verdictCooldown<=0){p.whiteMove=WhiteMove::Verdict;p.verdictCooldown=9.f;}
+                else {p.whiteMove=WhiteMove::Blink;p.buffReady=1.5f;}
             }else if(a.attack&&p.attackCooldown<=0){p.whiteMove=WhiteMove::Slash;p.attackCooldown=.46f/p.basicSpeed();}
             else return false;
             p.whiteAge=0;p.whiteRushHits=0;p.vx=0;p.vy=0;
@@ -419,13 +419,33 @@ class Combat {
         p.mageSkillCooldown=down(p.mageSkillCooldown,dt);
         p.sweepReady=down(p.sweepReady,dt);
         p.buffReady=down(p.buffReady,dt);
-        p.preparation=down(p.preparation,dt);p.swapCooldown=down(p.swapCooldown,dt);p.invulnerable=down(p.invulnerable,dt);
+        p.preparation=down(p.preparation,dt);p.swapCooldown=down(p.swapCooldown,dt);p.verdictCooldown=down(p.verdictCooldown,dt);p.invulnerable=down(p.invulnerable,dt);
         p.attackFlash=down(p.attackFlash,dt);p.comboWindow=down(p.comboWindow,dt);p.swapFlash=down(p.swapFlash,dt);
         p.whiteBoost=down(p.whiteBoost,dt);
         if(p.hitStop>0){p.hitStop=down(p.hitStop,dt);return;}
+        // Swap cycles Knight -> Mage -> White Night -> Knight. It is never the
+        // ultimate action; Verdict owns an independent button and cooldown.
+        if(a.swap&&p.swapCooldown<=0&&p.slamRecover<=0&&
+           (!p.whiteNight||p.whiteMove==WhiteMove::None)){
+            const bool mayEntryAttack=canAttack();
+            cancelAirSlam();cancelMageCast();p.meleeLeft=0;
+            const int next=p.whiteNight?0:p.form==0?1:2;
+            p.whiteNight=next==2;
+            p.form=next==1?1:0;
+            p.whiteMove=WhiteMove::None;p.whiteAge=0;
+            p.swapCooldown=1.f;p.attackFlash=.22f;p.combo=0;
+            p.comboWindow=0;p.attackPose=0;p.swapFlash=.24f;
+            if(mayEntryAttack){
+                ++p.attackSerial;
+                if(p.whiteNight)whiteEffect(LightFx::Arrive,p.x,p.y-48);
+                else if(p.form==0)melee(13,false,112);
+                else projectile(14,false);
+            }
+            return;
+        }
         if(p.whiteNight&&stepWhiteMove(dt,a))return;
         if(p.whiteNight){
-            a.skill=a.skillSweep=a.skillBuff=a.swap=false;
+            a.skill=a.skillSweep=a.skillBuff=a.ultimate=false;
             if(p.grounded)a.attack=false;
         }
         p.takeoffLock=down(p.takeoffLock,dt);
@@ -443,14 +463,6 @@ class Combat {
                 launchJump();
         }
         const bool attackAllowed=canAttack();
-        if(a.swap&&!p.whiteNight&&p.swapCooldown<=0&&p.slamRecover<=0){
-            cancelAirSlam();cancelMageCast();p.meleeLeft=0;p.form=1-p.form;p.swapCooldown=1;
-            p.attackFlash=.22f;p.combo=0;p.comboWindow=0;p.attackPose=0;p.swapFlash=.24f;
-            if(attackAllowed){
-                ++p.attackSerial;
-                if(p.form==0)melee(13,false,112);else projectile(14,false);
-            }
-        }
         if(attackAllowed&&a.skillBuff&&p.form==0&&p.buffReady<=0&&p.grounded&&p.dashLeft<=0&&p.slamRecover<=0){
             p.preparation=preparationDuration;
             p.buffReady=buffCooldown;
