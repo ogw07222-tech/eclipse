@@ -1,6 +1,6 @@
 {
-  "id": "void_lord_v3",
-  "name": "공허의 군주",
+  "id": "sovereign_of_space",
+  "name": "공간의 지배자",
   "status": "concept_key_pose_atlas_not_runtime_integrated",
   "source": "Docs/CURRENT_CLASS_DESIGN.md",
   "cell": {
@@ -43,64 +43,80 @@
       "start": 0,
       "count": 3,
       "duration": 0.9,
-      "target_fps": 8,
-      "key_pose_only": true
+      "key_pose_only": true,
+      "production_target_frames": 8,
+      "production_target_fps": 8.89,
+      "actual_authored_frames": 3
     },
     {
       "name": "run",
       "start": 3,
       "count": 4,
       "duration": 0.7,
-      "target_fps": 24,
-      "key_pose_only": true
+      "key_pose_only": true,
+      "production_target_frames": 24,
+      "production_target_fps": 34.29,
+      "actual_authored_frames": 4
     },
     {
       "name": "attack",
       "start": 7,
       "count": 4,
       "duration": 0.44,
-      "target_fps": 32,
-      "key_pose_only": true
+      "key_pose_only": true,
+      "production_target_frames": 16,
+      "production_target_fps": 36.36,
+      "actual_authored_frames": 4
     },
     {
       "name": "flight",
       "start": 11,
       "count": 3,
       "duration": 0.65,
-      "target_fps": 16,
-      "key_pose_only": true
+      "key_pose_only": true,
+      "production_target_frames": 12,
+      "production_target_fps": 18.46,
+      "actual_authored_frames": 3
     },
     {
       "name": "gravity_field",
       "start": 14,
       "count": 3,
       "duration": 0.5,
-      "target_fps": 24,
-      "key_pose_only": true
+      "key_pose_only": true,
+      "production_target_frames": 12,
+      "production_target_fps": 24,
+      "actual_authored_frames": 3
     },
     {
       "name": "dimensional_spikes",
       "start": 17,
       "count": 3,
       "duration": 0.55,
-      "target_fps": 24,
-      "key_pose_only": true
+      "key_pose_only": true,
+      "production_target_frames": 16,
+      "production_target_fps": 29.09,
+      "actual_authored_frames": 3
     },
     {
       "name": "repulsion",
       "start": 20,
       "count": 3,
       "duration": 0.42,
-      "target_fps": 32,
-      "key_pose_only": true
+      "key_pose_only": true,
+      "production_target_frames": 16,
+      "production_target_fps": 38.1,
+      "actual_authored_frames": 3
     },
     {
       "name": "singularity",
       "start": 23,
       "count": 4,
       "duration": 2,
-      "target_fps": 24,
-      "key_pose_only": true
+      "key_pose_only": true,
+      "production_target_frames": 48,
+      "production_target_fps": 24,
+      "actual_authored_frames": 4
     }
   ],
   "caveats": [
@@ -108,5 +124,6 @@
     "Separate transparent book and FX layers need renderer registration and anchoring before gameplay.",
     "Existing fire mage logic and assets are not replaced.",
     "Gameplay parameters remain as defined in Docs/CURRENT_CLASS_DESIGN.md."
-  ]
+  ],
+  "production_note": "Production frame counts are targets only. Original 27 key-pose PNGs unchanged; no new poses authored or runtime integration. Never treat goals as actual atlas ranges."
 }
