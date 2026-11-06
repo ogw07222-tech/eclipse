@@ -31,6 +31,16 @@ This is a manually available workflow, **not permission for assistants to use it
 
 If any other instruction conflicts, follow this project owner policy and do not initiate GitHub Actions.
 
+## Dialogue-free storytelling (mandatory creative rule)
+
+ECLIPSE tells its story without character dialogue, voice lines, narration, subtitles, speech bubbles, or written plot exposition. Story-critical information must be understandable through pixel-art acting, character movement, staging, animation, camera, sound/music, visual motifs and environmental changes. No cutscene or tutorial should require reading prose to follow the narrative.
+
+- Tutorials: contextual button glyphs, visual input demonstrations and direct feedback instead of instructional sentences. Keep controls understandable and accessible.
+- Narrative: show the player the story through actions and consequences; use visual continuity to convey the Demon King's second phase, the protagonist's defeat, reincarnation and loss of the legendary classes.
+- Interface exceptions: functional menus, accessibility labels, settings and explicit technical errors are permitted; this is **no story dialogue**, not a ban on safety/error feedback or necessary UI text.
+- Review each major beat for legibility without text and without audio, then enrich with sound; never rely solely on color, audio, or opaque effects.
+- Reference: `Docs/TUTORIAL_PROLOGUE_FLOW.md`.
+
 ## Asset loading: fail loudly (mandatory)
 
 - Required game images (including the five demon-castle entrance layers and both title layers) must never silently fall back to another scene, placeholder, or missing animation when loading/decoding, dimension checks, or texture creation fail.
