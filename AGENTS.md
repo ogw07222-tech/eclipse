@@ -41,6 +41,17 @@ ECLIPSE tells its story without character dialogue, voice lines, narration, subt
 - Review each major beat for legibility without text and without audio, then enrich with sound; never rely solely on color, audio, or opaque effects.
 - Reference: `Docs/TUTORIAL_PROLOGUE_FLOW.md`.
 
+## GitHub + ChatGPT Library PNG exchange (mandatory)
+
+For every PNG or sprite edit/import/replacement, follow [`Docs/PNG_GITHUB_LIBRARY_WORKFLOW.md`](Docs/PNG_GITHUB_LIBRARY_WORKFLOW.md).
+
+- **GitHub is the canonical versioned source of truth.** `Art/` holds editable originals and authored poses; `Assets/Resources/Eclipse/` holds only approved runtime assets at exact existing paths. The ChatGPT Library is an optional companion shelf for source references, drafts and approved exports, **not** an automatic GitHub mirror.
+- Track stable asset identity, exact GitHub source/runtime paths, image dimensions, frame metadata, version/status and real content hashes/refs where available. Never fabricate Library IDs or assume a file named alike is identical.
+- For “modify existing PNG”, retrieve and inspect the **actual original binary image** first. If current tools can only read GitHub text and cannot retrieve binary PNGs, state that limitation and seek accessible Library/uploaded source; never claim a newly generated approximation is a faithful edit.
+- For “bring PNG from Library”, verify item bytes, compare with GitHub, keep original, and commit only the approved change with matching runtime/metadata/packaging updates. For “save PNG to Library”, explicitly upload and verify if supported; otherwise provide the file for manual import. **Never claim background or bidirectional sync.**
+- Maintain a reviewable before/after with native-resolution visual checks. Do not silently overwrite canonical PNGs, alter silhouettes/hitboxes, or move runtime paths. Preserve pre-edit version via Git and report which of GitHub / Library / local draft actually changed.
+- This rule does **not** authorize GitHub Actions, unrequested tests, or automatic builds. Observe the absolute owner-approval rule above.
+
 ## Asset loading: fail loudly (mandatory)
 
 - Required game images (including the five demon-castle entrance layers and both title layers) must never silently fall back to another scene, placeholder, or missing animation when loading/decoding, dimension checks, or texture creation fail.
