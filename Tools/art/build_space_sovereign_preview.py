@@ -8,6 +8,7 @@ Requires Pillow, numpy, opencv-python (cv2). No tests or Actions are invoked.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -179,6 +180,18 @@ def main():
     for name in SOURCE_NAMES:
         cell = tuple(manifest["cell"]["effects" if name == "effects" else "character"])
         layers[name] = frames_from_sheet(source / (name + ".png"), cell, source_count)
+    # The original reference branch currently stores identical image bytes for
+    # character.png and grimoire.png. Compositing both would draw two whole
+    # characters, not a real separate grimoire. Refuse this silent art defect.
+    character_hash = hashlib.sha256((source / "character.png").read_bytes()).hexdigest()
+    grimoire_hash = hashlib.sha256((source / "grimoire.png").read_bytes()).hexdigest()
+    if character_hash == grimoire_hash:
+        raise SystemExit(
+            "ECLIPSE ASSET ERROR: character.png and grimoire.png are identical. "
+            "The source does not contain an independently separated book layer. "
+            "Do not generate falsely layered 140-frame atlases until the source "
+            "book pixels have been isolated."
+        )
     out.mkdir(parents=True, exist_ok=True)
     new_clips = []
     reports = {}
