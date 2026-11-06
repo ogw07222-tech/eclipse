@@ -23,38 +23,39 @@ CONFIG = [
 ]
 
 def upper_body(frame, phase, belt, upright):
-    """Resample existing torso as single continuous pixel shapes, anchored at pelvis.
+    """Pixel-only head/torso sway with delayed cape follow-through.
 
-    A fixed backward (leftward for right-facing character) corrective tilt makes
-    the crouched silhouette more upright. Small opposite-phase sway accompanies
-    alternating planted legs. Do not translate the leg or sword below the belt.
+    Original lower pixels are unchanged. A continuous displacement field is
+    used rather than moving isolated body pieces, avoiding detached limbs.
     """
     base = frame.convert("RGBA")
     w, h = base.size
     result = base.copy()
     pixels = result.load()
     source = base.load()
-    # Wipe ONLY the source upper region, preserving all y >= belt verbatim.
     for y in range(belt):
         for x in range(w):
             pixels[x, y] = (0, 0, 0, 0)
 
-    cycle = 2 * math.pi * phase
-    sway = math.sin(cycle)
-    lift = (1.0 - math.cos(2 * cycle)) / 2.0
+    cycle = 2.0 * math.pi * phase
     for y in range(belt):
-        # Pelvis stays fixed, shoulders/head lean backward.
-        strength = min(1.0, max(0.0, (belt - y) / 34.0))
-        # Stationary backward stance correction up to 2 px;
-        # 1 px sway, never body-length bobbing or exaggerated sneak pose.
-        dx = round((-upright + 1.0 * sway) * strength)
-        dy = -round(0.7 * lift * strength)
+        influence = min(1.0, max(0.0, (belt-y)/36.0))
+        # Restrained correction, with pelvis fixed at the waist seam.
+        body_dx = round((-upright * 0.55 + 1.25 * math.sin(cycle + 0.2)) * influence)
+        body_dy = -round(0.8 * math.sin(cycle + 0.2)**2 * influence)
         for x in range(w):
-            if source[x, y][3] == 0:
+            rgba = source[x, y]
+            if rgba[3] == 0:
                 continue
+            # Left-facing trailing cloth/hair responds slightly after shoulders.
+            trailing = max(0.0, min(1.0, (27.0-x)/23.0))
+            follow = trailing * min(1.0, (belt-y)/45.0)
+            dx = body_dx + round(1.6 * follow *
+                                 math.sin(cycle - 0.75 - (27-x)*0.045))
+            dy = body_dy + round(0.8 * follow * math.sin(cycle - 0.85))
             nx, ny = x + dx, y + dy
             if 0 <= nx < w and 0 <= ny < belt:
-                pixels[nx, ny] = source[x, y]
+                pixels[nx, ny] = rgba
     return result
 
 def changed_indices(clips):
