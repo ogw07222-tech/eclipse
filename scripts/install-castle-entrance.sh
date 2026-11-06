@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Replace only the five ECLIPSE demon castle entrance images.
 # Run from anywhere: bash ~/eclipse/scripts/install-castle-entrance.sh
-# Never touches ECLIPSE Studio files, other assets, or GitHub Actions.
+# Never touches other assets or GitHub Actions.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 if [[ "$(git -C "$ROOT" remote get-url origin 2>/dev/null)" != *"ogw07222-tech/eclipse.git"* ]]; then
-  echo "ERROR: run this script from a clone of ogw07222-tech/eclipse (not eclipse-studio)" >&2
+  echo "ERROR: run this script from a clone of ogw07222-tech/eclipse" >&2
   exit 2
 fi
 ZIP="${1:-$HOME/storage/downloads/demon_castle_fixed_assets.zip}"
