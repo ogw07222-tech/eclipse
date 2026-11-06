@@ -60,7 +60,15 @@ for i,pose in enumerate(sprint_poses(sprint_source)):
     occupied.add(row*16+i%16)
     unique.add(cell.tobytes())
 skills=Image.open(ROOT/'Assets/Resources/Eclipse/knight_skill_motion.png').convert('RGBA')
-assert skills.size==(448,564)
+assert skills.size==(448,846), 'Knight skills must be 4x9 cells of 112x94'
+skill_fx=Image.open(ROOT/'Assets/Resources/Eclipse/knight_skill_fx_layer.png').convert('RGBA')
+assert skill_fx.size==(448,564), 'Separate skill effects must remain 4x6 cells'
+for skill_index in range(3):
+    poses=[skills.crop(((n%4)*112,(n//4)*94,(n%4+1)*112,(n//4+1)*94))
+           for n in range(skill_index*12,(skill_index+1)*12)]
+    assert all(frame.getchannel('A').getbbox() for frame in poses), ('empty skill pose',skill_index)
+    assert len({hashlib.sha256(frame.tobytes()).digest() for frame in poses})==12,('duplicate skill pose',skill_index)
+    assert all(set(frame.getchannel('A').getdata())<={0,255} for frame in poses),('skill alpha',skill_index)
 results=dict(atlas_pixels=list(im.size),cell_pixels=[64,94],clips=13,frames=len(occupied),unique_poses=len(unique),alpha=[0,255],pivot=[28,88],world_scale=1.85,source='Indexed key poses and interleaved midpoint poses')
 # Blade annotations are checked against the ACTUAL steel pixels, not a retired rig.
 import importlib.util,math

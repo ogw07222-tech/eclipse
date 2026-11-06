@@ -59,7 +59,9 @@ def main():
         note='16→11 기존 자세 선택. 접촉 위상 .43에서 원래 6번 자세. 타격/게임플레이 타이밍 유지. 검 궤적은 표시 PNG 자세와 동기화. 기본 속도 기준; 장비/강화/히트스톱은 실제 속도에 영향.')
     for i,(name,d) in enumerate([('스킬1 찌르기',.48),('스킬2 휩쓸기',.415),('스킬3 준비',.40)]):
         add('일반 기사',name,'knight_skill_motion.png',(112,94),4,(44,88),doubled(i*4,4,12),d,
-            note=f'4키+3중간=7고유 자세. 24~48FPS에는 {math.ceil(d*24)}~{math.floor(d*48)}고유 자세 필요. 생성 2회 모두 검 길이/디자인/픽셀 일관성 미달로 미반영. 새 PNG 제작 미완료.')
+            after=list(range(i*12,i*12+12)),before_sheet='Art/knight/skill/original_4x6.png',
+            before_columns=4,new_png=True,code=True,
+            note='기존 GitHub 키/중간 자세에서 파생한12고유 PNG 자세. 상체·검·망토 픽셀에 제한적 정수 워프를 적용, 발 접지 영역 보존. 검기는 별도 PNG 유지. 실제 자연스러움 미검증.')
     mage='mage_motion.png'
     for name,row,d in [('대기',0,.96),('공격 지상',8,.32),('공격 공중',9,.32),('점프',2,.52),('낙하',3,.65),('착지',4,.12),('대시',5,.15),('사망',7,.9)]:
         air=name in ('점프','낙하')
@@ -81,9 +83,9 @@ def main():
             add(label+' 슬라임','이동' if move else '공격',f'monsters/slime_{file}.png',(128,128),4,(64,116),list(range(0,8)) if move else list(range(8,16)),duration,variable=move,
                 note=f'8장 유지 / 미완료. 최저 목표에 최소 {count}고유 자세 필요. PNG 실루엣이 slime_shapes.hpp 충돌 판정에 연결됨: 별도 시각 매핑 설계 없이 재작화/판정 변경 금지.')
     OUT.mkdir(parents=True,exist_ok=True)
-    (OUT/'animation-audit.json').write_text('{\n  "base":"d223a65",\n  "status":"INCOMPLETE — static inspection and partial presentation fixes only",\n  "clips":[\n'+',\n'.join(json.dumps(c,ensure_ascii=False) for c in CLIPS)+'\n]}\n')
+    (OUT/'animation-audit.json').write_text('{\n  "base":"knight-skill-12",\n  "status":"INCOMPLETE — static inspection and partial presentation fixes only",\n  "clips":[\n'+',\n'.join(json.dumps(c,ensure_ascii=False) for c in CLIPS)+'\n]}\n')
     lines=['# 캐릭터 애니메이션 점검 — 미완료','',
-           '기준 main: `d223a65`. PNG 범위·빈 프레임·RGBA 해시를 정적으로 확인했다. 빌드/게임 실행/테스트/GitHub Actions는 실행하지 않았다. 자연스러움·발 접촉·반짝임·전환·기기 재생은 검증하지 않았다. 일반 기사 달리기는 새24PNG를 반영했다. 다른 신규 PNG 제작 미완료 항목은 그대로다. 전체 최적화 완료가 아니다. 후속 변경 검토는 [CHANGED_MOTION_REVIEW.md](CHANGED_MOTION_REVIEW.md)를 참고한다.','',
+           '최신 기준: GitHub 본편 PNG 정적 점검. 신규 기사 스킬 12자세와 별도 검기 시트 포함. PNG 범위·빈 프레임·RGBA 해시를 정적으로 확인했다. 빌드/게임 실행/테스트/GitHub Actions는 실행하지 않았다. 자연스러움·발 접촉·반짝임·전환·기기 재생은 검증하지 않았다. 일반 기사 달리기24PNG 및 스킬 3종 각12PNG를 반영했다. 그 밖의 신규 PNG 미완료 항목은 그대로다. 전체 최적화 완료가 아니다. 후속 변경 검토는 [CHANGED_MOTION_REVIEW.md](CHANGED_MOTION_REVIEW.md)를 참고한다.','',
            'FPS는 기본 이동속도 280·기본 장비·히트스톱 없는 조건의 표시 슬롯/초다. 기존 보고의 키 프레임 수에는 중간 PNG 자세가 빠져 있었다. 중간 자세를 사용하는 모션은 슬롯 수와 고유 이미지 수를 함께 적었다. 마지막 자세 홀드 슬롯은 중복이며 새 제작 프레임으로 계산하지 않는다. 60Hz 표시에서는 60FPS 초과 슬롯 일부가 보이지 않을 수 있다. 점프/낙하는 속도 기반이라 표의 FPS를 고정 재생속도로 해석하면 안 된다.','',
            '| 캐릭터 | 동작 | 기존 프레임(슬롯/고유) | 기존 FPS | 변경 프레임(슬롯/고유) | 변경 FPS | 새 PNG | 코드 반영 | 미검증/남은 작업 |',
            '|---|---|---:|---:|---:|---:|---|---|---|']

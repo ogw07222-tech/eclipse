@@ -32,3 +32,9 @@ The previous animation audit/replay artifacts are historical for their recorded 
 ### Folded-leg follow-up
 
 The first alternating revision compressed the legs horizontally by0.84 during packing, making folded shins read shorter. That scaling is removed. A new15px thigh/15px shin guide with lower heel recovery was used to redraw the legs; these are guide targets, not measured proof of every PNG bone length. Original upper-body/sword/non-run pixels remain protected. Runtime phase/start/count/240-unit stride and all gameplay values are unchanged by this follow-up. Current comparison videos use the preceding alternating revision at the same cadence on both sides.
+
+## Verdict visual-rate exception
+
+- The current ultimate actor clip uses 20 separate PNG poses over 1.12s (17.86 slots/s).
+- Its authored time-stop deliberately holds the off-hand-fist pose between 0.23s and 0.70s; this is a cinematic visual hold, not missing run/attack art. Because the ECLIPSE FPS targets are guidelines rather than immutable minima, **preserve the 20-frame Verdict clip until a separately approved re-authoring of the time-stop timeline** instead of adding fake duplicated frames.
+- The executor's sprint remains 32 distinct PNG poses, with its approved movement-linked 240-unit stride. Sword slashes, golden lance textures and spatial rifts are independent PNG effects and must not be baked into the body sheet.
