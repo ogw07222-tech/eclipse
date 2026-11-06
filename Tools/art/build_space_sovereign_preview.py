@@ -18,7 +18,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[2] / "Assets/Resources/Eclipse/void_mage"
 SOURCE_NAMES = ("character", "grimoire", "effects")
 TARGET_COUNTS = {
-    "idle": 8, "run": 24, "attack": 16, "flight": 12,
+    "idle": 8, "move_hover": 12, "attack": 16, "flight": 12,
     "gravity_field": 12, "dimensional_spikes": 16,
     "repulsion": 16, "singularity": 48,
 }
@@ -26,7 +26,7 @@ TARGET_COUNTS = {
 # ability release occurs after anticipation; ultimate keeps its long build-up.
 BEATS = {
     "idle": (0.0, .45, 1.0),
-    "run": (0.0, .23, .53, .80),
+
     "attack": (0.0, .26, .39, 1.0),
     "flight": (0.0, .34, 1.0),
     "gravity_field": (0.0, .28, 1.0),
@@ -110,6 +110,49 @@ def render_layer(keys: list[np.ndarray], frame_count: int,
                                 fraction, cv2))
     return output
 
+def hover_frame(base: np.ndarray, i: int, layer: str, frame_count: int) -> np.ndarray:
+    """Original idle art, pixel-accurate sublayer offsets, NOT fake leg cycling.
+
+    The character gently levitates; the grimoire follows with phase lag.
+    The original run source keys are intentionally never referenced.
+    """
+    phase = 2.0 * math.pi * i / frame_count
+    body_y = round(math.sin(phase) * 1.0)
+    body_x = round(math.sin(phase - .65) * .55)
+    if layer == "grimoire":
+        body_x += round(2.0 * math.sin(phase - 1.1))
+        body_y += round(2.0 * math.sin(phase - 1.25))
+    if layer == "effects":
+        body_x += round(math.sin(phase - .85))
+        body_y += round(math.sin(phase - .8))
+    from PIL import Image as PILImage
+    h, w = base.shape[:2]
+    layer_image = PILImage.fromarray(base, "RGBA")
+    canvas = PILImage.new("RGBA", (w, h))
+    canvas.paste(layer_image, (body_x, body_y), layer_image)
+    return np.array(canvas, dtype=np.uint8)
+
+
+def quality_report(frames: list[np.ndarray]) -> dict:
+    """Static heuristics only; NEVER a substitute for animation visual review."""
+    import hashlib
+    hashes = [hashlib.sha256(frame.tobytes()).hexdigest() for frame in frames]
+    centers = []
+    for frame in frames:
+        yy, xx = np.where(frame[:, :, 3] >= 128)
+        centers.append((round(float(xx.mean()), 2), round(float(yy.mean()), 2)) if len(xx) else None)
+    jumps = []
+    for i in range(1, len(centers)):
+        a, b = centers[i - 1], centers[i]
+        if a is not None and b is not None:
+            dist = math.dist(a, b)
+            if dist > 3.5:
+                jumps.append({"frame": i, "alpha_centroid_jump_px": round(dist, 2)})
+    return {"slots": len(frames), "unique_rgba_frames": len(set(hashes)),
+            "centroid_jump_warnings": jumps,
+            "duplicate_frames_are_not_distinct_new_art": True}
+
+
 def atlas(frames: list[np.ndarray], width: int, height: int, columns: int = 8):
     rows = math.ceil(len(frames) / columns)
     image = Image.new("RGBA", (width * columns, height * rows))
@@ -138,22 +181,31 @@ def main():
         layers[name] = frames_from_sheet(source / (name + ".png"), cell, source_count)
     out.mkdir(parents=True, exist_ok=True)
     new_clips = []
+    reports = {}
     rendered = {name: [] for name in SOURCE_NAMES}
     running_index = 0
     for clip in clips:
-        name = clip["name"]
+        name = "move_hover" if clip["name"] == "run" else clip["name"]
         count = TARGET_COUNTS[name]
         keys = slice(clip["start"], clip["start"] + clip["count"])
         for layer in SOURCE_NAMES:
-            rendered[layer].extend(render_layer(layers[layer][keys], count,
-                                 BEATS[name], name in ("idle", "run"), cv2))
+            if name == "move_hover":
+                # The run atlas was a design draft; locomotion uses the idle pose.
+                # No walking legs or running phase in the new class.
+                base = layers[layer][0]
+                generated = [hover_frame(base, i, layer, count) for i in range(count)]
+            else:
+                generated = render_layer(layers[layer][keys], count,
+                                         BEATS[name], name == "idle", cv2)
+            rendered[layer].extend(generated)
+            reports[f"{name}/{layer}"] = quality_report(generated)
         new_clips.append({
             "name": name, "start": running_index, "count": count,
             "duration": clip["duration"],
             "playback_fps": round(count / clip["duration"], 3),
-            "playback": "distance_driven" if name == "run" else "time_driven",
-            "original_key_pose_indices": list(range(clip["start"], clip["start"] + clip["count"])),
-            "production_status": "optical_flow_preview_requires_manual_pixel_cleanup",
+            "playback": "distance_driven" if name == "move_hover" else "time_driven",
+            "original_key_pose_indices": [0] if name == "move_hover" else list(range(clip["start"], clip["start"] + clip["count"])),
+            "production_status": "pixel_offset_hover_preview" if name == "move_hover" else "optical_flow_preview_requires_manual_pixel_cleanup",
         })
         running_index += count
     for name in SOURCE_NAMES:
@@ -167,16 +219,19 @@ def main():
         "columns": 8, "frames": running_index,
         "cells": manifest["cell"], "pivots": manifest["pivot"],
         "clips": new_clips,
+        "static_quality_heuristics": reports,
         "warnings": [
             "Inspect foot plants, cape, arms, book registration, and effect edges.",
             "Do not replace original PNGs or claim hand-authored poses.",
             "Sync gameplay release/contact events to the named beats before runtime use.",
-            "Run motion is distance-driven in game: 24 frames / 0.7 sec is a base-speed reference only."
+            "Hover locomotion is 12 display slots / 0.7 sec at baseline, not 12 distinct hand-painted poses.",
+            "Hover uses source idle pose 0; old run key poses are not used.",
+            "No game runtime changed; inspect exported clip loops and attack impacts manually."
         ]
     }
     (out / "manifest.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n",
                                         encoding="utf-8")
-    print(f"Generated {running_index} synchronized preview cells per layer in {out}")
+    print(f"Generated {running_index} synchronized PREVIEW cells per layer in {out}; NOT QA-approved artwork")
 
 if __name__ == "__main__":
     main()
