@@ -1,0 +1,43 @@
+{
+  "id": "space_sovereign_move_hover_art_draft",
+  "name": "공간의 지배자",
+  "animation": "move_hover",
+  "status": "authored_draft_not_approved_not_runtime_integrated",
+  "frames": 12,
+  "durationSeconds": 0.7,
+  "spriteFps": 17.142857142857142,
+  "grid": {
+    "columns": 6,
+    "rows": 2
+  },
+  "layers": {
+    "character": {
+      "file": "move_hover_character.png",
+      "cell": [
+        64,
+        96
+      ]
+    },
+    "grimoire": {
+      "file": "move_hover_grimoire.png",
+      "cell": [
+        64,
+        96
+      ]
+    },
+    "effects": {
+      "file": "move_hover_effects.png",
+      "cell": [
+        96,
+        96
+      ]
+    }
+  },
+  "motion": "feet do not step; idle hover with 1px vertical movement; book delayed separately",
+  "source": "new authored pixel draft referencing existing purple hooded class concept",
+  "notes": [
+    "Not an overwrite of original 27-key-pose atlas",
+    "Manually inspect continuity at real speed and original design fidelity",
+    "Not an integrated runtime asset; no owner test/build has run"
+  ]
+}
