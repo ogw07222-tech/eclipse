@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('apk', type=Path)
 parser.add_argument('--abi', default='arm64-v8a', choices=['arm64-v8a', 'x86_64'])
 parser.add_argument('--all-assets', action='store_true',
-                    help='For Studio APK: validate every PNG/JSON resource rather than legacy Game APK subset')
+                    help='Validate every PNG/JSON resource rather than the default subset')
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[2]
 assets = ['knight_motion.png', 'mage_run.png', 'mage_motion.png', 'ui/attack_states.png', 'ui/dash_states.png',
@@ -36,7 +36,7 @@ assets.extend('ui/' + path.name for path in sorted((art_root / 'ui').glob('knigh
 assets = sorted(set(assets))
 forest_assets = sum(len(folder_assets[folder]) for folder in ('forest', 'forest_v2', 'forest_v3', 'forest_entrance'))
 if args.all_assets:
-    # Studio now bundles the complete resource tree. Keep the standalone Game
+    # Complete resource validation is optional. Keep the standalone Game
     # APK's original subset validation unchanged unless this flag is selected.
     assets = sorted(path.relative_to(art_root).as_posix()
                     for path in art_root.rglob('*')
