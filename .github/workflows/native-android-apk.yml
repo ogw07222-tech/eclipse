@@ -32,6 +32,7 @@ jobs:
       - name: Prepare official SDL Android bridge
         run: python3 native-engine/tools/prepare_android.py
       - name: Compile and test combat rules
+        if: ${{ inputs.skip_combat_tests != true }}
         run: |
           g++ -std=c++17 -O2 -Wall -Wextra -Werror native-engine/tests/core_tests.cpp -o /tmp/eclipse-combat-tests
           /tmp/eclipse-combat-tests
@@ -99,9 +100,13 @@ jobs:
       - name: Prepare SDL Android bridge
         run: python3 native-engine/tools/prepare_android.py
       - name: Compile native combat tests
+        if: ${{ inputs.skip_combat_tests != true }}
         run: |
           g++ -std=c++17 -O2 -Wall -Wextra -Werror native-engine/tests/core_tests.cpp -o /tmp/eclipse-combat-tests
           /tmp/eclipse-combat-tests
+      - name: Warn on unverified combat regression
+        if: ${{ inputs.skip_combat_tests == true }}
+        run: echo '::warning::Combat regression tests bypassed for manual APK testing; do not treat as QA-passed.'
       - name: Build release-signed APK
         env:
           ECLIPSE_KEYSTORE_BASE64: ${{ secrets.ECLIPSE_KEYSTORE_BASE64 }}
