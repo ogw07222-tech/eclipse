@@ -100,6 +100,8 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
                     if(e.key.scancode==SDL_SCANCODE_1||e.key.scancode==SDL_SCANCODE_KP_1)selection=0;
                     if(e.key.scancode==SDL_SCANCODE_2||e.key.scancode==SDL_SCANCODE_KP_2)selection=1;
                     if(e.key.scancode==SDL_SCANCODE_3||e.key.scancode==SDL_SCANCODE_KP_3)selection=2;
+                }else if(titlePage==TitlePage::Gear&&(e.key.scancode==SDL_SCANCODE_3||e.key.scancode==SDL_SCANCODE_KP_3)){
+                    selection=2;
                 }else if(e.key.scancode==SDL_SCANCODE_RETURN||e.key.scancode==SDL_SCANCODE_KP_ENTER||e.key.scancode==SDL_SCANCODE_SPACE){
                     selection=0;
                 }
@@ -112,7 +114,8 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
                     const auto& buttons=eclipse::Presentation::qaCharacterButtons;
                     for(size_t i=0;i<buttons.size();++i)if(SDL_PointInRectFloat(&pos,&buttons[i]))selection=static_cast<int>(i);
                 }else{
-                    if(SDL_PointInRectFloat(&pos,&eclipse::Presentation::titleGear))selection=9;
+                    if(titlePage==TitlePage::Gear&&SDL_PointInRectFloat(&pos,&eclipse::Presentation::titleDeveloperQA))selection=2;
+                    else if(SDL_PointInRectFloat(&pos,&eclipse::Presentation::titleGear))selection=9;
                     else if(SDL_PointInRectFloat(&pos,&eclipse::Presentation::titleBack))selection=8;
                     else for(int i=0;i<2;++i)
                         if(SDL_PointInRectFloat(&pos,&eclipse::Presentation::titleOptions[i]))selection=i;
@@ -149,6 +152,7 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
                 case TitlePage::Gear:
                     if(selection==0)titlePage=TitlePage::Settings;
                     else if(selection==1)running=false;
+                    else if(selection==2){qaFirstJob=-1;titlePage=TitlePage::QaCharacters;}
                     break;
                 case TitlePage::Settings:
                     if(selection==0)titlePage=TitlePage::Gear;
