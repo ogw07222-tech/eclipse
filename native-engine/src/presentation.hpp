@@ -37,6 +37,8 @@ class Presentation {
     std::array<SDL_Texture*,4> whiteSkillTextures_{};
     float offset=0;
     SDL_Texture* knightSkillMotion_=nullptr;
+    // Effects remain in an independent transparent atlas, never baked onto the actor.
+    SDL_Texture* knightSkillFx_=nullptr;
     SDL_Texture* mageRun_=nullptr;
     SDL_Texture* mageMotion_=nullptr;
     SDL_Texture* settingsGear_=nullptr;
@@ -462,75 +464,22 @@ class Presentation {
             rect(x-offset,p.y+(s.y-motionPivotY)*motionScale,s.width*motionScale,motionScale,swordTrailColors[s.shade],static_cast<Uint8>(swordTrailAlpha[s.shade]*frame.alpha/255));
         }
     }
-    void knightSkillEffect(const Player& p,const Animation& a){
-        if(!isSkillMotion(a.state)||p.health<=0)return;
+    void knightSkillPngEffect(const Player& p,const Animation& a){
+        if(!knightSkillFx_||!isSkillMotion(a.state)||p.health<=0)return;
+        // Key frames are stored in the first three rows of the 4x6 FX sheet.
+        // The character's separately authored midpoint rows do not change
+        // effect frame IDs, so sword trails cannot jump to another atlas row.
         const auto& clip=motionClips[a.state];
         const int pose=std::clamp(a.frame-clip.start,0,clip.count-1);
-        const auto blade=skillBlades[clip.start-skillMotionStart+pose];
-        const float hx=(blade.handX-skillMotionPivotX)*motionScale;
-        const float hy=(blade.handY-motionPivotY)*motionScale;
-        const float tx=(blade.tipX-skillMotionPivotX)*motionScale;
-        const float ty=(blade.tipY-motionPivotY)*motionScale;
-        auto dot=[&](float x,float y,float size,unsigned color,Uint8 alpha){
-            rect(std::round(p.x-offset+p.facing*x-size/2),
-                 std::round(p.y+y-size/2),size,size,color,alpha);
-        };
-        auto streak=[&](float x,float y,float endX,float endY,float size,unsigned color,Uint8 alpha){
-            const int steps=std::max(1,static_cast<int>(std::ceil(std::hypot(endX-x,endY-y)/2)));
-            for(int i=0;i<=steps;++i){
-                const float t=static_cast<float>(i)/steps;
-                dot(x+(endX-x)*t,y+(endY-y)*t,size,color,alpha);
-            }
-        };
-
-        if(a.state==prepSkillState){
-            if(pose==0)return;
-            streak(hx,hy,tx,ty,4,0xffd58b,pose==3?110:225);
-            for(int i=0;i<9;++i){
-                const float angle=i*.698f;
-                const float radius=9.f+pose*6.f+i%3*4.f;
-                dot(tx+std::cos(angle)*radius,ty+std::sin(angle)*radius,3,
-                    i%2?0xd9a35b:0xffefb4,pose==3?80:210);
-            }
-            return;
-        }
-        if(a.state==thrustSkillState){
-            if(pose!=1&&pose!=2)return;
-            const float length=std::hypot(tx-hx,ty-hy);
-            const float dx=(tx-hx)/length,dy=(ty-hy)/length;
-            const float extension=std::max(10.f,p.meleeReach-tx);
-            const Uint8 alpha=pose==1?240:130;
-            for(int side:{-1,1}){
-                streak(hx,hy,tx-dy*side*10,ty+dx*side*10,5,0x9c4056,alpha);
-                streak(tx-dy*side*10,ty+dx*side*10,tx+dx*extension,ty+dy*extension,
-                       3,0xf88d9c,alpha);
-            }
-            streak(hx,hy,tx+dx*extension,ty+dy*extension,3,0xffe8df,alpha);
-            return;
-        }
-        if(pose<2)return;
-        // The contact frame sweeps from overhead into the registered steel tip.
-        const SkillBlade contact=skillBlades[motionClips[sweepSkillState].start-skillMotionStart+2];
-        const float cx=(contact.handX-skillMotionPivotX)*motionScale;
-        const float cy=(contact.handY-motionPivotY)*motionScale;
-        const float bladeX=(contact.tipX-contact.handX)*motionScale;
-        const float bladeY=(contact.tipY-contact.handY)*motionScale;
-        const float endAngle=std::atan2(bladeY,bladeX);
-        const float bladeLength=std::hypot(bladeX,bladeY);
-        const Uint8 alpha=pose==2?230:85;
-        for(int i=0;i<=52;++i){
-            const float t=i/52.f;
-            const float angle=endAngle-(1-t)*2.12f;
-            const float radius=bladeLength+(std::max(bladeLength,p.meleeReach-cx)-bladeLength)*std::sin(t*3.141593f);
-            const float dx=std::cos(angle),dy=std::sin(angle);
-            dot(cx+dx*radius,cy+dy*radius,3,0xd2f4ff,alpha);
-            for(int layer=1;layer<=4;++layer){
-                const float inner=radius-layer*(2.f+3.f*std::sin(t*3.141593f));
-                dot(cx+dx*inner,cy+dy*inner,5,layer==1?0x8ecbfa:0x4075b3,
-                    static_cast<Uint8>(alpha*(layer<=2?.7f:.36f)));
-            }
-            if(i%8==3)dot(cx+dx*(radius+7),cy+dy*(radius+7),3,0xf58e99,alpha);
-        }
+        const int fxRow=a.state-thrustSkillState;
+        const SDL_FRect src{float(pose*skillMotionWidth),
+            float(fxRow*motionHeight),float(skillMotionWidth),float(motionHeight)};
+        const SDL_FRect dest{
+            std::round(p.x-offset-skillMotionPivotX*motionScale),
+            std::round(p.y-motionPivotY*motionScale),
+            skillMotionWidth*motionScale,motionHeight*motionScale};
+        SDL_RenderTextureRotated(renderer,knightSkillFx_,&src,&dest,0,nullptr,
+            p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
     }
     void icon(int texture,int col,int row,float x,float y,float size,bool down){
         SDL_FRect source{col*128.f,row*128.f,128,128},target{x,y,size,size};
@@ -862,7 +811,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_,riftSlash_,riftTrace_})if(fx)SDL_DestroyTexture(fx);for(auto* fx:whiteFxTextures_)if(fx)SDL_DestroyTexture(fx);if(whiteNightMotion_)SDL_DestroyTexture(whiteNightMotion_);if(whiteNightLance_)SDL_DestroyTexture(whiteNightLance_);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleBg_)SDL_DestroyTexture(titleBg_);if(titleKnightFg_)SDL_DestroyTexture(titleKnightFg_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:whiteSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_,riftSlash_,riftTrace_})if(fx)SDL_DestroyTexture(fx);for(auto* fx:whiteFxTextures_)if(fx)SDL_DestroyTexture(fx);if(whiteNightMotion_)SDL_DestroyTexture(whiteNightMotion_);if(whiteNightLance_)SDL_DestroyTexture(whiteNightLance_);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleBg_)SDL_DestroyTexture(titleBg_);if(titleKnightFg_)SDL_DestroyTexture(titleKnightFg_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);if(knightSkillFx_)SDL_DestroyTexture(knightSkillFx_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:whiteSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -1194,6 +1143,12 @@ public:
         }
         knightSkillMotion_=loadOptionalTexture("knight_skill_motion.png",
             skillMotionWidth*skillMotionColumns,motionHeight*skillMotionRows);
+        knightSkillFx_=loadOptionalTexture("knight_skill_fx_layer.png",
+            skillMotionWidth*skillMotionColumns,motionHeight*skillMotionRows);
+        if(!knightSkillFx_){
+            SDL_SetError("ECLIPSE ASSET ERROR: knight_skill_fx_layer.png missing or invalid (expected 448x564)");
+            return false;
+        }
         mageRun_=loadOptionalTexture("mage_run.png",motionWidth*motionColumns,motionHeight);
         mageMotion_=loadOptionalTexture("mage_motion.png",motionWidth*mageMotionColumns,motionHeight*mageMotionRows);
         if(!settingsGear_)settingsGear_=loadOptionalTexture("ui/settings_gear.png");
@@ -1509,7 +1464,7 @@ public:
         }
         slamShockwave(p);
         if(p.form==0&&!p.whiteNight){
-            if(isSkillMotion(a.state)&&knightSkillMotion_)knightSkillEffect(p,a);
+            if(isSkillMotion(a.state)&&knightSkillMotion_)knightSkillPngEffect(p,a);
             else if(isSkillMotion(a.state)&&a.state!=prepSkillState){
                 Animation fallback=a;
                 fallback.state=a.state==thrustSkillState?6:5;
