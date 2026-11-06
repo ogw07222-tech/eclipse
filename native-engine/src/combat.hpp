@@ -48,6 +48,9 @@ struct Player {
     int health=100,form=0,facing=1,combo=0,attackSerial=0,hurtSerial=0,landingSerial=0;
     int storedLightLances=0;
     bool grounded=true,whiteNight=false;
+    // Only these two QA-selected jobs are available to the swap button.
+    std::array<int,2> equippedJobs{{0,1}};
+    int activeJob=0;
     WhiteMove whiteMove=WhiteMove::None;
     float whiteAge=0,whiteBoost=0,whiteSlashSpeed=1.f;
     size_t whiteTarget=0;
@@ -423,13 +426,13 @@ class Combat {
         p.attackFlash=down(p.attackFlash,dt);p.comboWindow=down(p.comboWindow,dt);p.swapFlash=down(p.swapFlash,dt);
         p.whiteBoost=down(p.whiteBoost,dt);
         if(p.hitStop>0){p.hitStop=down(p.hitStop,dt);return;}
-        // Swap cycles Knight -> Mage -> White Night -> Knight. It is never the
-        // ultimate action; Verdict owns an independent button and cooldown.
+        // Swap only toggles the two equipped jobs. Verdict is a separate action.
         if(a.swap&&p.swapCooldown<=0&&p.slamRecover<=0&&
            (!p.whiteNight||p.whiteMove==WhiteMove::None)){
             const bool mayEntryAttack=canAttack();
             cancelAirSlam();cancelMageCast();p.meleeLeft=0;
-            const int next=p.whiteNight?0:p.form==0?1:2;
+            p.activeJob=1-p.activeJob;
+            const int next=p.equippedJobs[p.activeJob];
             p.whiteNight=next==2;
             p.form=next==1?1:0;
             p.whiteMove=WhiteMove::None;p.whiteAge=0;
@@ -660,7 +663,7 @@ public:
     bool ended=false,won=false,inventory=false;
     float clock=0,enemyVisualClock=0;
     Combat(){projectiles.reserve(16);popups.reserve(32);restart();}
-    void restart(){player={};enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};projectiles.clear();lightLances.clear();lightBursts.clear();riftScars.clear();cameraCenter=viewWidth*.5f;popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=enemyVisualClock=0;}
+    void restart(){const auto jobs=player.equippedJobs;player={};player.equippedJobs=jobs;player.activeJob=0;player.form=jobs[0]==1?1:0;player.whiteNight=jobs[0]==2;enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};projectiles.clear();lightLances.clear();lightBursts.clear();riftScars.clear();cameraCenter=viewWidth*.5f;popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=enemyVisualClock=0;}
     int foes()const{int count=0;for(const auto& e:enemies)if(!e.dead())++count;return count;}
     void hit(Enemy& e,int amount,bool fire,int bleed=0,bool slam=false){
         if(e.dead()||ended)return;
