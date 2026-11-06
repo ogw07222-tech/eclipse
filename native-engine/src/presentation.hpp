@@ -1380,7 +1380,7 @@ public:
             }
         }
         // Persistent yellow-white PNG markers show exactly which enemies
-        // will be struck by the three-lance ultimate.
+        // are eligible for the twenty-lance sky ultimate.
         if(caster.whiteNight&&goldOrb_&&goldImpact_){
             for(const auto& e:g.enemies){
                 if(e.dead()||e.lightMark<=0)continue;
@@ -1417,6 +1417,8 @@ public:
             }
         }
         if(lanceArt)for(const auto& lance:g.lightLances){
+            // Do not reveal queued sky spears before their staggered drop.
+            if(lance.verdict&&lance.delay>0.f)continue;
             const float x=lance.x-offset,y=lance.y;
             const float angle=lance.angle*.017453293f;
             const float dx=std::cos(angle),dy=std::sin(angle);
