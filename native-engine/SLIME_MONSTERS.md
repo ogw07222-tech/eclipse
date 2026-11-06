@@ -19,7 +19,7 @@ halfway through the attack. Moving behind the jaw or out of range avoids damage.
 The opening wave is green, red, green, purple.
 
 Desktop CMake and Game Android asset packaging both include all three sheets.
-The separately maintained Studio repository must package `monsters/**/*.png`
+Any game resource packager must include `monsters/**/*.png`
 when it next syncs these game sources; this repository does not control its build.
 
 ## Visual review
