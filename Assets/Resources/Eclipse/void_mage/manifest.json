@@ -1,0 +1,131 @@
+{
+  "id": "sovereign_of_space",
+  "name": "공간의 지배자",
+  "status": "concept_key_pose_atlas_not_runtime_integrated",
+  "source": "Docs/CURRENT_CLASS_DESIGN.md",
+  "cell": {
+    "character": [
+      64,
+      96
+    ],
+    "grimoire": [
+      64,
+      96
+    ],
+    "effects": [
+      96,
+      96
+    ]
+  },
+  "layout": {
+    "columns": 8,
+    "frameCount": 27,
+    "order": "row-major"
+  },
+  "pivot": {
+    "character": [
+      32,
+      84
+    ],
+    "effects": [
+      48,
+      70
+    ]
+  },
+  "layers": [
+    "character.png",
+    "grimoire.png",
+    "effects.png"
+  ],
+  "motions": [
+    {
+      "name": "idle",
+      "start": 0,
+      "count": 3,
+      "duration": 0.9,
+      "key_pose_only": true,
+      "production_target_frames": 8,
+      "production_target_fps": 8.89,
+      "actual_authored_frames": 3
+    },
+    {
+      "name": "move_hover",
+      "start": 3,
+      "count": 4,
+      "duration": 0.7,
+      "key_pose_only": true,
+      "production_target_frames": 12,
+      "production_target_fps": 17.143,
+      "actual_authored_frames": 4,
+      "playback_type": "distance_driven",
+      "source_note": "New hover generator reuses idle 0 instead of source run frames 3-6. Source key-pose PNG unchanged."
+    },
+    {
+      "name": "attack",
+      "start": 7,
+      "count": 4,
+      "duration": 0.44,
+      "key_pose_only": true,
+      "production_target_frames": 16,
+      "production_target_fps": 36.36,
+      "actual_authored_frames": 4
+    },
+    {
+      "name": "flight",
+      "start": 11,
+      "count": 3,
+      "duration": 0.65,
+      "key_pose_only": true,
+      "production_target_frames": 12,
+      "production_target_fps": 18.46,
+      "actual_authored_frames": 3
+    },
+    {
+      "name": "gravity_field",
+      "start": 14,
+      "count": 3,
+      "duration": 0.5,
+      "key_pose_only": true,
+      "production_target_frames": 12,
+      "production_target_fps": 24,
+      "actual_authored_frames": 3
+    },
+    {
+      "name": "dimensional_spikes",
+      "start": 17,
+      "count": 3,
+      "duration": 0.55,
+      "key_pose_only": true,
+      "production_target_frames": 16,
+      "production_target_fps": 29.09,
+      "actual_authored_frames": 3
+    },
+    {
+      "name": "repulsion",
+      "start": 20,
+      "count": 3,
+      "duration": 0.42,
+      "key_pose_only": true,
+      "production_target_frames": 16,
+      "production_target_fps": 38.1,
+      "actual_authored_frames": 3
+    },
+    {
+      "name": "singularity",
+      "start": 23,
+      "count": 4,
+      "duration": 2,
+      "key_pose_only": true,
+      "production_target_frames": 48,
+      "production_target_fps": 24,
+      "actual_authored_frames": 4
+    }
+  ],
+  "caveats": [
+    "Current PNGs are newly authored draft silhouettes based on uploaded reference; not validated as 24–48 unique production poses.",
+    "Separate transparent book and FX layers need renderer registration and anchoring before gameplay.",
+    "Existing fire mage logic and assets are not replaced.",
+    "Gameplay parameters remain as defined in Docs/CURRENT_CLASS_DESIGN.md."
+  ],
+  "production_note": "Target preview is 140 total DISPLAY SLOTS across three layers. No completed 140-frame PNG has been checked in; script-only authoring tool. All current original 27 key poses untouched."
+}

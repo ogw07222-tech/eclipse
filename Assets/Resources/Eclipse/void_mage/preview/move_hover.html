@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ECLIPSE · 공간의 지배자 · 저공 부유 이동 시안</title>
+<style>
+:root{color-scheme:dark}body{margin:0;background:#0c0c14;color:#ddd;font-family:system-ui,sans-serif}
+main{max-width:820px;margin:26px auto;padding:0 18px}h1{font-size:21px}
+p{color:#a9a6b9}canvas{image-rendering:pixelated;max-width:100%;background:#131321;border:1px solid #343246}
+section{display:flex;gap:14px;flex-wrap:wrap;align-items:center}button{background:#2b2844;color:#f3eefc;border:1px solid #777092;padding:10px 14px;cursor:pointer}
+label{display:inline-flex;gap:8px;align-items:center}input{accent-color:#a196d3}
+small{display:block;color:#aaa;margin:12px 0}code{color:#ccbdfb}
+</style></head><body><main>
+<h1>공간의 지배자 · 저공 부유 이동 (새 시안만)</h1>
+<p>기존 27장 시안의 <b>idle 0–2번 포즈</b>만 재사용. 달리기/공격/스킬 원본은 변경하지 않음.
+기본 몸체는 떠 있고, 이동 방향으로 기울며 로브와 마도서는 관성에 의해 늦게 따라옴.</p>
+<section><label>방향 <select id="direction"><option value="1">오른쪽</option><option value="-1">왼쪽</option></select></label>
+<label>부유 속도 <input id="speed" type="range" min="50" max="150" value="100"></label>
+<button id="stop">일시정지</button><button id="export">12프레임 PNG 시트 저장</button></section>
+<p><canvas id="stage" width="640" height="384"></canvas></p>
+<small>시안 재생: 이동 0.7초/12프레임(17.14 pose/s), 몸통 상하 1px, 마도서 관성 지연. 원본 64×96 픽셀 격자 유지. 아래 시트는 실작화가 아닌 저공부양 레이어/픽셀 오프셋 시안.</small>
+<p id="status">원본 시안 레이어 불러오는 중…</p>
+</main><script>
+'use strict';
+const root='../'; // This file is placed in void_mage/preview/, one level below original PNGs.
+const names=['character','grimoire','effects'], imgs={};
+const c=document.getElementById('stage'),ctx=c.getContext('2d');ctx.imageSmoothingEnabled=false;
+let pause=false,origin=performance.now(),pausedTime=0;
+const sleep=(n)=>new Promise(r=>setTimeout(r,n));
+async function load(){
+  for(const name of names){
+    const img=new Image();img.src=root+name+'.png';
+    try {await img.decode();imgs[name]=img} catch(e){if(name!=='effects')throw new Error(name+'.png 로딩 실패: '+e.message)}
+  }
+  document.getElementById('status').textContent='시안 준비 완료. 기존 소스는 변경하지 않았음.';
+  requestAnimationFrame(tick);
+}
+const cycle=.7;
+function draw(t, canvasCtx=ctx, x0=0, y0=0, direction=1, zoom=4, background=true){
+  const phase=((t/cycle)%1+1)%1;
+  const wave=Math.sin(phase*2*Math.PI);
+  const sway=Math.sin(phase*2*Math.PI-.65);
+  const bodyY=Math.round(wave); // maximum ±1 native pixel
+  const bodyX=Math.round(sway*.55);
+  const bookX=Math.round(Math.sin(phase*2*Math.PI-1.1)*2);
+  const bookY=Math.round(Math.sin(phase*2*Math.PI-1.25)*2);
+  const pose=phase<.35?0:phase<.70?1:2; // source idle frame, never source run
+  if(background){
+    canvasCtx.fillStyle='#131321';canvasCtx.fillRect(0,0,640,384);
+    canvasCtx.strokeStyle='#323047';canvasCtx.beginPath();canvasCtx.moveTo(0,330);canvasCtx.lineTo(640,330);canvasCtx.stroke();
+  }
+  canvasCtx.save();
+  canvasCtx.translate(x0+32*zoom,y0);
+  canvasCtx.scale(direction,1);
+  canvasCtx.translate(-32*zoom,0);
+  canvasCtx.imageSmoothingEnabled=false;
+  function layer(name,dx,dy,w=64,h=96){
+    if(!imgs[name])return;
+    canvasCtx.drawImage(imgs[name],pose*64,0,w,h,Math.round((dx)*zoom),Math.round(dy*zoom),w*zoom,h*zoom);
+  }
+  // Character body is never foot-stepping. Only slow native-pixel hover.
+  layer('character',bodyX,bodyY);
+  // Floating grimoire is separate, delayed relative to the body.
+  layer('grimoire',bodyX+bookX,bodyY+bookY);
+  canvasCtx.restore();
+}
+function tick(now){
+ if(!pause)pausedTime=(now-origin)/1000 * Number(document.getElementById('speed').value)/100;
+ const direction=Number(document.getElementById('direction').value);
+ draw(pausedTime,ctx,192,0,direction);
+ requestAnimationFrame(tick);
+}
+document.getElementById('stop').onclick=e=>{pause=!pause;e.target.textContent=pause?'재생':'일시정지';if(!pause)origin=performance.now()-pausedTime*1000/(Number(document.getElementById('speed').value)/100)};
+document.getElementById('export').onclick=()=>{
+ if(!imgs.character||!imgs.grimoire)return;
+ const out=document.createElement('canvas');out.width=64*12;out.height=96;
+ const g=out.getContext('2d');g.imageSmoothingEnabled=false;
+ for(let i=0;i<12;i++)draw(i*cycle/12,g,i*64,0,1,1,false);
+ const a=document.createElement('a');a.download='space_sovereign_move_hover_12_preview.png';a.href=out.toDataURL('image/png');a.click();
+};
+load().catch(e=>{document.getElementById('status').textContent='ECLIPSE ASSET ERROR: '+e.message});
+</script></body></html>
