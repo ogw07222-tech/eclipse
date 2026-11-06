@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "repository": "ogw07222-tech/eclipse",
+  "branch": "main",
+  "library_root": "/ECLIPSE/characters",
+  "sync_mode": "explicit_snapshot_with_sha256_verification",
+  "sync_status": "not_yet_mirrored",
+  "characters": [
+    {
+      "id": "knight",
+      "name": "일반 기사",
+      "runtime_png": "Assets/Resources/Eclipse/knight_motion.png",
+      "library_png": "/ECLIPSE/characters/knight/knight_motion.png",
+      "cell": [
+        64,
+        94
+      ],
+      "atlas": [
+        1024,
+        2914
+      ],
+      "runtime_movement": {
+        "walk": {
+          "start": 16,
+          "count": 8
+        },
+        "run": {
+          "start": 432,
+          "count": 24
+        }
+      },
+      "github_sha256": null,
+      "library_sha256": null,
+      "verified_commit": null
+    },
+    {
+      "id": "white-night",
+      "name": "백야의 집행자",
+      "runtime_png": "Assets/Resources/Eclipse/ui/white_night_motion.png",
+      "library_png": "/ECLIPSE/characters/white-night/white_night_motion.png",
+      "cell": [
+        64,
+        96
+      ],
+      "atlas": [
+        512,
+        1440
+      ],
+      "runtime_movement": {
+        "run": {
+          "start": 88,
+          "count": 32
+        }
+      },
+      "github_sha256": null,
+      "library_sha256": null,
+      "verified_commit": null
+    },
+    {
+      "id": "mage",
+      "name": "마법사",
+      "runtime_png": "Assets/Resources/Eclipse/mage_motion.png",
+      "library_png": "/ECLIPSE/characters/mage/mage_motion.png",
+      "cell": [
+        64,
+        94
+      ],
+      "atlas": null,
+      "github_sha256": null,
+      "library_sha256": null,
+      "verified_commit": null
+    }
+  ]
+}
