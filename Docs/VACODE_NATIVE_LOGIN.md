@@ -1,6 +1,6 @@
 # ECLIPSE — VACODE native Google login (Android)
 
-Status: **first-stage integration, not device-validated**. This change is limited to the normal Game APK; ECLIPSE Studio is a separate application/repository.
+Status: **first-stage integration, not device-validated**. This integration targets the normal Game APK.
 
 ## What is implemented
 
@@ -13,7 +13,7 @@ Status: **first-stage integration, not device-validated**. This change is limite
 ## Important limitations
 
 1. **Session tokens are kept in memory only** and cleared on Activity teardown/sign-out. The user signs in again after app restart. Durable secure session storage and token refresh are not implemented.
-2. **There is no cloud-save backend or account-based game-state synchronization yet.** Existing local save, progression, purchases and Studio are unchanged. Do not claim the login alone enables cross-device saves.
+2. **There is no cloud-save backend or account-based game-state synchronization yet.** Existing local save, progression and purchases are unchanged. Do not claim the login alone enables cross-device saves.
 3. The button is a temporary native overlay. When the ECLIPSE pixel-art title menu ships, trigger this Android flow from its login button and remove the overlay, without copying VACODE credentials into C++ or displaying them in logs.
 4. Google sign-in success on an actual Android device requires configuration of appropriate app signing fingerprints / client registration on the Google/VACODE side. The preexisting NOCT web client ID alone does not prove the ECLIPSE Android package and signing certificate have been authorized.
 5. The Google provider must be enabled on the VACODE Supabase project, and its accepted audiences must include the configured web client.
