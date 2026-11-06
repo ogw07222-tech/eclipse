@@ -63,3 +63,27 @@ verify naturalness and must not be equated with game/device testing.
 update; this does not silently revert or fix it. No owner tests, local game build,
 APK build, or GitHub Actions have been executed. Owner device acceptance remains
 required.
+
+## 2026-11-06 alpha restoration (technical repair, not art approval)
+
+The 4×9 actor atlas previously contained fifteen opaque rectangular padding
+artifacts. The restored game PNG retains its **original RGB** and original
+pose order; the affected alpha planes were reconstructed against the existing
+original 4×6 hand-drawn source masks. The binary PNG is now 448×846 RGBA
+and the opaque-body-pixel counts across its 36 frames are within the source
+range (approximately 1,166–1,682 pixels per cell).
+
+Affected local pose numbers in each of the three skills were **3, 6, 9, 10,
+11**. The damaged previous 4×9 atlas is archived as
+`Art/knight/skill/rejected_opaque_4x9.png` for inspection. The alpha-only
+fix **does not** redraw limbs, sword, shoulders, cape or other anatomical
+in-betweens. Even after the alpha repair, the 12-pose sequences remain a
+procedural draft rather than AGENTS-approved hand-authored artwork; real-speed
+motion continuity and owner device QA remain **unverified**.
+
+The old `Tools/bake_knight_skill_12.py` entry point is disabled to prevent a
+future automatic regeneration from overwriting this repair. New replacement
+work must start with individually authored frames under `Art/`, visual
+review and approval, then pack to `Assets/` with the existing runtime timing.
+The actor PNG and independent `knight_skill_fx_layer.png` remain separate.
+No GitHub Actions, owner tests, APK builds or gameplay runtime tests were run.

@@ -58,4 +58,9 @@ def bake():
     print("Wrote 448x846, 4 columns, 9 rows, 12 poses per skill:",OUT)
 
 if __name__=="__main__":
-    bake()
+    raise SystemExit(
+        "DEPRECATED by AGENTS.md: raster-warp skill generator is not an approved "
+        "hand-authored animation source. The 2026-11-06 alpha repair was applied "
+        "to the game PNG, but the motion poses still require individually drawn "
+        "pixel-level corrections. Do not auto-overwrite the asset."
+    )
