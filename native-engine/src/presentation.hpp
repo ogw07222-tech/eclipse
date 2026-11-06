@@ -825,53 +825,13 @@ public:
     const ForestGenerator& forestGenerator() const {return forestGenerator_;}
     static std::string asset(const char* name){
 #ifdef SDL_PLATFORM_ANDROID
-        // Optional Studio asset overrides live in the application's private files.
-        // The path is fixed and comes from compiled asset names, not user input.
-        // Fall back to the APK AssetManager when an override is absent.
-        const char* storage = SDL_GetAndroidInternalStoragePath();
-        if (storage && *storage) {
-            // The installed Studio APK accepts ui/ but not root-level mage
-            // sprites or demon_castle/. Prefer compatible aliases from its
-            // imported asset pack, then retain the original APK fallback.
-            const std::string logicalName(name);
-            std::string studioAlias;
-            if (logicalName=="mage_run.png" || logicalName=="mage_motion.png" ||
-                logicalName=="knight_skill_motion.png") {
-                studioAlias="ui/"+logicalName;
-            } else if (logicalName.rfind("demon_castle/entrance/",0)==0) {
-                studioAlias="ui/demon_castle_entrance_"+
-                    logicalName.substr(sizeof("demon_castle/entrance/")-1);
-            }
-            if (!studioAlias.empty()) {
-                const std::string aliasedPath=std::string(storage)+"/game_assets/"+studioAlias;
-                if (FILE* file=std::fopen(aliasedPath.c_str(),"rb")) {
-                    std::fclose(file);
-                    return aliasedPath;
-                }
-            }
-            // Generic route for any new PNG/JSON folder not accepted by the
-            // already-installed Studio APK. The packer stores it unchanged
-            // below ui/__studio_all__/, keeping subdirectories intact.
-            // Explicit legacy aliases above take precedence for old packs.
-            const std::string genericPath =
-                std::string(storage) + "/game_assets/ui/__studio_all__/" + logicalName;
-            if (FILE* file = std::fopen(genericPath.c_str(), "rb")) {
-                std::fclose(file);
-                return genericPath;
-            }
-            const std::string overridePath = std::string(storage) + "/game_assets/" + name;
-            if (FILE* file = std::fopen(overridePath.c_str(), "rb")) {
-                std::fclose(file);
-                return overridePath;
-            }
-        }
         return name;
 #else
         const char* base=SDL_GetBasePath();return std::string(base?base:"")+"assets/"+name;
 #endif
     }
     bool loadTitle(){
-        // Canonical title assets: Studio now supports the title/ namespace.
+        // Canonical game title assets use the title/ namespace.
         titleTexture_=IMG_LoadTexture(renderer,asset("title/eclipse.png").c_str());
         if(!titleTexture_){SDL_SetError("ECLIPSE ASSET ERROR: title/eclipse.png missing or invalid");return false;}
         titleCape_=IMG_LoadTexture(renderer,asset("title/cape.png").c_str());
@@ -946,7 +906,7 @@ public:
         whiteNightLance_=texture;
         whiteNightMotion_=motion;
         // Gold/white effects are mandatory game assets, not optional decoration.
-        // Validate dimensions so Studio and APK fail visibly instead of drawing fake fallbacks.
+        // Validate dimensions so the game fails visibly instead of drawing fake fallbacks.
         auto loadGold=[&](SDL_Texture*& destination,const char* name,float expectedW,float expectedH)->bool{
             if(destination)return true;
             const std::string file=asset(name);
