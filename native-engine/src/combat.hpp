@@ -376,8 +376,9 @@ class Combat {
         p.whiteAge=std::min(clip.duration,old+dt*speed);
         if(old<clip.contact&&p.whiteAge>=clip.contact){
             if(move==WhiteMove::Slash){
-                whiteEffect(LightFx::Slash,p.x+p.facing*42,p.y-48);
-                riftScars.push_back({p.x+p.facing*100.f,p.y-52.f,p.facing>0?-14.f:194.f,.21f,true});
+                // The authored slash clip drives the PNG sword arc in Presentation.
+                // Keep the hit on its original contact frame; do not create
+                // a second stationary world-space slash or rift on top of it.
                 melee(15+p.gear.attack(),0,105*p.gear.range());
             }else if(move==WhiteMove::Command){
                 // The forward-pointing sword pose is the shared release frame for the entire volley.
