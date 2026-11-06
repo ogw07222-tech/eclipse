@@ -15,7 +15,7 @@ CW,CH=112,94
 
 def main():
     data=SRC.read_text().split("skillBlades[]=",1)[1].split("};",1)[0]
-    marks=[tuple(map(int,x)) for x in re.findall(r"\\{\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\}",data)]
+    marks=[tuple(map(int,x)) for x in re.findall(r"\{\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\}",data)]
     if len(marks)!=12: raise ValueError("Expected exactly 12 original authored skill blade paths")
     sheet=Image.new("RGBA",(CW*4,CH*6))
     for i,(hx,hy,tx,ty) in enumerate(marks):
