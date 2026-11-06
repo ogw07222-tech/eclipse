@@ -975,7 +975,7 @@ public:
         {410,374,460,52},{410,436,460,52},{410,498,460,52},{530,562,220,44}
     }};
 
-    void drawTitle(float seconds,int page=0,bool loggingIn=false){
+    void drawTitle(float seconds,int page=0,bool loggingIn=false,int qaFirstJob=-1){
         constexpr float width=1280, height=720;
         constexpr float logoBand=195;
         const SDL_FRect lowerScene{0,logoBand,width,height-logoBand};
@@ -1050,14 +1050,16 @@ public:
         if(seconds>=titleReadyTime&&page==2){
             rect(386,320,508,304,0x101223);
             rect(386,320,508,3,0xad95c7);
-            text("QA CHARACTER SELECT",469,340,3,0xffe2b7);
+            text(qaFirstJob<0?"QA: PICK FIRST JOB":"QA: PICK SECOND JOB",453,340,3,0xffe2b7);
             constexpr const char* labels[]={"1 KNIGHT","2 FIRE MAGE","3 WHITE NIGHT","BACK"};
             for(size_t i=0;i<qaCharacterButtons.size();++i){
                 const auto& target=qaCharacterButtons[i];
                 const SDL_FRect source{0,0,112,30};
                 SDL_RenderTexture(renderer,titleMenu_,&source,&target);
+                const bool chosen=qaFirstJob==static_cast<int>(i);
                 text(labels[i],target.x+(target.w-std::strlen(labels[i])*18.f)*.5f,
-                    target.y+(target.h-21)*.5f,3,0xece3f4);
+                    target.y+(target.h-21)*.5f,3,chosen?0xffd17c:0xece3f4);
+                if(chosen)rect(target.x+7,target.y+10,5,target.h-20,0xffd17c);
             }
         }else if(seconds>=titleReadyTime){
             // Screens: MAIN=0, START_OPTIONS=1, QA=2, GEAR=3, SETTINGS=4.
