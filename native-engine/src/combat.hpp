@@ -188,16 +188,34 @@ class Combat {
         }
         p.storedLightLances=0;
     }
-    // The ultimate releases new lances from the off-hand light sphere, independent of stored charges.
+    // Verdict rains exactly 20 sky lances, split as evenly as possible
+    // among enemies marked at cast time. The remainder is assigned randomly.
     void launchVerdictLances(){
-        auto& p=player;
-        for(size_t target=0;target<enemies.size();++target){
+        std::vector<size_t> marked;
+        for(size_t i=0;i<enemies.size();++i)
+            if(!enemies[i].dead()&&enemies[i].lightMark>0)marked.push_back(i);
+        if(marked.empty())return;
+        static std::mt19937 random{std::random_device{}()};
+        std::shuffle(marked.begin(),marked.end(),random);
+        constexpr int volley=20;
+        std::vector<size_t> assignments;
+        assignments.reserve(volley);
+        for(size_t i=0;i<marked.size();++i){
+            const int count=volley/static_cast<int>(marked.size())
+                +(static_cast<int>(i)<volley%static_cast<int>(marked.size())?1:0);
+            for(int j=0;j<count;++j)assignments.push_back(marked[i]);
+        }
+        std::shuffle(assignments.begin(),assignments.end(),random);
+        for(int i=0;i<volley;++i){
+            const size_t target=assignments[i];
             const auto& e=enemies[target];
-            if(e.dead()||e.lightMark<=0)continue;
-            for(int i=0;i<3;++i){
-                const float spread=(i-1.f)*28.f;
-                lightLances.push_back({target,p.x-p.facing*24.f,p.y-57.f+spread*.18f,1.3f,spread,0.f,true,true,false,i*.028f});
-            }
+            // The first two impacts are isolated; the remaining 18 accelerate
+            // into a dense rain. Each spear originates beyond the top of view.
+            const float delay=i==0?0.f:i==1?.24f:i==2?.44f:.57f+(i-3)*.055f;
+            const float jitter=std::uniform_real_distribution<float>{-22.f,22.f}(random);
+            const float skyY=std::min(-135.f,enemyBounds(e).top-420.f);
+            lightLances.push_back({target,e.x+jitter,skyY,3.5f,0.f,90.f,
+                                   true,true,false,delay});
         }
     }
     void melee(int damage,int bleed,float reach){
@@ -369,10 +387,9 @@ class Combat {
                 p.facing=e.x>=p.x?1:-1;
                 whiteEffect(LightFx::Arrive,p.x,p.y-48);
             }else if(move==WhiteMove::Verdict){
-                // A clenched off-hand releases the accumulated light from its sphere.
+                // The off-hand signals the sky volley; target impact flashes
+                // occur only as individual lances actually land.
                 whiteEffect(LightFx::Arrive,p.x-p.facing*24.f,p.y-57.f);
-                for(const auto& e:enemies)
-                    if(!e.dead()&&e.lightMark>0)whiteEffect(LightFx::Verdict,e.x,e.y-45);
                 launchVerdictLances();
             }
         }
@@ -583,6 +600,7 @@ class Combat {
                 if(distance<=movement+12.f){
                     damageEnemy(enemies[lance.target],(lance.verdict?8:10)+player.gear.attack(),DamageKind::Normal,false);
                     if(lance.markOnHit&&!enemies[lance.target].dead())enemies[lance.target].lightMark=5.f;
+                    if(lance.verdict)whiteEffect(LightFx::Verdict,tx,ty);
                     lightBursts.push_back({tx,ty});
                     return true;
                 }
