@@ -34,6 +34,7 @@ class Presentation {
     SDL_Texture* enemyBarFrame_=nullptr;
     SDL_Texture* executeIcon_=nullptr;
     std::array<SDL_Texture*,3> knightSkillTextures_{};
+    std::array<SDL_Texture*,4> whiteSkillTextures_{};
     float offset=0;
     SDL_Texture* knightSkillMotion_=nullptr;
     SDL_Texture* mageRun_=nullptr;
@@ -542,8 +543,10 @@ class Presentation {
                      bool pressed,unsigned accent,bool enabled=true,int art=-1){
         const float ready=remaining>0&&duration>0
             ?1.f-std::clamp(remaining/duration,0.f,1.f):1.f;
-        if(art>=0&&art<3&&knightSkillTextures_[art]){
-            SDL_Texture* image=knightSkillTextures_[art];
+        SDL_Texture* skillArt=art>=3&&art<7?whiteSkillTextures_[art-3]:
+            art>=0&&art<3?knightSkillTextures_[art]:nullptr;
+        if(skillArt){
+            SDL_Texture* image=skillArt;
             float width=0,height=0;
             if(SDL_GetTextureSize(image,&width,&height)){
                 const float size=std::round(b.size);
@@ -664,12 +667,13 @@ class Presentation {
         thumbLayer(thumb*.58f,0x304353,174);
         icon(1,held.attack?1:0,0,c[ControlLayout::Attack].x,c[ControlLayout::Attack].y,c[ControlLayout::Attack].size,held.attack);
         icon(2,held.dash?1:0,0,c[ControlLayout::Dash].x,c[ControlLayout::Dash].y,c[ControlLayout::Dash].size,held.dash);
-        icon(3,0,0,c[ControlLayout::Swap].x,c[ControlLayout::Swap].y,c[ControlLayout::Swap].size,held.swap);
+        // For White Night the swap slot is the dedicated ultimate, not a form-change icon.
+        if(!p.whiteNight)icon(3,0,0,c[ControlLayout::Swap].x,c[ControlLayout::Swap].y,c[ControlLayout::Swap].size,held.swap);
         if(p.whiteNight){
-            skillSlot(c[ControlLayout::Skill],1,"RUSH",p.skillCooldown,3.f,held.skill,0xb4d8ee,true,-1);
-            skillSlot(c[ControlLayout::Sweep],2,"RELEASE",p.sweepReady,1.f,held.skillSweep,0x9bb9d6,true,-1);
-            skillSlot(c[ControlLayout::Buff],3,"BLINK",p.buffReady,1.5f,held.skillBuff,0xd9ecf5,true,-1);
-            skillSlot(c[ControlLayout::Swap],4,"VERDICT",p.swapCooldown,9.f,held.swap,0xc4d7ed,true,-1);
+            skillSlot(c[ControlLayout::Skill],1,"RUSH",p.skillCooldown,3.f,held.skill,0xb4d8ee,true,3);
+            skillSlot(c[ControlLayout::Sweep],2,"RELEASE",p.sweepReady,1.f,held.skillSweep,0x9bb9d6,true,4);
+            skillSlot(c[ControlLayout::Buff],3,"BLINK",p.buffReady,1.5f,held.skillBuff,0xd9ecf5,true,5);
+            skillSlot(c[ControlLayout::Swap],4,"VERDICT",p.swapCooldown,9.f,held.swap,0xc4d7ed,true,6);
         }else{
             const bool knight=p.form==0;
             skillSlot(c[ControlLayout::Skill],1,knight?"STAB":"FIRE",
@@ -1200,6 +1204,16 @@ public:
         knightSkillTextures_[0]=loadOptionalTexture("ui/knight_skill_stab.png");
         knightSkillTextures_[1]=loadOptionalTexture("ui/knight_skill_sweep.png");
         knightSkillTextures_[2]=loadOptionalTexture("ui/knight_skill_prep.png");
+        constexpr const char* whiteButtonFiles[]={
+            "ui/white_skill_rush.png","ui/white_skill_release.png",
+            "ui/white_skill_blink.png","ui/white_skill_verdict.png"};
+        for(int i=0;i<4;++i){
+            whiteSkillTextures_[i]=loadOptionalTexture(whiteButtonFiles[i],128,128);
+            if(!whiteSkillTextures_[i]){
+                SDL_SetError("ECLIPSE ASSET ERROR: required White Night skill button PNG %s missing or invalid (expected 128x128)",whiteButtonFiles[i]);
+                return false;
+            }
+        }
         // Optional sprite library: the procedural renderer remains functional without it.
         // Only startup loads textures; no per-frame filesystem work.
         constexpr const char* forestFiles[40]={
