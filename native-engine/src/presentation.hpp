@@ -905,6 +905,7 @@ public:
 
     static constexpr std::array<SDL_FRect,2> titleOptions{{{404,552,472,62},{404,624,472,62}}};
     static constexpr SDL_FRect titleGear{1204,24,52,52};
+    static constexpr SDL_FRect titleDeveloperQA{500,478,280,54};
     static constexpr SDL_FRect titleBack{26,25,190,50};
     static constexpr float titleReadyTime=0.85f;
 
@@ -1080,7 +1081,12 @@ public:
             if(page==1){
                 text("CHOOSE YOUR JOURNEY",423,516,2,0xbeb2d9);
                 if(loggingIn)text("VERIFYING VACODE ACCOUNT",425,478,2,0xf0d5aa);
-            }else if(page==3)text("OPTIONS",576,516,2,0xbeb2d9);
+            }else if(page==3){
+                text("OPTIONS",576,450,2,0xbeb2d9);
+                const SDL_FRect qaSource{0,0,112,30};
+                SDL_RenderTexture(renderer,titleMenu_,&qaSource,&titleDeveloperQA);
+                text("DEV QA",titleDeveloperQA.x+76,titleDeveloperQA.y+17,3,0xffd17c);
+            }
             else if(page==4){
                 rect(344,325,592,164,0x080a16,245);
                 rect(344,325,592,3,0xb09ac9);
