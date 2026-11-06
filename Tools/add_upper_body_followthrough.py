@@ -1,106 +1,132 @@
 #!/usr/bin/env python3
-"""Add restrained upper-body follow-through to ECLIPSE movement PNGs.
+"""Rebuild restrained, more upright movement upper bodies into ECLIPSE PNG atlases.
 
-Pillow only; offline. Keeps leg pixels, sword below hip, frame count, and timing.
-Run after fetching latest game assets. Creates original backups once.
+Offline Pillow-only tool. Writes REAL game PNGs, not runtime transforms.
+Safe to rerun: source comes from immutable initial .pre-upper-motion.png backups.
+The transparent background and all non-movement frames are preserved.
+Does not rebuild legs, attacks, hitboxes, or animation timing.
 """
 from pathlib import Path
+from PIL import Image
 import argparse
 import hashlib
 import math
-from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGETS = (
-    ("knight_walk", "knight_motion.png", 64, 94, 16, 8, 16, 2, 65),
-    ("knight_run", "knight_motion.png", 64, 94, 432, 24, 16, 2, 65),
-    ("white_night_run", "ui/white_night_motion.png", 64, 96, 88, 32, 8, 2, 65),
-)
+ASSETS = ROOT / "Assets/Resources/Eclipse"
+# (asset path, expected dimensions, cell dimensions, columns, movement clips)
+CONFIG = [
+    ("knight_motion.png", (1024, 2914), (64, 94), 16,
+     [("walk", 16, 8, 65, 2.0), ("run", 432, 24, 65, 2.6)]),
+    ("ui/white_night_motion.png", (512, 1440), (64, 96), 8,
+     [("run", 88, 32, 66, 2.5)]),
+]
 
-def shift_upper(frame, phase, hip_y, strength=1.0):
-    """Subpixel phase -> integer-pixel, nearest-neighbor, no blended pixels.
+def upper_body(frame, phase, belt, upright):
+    """Resample existing torso as single continuous pixel shapes, anchored at pelvis.
 
-    Torso lean alternates across steps; breathing-height bounce peaks twice.
-    Upper pixels y<hip_y are gently shifted; y>=hip_y is untouched.
-    Seam taper at the belt ensures the source legs don't disconnect.
+    A fixed backward (leftward for right-facing character) corrective tilt makes
+    the crouched silhouette more upright. Small opposite-phase sway accompanies
+    alternating planted legs. Do not translate the leg or sword below the belt.
     """
-    w, h = frame.size
-    rgba = frame.convert("RGBA")
-    base = rgba.copy()
-    dst = base.load()
-    src = rgba.load()
-    lean = math.sin(2 * math.pi * phase)
-    bounce = (1 - math.cos(4 * math.pi * phase)) * .5
-    for y in range(0, hip_y):
-        # Full effect at chest/helmet; hold waist and pelvis stable.
-        taper = min(1.0, max(0.0, (hip_y - y) / 15.0))
-        # Lean is at most 1px, with 2px reserved only in heavy sprint.
-        dx = round(1.25 * strength * lean * taper)
-        dy = -round(.85 * bounce * taper)
+    base = frame.convert("RGBA")
+    w, h = base.size
+    result = base.copy()
+    pixels = result.load()
+    source = base.load()
+    # Wipe ONLY the source upper region, preserving all y >= belt verbatim.
+    for y in range(belt):
         for x in range(w):
-            dst[x, y] = (0, 0, 0, 0)
-        for x in range(w):
-            nx, ny = x + dx, y + dy
-            # Don't write below belt, onto legs, or outside the cell.
-            if 0 <= nx < w and 0 <= ny < hip_y and src[x, y][3]:
-                dst[nx, ny] = src[x, y]
-    # Protect everything at and below the waist, including sword and legs.
-    return base
+            pixels[x, y] = (0, 0, 0, 0)
 
-def update_sheet(original, targets):
-    out = original.convert("RGBA")
-    for name, _, fw, fh, start, count, columns, strength, hip_y in targets:
+    cycle = 2 * math.pi * phase
+    sway = math.sin(cycle)
+    lift = (1.0 - math.cos(2 * cycle)) / 2.0
+    for y in range(belt):
+        # Pelvis stays fixed, shoulders/head lean backward.
+        strength = min(1.0, max(0.0, (belt - y) / 34.0))
+        # Stationary backward stance correction up to 2 px;
+        # 1 px sway, never body-length bobbing or exaggerated sneak pose.
+        dx = round((-upright + 1.0 * sway) * strength)
+        dy = -round(0.7 * lift * strength)
+        for x in range(w):
+            if source[x, y][3] == 0:
+                continue
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < w and 0 <= ny < belt:
+                pixels[nx, ny] = source[x, y]
+    return result
+
+def changed_indices(clips):
+    return {i for _, first, count, _, _ in clips for i in range(first, first + count)}
+
+def build(source, fw, fh, cols, clips):
+    before = source.convert("RGBA")
+    out = before.copy()
+    for name, start, count, belt, upright in clips:
         for i in range(count):
             index = start + i
-            x, y = index % columns * fw, index // columns * fh
-            rect = (x, y, x + fw, y + fh)
-            old = original.convert("RGBA").crop(rect)
-            # Two footfalls per loop; torso swings once in each direction.
-            new = shift_upper(old, i / count, hip_y, strength)
-            if new.crop((0, hip_y, fw, fh)).tobytes() != old.crop((0, hip_y, fw, fh)).tobytes():
-                raise AssertionError((name, i, "lower body changed"))
-            out.paste(new, (x, y))
+            x = (index % cols) * fw
+            y = (index // cols) * fh
+            box = (x, y, x + fw, y + fh)
+            original = before.crop(box)
+            modified = upper_body(original, i / count, belt, upright)
+            # All lower body pixels remain exactly identical.
+            assert original.crop((0, belt, fw, fh)).tobytes() == modified.crop((0, belt, fw, fh)).tobytes(), (name, i)
+            out.paste(modified, (x, y))
+    # Other animation frame slots must be exactly unchanged.
+    allowed = changed_indices(clips)
+    for index in range((before.width // fw) * (before.height // fh)):
+        if index in allowed:
+            continue
+        x = (index % cols) * fw
+        y = (index // cols) * fh
+        box = (x, y, x + fw, y + fh)
+        assert before.crop(box).tobytes() == out.crop(box).tobytes(), ("unrelated frame modified", index)
     return out
 
 def main():
-    p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--dry-run", action="store_true", help="Validate and report without writing PNGs")
-    args = p.parse_args()
-    groups = {}
-    for target in TARGETS:
-        groups.setdefault(target[1], []).append(target)
-    for rel, clips in groups.items():
-        path = ROOT / "Assets/Resources/Eclipse" / rel
-        if not path.is_file():
-            raise FileNotFoundError(path)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--preview-dir", type=Path, default=ROOT / "Art/movement-upper-review")
+    args = parser.parse_args()
+    args.preview_dir.mkdir(parents=True, exist_ok=True)
+    for rel, expected, (fw, fh), cols, clips in CONFIG:
+        path = ASSETS / rel
         backup = path.with_suffix(".pre-upper-motion.png")
-        if backup.exists():
-            # Always build from the pristine backup, never compound corrections.
-            original = Image.open(backup)
-        else:
-            original = Image.open(path)
-        if original.size != (1024, 2914) if rel == "knight_motion.png" else original.size != (512, 1440):
-            raise ValueError((rel, "unexpected atlas dimensions", original.size))
-        output = update_sheet(original, clips)
-        before = original.convert("RGBA")
-        changed = set()
-        for _, _, fw, fh, start, count, columns, _, _ in clips:
-            changed.update(range(start, start + count))
-        for i in range((original.width // clips[0][2]) * (original.height // clips[0][3])):
-            if i in changed:
-                continue
-            fw, fh, columns = clips[0][2], clips[0][3], clips[0][6]
-            x, y = i % columns * fw, i // columns * fh
-            rect = (x, y, x + fw, y + fh)
-            if before.crop(rect).tobytes() != output.crop(rect).tobytes():
-                raise AssertionError((rel, "other animation changed", i))
-        print(f"{rel}: {len(changed)} movement frames processed; other clips preserved")
+        if not path.exists():
+            raise FileNotFoundError(path)
+        src = Image.open(backup if backup.exists() else path)
+        if src.size != expected:
+            raise ValueError((rel, "unexpected atlas dimensions", src.size))
+        out = build(src, fw, fh, cols, clips)
+        for name, start, count, belt, upright in clips:
+            frames = []
+            for i in range(count):
+                idx = start + i
+                crop = (idx % cols * fw, idx // cols * fh, (idx % cols + 1) * fw, (idx // cols + 1) * fh)
+                frames.append(out.crop(crop))
+            # This is the exact PNG data written to the game atlas.
+            contact = Image.new("RGBA", (fw * min(8, count), fh * ((count + 7) // 8)), (0, 0, 0, 0))
+            for i, frame in enumerate(frames):
+                contact.alpha_composite(frame, (i % 8 * fw, i // 8 * fh))
+            key = ("white_night" if rel.startswith("ui/") else "knight") + "_" + name
+            contact.save(args.preview_dir / (key + "_contact.png"))
+            larger = [f.resize((fw * 4, fh * 4), Image.Resampling.NEAREST) for f in frames]
+            larger[0].save(args.preview_dir / (key + ".gif"), save_all=True,
+                           append_images=larger[1:],
+                           duration=round((700 if name=="run" else 600) / count), loop=0, disposal=2)
+            # First/last continuity report; not a subjective visual verdict.
+            diff = sum(a != b for a, b in zip(frames[-1].tobytes(), frames[0].tobytes()))
+            print(key, "frames:", count, "loop boundary differing bytes:", diff)
         if not args.dry_run:
             if not backup.exists():
-                original.save(backup)
-            output.save(path, optimize=True)
-            print(f"  wrote {path}; original kept at {backup}")
-    print("Offline sprite update complete; device playback is NOT validated.")
+                src.save(backup, optimize=True)
+            out.save(path, optimize=True)
+            print("Updated actual PNG:", path, "SHA256:", hashlib.sha256(path.read_bytes()).hexdigest())
+        else:
+            print("Dry run; actual PNG not written:", path)
+    print("NOTE: Real device playback and pose-quality approval require a human visual check.")
 
 if __name__ == "__main__":
     main()
