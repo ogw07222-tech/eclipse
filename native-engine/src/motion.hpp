@@ -2,7 +2,8 @@
 namespace eclipse {
 struct MotionClip{int start,count;float duration,contact,stride;};
 constexpr int thrustSkillState=13,sweepSkillState=14,prepSkillState=15;
-constexpr int skillMotionColumns=4,skillMotionRows=6,skillMotionStart=208;
+constexpr int skillMotionColumns=4,skillMotionRows=9,skillMotionStart=208;
+constexpr int skillFxRows=6; // The independently rendered FX sheet stays 4 x 6.
 constexpr int skillMotionWidth=112,skillMotionPivotX=44;
 constexpr bool isSkillMotion(int state){return state>=thrustSkillState&&state<=prepSkillState;}
 constexpr MotionClip motionClips[]={
@@ -19,9 +20,9 @@ constexpr MotionClip motionClips[]={
     {80,6,0.120000f,0.500000f,0.000000f},
     {16,8,0.600000f,0.500000f,72.000000f},
     {192,8,0.380000f,0.625000f,0.000000f},
-    {208,4,.48f,.455f,0.f}, // thrust contact matches the extended pose
-    {212,4,.415f,.50f,0.f},  // sweep contact matches the downswing
-    {216,4,.40f,.50f,0.f},  // raise the sword, brace, recover
+    {208,12,.48f,.455f,0.f}, // special thrust: 12 source-based visual frames (~25 FPS)
+    {220,12,.415f,.50f,0.f},  // rotational sweep: 12 frames (~28.9 FPS)
+    {232,12,.40f,.50f,0.f},  // prepare / brace: 12 frames (30 FPS)
 };
 constexpr int motionWidth=64,motionHeight=94,motionColumns=16,motionRows=31,motionPivotX=28,motionPivotY=88;
 constexpr int knightRunMidpointStart=13*motionColumns;

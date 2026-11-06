@@ -472,7 +472,10 @@ class Presentation {
         const auto& clip=motionClips[a.state];
         const int pose=std::clamp(a.frame-clip.start,0,clip.count-1);
         const int fxRow=a.state-thrustSkillState;
-        const SDL_FRect src{float(pose*skillMotionWidth),
+        // FX atlas keeps four key-effect phases per skill, independent of
+        // the actor atlas's twelve authored source-based display poses.
+        const int fxPose=std::clamp(pose/3,0,3);
+        const SDL_FRect src{float(fxPose*skillMotionWidth),
             float(fxRow*motionHeight),float(skillMotionWidth),float(motionHeight)};
         const SDL_FRect dest{
             std::round(p.x-offset-skillMotionPivotX*motionScale),
@@ -1152,7 +1155,7 @@ public:
         knightSkillMotion_=loadOptionalTexture("knight_skill_motion.png",
             skillMotionWidth*skillMotionColumns,motionHeight*skillMotionRows);
         knightSkillFx_=loadOptionalTexture("knight_skill_fx_layer.png",
-            skillMotionWidth*skillMotionColumns,motionHeight*skillMotionRows);
+            skillMotionWidth*skillMotionColumns,motionHeight*skillFxRows);
         if(!knightSkillFx_){
             SDL_SetError("ECLIPSE ASSET ERROR: knight_skill_fx_layer.png missing or invalid (expected 448x564)");
             return false;
@@ -1525,12 +1528,10 @@ public:
                 static_cast<int>(a.travelPhase*knightSprintPlaybackFrames),0,knightSprintPlaybackFrames-1);
             frame=knightSprintStart+std::clamp(
                 playbackFrame*knightSprintFrames/knightSprintPlaybackFrames,0,knightSprintFrames-1);
-        }else if(p.form==0&&a.midpoint&&a.state!=4){
-            if(isSkillMotion(a.state)){
-                if(knightSkillMotion_)frame+=skillMotionColumns*(skillMotionRows/2);
-            }else{
-                frame+=knightMidpointStart;
-            }
+        }else if(p.form==0&&a.midpoint&&a.state!=4&&!isSkillMotion(a.state)){
+            // Skill atlas has twelve actual display poses per clip, so do not
+            // apply the old 4-key/4-midpoint row offset to those frames.
+            frame+=knightMidpointStart;
         }
         if(p.whiteNight&&whiteNightMotion_&&(p.whiteMove!=WhiteMove::None||p.health>0)){
             int whiteFrame=30;
