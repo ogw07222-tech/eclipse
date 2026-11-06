@@ -98,3 +98,11 @@ The project's baseline motion FPS guidelines are twice the previous guidelines:
 - When changing motion rates or frame counts, update both the runtime's animation mapping and corresponding atlas-generation/asset metadata. Do not claim a new 24-frame PNG has been authored when runtime is only selecting 24 poses out of an existing atlas.
 - Do not change gameplay movement speed, hitboxes, damage windows or cooldowns merely to achieve a sprite FPS target without specific approval.
 - Document any justified exceptions beside the motion. The owner verifies rendering and tests; never run GitHub Actions without their specific prior approval.
+
+## Character art: GitHub + ChatGPT Library working-copy bridge
+
+- The **GitHub game repository main** is the authoritative runtime/source version; ChatGPT **Library `/ECLIPSE/characters/`** is a separately uploaded, versioned working copy for directly inspecting/editing PNGs.
+- Read `Art/character-library/README.md` and `Art/character-library/character-asset-manifest.json` at the start of every character/sprite task.
+- Retrieve matching production PNG files from Library when present, but check their SHA-256 against the intended GitHub revision first. Never substitute a similar-looking concept image or silently assume the Library mirror is synchronized.
+- After approved manual pixel-art edits and PNG inspection, update the GitHub runtime PNG **and** its Library working copy with identical bytes and record the verified source revision. Keep original/editable `Art/` sources. Do not claim completion if the actual PNG or mirror is still missing.
+- Library does not auto-sync with GitHub; use an explicit snapshot and integrity check. Creating an index or folders is not copying runtime PNGs. Preserve all prior prohibitions on unapproved GitHub Actions and owner-owned tests.
