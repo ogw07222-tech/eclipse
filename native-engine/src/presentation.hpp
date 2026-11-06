@@ -1405,15 +1405,9 @@ public:
             goldenSprite(lanceArt,x-dx*10,y-dy*10,96,24,lance.angle);
         }
         for(const auto& burst:g.lightBursts){
-            if(burst.kind==LightFx::Slash){
-                const float t=std::clamp(1.f-burst.life/.24f,0.f,1.f);
-                goldenSprite(riftSlash_,burst.x-offset+burst.facing*47.f,
-                    burst.y-4.f,235.f*(1.f-.22f*t),72.f*(1.f-.4f*t),
-                    burst.facing>0?-14.f:194.f,
-                    static_cast<Uint8>(230*(1.f-t)));
-            }else{
-                goldenImpactParticles(burst);
-            }
+            // The basic sword slash is now driven by the *current sword pose*
+            // below, not by a detached world-space burst with its own clock.
+            if(burst.kind!=LightFx::Slash)goldenImpactParticles(burst);
         }
         for(const auto& b:g.projectiles){
             const int radius=b.empowered?14:8;
@@ -1527,6 +1521,30 @@ public:
                 }
                 SDL_SetTextureAlphaMod(whiteNightMotion_,255);
             }else if(p.hurtTint>0)SDL_SetTextureColorMod(whiteNightMotion_,255,150,160);
+            // The sword arc tracks the SAME clip clock (including stored-lance
+            // attack-speed boosts) as the 15 authored slash poses. The PNG
+            // silhouette/palette is unchanged; only position, scale and opacity
+            // are registered to the active swing instead of a detached burst.
+            if(p.whiteMove==WhiteMove::Slash && riftSlash_){
+                const auto slashClip=whiteClips[static_cast<int>(WhiteMove::Slash)];
+                const float phase=std::clamp(p.whiteAge/slashClip.duration,0.f,1.f);
+                constexpr float arcIn=.26f,arcPeak=.40f,arcOut=.76f;
+                if(phase>=arcIn&&phase<arcOut){
+                    const float emerge=std::clamp((phase-arcIn)/(arcPeak-arcIn),0.f,1.f);
+                    const float decay=std::clamp((arcOut-phase)/(arcOut-arcPeak),0.f,1.f);
+                    const float opacity=std::min(emerge,decay);
+                    const float sweep=std::clamp((phase-arcIn)/(arcOut-arcIn),0.f,1.f);
+                    // Follow the forward-moving blade, with the center of
+                    // the incision close to the sword rather than 140px ahead.
+                    const float bladeX=p.x-offset+p.facing*(43.f+33.f*sweep);
+                    const float bladeY=p.y-60.f+7.f*sweep;
+                    const float width=175.f+58.f*emerge;
+                    const float height=45.f+24.f*emerge;
+                    goldenSprite(riftSlash_,bladeX,bladeY,width,height,
+                        p.facing>0?-14.f:194.f,
+                        static_cast<Uint8>(225.f*opacity));
+                }
+            }
             SDL_RenderTextureRotated(renderer,whiteNightMotion_,&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
             SDL_SetTextureColorMod(whiteNightMotion_,255,255,255);
             if(p.whiteMove==WhiteMove::Command&&p.whiteAge>=.08f&&p.whiteAge<.46f&&goldOrb_){
