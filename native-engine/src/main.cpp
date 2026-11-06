@@ -33,7 +33,7 @@ bool vacodeSessionReady(){
     return false;
 #endif
 }
-int qaStartForm=-1;
+int qaFirstJob=-1;
 float camera=640;
 void requestVacodeLogin(){
 #ifdef SDL_PLATFORM_ANDROID
@@ -61,6 +61,20 @@ void updateKeyboard(){const auto& k=keyState;eclipse::Actions a;
 }
 void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
     const bool wasTitle=titleActive;
+    auto beginGame=[&](int first,int second)->bool{
+        if(first==second||first<0||first>2||second<0||second>2)return false;
+        if((first==2||second==2)&&!view.loadWhiteNight()){
+            const std::string reason=SDL_GetError();
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",reason.c_str());
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"ECLIPSE ASSET ERROR",reason.c_str(),window);
+            return false;
+        }
+        game.player.equippedJobs={{first,second}};
+        game.restart();animation.reset();input.reset();keyState.fill(false);
+        camera=640;qaFirstJob=-1;titlePage=TitlePage::Main;titleActive=false;
+        SDL_Log("ECLIPSE equipped jobs first=%d second=%d",first,second);
+        return true;
+    };
     SDL_Event e;
     while(!layout.exitRequested&&SDL_PollEvent(&e)){
         if(e.type==SDL_EVENT_QUIT){running=false;continue;}
@@ -71,12 +85,15 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
             if(e.type==SDL_EVENT_KEY_DOWN&&e.key.scancode==SDL_SCANCODE_ESCAPE){
                 if(titlePage==TitlePage::Main)running=false;
                 else if(titlePage==TitlePage::Settings)titlePage=TitlePage::Gear;
-                else if(titlePage==TitlePage::QaCharacters)titlePage=TitlePage::StartOptions;
+                else if(titlePage==TitlePage::QaCharacters){qaFirstJob=-1;titlePage=TitlePage::Main;}
                 else titlePage=TitlePage::Main;
                 waitingForVacode=false;
                 continue;
             }
             if(titleSeconds<eclipse::Presentation::titleReadyTime)continue;
+            if(e.type==SDL_EVENT_KEY_DOWN&&!e.key.repeat&&e.key.scancode==SDL_SCANCODE_F9){
+                qaFirstJob=-1;titlePage=TitlePage::QaCharacters;waitingForVacode=false;continue;
+            }
             int selection=-1;
             if(e.type==SDL_EVENT_KEY_DOWN&&!e.key.repeat){
                 if(titlePage==TitlePage::QaCharacters){
@@ -111,24 +128,11 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
                 waitingForVacode=false;continue;
             }
             if(titlePage==TitlePage::QaCharacters){
-                if(selection==3){titlePage=TitlePage::StartOptions;continue;}
+                if(selection==3){qaFirstJob=-1;titlePage=TitlePage::Main;continue;}
                 if(selection>=0&&selection<3){
-                    if(selection==2&&!view.loadWhiteNight()){
-                        const std::string reason=SDL_GetError();
-                        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",reason.c_str());
-                        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"ECLIPSE ASSET ERROR",reason.c_str(),window);
-                        continue;
-                    }
-                    qaStartForm=selection;
-                    game.restart();
-                    game.player.form=qaStartForm==1?1:0;
-                    game.player.whiteNight=qaStartForm==2;
-                    animation.reset();
-                    input.reset();
-                    keyState.fill(false);
-                    camera=640;
-                    titlePage=TitlePage::Main;titleActive=false;
-                    SDL_Log("ECLIPSE QA selected form=%d",qaStartForm);
+                    if(qaFirstJob<0)qaFirstJob=selection;
+                    else if(selection!=qaFirstJob)beginGame(qaFirstJob,selection);
+                    // Duplicate selection is ignored: exactly two distinct jobs.
                 }
                 continue;
             }
@@ -138,9 +142,9 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
                     break;
                 case TitlePage::StartOptions:
                     if(selection==0){
-                        if(vacodeSessionReady()){waitingForVacode=false;titlePage=TitlePage::QaCharacters;}
+                        if(vacodeSessionReady()){waitingForVacode=false;beginGame(0,1);}
                         else if(!waitingForVacode){waitingForVacode=true;requestVacodeLogin();}
-                    }else if(selection==1){waitingForVacode=false;titlePage=TitlePage::QaCharacters;}
+                    }else if(selection==1){waitingForVacode=false;beginGame(0,1);}
                     break;
                 case TitlePage::Gear:
                     if(selection==0)titlePage=TitlePage::Settings;
@@ -189,10 +193,6 @@ void tick(eclipse::Actions action){
     const int previousMotion=animation.state;
     game.cameraCenter=camera;
     game.step(static_cast<float>(eclipse::fixedStep),action);
-    if(action.restart&&qaStartForm>=0){
-        game.player.form=qaStartForm==1?1:0;
-        game.player.whiteNight=qaStartForm==2;
-    }
     animation.step(game.player,static_cast<float>(eclipse::fixedStep));
     if(animation.state!=previousMotion)SDL_Log("ECLIPSE motion state=%d frame=%d",animation.state,animation.frame);
     if(action.inventory||action.swap||action.restart||action.weapon||action.armor||action.charm)
@@ -344,10 +344,12 @@ int main(int argc,char** argv){
             titleSeconds+=static_cast<float>(elapsed);
             if(waitingForVacode&&vacodeSessionReady()&&titlePage==TitlePage::StartOptions){
                 waitingForVacode=false;
-                titlePage=TitlePage::QaCharacters;
-                SDL_Log("VACODE verified: select QA character");
+                game.player.equippedJobs={{0,1}};
+                game.restart();animation.reset();input.reset();keyState.fill(false);
+                camera=640;titlePage=TitlePage::Main;titleActive=false;
+                SDL_Log("VACODE verified: default two-job loadout");
             }
-            view->drawTitle(titleSeconds,static_cast<int>(titlePage),waitingForVacode);
+            view->drawTitle(titleSeconds,static_cast<int>(titlePage),waitingForVacode,qaFirstJob);
         }else{
             accumulator+=elapsed;
             while(accumulator>=eclipse::fixedStep){if(!layout.editing)tick(input.sample());accumulator-=eclipse::fixedStep;}
