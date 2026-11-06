@@ -616,13 +616,13 @@ class Presentation {
         thumbLayer(thumb*.58f,0x304353,174);
         icon(1,held.attack?1:0,0,c[ControlLayout::Attack].x,c[ControlLayout::Attack].y,c[ControlLayout::Attack].size,held.attack);
         icon(2,held.dash?1:0,0,c[ControlLayout::Dash].x,c[ControlLayout::Dash].y,c[ControlLayout::Dash].size,held.dash);
-        // For White Night the swap slot is the dedicated ultimate, not a form-change icon.
-        if(!p.whiteNight)icon(3,0,0,c[ControlLayout::Swap].x,c[ControlLayout::Swap].y,c[ControlLayout::Swap].size,held.swap);
+        // Character swap remains available in every class, including White Night.
+        icon(3,0,0,c[ControlLayout::Swap].x,c[ControlLayout::Swap].y,c[ControlLayout::Swap].size,held.swap);
         if(p.whiteNight){
             skillSlot(c[ControlLayout::Skill],1,"RUSH",p.skillCooldown,3.f,held.skill,0xb4d8ee,true,3);
             skillSlot(c[ControlLayout::Sweep],2,"RELEASE",p.sweepReady,1.f,held.skillSweep,0x9bb9d6,true,4);
             skillSlot(c[ControlLayout::Buff],3,"BLINK",p.buffReady,1.5f,held.skillBuff,0xd9ecf5,true,5);
-            skillSlot(c[ControlLayout::Swap],4,"VERDICT",p.swapCooldown,9.f,held.swap,0xc4d7ed,true,6);
+            skillSlot(c[ControlLayout::Ultimate],4,"VERDICT",p.verdictCooldown,9.f,held.ultimate,0xc4d7ed,true,6);
         }else{
             const bool knight=p.form==0;
             skillSlot(c[ControlLayout::Skill],1,knight?"STAB":"FIRE",
@@ -674,7 +674,7 @@ class Presentation {
     }
     void settings(const ControlLayout& layout){
         constexpr unsigned ink=0xe4dfd1,muted=0x9eacba,gold=0xc7a575;
-        const char* names[]={"JOYSTICK","ATTACK","DASH","SWAP","SKILL 1","SKILL 2","SKILL 3"};
+        const char* names[]={"JOYSTICK","ATTACK","DASH","SWAP","SKILL 1","SKILL 2","SKILL 3","ULTIMATE"};
         if(layout.reposition){
             // Fullscreen editing: leave the gameplay and HUD visible. The entire
             // settings window is suppressed until DONE is pressed.
