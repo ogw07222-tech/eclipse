@@ -49,14 +49,16 @@
       "actual_authored_frames": 3
     },
     {
-      "name": "run",
+      "name": "move_hover",
       "start": 3,
       "count": 4,
       "duration": 0.7,
       "key_pose_only": true,
-      "production_target_frames": 24,
-      "production_target_fps": 34.29,
-      "actual_authored_frames": 4
+      "production_target_frames": 12,
+      "production_target_fps": 17.143,
+      "actual_authored_frames": 4,
+      "playback_type": "distance_driven",
+      "source_note": "New hover generator reuses idle 0 instead of source run frames 3-6. Source key-pose PNG unchanged."
     },
     {
       "name": "attack",
@@ -125,5 +127,5 @@
     "Existing fire mage logic and assets are not replaced.",
     "Gameplay parameters remain as defined in Docs/CURRENT_CLASS_DESIGN.md."
   ],
-  "production_note": "Production frame counts are targets only. Original 27 key-pose PNGs unchanged; no new poses authored or runtime integration. Never treat goals as actual atlas ranges."
+  "production_note": "Target preview is 140 total DISPLAY SLOTS across three layers. No completed 140-frame PNG has been checked in; script-only authoring tool. All current original 27 key poses untouched."
 }
