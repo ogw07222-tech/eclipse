@@ -17,7 +17,7 @@ root = Path(__file__).resolve().parents[2]
 assets = ['knight_motion.png', 'mage_run.png', 'mage_motion.png', 'ui/attack_states.png', 'ui/dash_states.png',
           'ui/swap_skill_states.png', 'ui/joystick_arrows_new.png',
           'ui/settings_gear.png', 'ui/settings_menu_panel.png', 'ui/settings_window.png', 'ui/enemy_bar_frame.png', 'ui/execute_skull.png',
-          'knight_skill_motion.png', 'title/eclipse.png', 'title/cape.png', 'ui/title_menu.png',
+          'knight_skill_motion.png', 'knight_skill_fx_layer.png', 'title/eclipse.png', 'title/cape.png', 'ui/title_menu.png',
           'ui/lance_gold.png', 'ui/trail_gold.png', 'ui/orb_gold.png', 'ui/impact_gold.png',
           'ui/rift_slash.png', 'ui/rift_trace.png', 'ui/white_night_lance.png', 'ui/white_night_motion.png']
 # Directory assets are packaged by the Android Gradle Sync task. Verify all actual
