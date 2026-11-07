@@ -37,3 +37,29 @@ No requested account credentials, tokens, signing keys or GitHub Actions permiss
 - Node v22.16.0 was available in local container, but Pixelbolt was not installed. `git ls-remote https://github.com/skulitom/Pixelbolt.git HEAD` failed: `Could not resolve host: github.com`; npm cache had no Pixelbolt package. Therefore **Pixelbolt was not executed**.
 - Created local downloadable `/mnt/data/white_night_pixelbolt_reference.pixel.json` by exact per-pixel transfer of original frames 88–95 into Pixelbolt recipe `frames[].pixels` and an 8-frame animation. This is a conversion input, **not** a Pixelbolt-generated novel animation, and remains unvalidated by Pixelbolt CLI. No game source, runtime PNG or GitHub Actions modified.
 - Resume: Run `node bin/pixelbolt.js validate <recipe>` then `inspect` and `render` in a Node environment with Pixelbolt installed, check image bytes/atlas. Afterwards develop genuine poses-based variant and visually inspect all frames. Do not claim actual tool execution until achieved.
+
+## 2026-11-08 — 2D Pixel Art Pipeline architecture v2 (GitHub design)
+
+Status: PARTIAL — documentation and metadata committed; exporter/render adapters and runtime art integration NOT implemented.
+
+### Completed
+- Re-read game `AGENTS.md`, `README.md`, `Docs/PNG_GITHUB_LIBRARY_WORKFLOW.md` and Motion Library instructions.
+- Inspected `.github/workflows/native-engine-checks.yml` and `.github/workflows/native-android-apk.yml`: both manual `workflow_dispatch` only. No GitHub Actions dispatched.
+- Reused existing `tools/pixel-tools.sh` (Pixelbolt/PixelFX) and `native-engine/tools/eclipse_sprite_tool.py` (Pillow). Did not claim these executed.
+- Created `Docs/ART_PIPELINE_V2.md` at commit `0da783e4735a954a3d2926f86f49650df37158c6`.
+- Created `Art/pipeline/recipes/white_night_run.json` at commit `8bebd2e6deec0f5847c3a1e661c9df63668f84d7`.
+- Re-fetched both new files from main, confirming their presence.
+- No existing PNGs, animations, engine sources, signing material or workflows changed.
+
+### Not completed / blockers
+- The JSON is orchestration metadata, not native Pixelbolt/PixelFX schema; rendering, extract/compare/stage CLI, Sprite Fusion adapter and LibreSprite installation are not implemented.
+- No original PNG bytes or hashes inspected in this task; no art generated, visually reviewed or integrated.
+- Library mirror at `/ECLIPSE/eclipse main/` for the two new files is NOT verified/synchronized. GitHub main is ahead until an explicit byte-matching Library upload occurs.
+- No tests, builds or device playback performed (owner-controlled).
+
+### Next steps on '이어서'
+1. Retrieve the actual source PNG bytes and verify original dimensions/hashes against the manifest, without overwriting the runtime asset.
+2. Implement a minimal read-only Python `inspect/extract/compare` adapter reusing existing Pillow analysis and stable recipe schema, with staged output only in `Art/`.
+3. Add an effect recipe and native Pixelbolt/PixelFX adapter only after verifying tool schema and installation in a suitable shell.
+4. Produce before/after frame contacts for human review; no auto-approval of character artwork.
+5. Explicitly sync committed docs/recipe with Library and compare bytes, or record mirror divergence.
