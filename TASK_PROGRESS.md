@@ -30,3 +30,10 @@ Status: PARTIAL — local setup and in-game integration NOT verified.
 5. Stage drafts only; integrate game-runtime PNGs and mappings after reviewed approvals. Owner runs game tests.
 
 No requested account credentials, tokens, signing keys or GitHub Actions permissions are needed to proceed.
+
+## 2026-11-08 — Pixelbolt live render attempt
+- User requested actual Pixelbolt generation from Library `/ECLIPSE/characters/white-night/white_night_motion.png`.
+- Library original materialized: 512x1440 PNG; frames 88–95 are 64x96.
+- Node v22.16.0 was available in local container, but Pixelbolt was not installed. `git ls-remote https://github.com/skulitom/Pixelbolt.git HEAD` failed: `Could not resolve host: github.com`; npm cache had no Pixelbolt package. Therefore **Pixelbolt was not executed**.
+- Created local downloadable `/mnt/data/white_night_pixelbolt_reference.pixel.json` by exact per-pixel transfer of original frames 88–95 into Pixelbolt recipe `frames[].pixels` and an 8-frame animation. This is a conversion input, **not** a Pixelbolt-generated novel animation, and remains unvalidated by Pixelbolt CLI. No game source, runtime PNG or GitHub Actions modified.
+- Resume: Run `node bin/pixelbolt.js validate <recipe>` then `inspect` and `render` in a Node environment with Pixelbolt installed, check image bytes/atlas. Afterwards develop genuine poses-based variant and visually inspect all frames. Do not claim actual tool execution until achieved.
