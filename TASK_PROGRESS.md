@@ -63,3 +63,22 @@ Status: PARTIAL — documentation and metadata committed; exporter/render adapte
 3. Add an effect recipe and native Pixelbolt/PixelFX adapter only after verifying tool schema and installation in a suitable shell.
 4. Produce before/after frame contacts for human review; no auto-approval of character artwork.
 5. Explicitly sync committed docs/recipe with Library and compare bytes, or record mirror divergence.
+
+## 2026-11-08 — ChatGPT execution environment probe and Pillow prototype
+
+Status: PARTIAL — local tooling verified; Pixelbolt unavailable; production source not edited.
+
+### Completed
+- ChatGPT container: Python 3.13.5, Pillow and NumPy available; Node v22.16.0, npm and git present.
+- Tested Pixelbolt network access: `git ls-remote https://github.com/skulitom/Pixelbolt.git HEAD` failed DNS resolution for github.com. `npm view pixelbolt version` failed `EAI_AGAIN` for registry.npmjs.org. Pixelbolt NOT installed or executed.
+- Authored and locally executed `/mnt/data/eclipse-art-toolkit/pixel_patch.py` as a non-destructive Pillow prototype. Requires source SHA-256, precise row-major frame+pixel coordinates, optional expected old RGBA, distinct nonexisting output. Reports changed pixels/frames and sha256, status DRAFT_NOT_REVIEWED.
+- Synthetic 2-frame PNG verified: only one pixel in frame #1 changed; frame #0 and original PNG unchanged; accidental overwrite rejected. Python bytecode compilation succeeded. NOT an ECLIPSE game asset test.
+- Local downloadable prototype bundle: `/mnt/data/eclipse-art-toolkit.zip` (conversation artifact, not yet committed to GitHub).
+- No GitHub Actions, APK build, game testing or production asset overwrite.
+
+### Outstanding
+1. GitHub source file for `pixel_patch.py` was not committed; only local exported ZIP exists. Copy after code review and verify source bytes.
+2. Retrieve exact existing production PNG bytes (and hashes); this synthetic fixture is not the actual character sprite.
+3. Install Pixelbolt in an environment with working npm/GitHub DNS or use a verified offline source archive, then validate its native schema and CLI. Do not infer runtime success.
+4. Implement full review compare/contact sheet and approval workflow; integrate only after visual review and owner approval.
+5. Check Library mirror separately; no automatic sync.
