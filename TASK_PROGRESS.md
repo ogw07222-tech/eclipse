@@ -82,3 +82,22 @@ Status: PARTIAL — local tooling verified; Pixelbolt unavailable; production so
 3. Install Pixelbolt in an environment with working npm/GitHub DNS or use a verified offline source archive, then validate its native schema and CLI. Do not infer runtime success.
 4. Implement full review compare/contact sheet and approval workflow; integrate only after visual review and owner approval.
 5. Check Library mirror separately; no automatic sync.
+
+## 2026-11-08 — Uploaded Pixelbolt v0.13.0 source: actual offline execution VERIFIED
+
+Status: Pixelbolt CLI sample rendering SUCCESS in ChatGPT container. ECLIPSE art integration remains NOT DONE.
+
+### Completed
+- Received user-provided `Pixelbolt-main.zip` (~7.3 MB). Inspected archive for traversal and symlinks before extraction. Package metadata: `pixelbolt` v0.13.0, Node >=20, zero runtime dependencies (as declared).
+- Extracted safely into the ChatGPT container. Node v22.16.0.
+- Executed `node bin/pixelbolt.js validate examples/forest-spirit.json`: `ok:true`, 24×24, 6 source frames, idle/bob/blink animations, zero validation warnings.
+- Executed `node bin/pixelbolt.js render examples/forest-spirit.json --out /mnt/data/pixelbolt_render_demo`: `ok:true`, produced actual 156×26 RGBA sprite atlas, individual animation PNGs, `forest-spirit.atlas.json`, preview HTML and other output files.
+- Opened resulting images with Pillow: source atlas 156×26 RGBA; idle/bob/blink PNG 24×24 RGBA each. Downloadable result bundle: `/mnt/data/pixelbolt_verified_output.zip`.
+- The prior Pixelbolt DNS/network blocker is now BYPASSED for this uploaded, dependency-free source checkout; network install is unnecessary for this copy.
+- Read effective two game workflows again, both manual dispatch-only. No GitHub Actions, build, or game tests executed.
+
+### Limitations / next steps
+1. The uploaded ZIP is an extracted local tool, NOT a permanent global plugin or persistent installation across new execution environments. Retain ZIP for reuse.
+2. Only packaged sample recipe rendered, not a novel ECLIPSE sprite. Existing game asset PNGs untouched.
+3. Need a validated native Pixelbolt recipe for a specific ECLIPSE effect, then native-size alpha/frame/contact review and user art approval. Never treat procedural character frames as hand-authored final poses.
+4. Production integration, external Library synchronization, Termux device execution, CMU adapter and Sprite Fusion remain unverified/not implemented.
