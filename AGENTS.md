@@ -71,33 +71,34 @@ For all ECLIPSE playable characters and enemies, animation **artwork** must be a
 5. **Source and integration:** Retain editable authored frames and key poses in `Art/`; place only approved, packed game-ready PNG atlases in `Assets/Resources/Eclipse/`. Keep displayed-frame mappings and timing synchronized with the actual atlas. Distinguish authored key poses, intermediate drawings, and automated QA artifacts in the documentation.
 6. **Acceptance:** Work is complete only after actual PNG assets have been reviewed for continuity and committed with their matching metadata/runtime references; otherwise report exactly what remains. Owner performs final device/game tests; do not run owner-owned tests or GitHub Actions without separately granted approval.
 
-### Current running-animation art targets
+### Current running-animation art targets — migrate to 60 FPS
 
-- **Standard knight:** 24 distinct manually authored or manually corrected displayed poses per approximately 0.7-second cycle, using roughly 8 foundational key poses.
-- **White Night Executioner:** 32 distinct manually authored or manually corrected displayed poses per current distance-driven run cycle, using roughly 8 foundational key poses.
-- In both, arms, shoulders, weapon, pelvis, legs, cape and hair must be pose-coherent. No automatic upper-body shift script counts as a substitute for authored torso/arm/weapon animation.
-- This authoring rule supersedes the earlier practice of treating `Tools/add_upper_body_followthrough.py` or other pixel-translation/procedural-bake scripts as final animation art. Existing assets are not silently deleted or changed by this policy; replace them in separately reviewed art commits.
+- **All character and enemy actions:** produce a true **60 distinct sprite poses per second of animation playback** at the authored default timing, including idle, walk, run, jump, fall, dash, attacks, combos, skills, ultimate, recoil, death, and other animated actions.
+- **Standard knight run:** previously approved 24 poses per approximately 0.7-second cycle; **new target is 42 distinct displayed poses per approximately 0.7-second cycle** (60 FPS). Preserve run duration and locomotion distance. Legacy 24-frame assets remain legacy until separately redrawn, integrated and reviewed; do not label them 60-FPS complete.
+- **White Night Executioner run:** previous 32-pose distance-driven cycle is legacy. Derive the new count from the actual cycle duration at its reference/default movement speed: `round(cycle_seconds × 60)`; record that duration and updated frame count before art production. Preserve its original run speed/distance and do not assume 32 poses already constitute 60 FPS.
+- In every pose, arms, shoulders, weapon, pelvis, legs, cape and hair must be coherent, and left/right contact must alternate. Do not use automatic upper-body shifts, image translations or duplicated sprites as a substitute for authored animation.
+- Existing sprite sheets and runtime mappings are **not automatically converted** by this instruction update. Track each unfinished migration explicitly until the updated PNG, metadata and runtime mapping have been reviewed and committed.
 
-## Animation FPS and motion continuity — ECLIPSE development principle (mandatory)
+## Sprite animation FPS and motion continuity — universal 60 FPS standard (mandatory)
 
-These are **sprite animation update rates**, not renderer FPS. Target gameplay rendering at 60 FPS or the device's supported stable rate; do not equate sprite pose count with screen refresh rate.
-
-The project's baseline motion FPS guidelines are twice the previous guidelines:
+**Every sprite-sheet action animation for ECLIPSE playable characters, enemies and bosses must target 60 distinct displayed poses per second at its authored playback duration.** This replaces all older 8–60 FPS or move-specific lower-FPS recommendations. Gameplay rendering also targets 60 FPS on a capable device, but render FPS and sprite animation FPS remain different metrics.
 
 | Motion category | Target sprite animation FPS |
 | --- | --- |
-| Idle / breathing | 8–16 FPS |
-| Walking / running | 16–32 FPS |
-| Standard attacks / combos | 24–48 FPS |
-| Dash / fast special action | 32–60 FPS |
+| Idle / breathing / ambient character motion | 60 FPS |
+| Walking / running / jumping / falling | 60 FPS |
+| Standard attacks / combos / recovery | 60 FPS |
+| Dash / movement skills / special action | 60 FPS |
+| Skills / ultimates / transformations | 60 FPS |
+| Enemy / boss attacks, idle, transitions and death | 60 FPS |
 
-- These ranges are **production targets**, not absolute limits: choose per move based on its actual duration, distance, playback speed, readability, and visual continuity.
-- Calculate desired distinct frames from `motion duration (seconds) × sprite FPS`; do **not** confuse the number of frames in one animation cycle with FPS.
-- Current approved **standard knight run** target: **24 distinct displayed poses per approximately 0.7-second cycle at the default run speed**, equivalent to **about 34.3 pose updates/second**. This explicitly approved move-specific target takes precedence over the general 16–32 FPS running guideline. Other movement speeds may alter its real-time cycle because locomotion animation is distance-driven.
-- Keep consistent character registration, foot contact and stance/swing timing, body proportions, helm/armor and sword silhouette, transparent pixels, cape continuity, and loop closure. Never increase frame count by simply duplicating/interpolating unstable silhouettes or letting limbs teleport/flicker.
-- When changing motion rates or frame counts, update both the runtime's animation mapping and corresponding atlas-generation/asset metadata. Do not claim a new 24-frame PNG has been authored when runtime is only selecting 24 poses out of an existing atlas.
-- Do not change gameplay movement speed, hitboxes, damage windows or cooldowns merely to achieve a sprite FPS target without specific approval.
-- Document any justified exceptions beside the motion. The owner verifies rendering and tests; never run GitHub Actions without their specific prior approval.
+1. **Frame planning:** `target distinct displayed frames = round(actual action duration in seconds × 60)`. Example: a 0.7-second running cycle requires 42 unique displayed poses. One 60-frame cycle is 60 FPS only if it plays in 1.0 second; 24 frames over 0.7 seconds are approximately 34.3 pose updates/second, **not** 60 FPS.
+2. **Original art:** Draw/manual-correct real intermediate pixel poses using coherent hand-authored keys. Do not pad the count by duplicating frames, repeating earlier poses, copying/warping/scaling raster pieces or using automatic interpolation as final artwork. Source reference rigs/motion capture may guide manual pose drawing but are not proof of approved pixel art.
+3. **Continuity:** Check feet and leg identity, grounded contact, center of mass, pelvis/torso/shoulder follow-through, attached hands/weapons, cape/hair drag, alpha/palette stability, and first-to-last loop closure at native scale and 60-FPS playback. Rapid attacks must keep anticipation, impact and recovery readable; use timing/pose design rather than changing gameplay mechanics.
+4. **Runtime and atlas:** Keep PNG sheet dimensions, frame counts, row/column indexes, playback duration, renderer sprite selection, and any distance-driven locomotion timing consistent. A 60-FPS renderer that displays fewer unique images is **not** a 60-FPS sprite-sheet animation. Record authored pose count and effective pose rate per action.
+5. **Gameplay invariance:** Do not alter movement speed, distance, jump physics, collision boxes, damage/hit windows, knockback, cooldowns or skill balance merely to satisfy 60 FPS. Preserve existing action durations unless a separate owner request approves changing one.
+6. **Migration and acceptance:** Apply the rule to all **new and revised** animation sheets immediately, and migrate existing sheets individually. Mark older files as **pending 60-FPS conversion** rather than claiming they already meet the standard. Completion requires real approved art PNGs, matching game runtime metadata/mapping, visual motion review, and explicit owner/device verification. The owner performs tests. **Never run GitHub Actions without specific prior owner approval.**
+7. **Exceptions:** Do not lower the target for stylistic reasons without the owner's explicit approval. If platform constraints require dropped or held poses at runtime, document the actual effective FPS as a performance exception, not as a 60-FPS authored animation.
 
 ## Character art: GitHub + ChatGPT Library working-copy bridge
 
