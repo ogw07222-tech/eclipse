@@ -117,3 +117,15 @@ For all ECLIPSE playable characters and enemies, animation **artwork** must be a
 - **A GitHub commit without its Library update is a partial result**, not a synchronized completion. If file size, tool limitations, permissions or an interrupted upload block updating Library, clearly report the divergence and required manual step; never silently declare both sides synchronized.
 - GitHub is authoritative for released/game assets; Library is a manually maintained mirror, not a live link. `main` commits made outside this ChatGPT work session cannot automatically change Library. At the next relevant interaction, detect the changed GitHub commit and reconcile explicitly.
 - Do **not** trigger GitHub Actions or user-owned tests just to synchronize. This policy does not grant approval for GitHub Actions runs.
+
+## Mandatory autonomous quality gate — repeat until accepted or blocked
+
+For ECLIPSE game assets, sprites, animation, and other implementation deliverables:
+
+1. Translate the request into concrete, verifiable acceptance criteria before production. For sprite work, include original character identity, actual transparent PNG frames, intended cell dimensions, true distinct authored poses at 60 poses per playback second, animation continuity, weapon/limb/foot contact, atlas metadata, and runtime integration where requested.
+2. Produce the actual requested deliverable, not a concept sheet, illustration of a sprite sheet, placeholder, or code-drawn character substituted for authored art. Use scripts only for packing, format conversion, metadata, and static checks, never to fabricate hand-authored animation frames.
+3. Inspect the result against every criterion. A generated image, successful script, frame count, or file existence is not proof of visual quality or runtime readiness.
+4. On any failed criterion, revise the defective frames or rebuild the asset and verify again **without asking the owner to say “retry”**. Repeat while tools and execution budget permit. Do not present a failing candidate as final or silently lower the acceptance threshold.
+5. Only label work complete after the applicable quality gates genuinely pass. Clearly distinguish static checks from owner-only runtime/device testing. Never claim a test or approval that did not occur.
+6. If tool availability, access, or execution limits prevent completion, update `TASK_PROGRESS.md` with completed steps, exact modified files, failed checks, remaining work, blockers, and precise next actions so a subsequent “이어서” resumes without duplicating work.
+7. Do not run GitHub Actions or owner-owned tests without the separately required explicit approval. Follow all GitHub/Library synchronization rules above.
