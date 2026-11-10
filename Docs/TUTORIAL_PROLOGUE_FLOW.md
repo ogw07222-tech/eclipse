@@ -73,3 +73,25 @@ These numbers are placeholders and must account for simultaneous enemy/performan
 
 ## Open design decisions
 Exact enemy numbers, HP and cooldown tuning, mid-boss identity, stage duration, cinematic timings, player starting level/skills after reincarnation, and exact forest layout remain to be finalized.
+
+
+## Flash Executioner — confirmed combat and animation specification (2026-11-10)
+
+This section is the owner's approved design specification. It supersedes any earlier speculative names or slash-based interpretations for this class. **Design documentation only**: implementation, balancing, sprite completion, and device validation are not asserted.
+
+| Input | Combat behavior | Required actor animation |
+| --- | --- | --- |
+| Basic attack / passive | Each successful basic-attack activation grants exactly one orbiting light orb, even when the same attack hits multiple enemies. Each orb increases attack speed, maximum five. No orb on a miss. | Distinct basic-attack strikes; orbiting orbs are separate visual layers, not baked into the actor. |
+| Skill 1 — Rush | Rapid forward charge applying the Flash mark to struck enemies. | Sword thrust straight ahead while charging; legs trail behind with one leg bent in a conventional lunging/dashing pose, **not** a Superman flight pose. Do not finish with a sword swing. |
+| Skill 2 — Command | Transform available light orbs into light lances and launch them together at randomly selected enemies. | Raise the **non-sword hand** and clench its fist to command simultaneous release. Sword does not swing. Lances are separate effect/projectile layers. |
+| Skill 3 — Blink | Teleport to the **farthest Flash-marked enemy**. | Distinct departure/disappearance and arrival/recovery poses; not a slash attack. |
+| Ultimate — Verdict | Drop exactly **20** light lances onto Flash-marked enemies, distributing counts as evenly as possible among eligible targets. | Raise the sword skyward; time freezes. First lances fall one by one, then a dense final rain. Preserve the raised-sword hold; do not replace it with a generic slash. |
+
+### Deterministic implementation notes / unresolved values
+
+- Orb gain is per successful basic-attack activation, not per target or damage tick. The precise attack-speed increment per orb, orb lifetime, and skill-2 consumption behavior beyond transformation remain to be specified.
+- For 20 ultimate lances across N eligible enemies, assign each target either floor(20/N) or ceil(20/N) when N <= 20; if N > 20, choose 20 targets by a documented deterministic rule. Exact target ordering and zero-eligible-target behavior remain unresolved.
+- Exact skill damage, cooldowns, Flash mark duration, invulnerability windows, and attack-frame timing must be checked against gameplay code before changing runtime behavior.
+- Actor sprites, light orbs, lances, teleport visuals and impact effects remain separate assets. Author each skill from distinct key poses, not from a shared sword-swing template.
+- Existing runtime clip identifiers `Slash`, `Rush`, `Command`, `Blink`, `Verdict` are implementation labels, **not** evidence that `Slash` is a separately named skill called '섬광 베기'.
+- Do not run GitHub Actions or cloud builds without explicit owner permission.
