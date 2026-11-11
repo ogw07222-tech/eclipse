@@ -95,3 +95,18 @@ This section is the owner's approved design specification. It supersedes any ear
 - Actor sprites, light orbs, lances, teleport visuals and impact effects remain separate assets. Author each skill from distinct key poses, not from a shared sword-swing template.
 - Existing runtime clip identifiers `Slash`, `Rush`, `Command`, `Blink`, `Verdict` are implementation labels, **not** evidence that `Slash` is a separately named skill called '섬광 베기'.
 - Do not run GitHub Actions or cloud builds without explicit owner permission.
+
+
+## Canonical class-based motion asset naming (2026-11-11)
+
+Use the character's canonical English class ID, not the animation's source name, as the asset prefix. For the Flash Executioner, the approved mapping is:
+
+| Role | Canonical asset filename | Legacy clip |
+| --- | --- | --- |
+| Basic attack | `executor.basic.mp4` | `slash.mp4` |
+| Skill 1 | `executor.skill1.mp4` | `rush.mp4` |
+| Skill 2 | `executor.skill2.mp4` | `command.mp4` |
+| Skill 3 | `executor.skill3.mp4` | `blink.mp4` |
+| Ultimate | `executor.ultimate.mp4` | `verdict.mp4` |
+
+Use the same stem for motion descriptions and skill descriptions. Preserve extension and class spelling consistently. Do not number basic attacks or ultimates as normal skills. This is an authoring/export convention; existing runtime identifiers, binary PNG paths, CMake packaging, and game logic are not renamed without an atomic migration of all references and verification. No GitHub Actions were run.
