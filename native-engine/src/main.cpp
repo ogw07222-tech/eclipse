@@ -196,12 +196,15 @@ void tick(eclipse::Actions action){
     if(action.restart){input.reset();keyState.fill(false);animation.reset();camera=640;}
     const int previousMotion=animation.state;
     game.cameraCenter=camera;
+    const unsigned respawnBefore=game.pitRespawnSerial;
     game.step(static_cast<float>(eclipse::fixedStep),action);
+    if(game.pitRespawnSerial!=respawnBefore)
+        camera=std::clamp(game.player.x,640.f,std::max(640.f,game.castleWorldWidth()-640.f));
     animation.step(game.player,static_cast<float>(eclipse::fixedStep));
     if(animation.state!=previousMotion)SDL_Log("ECLIPSE motion state=%d frame=%d",animation.state,animation.frame);
     if(action.inventory||action.swap||action.restart||action.weapon||action.armor||action.charm)
         SDL_Log("ECLIPSE state form=%d inventory=%d hp=%d foes=%d restart=%d weapon=%d armor=%d charm=%d",game.player.form,game.inventory,game.player.health,game.foes(),action.restart,game.player.gear.selected[0],game.player.gear.selected[1],game.player.gear.selected[2]);
-    camera+=(std::clamp(game.player.x,640.f,960.f)-camera)*(1-std::exp(-5*static_cast<float>(eclipse::fixedStep)));
+    camera+=(std::clamp(game.player.x,640.f,std::max(640.f,game.castleWorldWidth()-640.f))-camera)*(1-std::exp(-5*static_cast<float>(eclipse::fixedStep)));
 }
 void cleanup(){if(renderer)SDL_DestroyRenderer(renderer);if(window)SDL_DestroyWindow(window);SDL_Quit();}
 }
