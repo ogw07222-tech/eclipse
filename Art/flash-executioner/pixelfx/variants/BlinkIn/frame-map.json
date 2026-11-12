@@ -1,0 +1,140 @@
+[
+ {
+  "output": 0,
+  "sourceFrame": 0,
+  "sourceTime": 0,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 1,
+  "sourceFrame": 4,
+  "sourceTime": 0.06363636363636363,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 2,
+  "sourceFrame": 8,
+  "sourceTime": 0.12727272727272726,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 3,
+  "sourceFrame": 11,
+  "sourceTime": 0.1909090909090909,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 4,
+  "sourceFrame": 15,
+  "sourceTime": 0.2545454545454545,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 5,
+  "sourceFrame": 19,
+  "sourceTime": 0.3181818181818182,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 6,
+  "sourceFrame": 23,
+  "sourceTime": 0.3818181818181818,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 7,
+  "sourceFrame": 27,
+  "sourceTime": 0.44545454545454544,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 8,
+  "sourceFrame": 31,
+  "sourceTime": 0.509090909090909,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 9,
+  "sourceFrame": 34,
+  "sourceTime": 0.5727272727272728,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 10,
+  "sourceFrame": 38,
+  "sourceTime": 0.6363636363636364,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 11,
+  "sourceFrame": 42,
+  "sourceTime": 0.7,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 12,
+  "sourceFrame": 46,
+  "sourceTime": 0.7636363636363636,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 13,
+  "sourceFrame": 50,
+  "sourceTime": 0.8272727272727273,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 14,
+  "sourceFrame": 53,
+  "sourceTime": 0.8909090909090909,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 15,
+  "sourceFrame": 57,
+  "sourceTime": 0.9545454545454544,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 16,
+  "sourceFrame": 61,
+  "sourceTime": 1.018181818181818,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 17,
+  "sourceFrame": 65,
+  "sourceTime": 1.0818181818181818,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 18,
+  "sourceFrame": 69,
+  "sourceTime": 1.1454545454545455,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 19,
+  "sourceFrame": 73,
+  "sourceTime": 1.209090909090909,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 20,
+  "sourceFrame": 76,
+  "sourceTime": 1.2727272727272727,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 21,
+  "sourceFrame": 80,
+  "sourceTime": 1.3363636363636364,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 22,
+  "sourceFrame": 84,
+  "sourceTime": 1.4,
+  "alphaEnvelope": 1
+ }
+]

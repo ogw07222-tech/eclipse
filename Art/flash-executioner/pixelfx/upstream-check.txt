@@ -1,0 +1,15 @@
+ok    melee/sword-slash
+ok    melee/thrust
+ok    arcane/spell-charge
+ok    arcane/blink-out
+ok    arcane/blink-in
+ok    holy/holy-pillar
+ok    holy/smite
+ok    impacts/crit-hit
+ok    arcane/arcane-orb
+ok    ice/ice-lance
+ok    status/haste
+ok    impacts/heavy-landing
+ok    arcane/mana-burst
+
+13 effects: 13 pass, 0 fail, 0 with warnings

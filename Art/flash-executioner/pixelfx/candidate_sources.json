@@ -1,0 +1,247 @@
+{
+  "source_repo": "https://github.com/patch-gg/pixelfx",
+  "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+  "old_custom_recipes_reused": false,
+  "candidates": [
+    {
+      "role": "Slash",
+      "resource_id": "melee/sword-slash",
+      "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "source_sha256": "3abcde4466df41bddd1da0c9c9824aa2450185de39c61c3b7d156272dcc9327a",
+      "source_file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/source-original/fx/melee/sword-slash.js",
+      "original_contact": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/originals/melee/sword-slash/contact.png",
+      "note": "기존 선명한 crescent; 금빛 palette + 기존 radius 42→50 후보",
+      "proposed_changes_only": [
+        "palette",
+        "existing exposed options",
+        "uniform scale/registration",
+        "playback timing"
+      ],
+      "status": "original candidate; waiting main selection"
+    },
+    {
+      "role": "Rush",
+      "resource_id": "melee/thrust",
+      "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "source_sha256": "ac2f2257fafb9dec3bdcb8e75020db952e14810c700eea6b232be7b348eb261d",
+      "source_file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/source-original/fx/melee/thrust.js",
+      "original_contact": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/originals/melee/thrust/contact.png",
+      "note": "기존 관통찌르기/속도선; reach66→80 후보, slash없음",
+      "proposed_changes_only": [
+        "palette",
+        "existing exposed options",
+        "uniform scale/registration",
+        "playback timing"
+      ],
+      "status": "original candidate; waiting main selection"
+    },
+    {
+      "role": "Command",
+      "resource_id": "arcane/spell-charge",
+      "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "source_sha256": "cc424b77b0b989a8dfc7fae793848c2be0966bde0248a14699ad2733d1e4bec0",
+      "source_file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/source-original/fx/arcane/spell-charge.js",
+      "original_contact": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/originals/arcane/spell-charge/contact.png",
+      "note": "기존 손의 충전구; gold palette, 원본loop의 짧은재생. 대안 lightning/charge-up은폭발형",
+      "proposed_changes_only": [
+        "palette",
+        "existing exposed options",
+        "uniform scale/registration",
+        "playback timing"
+      ],
+      "status": "original candidate; waiting main selection"
+    },
+    {
+      "role": "BlinkOut",
+      "resource_id": "arcane/blink-out",
+      "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "source_sha256": "5554d07dd8e29d912f9bf3a8440d36369f3d6843f73ec59dfd33e4ac3b0c3186",
+      "source_file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/source-original/fx/arcane/blink-out.js",
+      "original_contact": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/originals/arcane/blink-out/contact.png",
+      "note": "기존 mask기반 소멸; 원본stockActor를 실제집행자mask입력으로 교체해야함",
+      "proposed_changes_only": [
+        "palette",
+        "existing exposed options",
+        "uniform scale/registration",
+        "playback timing"
+      ],
+      "status": "original candidate; waiting main selection"
+    },
+    {
+      "role": "BlinkIn",
+      "resource_id": "arcane/blink-in",
+      "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "source_sha256": "b5439fbdb31b26b45038164f4f5d129445eaa5b8aa4ec111c28bfbd0c325661e",
+      "source_file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/source-original/fx/arcane/blink-in.js",
+      "original_contact": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/originals/arcane/blink-in/contact.png",
+      "note": "기존 mask기반 출현; 같은실제actor등록필수",
+      "proposed_changes_only": [
+        "palette",
+        "existing exposed options",
+        "uniform scale/registration",
+        "playback timing"
+      ],
+      "status": "original candidate; waiting main selection"
+    },
+    {
+      "role": "Verdict",
+      "resource_id": "holy/holy-pillar",
+      "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "source_sha256": "d65de3c0a32bf6c0816a5729248efcbb128290d6ce980ed8130eea8016d137e3",
+      "source_file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/source-original/fx/holy/holy-pillar.js",
+      "original_contact": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/originals/holy/holy-pillar/contact.png",
+      "note": "기존하늘광선fan원본보존; actor뒤배치, shafts7 유지",
+      "proposed_changes_only": [
+        "palette",
+        "existing exposed options",
+        "uniform scale/registration",
+        "playback timing"
+      ],
+      "status": "original candidate; waiting main selection"
+    },
+    {
+      "role": "Impact",
+      "resource_id": "impacts/crit-hit",
+      "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "source_sha256": "c6af9303f0e463051696796a5886236d91182594e1d4fadee2067b9cf82ba857",
+      "source_file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/source-original/fx/impacts/crit-hit.js",
+      "original_contact": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/originals/impacts/crit-hit/contact.png",
+      "note": "기존강한whitehit와spark gold그대로",
+      "proposed_changes_only": [
+        "palette",
+        "existing exposed options",
+        "uniform scale/registration",
+        "playback timing"
+      ],
+      "status": "original candidate; waiting main selection"
+    },
+    {
+      "role": "Orb",
+      "resource_id": "arcane/arcane-orb",
+      "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "source_sha256": "22e7651d13482d9558b3ade048f86322ae0c116cf88f2834d7dd373499ebde9f",
+      "source_file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/source-original/fx/arcane/arcane-orb.js",
+      "original_contact": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/originals/arcane/arcane-orb/contact.png",
+      "note": "기존다중궤도orb; 축소scale와palette만변경",
+      "proposed_changes_only": [
+        "palette",
+        "existing exposed options",
+        "uniform scale/registration",
+        "playback timing"
+      ],
+      "status": "original candidate; waiting main selection"
+    },
+    {
+      "role": "Lance",
+      "resource_id": "ice/ice-lance",
+      "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "source_sha256": "4d5168e7ce7a5fc1f37e150c6d8227258962833d47e7b42dcc3da792f2e063a4",
+      "source_file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/source-original/fx/ice/ice-lance.js",
+      "original_contact": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/originals/ice/ice-lance/contact.png",
+      "note": "기존faceted spear+tail+ring; gold palette변경하면빛창",
+      "proposed_changes_only": [
+        "palette",
+        "existing exposed options",
+        "uniform scale/registration",
+        "playback timing"
+      ],
+      "status": "original candidate; waiting main selection"
+    },
+    {
+      "role": "SkyLance",
+      "resource_id": "ice/ice-lance",
+      "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "source_sha256": "4d5168e7ce7a5fc1f37e150c6d8227258962833d47e7b42dcc3da792f2e063a4",
+      "source_file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/source-original/fx/ice/ice-lance.js",
+      "original_contact": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/originals/ice/ice-lance/contact.png",
+      "note": "Lance동일원본resource90도회전만등록,20개수량은runtime",
+      "proposed_changes_only": [
+        "palette",
+        "existing exposed options",
+        "uniform scale/registration",
+        "playback timing"
+      ],
+      "status": "original candidate; waiting main selection"
+    },
+    {
+      "role": "LanceHit",
+      "resource_id": "holy/smite",
+      "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "source_sha256": "f0958ff226cb9114de31722b917c50867f715b9029f210c251186565895ea69b",
+      "source_file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/source-original/fx/holy/smite.js",
+      "original_contact": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/originals/holy/smite/contact.png",
+      "note": "기존single하늘강타와균열/먼지; 대상바닥anchor",
+      "proposed_changes_only": [
+        "palette",
+        "existing exposed options",
+        "uniform scale/registration",
+        "playback timing"
+      ],
+      "status": "original candidate; waiting main selection"
+    },
+    {
+      "role": "Dash",
+      "resource_id": "status/haste",
+      "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "source_sha256": "141fb1c06ebe581afd7d76a2f8ea6f7dd67e4b8babbd1417b5eb787bf4cb1946",
+      "source_file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/source-original/fx/status/haste.js",
+      "original_contact": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/originals/status/haste/contact.png",
+      "note": "기존bodymask기반잔상. 실제집행자mask등록필수",
+      "proposed_changes_only": [
+        "palette",
+        "existing exposed options",
+        "uniform scale/registration",
+        "playback timing"
+      ],
+      "status": "original candidate; waiting main selection"
+    },
+    {
+      "role": "Jump",
+      "resource_id": "impacts/heavy-landing",
+      "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "source_sha256": "317027b70876cdbc974d74c982935e698327215fdd98335ec5c98cf984aed6a7",
+      "source_file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/source-original/fx/impacts/heavy-landing.js",
+      "original_contact": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/originals/impacts/heavy-landing/contact.png",
+      "note": "정확한jump-takeoff기존resource 없음. 같은착지먼지효과앞부분을작게재사용후보, 승인없으면새fx미제작",
+      "proposed_changes_only": [
+        "palette",
+        "existing exposed options",
+        "uniform scale/registration",
+        "playback timing"
+      ],
+      "status": "original candidate; waiting main selection"
+    },
+    {
+      "role": "Land",
+      "resource_id": "impacts/heavy-landing",
+      "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "source_sha256": "317027b70876cdbc974d74c982935e698327215fdd98335ec5c98cf984aed6a7",
+      "source_file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/source-original/fx/impacts/heavy-landing.js",
+      "original_contact": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/originals/impacts/heavy-landing/contact.png",
+      "note": "기존먼지/돌튀김착지 그대로, palette만연한금색",
+      "proposed_changes_only": [
+        "palette",
+        "existing exposed options",
+        "uniform scale/registration",
+        "playback timing"
+      ],
+      "status": "original candidate; waiting main selection"
+    },
+    {
+      "role": "Swap",
+      "resource_id": "arcane/mana-burst",
+      "source_commit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "source_sha256": "5e13cd03df803020cdae40c62b9113548d41ca1a1c268c6221616413840b06ee",
+      "source_file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/source-original/fx/arcane/mana-burst.js",
+      "original_contact": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/originals/arcane/mana-burst/contact.png",
+      "note": "기존mana폭발; gold palette와타이밍만축약",
+      "proposed_changes_only": [
+        "palette",
+        "existing exposed options",
+        "uniform scale/registration",
+        "playback timing"
+      ],
+      "status": "original candidate; waiting main selection"
+    }
+  ]
+}

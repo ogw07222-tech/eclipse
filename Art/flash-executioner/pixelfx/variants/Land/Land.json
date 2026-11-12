@@ -1,0 +1,585 @@
+{
+ "frames": [
+  {
+   "filename": "Land 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 1",
+   "frame": {
+    "x": 208,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 2",
+   "frame": {
+    "x": 416,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 3",
+   "frame": {
+    "x": 624,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 4",
+   "frame": {
+    "x": 0,
+    "y": 128,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 5",
+   "frame": {
+    "x": 208,
+    "y": 128,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 6",
+   "frame": {
+    "x": 416,
+    "y": 128,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 7",
+   "frame": {
+    "x": 624,
+    "y": 128,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 8",
+   "frame": {
+    "x": 0,
+    "y": 256,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 9",
+   "frame": {
+    "x": 208,
+    "y": 256,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 10",
+   "frame": {
+    "x": 416,
+    "y": 256,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 11",
+   "frame": {
+    "x": 624,
+    "y": 256,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 12",
+   "frame": {
+    "x": 0,
+    "y": 384,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 13",
+   "frame": {
+    "x": 208,
+    "y": 384,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 14",
+   "frame": {
+    "x": 416,
+    "y": 384,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 15",
+   "frame": {
+    "x": 624,
+    "y": 384,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 16",
+   "frame": {
+    "x": 0,
+    "y": 512,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 17",
+   "frame": {
+    "x": 208,
+    "y": 512,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Land 18",
+   "frame": {
+    "x": 416,
+    "y": 512,
+    "w": 208,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 128
+   },
+   "duration": 17
+  }
+ ],
+ "meta": {
+  "app": "https://github.com/patch-gg/pixelfx",
+  "version": "1",
+  "image": "Land.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 832,
+   "h": 640
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "Land",
+    "from": 0,
+    "to": 18,
+    "direction": "forward"
+   }
+  ],
+  "pixelfx": {
+   "id": "executor-v2/land",
+   "name": "Heavy landing",
+   "fps": 60,
+   "loop": false,
+   "frames": 19,
+   "frameSize": [
+    208,
+    128
+   ],
+   "pivot": [
+    104,
+    88
+   ],
+   "columns": 4,
+   "act": {
+    "windup": 0.26,
+    "recovery": 1.3,
+    "onBody": false,
+    "targets": [],
+    "hits": [
+     {
+      "t": 0.005,
+      "freeze": 0.13,
+      "shake": 0.32,
+      "amp": 3,
+      "push": 1.2
+     }
+    ],
+    "poses": [
+     {
+      "t": -0.26,
+      "how": "smooth",
+      "pose": {
+       "turn": 0.8,
+       "y": -46,
+       "crouch": -1,
+       "lean": -1,
+       "fx": -9,
+       "fy": -42,
+       "bx": 10,
+       "by": -42,
+       "ffx": 6,
+       "ffy": -8,
+       "fbx": -3,
+       "fby": -3,
+       "toeB": true,
+       "ghost": 1
+      }
+     },
+     {
+      "t": -0.01,
+      "how": "in",
+      "pose": {
+       "turn": 0.8,
+       "y": -6,
+       "crouch": -1,
+       "lean": -1,
+       "fx": -9,
+       "fy": -42,
+       "bx": 10,
+       "by": -42,
+       "ffx": 6,
+       "ffy": -8,
+       "fbx": -3,
+       "fby": -3,
+       "toeB": true,
+       "ghost": 1
+      }
+     },
+     {
+      "t": 0,
+      "how": "snap",
+      "pose": {
+       "y": 0,
+       "crouch": 8,
+       "lean": 5,
+       "fx": 13,
+       "fy": -8,
+       "bx": -6,
+       "by": -23,
+       "ffx": 11,
+       "fbx": -10
+      }
+     },
+     {
+      "t": 0.55,
+      "how": "smooth",
+      "pose": {
+       "y": 0,
+       "crouch": 7,
+       "lean": 5,
+       "fx": 13,
+       "fy": -8,
+       "bx": -6,
+       "by": -23,
+       "ffx": 11,
+       "fbx": -10
+      }
+     },
+     {
+      "t": 0.95,
+      "how": "smooth",
+      "pose": {
+       "y": 0,
+       "crouch": 5,
+       "lean": 3,
+       "fx": 13,
+       "fy": -15,
+       "bx": -5,
+       "by": -20,
+       "ffx": 11,
+       "fbx": -10
+      }
+     },
+     {
+      "t": 1.3,
+      "how": "smooth",
+      "pose": {
+       "crouch": 3,
+       "fx": 11,
+       "fy": -21,
+       "bx": 9,
+       "by": -21,
+       "ffx": 7,
+       "fbx": -7
+      }
+     },
+     {
+      "t": 1.6,
+      "how": "smooth",
+      "pose": {
+       "crouch": 3,
+       "fx": 11,
+       "fy": -21,
+       "bx": 9,
+       "by": -21,
+       "ffx": 7,
+       "fbx": -7
+      }
+     }
+    ]
+   }
+  }
+ }
+}

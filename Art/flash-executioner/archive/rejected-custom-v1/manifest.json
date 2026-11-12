@@ -1,0 +1,413 @@
+{
+  "status": "candidate pending main visual review",
+  "generator": "pixelfx",
+  "generation_cost": 0,
+  "fps": 60,
+  "source_repo": "https://github.com/patch-gg/pixelfx",
+  "effects": [
+    {
+      "role": "Slash",
+      "name": "basic-slash",
+      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/basic-slash/basic-slash.png",
+      "cell": [
+        256,
+        224
+      ],
+      "columns": 5,
+      "rows": 5,
+      "count": 25,
+      "pivot": [
+        116,
+        163
+      ],
+      "scale": 1.0,
+      "duration": 0.4,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "Attack contact .184s",
+      "sha256": "fbeb2f5ef4ea74664e04175dc2f2c2014c24f6afe263fc7596ccf41895e6d30d",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 24
+    },
+    {
+      "role": "Rush",
+      "name": "rush-trail",
+      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/rush-trail/rush-trail.png",
+      "cell": [
+        320,
+        176
+      ],
+      "columns": 4,
+      "rows": 6,
+      "count": 22,
+      "pivot": [
+        190,
+        132
+      ],
+      "scale": 1.0,
+      "duration": 0.35,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "Skill1 contact .125s",
+      "sha256": "2433a6c03d6006d01fe7413114e1a4756e1f7c95093b277a01992d728965d5f1",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 20
+    },
+    {
+      "role": "Command",
+      "name": "command-release",
+      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/command-release/command-release.png",
+      "cell": [
+        224,
+        200
+      ],
+      "columns": 5,
+      "rows": 5,
+      "count": 25,
+      "pivot": [
+        112,
+        154
+      ],
+      "scale": 1.0,
+      "duration": 0.4,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "Skill2 contact .23s",
+      "sha256": "e11cc72d79bfe5eb6645f0aeb39341a0dbf9ddc7ffe0395d1f6447fdbddd0bea",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 24
+    },
+    {
+      "role": "BlinkOut",
+      "name": "blink-depart",
+      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/blink-depart/blink-depart.png",
+      "cell": [
+        224,
+        208
+      ],
+      "columns": 5,
+      "rows": 4,
+      "count": 20,
+      "pivot": [
+        112,
+        160
+      ],
+      "scale": 1.0,
+      "duration": 0.32,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "Skill3 starts, source world location",
+      "sha256": "05c52d6aac71678cbdfcd23d86df234723c490cfdd8b03a2a765d138ff18612d",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 19
+    },
+    {
+      "role": "BlinkIn",
+      "name": "blink-arrive",
+      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/blink-arrive/blink-arrive.png",
+      "cell": [
+        224,
+        208
+      ],
+      "columns": 5,
+      "rows": 5,
+      "count": 23,
+      "pivot": [
+        112,
+        160
+      ],
+      "scale": 1.0,
+      "duration": 0.36,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "Skill3 contact .15s, destination world location",
+      "sha256": "9d3e73d6a0cc338aeb1163ee3a32df5d1e02991b91af5fbb59f8e1ae1f828bef",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 21
+    },
+    {
+      "role": "Verdict",
+      "name": "verdict-charge",
+      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/verdict-charge/verdict-charge.png",
+      "cell": [
+        288,
+        256
+      ],
+      "columns": 7,
+      "rows": 7,
+      "count": 45,
+      "pivot": [
+        144,
+        206
+      ],
+      "scale": 1.0,
+      "duration": 0.728,
+      "fps": 60,
+      "loop": false,
+      "layer": "back",
+      "trigger": "Ultimate starts, attach to actor feet",
+      "sha256": "91f4e3fc12fed1fd0fb13e1880d8095015a6186309b51da758dc0c2911dd115d",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 43
+    },
+    {
+      "role": "Impact",
+      "name": "light-impact",
+      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/light-impact/light-impact.png",
+      "cell": [
+        224,
+        200
+      ],
+      "columns": 6,
+      "rows": 6,
+      "count": 31,
+      "pivot": [
+        112,
+        130
+      ],
+      "scale": 1.0,
+      "duration": 0.5,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "actual basic/rush enemy impact",
+      "sha256": "85604a1229cd4fceb9b95ad5bb83a5d8547aa029b6c8c5db1b6913a0f08d6a9c",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 30
+    },
+    {
+      "role": "Orb",
+      "name": "light-orb",
+      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/light-orb/light-orb.png",
+      "cell": [
+        48,
+        48
+      ],
+      "columns": 8,
+      "rows": 8,
+      "count": 60,
+      "pivot": [
+        24,
+        24
+      ],
+      "scale": 1.0,
+      "duration": 1.0,
+      "fps": 60,
+      "loop": true,
+      "layer": "front",
+      "trigger": "one per existing stored orb, gameplay orbit location",
+      "sha256": "4dd4f55b4443acf0b2aa726948e89b5d0eed83c36921e0aa29177a527124b915",
+      "empty_first": false,
+      "empty_last": false,
+      "unique_frames": 57
+    },
+    {
+      "role": "Lance",
+      "name": "light-lance",
+      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/light-lance/light-lance.png",
+      "cell": [
+        192,
+        80
+      ],
+      "columns": 3,
+      "rows": 7,
+      "count": 19,
+      "pivot": [
+        90,
+        45
+      ],
+      "scale": 0.85,
+      "duration": 0.3,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "existing projectile world location and flight rotation",
+      "sha256": "6ce03cb08c2a50b8a74d5f17ddb822840f0c95b7fac9a8bc40963548b371cf18",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 9,
+      "flightFrameRange": [
+        3,
+        8
+      ],
+      "flightFrameFps": 60,
+      "flightFramePolicy": "cycle inclusive frames3..8 using per-projectile visualFlightAge until actual collision, excluding fade endpoints",
+      "nativeDirectionDegrees": 0
+    },
+    {
+      "role": "SkyLance",
+      "name": "sky-lance",
+      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/sky-lance/sky-lance.png",
+      "cell": [
+        80,
+        208
+      ],
+      "columns": 8,
+      "rows": 3,
+      "count": 20,
+      "pivot": [
+        40,
+        152
+      ],
+      "scale": 0.85,
+      "duration": 0.32,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "existing verdict projectile world location, vertically downward; do not rotate twice",
+      "sha256": "61dba045d28a2a818daf311c34e7f847ef62377d028f63f3b4bb1c6c5cb87d91",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 10,
+      "flightFrameRange": [
+        3,
+        8
+      ],
+      "flightFrameFps": 60,
+      "flightFramePolicy": "cycle inclusive frames3..8 using per-projectile visualFlightAge until actual collision, excluding fade endpoints",
+      "nativeDirectionDegrees": 90
+    },
+    {
+      "role": "LanceHit",
+      "name": "verdict-impact",
+      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/verdict-impact/verdict-impact.png",
+      "cell": [
+        336,
+        320
+      ],
+      "columns": 7,
+      "rows": 6,
+      "count": 40,
+      "pivot": [
+        168,
+        232
+      ],
+      "scale": 1.0,
+      "duration": 0.65,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "existing verdict projectile collision",
+      "sha256": "948a8b8f0286b15fe826ca43fea8bb2696c0718db31396905a548fda05f9d80f",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 38
+    },
+    {
+      "role": "Dash",
+      "name": "dash-trail",
+      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/dash-trail/dash-trail.png",
+      "cell": [
+        256,
+        160
+      ],
+      "columns": 4,
+      "rows": 4,
+      "count": 16,
+      "pivot": [
+        150,
+        122
+      ],
+      "scale": 1.0,
+      "duration": 0.25,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "normal dash start",
+      "sha256": "a292088ad8e2ae224dd6ba033d4e6c8b305ef6db040918b4f8f403e958c6fdcb",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 15
+    },
+    {
+      "role": "Jump",
+      "name": "jump-takeoff",
+      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/jump-takeoff/jump-takeoff.png",
+      "cell": [
+        208,
+        176
+      ],
+      "columns": 4,
+      "rows": 4,
+      "count": 16,
+      "pivot": [
+        104,
+        100
+      ],
+      "scale": 1.0,
+      "duration": 0.25,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "jump takeoff edge",
+      "sha256": "f9060d4476d378a88d68545a53a854a67514c8a13a69d62b26e5f7dcfdb419ad",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 15
+    },
+    {
+      "role": "Land",
+      "name": "landing",
+      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/landing/landing.png",
+      "cell": [
+        208,
+        176
+      ],
+      "columns": 5,
+      "rows": 4,
+      "count": 19,
+      "pivot": [
+        104,
+        100
+      ],
+      "scale": 1.0,
+      "duration": 0.3,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "grounded landing edge",
+      "sha256": "38c319e451b8e5658d5a606c52c6d29cb10f4ccbbc6b49ba8926950ede419835",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 17
+    },
+    {
+      "role": "Swap",
+      "name": "class-swap",
+      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/class-swap/class-swap.png",
+      "cell": [
+        256,
+        224
+      ],
+      "columns": 5,
+      "rows": 5,
+      "count": 25,
+      "pivot": [
+        128,
+        172
+      ],
+      "scale": 1.0,
+      "duration": 0.4,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "equipped class swap start",
+      "sha256": "93db8054d094cc6bde4b28621771d837502eb2a3a90902b7c39cbfce42c18494",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 24
+    }
+  ]
+}

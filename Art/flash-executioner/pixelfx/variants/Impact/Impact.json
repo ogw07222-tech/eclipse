@@ -1,0 +1,721 @@
+{
+ "frames": [
+  {
+   "filename": "Impact 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 1",
+   "frame": {
+    "x": 320,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 2",
+   "frame": {
+    "x": 640,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 3",
+   "frame": {
+    "x": 960,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 4",
+   "frame": {
+    "x": 1280,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 5",
+   "frame": {
+    "x": 0,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 6",
+   "frame": {
+    "x": 320,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 7",
+   "frame": {
+    "x": 640,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 8",
+   "frame": {
+    "x": 960,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 9",
+   "frame": {
+    "x": 1280,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 10",
+   "frame": {
+    "x": 0,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 11",
+   "frame": {
+    "x": 320,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 12",
+   "frame": {
+    "x": 640,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 13",
+   "frame": {
+    "x": 960,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 14",
+   "frame": {
+    "x": 1280,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 15",
+   "frame": {
+    "x": 0,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 16",
+   "frame": {
+    "x": 320,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 17",
+   "frame": {
+    "x": 640,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 18",
+   "frame": {
+    "x": 960,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 19",
+   "frame": {
+    "x": 1280,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 20",
+   "frame": {
+    "x": 0,
+    "y": 896,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 21",
+   "frame": {
+    "x": 320,
+    "y": 896,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 22",
+   "frame": {
+    "x": 640,
+    "y": 896,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 23",
+   "frame": {
+    "x": 960,
+    "y": 896,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 24",
+   "frame": {
+    "x": 1280,
+    "y": 896,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 25",
+   "frame": {
+    "x": 0,
+    "y": 1120,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 26",
+   "frame": {
+    "x": 320,
+    "y": 1120,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 27",
+   "frame": {
+    "x": 640,
+    "y": 1120,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 28",
+   "frame": {
+    "x": 960,
+    "y": 1120,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 29",
+   "frame": {
+    "x": 1280,
+    "y": 1120,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Impact 30",
+   "frame": {
+    "x": 0,
+    "y": 1344,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  }
+ ],
+ "meta": {
+  "app": "https://github.com/patch-gg/pixelfx",
+  "version": "1",
+  "image": "Impact.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1600,
+   "h": 1568
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "Impact",
+    "from": 0,
+    "to": 30,
+    "direction": "forward"
+   }
+  ],
+  "pixelfx": {
+   "id": "executor-v2/impact",
+   "name": "Critical hit",
+   "fps": 60,
+   "loop": false,
+   "frames": 31,
+   "frameSize": [
+    320,
+    224
+   ],
+   "pivot": [
+    130,
+    112
+   ],
+   "columns": 5
+  }
+ }
+}

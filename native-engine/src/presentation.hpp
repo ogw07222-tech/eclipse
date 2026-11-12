@@ -909,6 +909,7 @@ public:
     }
     void reviewedFlashSprite(const FlashSheet& sheet,SDL_Texture* texture,int frame,float x,float y,int facing,Uint8 alpha=255,double angle=0){
         if(!texture||!sheet.file)return;
+        x+=sheet.offsetX*facing;y+=sheet.offsetY;
         frame=std::clamp(frame,0,sheet.count-1);
         const SDL_FRect source{float(frame%sheet.columns*sheet.cellW),float(frame/sheet.columns*sheet.cellH),float(sheet.cellW),float(sheet.cellH)};
         const float anchorX=facing>0?sheet.pivotX:sheet.cellW-sheet.pivotX;
@@ -938,10 +939,23 @@ public:
         const float duration=playbackDuration>0?playbackDuration:sheet.duration;
         if(!sheet.loop&&(age<0||age>=duration))return false;
         const float t=sheet.loop?std::fmod(std::max(0.f,age),duration):age;
-        reviewedFlashSprite(sheet,flashFxTextures_[index],reviewedFlashFrame(sheet,t,duration),x,y,facing,255,angle);
+        const int frame=std::clamp(static_cast<int>(t*sheet.fps),0,sheet.count-1);
+        reviewedFlashSprite(sheet,flashFxTextures_[index],frame,x,y,facing,255,angle);
         return true;
     }
 
+    static float reviewedFlashImpactY(const Combat& g,FlashFx role,const LightBurst& burst){
+        if(!flashEffects[static_cast<int>(role)].targetFeet)return burst.y;
+        // Only effects explicitly reviewed as ground-authored use target feet.
+        float ground=burst.y,best=128.f;
+        for(const auto& enemy:g.enemies){
+            const auto bounds=enemyBounds(enemy);
+            const float distance=std::abs(enemy.x-burst.x)+
+                std::abs((bounds.top+bounds.bottom)*.5f-burst.y);
+            if(distance<best){best=distance;ground=enemy.y;}
+        }
+        return ground;
+    }
     void updateReviewedFlashEffects(const Combat& g,const Animation& a){
         if(g.clock==reviewedFlashClock_)return;
         const auto& p=g.player;
@@ -956,8 +970,10 @@ public:
             [&](const ReviewedFlashEvent& event){return g.clock-event.born>=flashEffects[static_cast<int>(event.role)].duration;}),
             reviewedFlashEvents_.end());
         auto spawn=[&](FlashFx role,float x,float y,int facing,bool follow,float delay=0.f){
-            if(hasReviewedFlashFx(role))
-                reviewedFlashEvents_.push_back({role,x,y,g.clock-delay,facing,follow});
+            if(hasReviewedFlashFx(role)){
+                const auto& sheet=flashEffects[static_cast<int>(role)];
+                reviewedFlashEvents_.push_back({role,x,y,g.clock-delay-sheet.spawnAgeSeconds,facing,follow});
+            }
         };
         const bool newMove=p.whiteMove!=reviewedFlashMove_||p.whiteAge<reviewedFlashMoveAge_;
         const float before=newMove?0.f:reviewedFlashMoveAge_;
@@ -971,10 +987,21 @@ public:
                 case WhiteMove::Verdict:role=FlashFx::Verdict;trigger=0;break;
                 default:break;
             }
+            const float speed=p.whiteMove==WhiteMove::Slash?std::max(.001f,p.whiteSlashSpeed):1.f;
+            // Reviewed source anticipation/peak timing is expressed in real
+            // effect seconds. Preserve gameplay contact even with attack boosts.
+            const auto& fxSheet=flashEffects[static_cast<int>(role)];
+            float skippedPrelude=0;
+            if(fxSheet.triggerStartAgeSeconds>=0){
+                trigger=fxSheet.triggerStartAgeSeconds;
+            }else if(trigger>0){
+                trigger-=fxSheet.triggerLeadSeconds*speed;
+                skippedPrelude=std::max(0.f,-trigger/speed);
+                trigger=std::max(0.f,trigger);
+            }
             if((newMove&&trigger==0)||(before<trigger&&p.whiteAge>=trigger))
                 spawn(role,p.x,p.y,p.facing,p.whiteMove!=WhiteMove::Blink,
-                      std::max(0.f,p.whiteAge-trigger)/
-                      (p.whiteMove==WhiteMove::Slash?std::max(.001f,p.whiteSlashSpeed):1.f));
+                      std::max(0.f,p.whiteAge-trigger)/speed+skippedPrelude);
         }
         for(const auto& burst:g.lightBursts){
             if(burst.visualSerial<=reviewedFlashBurstSerial_)continue;
@@ -988,19 +1015,11 @@ public:
                         return other.kind==LightFx::Verdict&&std::abs(other.life-burst.life)<.001f&&
                                std::abs(other.x-burst.x)<1.f&&std::abs(other.y-burst.y)<1.f;
                     });
-                // Impact source draws its focal point30px above its origin.
-                if(!verdictPair)spawn(FlashFx::Impact,burst.x,burst.y+30.f,burst.facing,false,age);
+                if(!verdictPair)spawn(FlashFx::Impact,burst.x,
+                    reviewedFlashImpactY(g,FlashFx::Impact,burst),burst.facing,false,age);
             }else if(burst.kind==LightFx::Verdict){
-                // Verdict impact is ground-authored. Locate the actual target's
-                // feet from this collision's center without altering combat.
-                float ground=burst.y+38.f,best=128.f;
-                for(const auto& enemy:g.enemies){
-                    const auto bounds=enemyBounds(enemy);
-                    const float distance=std::abs(enemy.x-burst.x)+
-                        std::abs((bounds.top+bounds.bottom)*.5f-burst.y);
-                    if(distance<best){best=distance;ground=enemy.y;}
-                }
-                spawn(FlashFx::LanceHit,burst.x,ground,burst.facing,false,age);
+                spawn(FlashFx::LanceHit,burst.x,reviewedFlashImpactY(g,FlashFx::LanceHit,burst),
+                      burst.facing,false,age);
             }else if(burst.kind==LightFx::Arrive&&p.whiteMove==WhiteMove::Blink)
                 spawn(FlashFx::BlinkIn,burst.x,burst.y+48.f,burst.facing,false,age);
         }
@@ -1040,12 +1059,12 @@ public:
             if(sheet.flightFirst>=0&&sheet.flightLast>=sheet.flightFirst){
                 const int span=sheet.flightLast-sheet.flightFirst+1;
                 const int frame=sheet.flightFirst+
-                    static_cast<int>(lance.visualFlightAge*60.f)%span;
+                    static_cast<int>(lance.visualFlightAge*sheet.flightFrameFps)%span;
                 reviewedFlashSprite(sheet,flashFxTextures_[index],frame,lance.x,lance.y,1,255,
-                                    lance.angle-(lance.verdict?90.f:0.f));
+                                    lance.angle-sheet.nativeDirectionDegrees);
             }else{
                 reviewedFlashFx(role,lance.visualFlightAge,lance.x,lance.y,1,front,
-                                lance.angle-(lance.verdict?90.f:0.f));
+                                lance.angle-sheet.nativeDirectionDegrees);
             }
         }
     }

@@ -1,0 +1,665 @@
+{
+ "frames": [
+  {
+   "filename": "Rush 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 1",
+   "frame": {
+    "x": 320,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 2",
+   "frame": {
+    "x": 640,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 3",
+   "frame": {
+    "x": 960,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 4",
+   "frame": {
+    "x": 0,
+    "y": 160,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 5",
+   "frame": {
+    "x": 320,
+    "y": 160,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 6",
+   "frame": {
+    "x": 640,
+    "y": 160,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 7",
+   "frame": {
+    "x": 960,
+    "y": 160,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 8",
+   "frame": {
+    "x": 0,
+    "y": 320,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 9",
+   "frame": {
+    "x": 320,
+    "y": 320,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 10",
+   "frame": {
+    "x": 640,
+    "y": 320,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 11",
+   "frame": {
+    "x": 960,
+    "y": 320,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 12",
+   "frame": {
+    "x": 0,
+    "y": 480,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 13",
+   "frame": {
+    "x": 320,
+    "y": 480,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 14",
+   "frame": {
+    "x": 640,
+    "y": 480,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 15",
+   "frame": {
+    "x": 960,
+    "y": 480,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 16",
+   "frame": {
+    "x": 0,
+    "y": 640,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 17",
+   "frame": {
+    "x": 320,
+    "y": 640,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 18",
+   "frame": {
+    "x": 640,
+    "y": 640,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 19",
+   "frame": {
+    "x": 960,
+    "y": 640,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 20",
+   "frame": {
+    "x": 0,
+    "y": 800,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Rush 21",
+   "frame": {
+    "x": 320,
+    "y": 800,
+    "w": 320,
+    "h": 160
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 160
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 160
+   },
+   "duration": 17
+  }
+ ],
+ "meta": {
+  "app": "https://github.com/patch-gg/pixelfx",
+  "version": "1",
+  "image": "Rush.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1280,
+   "h": 960
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "Rush",
+    "from": 0,
+    "to": 21,
+    "direction": "forward"
+   }
+  ],
+  "pixelfx": {
+   "id": "executor-v2/rush",
+   "name": "Thrust",
+   "fps": 60,
+   "loop": false,
+   "frames": 22,
+   "frameSize": [
+    320,
+    160
+   ],
+   "pivot": [
+    80,
+    110
+   ],
+   "columns": 4,
+   "act": {
+    "windup": 0.46,
+    "recovery": 0.35,
+    "onBody": false,
+    "targets": [
+     80
+    ],
+    "hits": [
+     {
+      "t": 0.07,
+      "freeze": 0.12,
+      "shake": 0.14,
+      "amp": 2,
+      "push": 2.8
+     }
+    ],
+    "poses": [
+     {
+      "t": -0.46,
+      "how": "smooth",
+      "pose": {
+       "crouch": 3,
+       "fx": 12,
+       "fy": -21,
+       "bx": 9,
+       "by": -21,
+       "ffx": 7,
+       "fbx": -7,
+       "weapon": "sword",
+       "x": -14,
+       "sa": -0.3
+      }
+     },
+     {
+      "t": -0.24,
+      "how": "smooth",
+      "pose": {
+       "crouch": 5,
+       "fx": -3,
+       "fy": -19,
+       "bx": 8,
+       "by": -30,
+       "ffx": 10,
+       "fbx": -8,
+       "weapon": "sword",
+       "x": -14,
+       "sa": -0.05,
+       "lean": -3,
+       "armsFront": true
+      }
+     },
+     {
+      "t": -0.05,
+      "how": "smooth",
+      "pose": {
+       "crouch": 6,
+       "fx": -5,
+       "fy": -19,
+       "bx": 8,
+       "by": -30,
+       "ffx": 10,
+       "fbx": -8,
+       "weapon": "sword",
+       "x": -14,
+       "sa": -0.05,
+       "lean": -3,
+       "armsFront": true
+      }
+     },
+     {
+      "t": 0,
+      "how": "snap",
+      "pose": {
+       "crouch": 6,
+       "fx": 23,
+       "fy": -20,
+       "bx": -8,
+       "by": -24,
+       "ffx": 15,
+       "fbx": -11,
+       "weapon": "sword",
+       "x": -14,
+       "sa": 0,
+       "lean": 6,
+       "toeB": true,
+       "ghost": 1
+      }
+     },
+     {
+      "t": 0.07,
+      "how": "snap",
+      "pose": {
+       "crouch": 6,
+       "fx": 23,
+       "fy": -20,
+       "bx": -8,
+       "by": -24,
+       "ffx": 15,
+       "fbx": -11,
+       "weapon": "sword",
+       "x": -14,
+       "sa": 0,
+       "lean": 6,
+       "toeB": true
+      }
+     },
+     {
+      "t": 0.3,
+      "how": "smooth",
+      "pose": {
+       "crouch": 5,
+       "fx": 23,
+       "fy": -20,
+       "bx": -8,
+       "by": -24,
+       "ffx": 15,
+       "fbx": -11,
+       "weapon": "sword",
+       "x": -14,
+       "sa": 0,
+       "lean": 5,
+       "toeB": true
+      }
+     },
+     {
+      "t": 0.7,
+      "how": "smooth",
+      "pose": {
+       "crouch": 3,
+       "fx": 12,
+       "fy": -21,
+       "bx": 9,
+       "by": -21,
+       "ffx": 7,
+       "fbx": -7,
+       "weapon": "sword",
+       "x": -14,
+       "sa": -0.3
+      }
+     }
+    ]
+   }
+  }
+ }
+}

@@ -1,0 +1,628 @@
+{
+ "frames": [
+  {
+   "filename": "Dash 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Dash 1",
+   "frame": {
+    "x": 320,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Dash 2",
+   "frame": {
+    "x": 640,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Dash 3",
+   "frame": {
+    "x": 960,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Dash 4",
+   "frame": {
+    "x": 0,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Dash 5",
+   "frame": {
+    "x": 320,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Dash 6",
+   "frame": {
+    "x": 640,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Dash 7",
+   "frame": {
+    "x": 960,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Dash 8",
+   "frame": {
+    "x": 0,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Dash 9",
+   "frame": {
+    "x": 320,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Dash 10",
+   "frame": {
+    "x": 640,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Dash 11",
+   "frame": {
+    "x": 960,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Dash 12",
+   "frame": {
+    "x": 0,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Dash 13",
+   "frame": {
+    "x": 320,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Dash 14",
+   "frame": {
+    "x": 640,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Dash 15",
+   "frame": {
+    "x": 960,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 17
+  }
+ ],
+ "meta": {
+  "app": "https://github.com/patch-gg/pixelfx",
+  "version": "1",
+  "image": "Dash.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1280,
+   "h": 896
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "Dash",
+    "from": 0,
+    "to": 15,
+    "direction": "forward"
+   }
+  ],
+  "pixelfx": {
+   "id": "executor-v2/dash",
+   "name": "Haste",
+   "fps": 60,
+   "loop": false,
+   "frames": 16,
+   "frameSize": [
+    320,
+    224
+   ],
+   "pivot": [
+    190,
+    174
+   ],
+   "columns": 4,
+   "act": {
+    "windup": 0,
+    "recovery": 0.95,
+    "onBody": true,
+    "targets": [],
+    "hits": [],
+    "poses": [
+     {
+      "t": 0,
+      "how": "smooth",
+      "pose": {
+       "turn": 0.25,
+       "lean": 4,
+       "crouch": 3,
+       "ffx": 12,
+       "ffy": -5,
+       "fbx": -10,
+       "fby": -8,
+       "toeB": true,
+       "fx": -7,
+       "fy": -19,
+       "bx": 12,
+       "by": -27
+      }
+     },
+     {
+      "t": 0.1,
+      "how": "snap",
+      "pose": {
+       "turn": 0.25,
+       "lean": 4,
+       "crouch": 1,
+       "ffx": 4,
+       "ffy": -8,
+       "fbx": -1,
+       "fby": -5,
+       "fx": 3,
+       "fy": -18,
+       "bx": 5,
+       "by": -19
+      }
+     },
+     {
+      "t": 0.2,
+      "how": "snap",
+      "pose": {
+       "turn": 0.25,
+       "lean": 4,
+       "crouch": 3,
+       "ffx": -10,
+       "ffy": -8,
+       "toeF": true,
+       "fbx": 12,
+       "fby": -5,
+       "fx": 14,
+       "fy": -27,
+       "bx": -5,
+       "by": -19
+      }
+     },
+     {
+      "t": 0.3,
+      "how": "snap",
+      "pose": {
+       "turn": 0.25,
+       "lean": 4,
+       "crouch": 1,
+       "ffx": -1,
+       "ffy": -5,
+       "fbx": 4,
+       "fby": -8,
+       "fx": 5,
+       "fy": -19,
+       "bx": 3,
+       "by": -18
+      }
+     },
+     {
+      "t": 0.4,
+      "how": "snap",
+      "pose": {
+       "turn": 0.25,
+       "lean": 4,
+       "crouch": 3,
+       "ffx": 12,
+       "ffy": -5,
+       "fbx": -10,
+       "fby": -8,
+       "toeB": true,
+       "fx": -7,
+       "fy": -19,
+       "bx": 12,
+       "by": -27
+      }
+     },
+     {
+      "t": 0.5,
+      "how": "snap",
+      "pose": {
+       "turn": 0.25,
+       "lean": 4,
+       "crouch": 1,
+       "ffx": 4,
+       "ffy": -8,
+       "fbx": -1,
+       "fby": -5,
+       "fx": 3,
+       "fy": -18,
+       "bx": 5,
+       "by": -19
+      }
+     },
+     {
+      "t": 0.6,
+      "how": "snap",
+      "pose": {
+       "turn": 0.25,
+       "lean": 4,
+       "crouch": 3,
+       "ffx": -10,
+       "ffy": -8,
+       "toeF": true,
+       "fbx": 12,
+       "fby": -5,
+       "fx": 14,
+       "fy": -27,
+       "bx": -5,
+       "by": -19
+      }
+     },
+     {
+      "t": 0.7,
+      "how": "snap",
+      "pose": {
+       "turn": 0.25,
+       "lean": 4,
+       "crouch": 1,
+       "ffx": -1,
+       "ffy": -5,
+       "fbx": 4,
+       "fby": -8,
+       "fx": 5,
+       "fy": -19,
+       "bx": 3,
+       "by": -18
+      }
+     },
+     {
+      "t": 0.8,
+      "how": "snap",
+      "pose": {
+       "turn": 0.25,
+       "lean": 4,
+       "crouch": 3,
+       "ffx": 12,
+       "ffy": -5,
+       "fbx": -10,
+       "fby": -8,
+       "toeB": true,
+       "fx": -7,
+       "fy": -19,
+       "bx": 12,
+       "by": -27
+      }
+     },
+     {
+      "t": 0.9,
+      "how": "snap",
+      "pose": {
+       "turn": 0.25,
+       "lean": 4,
+       "crouch": 1,
+       "ffx": 4,
+       "ffy": -8,
+       "fbx": -1,
+       "fby": -5,
+       "fx": 3,
+       "fy": -18,
+       "bx": 5,
+       "by": -19
+      }
+     },
+     {
+      "t": 1,
+      "how": "snap",
+      "pose": {
+       "turn": 0.25,
+       "lean": 4,
+       "crouch": 3,
+       "ffx": -10,
+       "ffy": -8,
+       "toeF": true,
+       "fbx": 12,
+       "fby": -5,
+       "fx": 14,
+       "fy": -27,
+       "bx": -5,
+       "by": -19
+      }
+     },
+     {
+      "t": 1.1,
+      "how": "snap",
+      "pose": {
+       "turn": 0.25,
+       "lean": 4,
+       "crouch": 1,
+       "ffx": -1,
+       "ffy": -5,
+       "fbx": 4,
+       "fby": -8,
+       "fx": 5,
+       "fy": -19,
+       "bx": 3,
+       "by": -18
+      }
+     },
+     {
+      "t": 1.2,
+      "how": "snap",
+      "pose": {
+       "turn": 0.25,
+       "lean": 4,
+       "crouch": 3,
+       "ffx": 12,
+       "ffy": -5,
+       "fbx": -10,
+       "fby": -8,
+       "toeB": true,
+       "fx": -7,
+       "fy": -19,
+       "bx": 12,
+       "by": -27
+      }
+     }
+    ]
+   }
+  }
+ }
+}

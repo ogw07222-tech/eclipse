@@ -1,413 +1,1127 @@
 {
-  "status": "candidate pending main visual review",
-  "generator": "pixelfx",
-  "generation_cost": 0,
-  "fps": 60,
-  "source_repo": "https://github.com/patch-gg/pixelfx",
   "effects": [
     {
       "role": "Slash",
-      "name": "basic-slash",
-      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/basic-slash/basic-slash.png",
+      "file": "Assets/Resources/Eclipse/flash_executioner/effect_slash.png",
       "cell": [
         256,
-        224
+        216
       ],
+      "pivot": [
+        105,
+        165
+      ],
+      "scale": 2,
+      "count": 25,
       "columns": 5,
       "rows": 5,
-      "count": 25,
-      "pivot": [
-        116,
-        163
-      ],
-      "scale": 1.0,
       "duration": 0.4,
       "fps": 60,
       "loop": false,
       "layer": "front",
-      "trigger": "Attack contact .184s",
-      "sha256": "fbeb2f5ef4ea74664e04175dc2f2c2014c24f6afe263fc7596ccf41895e6d30d",
-      "empty_first": true,
-      "empty_last": true,
-      "unique_frames": 24
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        6,
+        -26
+      ],
+      "effectfocalOffset": [
+        6,
+        -26
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.03333333333333333,
+      "triggerLeadSeconds": 0.03333333333333333,
+      "spawnAgeSeconds": 0,
+      "sourceId": "melee/sword-slash",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "3abcde4466df41bddd1da0c9c9824aa2450185de39c61c3b7d156272dcc9327a",
+      "sourceTimeWindow": [
+        0,
+        0.75
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "radius": 60,
+        "sparks": [
+          "#ffffff",
+          "#fff5c4",
+          "#f7d47c",
+          "#b78f46"
+        ],
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "Art/flash-executioner/pixelfx/variants/Slash/frame-map.json",
+      "sha256": "7bf115c7862f15749bd0513320260cb0a286bd252a044c3dc85c9f321dd420a3",
+      "baselinePng": "Art/flash-executioner/pixelfx/variants/Slash/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-review-approved",
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 20,
+      "edgePixels": 0,
+      "peakCoverageFrame": 3,
+      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/melee/sword-slash.js"
     },
     {
       "role": "Rush",
-      "name": "rush-trail",
-      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/rush-trail/rush-trail.png",
+      "file": "Assets/Resources/Eclipse/flash_executioner/effect_rush.png",
       "cell": [
         320,
-        176
+        160
       ],
+      "pivot": [
+        80,
+        110
+      ],
+      "scale": 2,
+      "count": 22,
       "columns": 4,
       "rows": 6,
-      "count": 22,
-      "pivot": [
-        190,
-        132
-      ],
-      "scale": 1.0,
       "duration": 0.35,
       "fps": 60,
       "loop": false,
       "layer": "front",
-      "trigger": "Skill1 contact .125s",
-      "sha256": "2433a6c03d6006d01fe7413114e1a4756e1f7c95093b277a01992d728965d5f1",
-      "empty_first": true,
-      "empty_last": true,
-      "unique_frames": 20
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        9,
+        -20
+      ],
+      "effectfocalOffset": [
+        9,
+        -20
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.05,
+      "triggerLeadSeconds": 0.05,
+      "spawnAgeSeconds": 0,
+      "sourceId": "melee/thrust",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "ac2f2257fafb9dec3bdcb8e75020db952e14810c700eea6b232be7b348eb261d",
+      "sourceTimeWindow": [
+        0,
+        0.75
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "reach": 80,
+        "sparks": [
+          "#ffffff",
+          "#fff5c4",
+          "#f7d47c",
+          "#b78f46"
+        ],
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "Art/flash-executioner/pixelfx/variants/Rush/frame-map.json",
+      "sha256": "2604f32b9073137a0327251f4af13bf1ab9700a3d2eb35ce8d318d0ad7c88a2b",
+      "baselinePng": "Art/flash-executioner/pixelfx/variants/Rush/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-review-approved",
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 19,
+      "edgePixels": 0,
+      "peakCoverageFrame": 3,
+      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/melee/thrust.js"
     },
     {
       "role": "Command",
-      "name": "command-release",
-      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/command-release/command-release.png",
+      "file": "Assets/Resources/Eclipse/flash_executioner/effect_command.png",
       "cell": [
-        224,
-        200
+        160,
+        144
       ],
+      "pivot": [
+        64,
+        124
+      ],
+      "scale": 2.1,
+      "count": 25,
       "columns": 5,
       "rows": 5,
-      "count": 25,
-      "pivot": [
-        112,
-        154
-      ],
-      "scale": 1.0,
       "duration": 0.4,
       "fps": 60,
       "loop": false,
       "layer": "front",
-      "trigger": "Skill2 contact .23s",
-      "sha256": "e11cc72d79bfe5eb6645f0aeb39341a0dbf9ddc7ffe0395d1f6447fdbddd0bea",
-      "empty_first": true,
-      "empty_last": true,
-      "unique_frames": 24
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        15,
+        -22
+      ],
+      "effectfocalOffset": [
+        15,
+        -22
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        10,
+        -25
+      ],
+      "visualPeakSeconds": 0.2,
+      "triggerLeadSeconds": 0.2,
+      "spawnAgeSeconds": 0,
+      "sourceId": "arcane/spell-charge",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "cc424b77b0b989a8dfc7fae793848c2be0966bde0248a14699ad2733d1e4bec0",
+      "sourceTimeWindow": [
+        0.3,
+        0.7
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "light": 0.85
+      },
+      "postprocess": {
+        "alphaEdgeSeconds": [
+          0.025,
+          0.06
+        ],
+        "operation": "straight RGBA direct-copy atlas packing, alpha edge multiplication only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "Art/flash-executioner/pixelfx/variants/Command/frame-map.json",
+      "sha256": "1f7062671afcfa31ca0989f2267ea016cd0a530bf0e8eec8d38173b49d06c2e4",
+      "baselinePng": "Art/flash-executioner/pixelfx/variants/Command/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-review-approved",
+      "firstAlphaEmpty": true,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 25,
+      "edgePixels": 0,
+      "peakCoverageFrame": 12,
+      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/arcane/spell-charge.js"
     },
     {
       "role": "BlinkOut",
-      "name": "blink-depart",
-      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/blink-depart/blink-depart.png",
+      "file": "Assets/Resources/Eclipse/flash_executioner/effect_blinkout.png",
       "cell": [
-        224,
-        208
+        288,
+        224
       ],
-      "columns": 5,
-      "rows": 4,
-      "count": 20,
       "pivot": [
-        112,
-        160
+        144,
+        174
       ],
-      "scale": 1.0,
+      "scale": 1.4,
+      "count": 20,
+      "columns": 4,
+      "rows": 5,
       "duration": 0.32,
       "fps": 60,
       "loop": false,
       "layer": "front",
-      "trigger": "Skill3 starts, source world location",
-      "sha256": "05c52d6aac71678cbdfcd23d86df234723c490cfdd8b03a2a765d138ff18612d",
-      "empty_first": true,
-      "empty_last": true,
-      "unique_frames": 19
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.06666666666666667,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "arcane/blink-out",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "5554d07dd8e29d912f9bf3a8440d36369f3d6843f73ec59dfd33e4ac3b0c3186",
+      "sourceTimeWindow": [
+        0,
+        1.6
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "actor": "actor-input-BlinkOut.json",
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "Art/flash-executioner/pixelfx/variants/BlinkOut/frame-map.json",
+      "sha256": "7eca00f93c6e15d71a43c3aba8c9252eedd5cf79a97d20516c7dad7260e7db50",
+      "baselinePng": "Art/flash-executioner/pixelfx/variants/BlinkOut/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-review-approved",
+      "triggerStartAgeSeconds": 0.033333333333333326,
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 19,
+      "edgePixels": 0,
+      "peakCoverageFrame": 4,
+      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/arcane/blink-out.js"
     },
     {
       "role": "BlinkIn",
-      "name": "blink-arrive",
-      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/blink-arrive/blink-arrive.png",
+      "file": "Assets/Resources/Eclipse/flash_executioner/effect_blinkin.png",
       "cell": [
-        224,
-        208
+        288,
+        224
       ],
+      "pivot": [
+        144,
+        174
+      ],
+      "scale": 1.4,
+      "count": 23,
       "columns": 5,
       "rows": 5,
-      "count": 23,
-      "pivot": [
-        112,
-        160
-      ],
-      "scale": 1.0,
       "duration": 0.36,
       "fps": 60,
       "loop": false,
       "layer": "front",
-      "trigger": "Skill3 contact .15s, destination world location",
-      "sha256": "9d3e73d6a0cc338aeb1163ee3a32df5d1e02991b91af5fbb59f8e1ae1f828bef",
-      "empty_first": true,
-      "empty_last": true,
-      "unique_frames": 21
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.13333333333333333,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0.13333333333333333,
+      "sourceId": "arcane/blink-in",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "b5439fbdb31b26b45038164f4f5d129445eaa5b8aa4ec111c28bfbd0c325661e",
+      "sourceTimeWindow": [
+        0,
+        1.4
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "actor": "actor-input-BlinkIn.json",
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "Art/flash-executioner/pixelfx/variants/BlinkIn/frame-map.json",
+      "sha256": "0c7a286204a78a00912e334b1e59c61649324c4f2a6c22dd5c61e5911ba55501",
+      "baselinePng": "Art/flash-executioner/pixelfx/variants/BlinkIn/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-review-approved",
+      "firstAlphaEmpty": true,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 21,
+      "edgePixels": 0,
+      "peakCoverageFrame": 8,
+      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/arcane/blink-in.js"
     },
     {
       "role": "Verdict",
-      "name": "verdict-charge",
-      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/verdict-charge/verdict-charge.png",
+      "file": "Assets/Resources/Eclipse/flash_executioner/effect_verdict.png",
       "cell": [
-        288,
-        256
+        256,
+        280
       ],
-      "columns": 7,
-      "rows": 7,
-      "count": 45,
       "pivot": [
-        144,
-        206
+        128,
+        230
       ],
-      "scale": 1.0,
+      "scale": 1.7,
+      "count": 45,
+      "columns": 8,
+      "rows": 6,
       "duration": 0.728,
       "fps": 60,
       "loop": false,
       "layer": "back",
-      "trigger": "Ultimate starts, attach to actor feet",
-      "sha256": "91f4e3fc12fed1fd0fb13e1880d8095015a6186309b51da758dc0c2911dd115d",
-      "empty_first": true,
-      "empty_last": true,
-      "unique_frames": 43
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.15,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "holy/holy-pillar",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "d65de3c0a32bf6c0816a5729248efcbb128290d6ce980ed8130eea8016d137e3",
+      "sourceTimeWindow": [
+        0,
+        3.5
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "shafts": 7,
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "Art/flash-executioner/pixelfx/variants/Verdict/frame-map.json",
+      "sha256": "74c52bdfe446cf8fc87aeb07591c6349c422577ae30772b8b5554f54baedb0da",
+      "baselinePng": "Art/flash-executioner/pixelfx/variants/Verdict/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-review-approved",
+      "firstAlphaEmpty": true,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 43,
+      "edgePixels": 0,
+      "peakCoverageFrame": 21,
+      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/holy/holy-pillar.js"
     },
     {
       "role": "Impact",
-      "name": "light-impact",
-      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/light-impact/light-impact.png",
+      "file": "Assets/Resources/Eclipse/flash_executioner/effect_impact.png",
       "cell": [
-        224,
-        200
+        320,
+        224
       ],
-      "columns": 6,
-      "rows": 6,
-      "count": 31,
       "pivot": [
-        112,
-        130
+        130,
+        112
       ],
-      "scale": 1.0,
+      "scale": 1.7,
+      "count": 31,
+      "columns": 5,
+      "rows": 7,
       "duration": 0.5,
       "fps": 60,
       "loop": false,
       "layer": "front",
-      "trigger": "actual basic/rush enemy impact",
-      "sha256": "85604a1229cd4fceb9b95ad5bb83a5d8547aa029b6c8c5db1b6913a0f08d6a9c",
-      "empty_first": true,
-      "empty_last": true,
-      "unique_frames": 30
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "impact-center",
+      "anchorMode": "impact-center",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.016666666666666666,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0.016666666666666666,
+      "sourceId": "impacts/crit-hit",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "c6af9303f0e463051696796a5886236d91182594e1d4fadee2067b9cf82ba857",
+      "sourceTimeWindow": [
+        0,
+        0.9
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "height": 0,
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "Art/flash-executioner/pixelfx/variants/Impact/frame-map.json",
+      "sha256": "838c12558b20ea4be34b01fd395758ac38f83c0c2d4817f8cc4dd8c8c5f2c309",
+      "baselinePng": "Art/flash-executioner/pixelfx/variants/Impact/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-review-approved",
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 27,
+      "edgePixels": 0,
+      "peakCoverageFrame": 4,
+      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/impacts/crit-hit.js"
     },
     {
       "role": "Orb",
-      "name": "light-orb",
-      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/light-orb/light-orb.png",
+      "file": "Assets/Resources/Eclipse/flash_executioner/effect_orb.png",
       "cell": [
-        48,
-        48
+        136,
+        112
       ],
-      "columns": 8,
-      "rows": 8,
-      "count": 60,
       "pivot": [
-        24,
-        24
+        68,
+        104
       ],
-      "scale": 1.0,
-      "duration": 1.0,
+      "scale": 0.3,
+      "count": 144,
+      "columns": 11,
+      "rows": 14,
+      "duration": 2.4,
       "fps": 60,
       "loop": true,
       "layer": "front",
-      "trigger": "one per existing stored orb, gameplay orbit location",
-      "sha256": "4dd4f55b4443acf0b2aa726948e89b5d0eed83c36921e0aa29177a527124b915",
-      "empty_first": false,
-      "empty_last": false,
-      "unique_frames": 57
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        -52
+      ],
+      "effectfocalOffset": [
+        0,
+        -52
+      ],
+      "alignmentMode": "effect-focal",
+      "anchorMode": "effect-focal",
+      "offset": [
+        0,
+        15.6
+      ],
+      "visualPeakSeconds": 0,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "arcane/arcane-orb",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "22e7651d13482d9558b3ade048f86322ae0c116cf88f2834d7dd373499ebde9f",
+      "sourceTimeWindow": [
+        0,
+        2.4
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "Art/flash-executioner/pixelfx/variants/Orb/frame-map.json",
+      "sha256": "a7756c015a7ca2a3309f2eef50a44fe09993d9c0f9827c8c9003c2f399fe8248",
+      "baselinePng": "Art/flash-executioner/pixelfx/variants/Orb/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-review-approved",
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": false,
+      "uniquePixelFrames": 144,
+      "edgePixels": 0,
+      "peakCoverageFrame": 52,
+      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/arcane/arcane-orb.js"
     },
     {
       "role": "Lance",
-      "name": "light-lance",
-      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/light-lance/light-lance.png",
+      "file": "Assets/Resources/Eclipse/flash_executioner/effect_lance.png",
       "cell": [
-        192,
-        80
+        208,
+        96
       ],
-      "columns": 3,
-      "rows": 7,
-      "count": 19,
       "pivot": [
-        90,
-        45
+        170,
+        48
       ],
-      "scale": 0.85,
-      "duration": 0.3,
+      "scale": 1.3,
+      "count": 48,
+      "columns": 5,
+      "rows": 10,
+      "duration": 0.8,
       "fps": 60,
-      "loop": false,
+      "loop": true,
       "layer": "front",
-      "trigger": "existing projectile world location and flight rotation",
-      "sha256": "6ce03cb08c2a50b8a74d5f17ddb822840f0c95b7fac9a8bc40963548b371cf18",
-      "empty_first": true,
-      "empty_last": true,
-      "unique_frames": 9,
-      "flightFrameRange": [
-        3,
-        8
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
       ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "projectile-tip",
+      "anchorMode": "projectile-tip",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "ice/ice-lance",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "4d5168e7ce7a5fc1f37e150c6d8227258962833d47e7b42dcc3da792f2e063a4",
+      "sourceTimeWindow": [
+        0,
+        0.8
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "length": 48,
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "Art/flash-executioner/pixelfx/variants/Lance/frame-map.json",
+      "sha256": "47ca56f3e7c11e7d46d69f0688021bfe69543dd3ec6763404a6bd4a58ab8b489",
+      "baselinePng": "Art/flash-executioner/pixelfx/variants/Lance/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-review-approved",
       "flightFrameFps": 60,
-      "flightFramePolicy": "cycle inclusive frames3..8 using per-projectile visualFlightAge until actual collision, excluding fade endpoints",
-      "nativeDirectionDegrees": 0
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": false,
+      "uniquePixelFrames": 48,
+      "edgePixels": 0,
+      "peakCoverageFrame": 39,
+      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/ice/ice-lance.js"
     },
     {
       "role": "SkyLance",
-      "name": "sky-lance",
-      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/sky-lance/sky-lance.png",
+      "file": "Assets/Resources/Eclipse/flash_executioner/effect_skylance.png",
       "cell": [
-        80,
-        208
+        208,
+        96
       ],
-      "columns": 8,
-      "rows": 3,
-      "count": 20,
       "pivot": [
-        40,
-        152
+        170,
+        48
       ],
-      "scale": 0.85,
-      "duration": 0.32,
+      "scale": 1.8,
+      "count": 48,
+      "columns": 5,
+      "rows": 10,
+      "duration": 0.8,
       "fps": 60,
-      "loop": false,
+      "loop": true,
       "layer": "front",
-      "trigger": "existing verdict projectile world location, vertically downward; do not rotate twice",
-      "sha256": "61dba045d28a2a818daf311c34e7f847ef62377d028f63f3b4bb1c6c5cb87d91",
-      "empty_first": true,
-      "empty_last": true,
-      "unique_frames": 10,
-      "flightFrameRange": [
-        3,
-        8
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
       ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "projectile-tip",
+      "anchorMode": "projectile-tip",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "ice/ice-lance",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "4d5168e7ce7a5fc1f37e150c6d8227258962833d47e7b42dcc3da792f2e063a4",
+      "sourceTimeWindow": [
+        0,
+        0.8
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "length": 48,
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "Art/flash-executioner/pixelfx/variants/SkyLance/frame-map.json",
+      "sha256": "47ca56f3e7c11e7d46d69f0688021bfe69543dd3ec6763404a6bd4a58ab8b489",
+      "baselinePng": "Art/flash-executioner/pixelfx/variants/SkyLance/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-review-approved",
       "flightFrameFps": 60,
-      "flightFramePolicy": "cycle inclusive frames3..8 using per-projectile visualFlightAge until actual collision, excluding fade endpoints",
-      "nativeDirectionDegrees": 90
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": false,
+      "uniquePixelFrames": 48,
+      "edgePixels": 0,
+      "peakCoverageFrame": 39,
+      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/ice/ice-lance.js"
     },
     {
       "role": "LanceHit",
-      "name": "verdict-impact",
-      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/verdict-impact/verdict-impact.png",
+      "file": "Assets/Resources/Eclipse/flash_executioner/effect_lancehit.png",
       "cell": [
-        336,
-        320
-      ],
-      "columns": 7,
-      "rows": 6,
-      "count": 40,
-      "pivot": [
-        168,
+        288,
         232
       ],
-      "scale": 1.0,
+      "pivot": [
+        144,
+        188
+      ],
+      "scale": 1.5,
+      "count": 40,
+      "columns": 6,
+      "rows": 7,
       "duration": 0.65,
       "fps": 60,
       "loop": false,
       "layer": "front",
-      "trigger": "existing verdict projectile collision",
-      "sha256": "948a8b8f0286b15fe826ca43fea8bb2696c0718db31396905a548fda05f9d80f",
-      "empty_first": true,
-      "empty_last": true,
-      "unique_frames": 38
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "target-ground",
+      "anchorMode": "target-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "holy/smite",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "f0958ff226cb9114de31722b917c50867f715b9029f210c251186565895ea69b",
+      "sourceTimeWindow": [
+        0.55,
+        2.8
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "stone": "#796449",
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "Art/flash-executioner/pixelfx/variants/LanceHit/frame-map.json",
+      "sha256": "120945cda573789d388a0e6b324afb0902c77b16392c668e0715f8d221a4d32f",
+      "baselinePng": "Art/flash-executioner/pixelfx/variants/LanceHit/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-review-approved",
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 36,
+      "edgePixels": 0,
+      "peakCoverageFrame": 2,
+      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/holy/smite.js"
     },
     {
       "role": "Dash",
-      "name": "dash-trail",
-      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/dash-trail/dash-trail.png",
+      "file": "Assets/Resources/Eclipse/flash_executioner/effect_dash.png",
       "cell": [
-        256,
-        160
+        320,
+        224
       ],
+      "pivot": [
+        190,
+        174
+      ],
+      "scale": 1.4,
+      "count": 16,
       "columns": 4,
       "rows": 4,
-      "count": 16,
-      "pivot": [
-        150,
-        122
-      ],
-      "scale": 1.0,
       "duration": 0.25,
       "fps": 60,
       "loop": false,
       "layer": "front",
-      "trigger": "normal dash start",
-      "sha256": "a292088ad8e2ae224dd6ba033d4e6c8b305ef6db040918b4f8f403e958c6fdcb",
-      "empty_first": true,
-      "empty_last": true,
-      "unique_frames": 15
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "status/haste",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "141fb1c06ebe581afd7d76a2f8ea6f7dd67e4b8babbd1417b5eb787bf4cb1946",
+      "sourceTimeWindow": [
+        0,
+        1.2
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "actor": "actor-input-Dash.json",
+        "dust": "#d9c991",
+        "light": 0.85
+      },
+      "postprocess": {
+        "alphaEdgeSeconds": [
+          0.016,
+          0.04
+        ],
+        "operation": "straight RGBA direct-copy atlas packing, alpha edge multiplication only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "Art/flash-executioner/pixelfx/variants/Dash/frame-map.json",
+      "sha256": "690088690f87809db9867dce85aaebeff4ac672766d5c6455502fa6e8d0ad192",
+      "baselinePng": "Art/flash-executioner/pixelfx/variants/Dash/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-review-approved",
+      "firstAlphaEmpty": true,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 16,
+      "edgePixels": 0,
+      "peakCoverageFrame": 8,
+      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/status/haste.js"
     },
     {
       "role": "Jump",
-      "name": "jump-takeoff",
-      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/jump-takeoff/jump-takeoff.png",
+      "file": "Assets/Resources/Eclipse/flash_executioner/effect_jump.png",
       "cell": [
         208,
-        176
+        128
       ],
-      "columns": 4,
-      "rows": 4,
-      "count": 16,
       "pivot": [
         104,
-        100
+        88
       ],
-      "scale": 1.0,
+      "scale": 0.55,
+      "count": 16,
+      "columns": 4,
+      "rows": 4,
       "duration": 0.25,
       "fps": 60,
       "loop": false,
       "layer": "front",
-      "trigger": "jump takeoff edge",
-      "sha256": "f9060d4476d378a88d68545a53a854a67514c8a13a69d62b26e5f7dcfdb419ad",
-      "empty_first": true,
-      "empty_last": true,
-      "unique_frames": 15
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.016666666666666666,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "impacts/heavy-landing",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "317027b70876cdbc974d74c982935e698327215fdd98335ec5c98cf984aed6a7",
+      "sourceTimeWindow": [
+        0,
+        0.65
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "stone": "#86745f",
+        "light": 0.85
+      },
+      "postprocess": {
+        "alphaEdgeSeconds": [
+          0.008,
+          0.05
+        ],
+        "operation": "straight RGBA direct-copy atlas packing, alpha edge multiplication only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "Art/flash-executioner/pixelfx/variants/Jump/frame-map.json",
+      "sha256": "88ab91146ab4dc6c46f771c3e7f3fa31f4c39ad009ccf32ff963e95564115063",
+      "baselinePng": "Art/flash-executioner/pixelfx/variants/Jump/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-review-approved",
+      "firstAlphaEmpty": true,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 16,
+      "edgePixels": 0,
+      "peakCoverageFrame": 5,
+      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/impacts/heavy-landing.js"
     },
     {
       "role": "Land",
-      "name": "landing",
-      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/landing/landing.png",
+      "file": "Assets/Resources/Eclipse/flash_executioner/effect_land.png",
       "cell": [
         208,
-        176
+        128
       ],
-      "columns": 5,
-      "rows": 4,
-      "count": 19,
       "pivot": [
         104,
-        100
+        88
       ],
-      "scale": 1.0,
+      "scale": 1,
+      "count": 19,
+      "columns": 4,
+      "rows": 5,
       "duration": 0.3,
       "fps": 60,
       "loop": false,
       "layer": "front",
-      "trigger": "grounded landing edge",
-      "sha256": "38c319e451b8e5658d5a606c52c6d29cb10f4ccbbc6b49ba8926950ede419835",
-      "empty_first": true,
-      "empty_last": true,
-      "unique_frames": 17
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.016666666666666666,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "impacts/heavy-landing",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "317027b70876cdbc974d74c982935e698327215fdd98335ec5c98cf984aed6a7",
+      "sourceTimeWindow": [
+        0,
+        1.6
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "stone": "#86745f",
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "Art/flash-executioner/pixelfx/variants/Land/frame-map.json",
+      "sha256": "5be28648576c752a508ca9a08d5eca8364d73cce45ed7406e99a5dae07ff6621",
+      "baselinePng": "Art/flash-executioner/pixelfx/variants/Land/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-review-approved",
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 18,
+      "edgePixels": 0,
+      "peakCoverageFrame": 2,
+      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/impacts/heavy-landing.js"
     },
     {
       "role": "Swap",
-      "name": "class-swap",
-      "file": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx/class-swap/class-swap.png",
+      "file": "Assets/Resources/Eclipse/flash_executioner/effect_swap.png",
       "cell": [
         256,
         224
       ],
-      "columns": 5,
-      "rows": 5,
-      "count": 25,
       "pivot": [
         128,
-        172
+        174
       ],
-      "scale": 1.0,
+      "scale": 1.6,
+      "count": 25,
+      "columns": 5,
+      "rows": 5,
       "duration": 0.4,
       "fps": 60,
       "loop": false,
       "layer": "front",
-      "trigger": "equipped class swap start",
-      "sha256": "93db8054d094cc6bde4b28621771d837502eb2a3a90902b7c39cbfce42c18494",
-      "empty_first": true,
-      "empty_last": true,
-      "unique_frames": 24
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        -28
+      ],
+      "effectfocalOffset": [
+        0,
+        -28
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.05,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "arcane/mana-burst",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "5e13cd03df803020cdae40c62b9113548d41ca1a1c268c6221616413840b06ee",
+      "sourceTimeWindow": [
+        0,
+        1.8
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "Art/flash-executioner/pixelfx/variants/Swap/frame-map.json",
+      "sha256": "97888c5665a1f276a0f9d022f0e986965214be3a46892585c6f788ac0e286d40",
+      "baselinePng": "Art/flash-executioner/pixelfx/variants/Swap/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-review-approved",
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 25,
+      "edgePixels": 0,
+      "peakCoverageFrame": 5,
+      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/arcane/mana-burst.js"
     }
-  ]
+  ],
+  "sourceOnly": true,
+  "newGeometryRecipes": false,
+  "status": "main-reviewed existing-resource variants; runtime/device validation pending"
 }

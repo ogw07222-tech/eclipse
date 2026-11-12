@@ -1,0 +1,98 @@
+[
+ {
+  "output": 0,
+  "sourceFrame": 0,
+  "sourceTime": 0,
+  "alphaEnvelope": 0
+ },
+ {
+  "output": 1,
+  "sourceFrame": 3,
+  "sourceTime": 0.043333333333333335,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 2,
+  "sourceFrame": 5,
+  "sourceTime": 0.08666666666666667,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 3,
+  "sourceFrame": 8,
+  "sourceTime": 0.13,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 4,
+  "sourceFrame": 10,
+  "sourceTime": 0.17333333333333334,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 5,
+  "sourceFrame": 13,
+  "sourceTime": 0.21666666666666667,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 6,
+  "sourceFrame": 16,
+  "sourceTime": 0.26,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 7,
+  "sourceFrame": 18,
+  "sourceTime": 0.30333333333333334,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 8,
+  "sourceFrame": 21,
+  "sourceTime": 0.3466666666666667,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 9,
+  "sourceFrame": 23,
+  "sourceTime": 0.39,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 10,
+  "sourceFrame": 26,
+  "sourceTime": 0.43333333333333335,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 11,
+  "sourceFrame": 29,
+  "sourceTime": 0.4766666666666666,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 12,
+  "sourceFrame": 31,
+  "sourceTime": 0.52,
+  "alphaEnvelope": 0.9999999999999998
+ },
+ {
+  "output": 13,
+  "sourceFrame": 34,
+  "sourceTime": 0.5633333333333334,
+  "alphaEnvelope": 0.6666666666666665
+ },
+ {
+  "output": 14,
+  "sourceFrame": 36,
+  "sourceTime": 0.6066666666666667,
+  "alphaEnvelope": 0.33333333333333326
+ },
+ {
+  "output": 15,
+  "sourceFrame": 39,
+  "sourceTime": 0.65,
+  "alphaEnvelope": 0
+ }
+]

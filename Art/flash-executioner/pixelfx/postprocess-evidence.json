@@ -1,0 +1,194 @@
+[
+  {
+    "role": "Slash",
+    "sourceId": "melee/sword-slash",
+    "sourceHash": "3abcde4466df41bddd1da0c9c9824aa2450185de39c61c3b7d156272dcc9327a",
+    "variantHash": "7bf115c7862f15749bd0513320260cb0a286bd252a044c3dc85c9f321dd420a3",
+    "changedSourceFunctions": false,
+    "alphaEdge": {
+      "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+    },
+    "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Slash/frame-map.json",
+    "edgePixels": 0
+  },
+  {
+    "role": "Rush",
+    "sourceId": "melee/thrust",
+    "sourceHash": "ac2f2257fafb9dec3bdcb8e75020db952e14810c700eea6b232be7b348eb261d",
+    "variantHash": "2604f32b9073137a0327251f4af13bf1ab9700a3d2eb35ce8d318d0ad7c88a2b",
+    "changedSourceFunctions": false,
+    "alphaEdge": {
+      "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+    },
+    "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Rush/frame-map.json",
+    "edgePixels": 0
+  },
+  {
+    "role": "Command",
+    "sourceId": "arcane/spell-charge",
+    "sourceHash": "cc424b77b0b989a8dfc7fae793848c2be0966bde0248a14699ad2733d1e4bec0",
+    "variantHash": "1f7062671afcfa31ca0989f2267ea016cd0a530bf0e8eec8d38173b49d06c2e4",
+    "changedSourceFunctions": false,
+    "alphaEdge": {
+      "alphaEdgeSeconds": [
+        0.025,
+        0.06
+      ],
+      "operation": "straight RGBA direct-copy atlas packing, alpha edge multiplication only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+    },
+    "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Command/frame-map.json",
+    "edgePixels": 0
+  },
+  {
+    "role": "BlinkOut",
+    "sourceId": "arcane/blink-out",
+    "sourceHash": "5554d07dd8e29d912f9bf3a8440d36369f3d6843f73ec59dfd33e4ac3b0c3186",
+    "variantHash": "7eca00f93c6e15d71a43c3aba8c9252eedd5cf79a97d20516c7dad7260e7db50",
+    "changedSourceFunctions": false,
+    "alphaEdge": {
+      "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+    },
+    "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/BlinkOut/frame-map.json",
+    "edgePixels": 0
+  },
+  {
+    "role": "BlinkIn",
+    "sourceId": "arcane/blink-in",
+    "sourceHash": "b5439fbdb31b26b45038164f4f5d129445eaa5b8aa4ec111c28bfbd0c325661e",
+    "variantHash": "0c7a286204a78a00912e334b1e59c61649324c4f2a6c22dd5c61e5911ba55501",
+    "changedSourceFunctions": false,
+    "alphaEdge": {
+      "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+    },
+    "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/BlinkIn/frame-map.json",
+    "edgePixels": 0
+  },
+  {
+    "role": "Verdict",
+    "sourceId": "holy/holy-pillar",
+    "sourceHash": "d65de3c0a32bf6c0816a5729248efcbb128290d6ce980ed8130eea8016d137e3",
+    "variantHash": "74c52bdfe446cf8fc87aeb07591c6349c422577ae30772b8b5554f54baedb0da",
+    "changedSourceFunctions": false,
+    "alphaEdge": {
+      "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+    },
+    "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Verdict/frame-map.json",
+    "edgePixels": 0
+  },
+  {
+    "role": "Impact",
+    "sourceId": "impacts/crit-hit",
+    "sourceHash": "c6af9303f0e463051696796a5886236d91182594e1d4fadee2067b9cf82ba857",
+    "variantHash": "838c12558b20ea4be34b01fd395758ac38f83c0c2d4817f8cc4dd8c8c5f2c309",
+    "changedSourceFunctions": false,
+    "alphaEdge": {
+      "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+    },
+    "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Impact/frame-map.json",
+    "edgePixels": 0
+  },
+  {
+    "role": "Orb",
+    "sourceId": "arcane/arcane-orb",
+    "sourceHash": "22e7651d13482d9558b3ade048f86322ae0c116cf88f2834d7dd373499ebde9f",
+    "variantHash": "a7756c015a7ca2a3309f2eef50a44fe09993d9c0f9827c8c9003c2f399fe8248",
+    "changedSourceFunctions": false,
+    "alphaEdge": {
+      "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+    },
+    "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Orb/frame-map.json",
+    "edgePixels": 0
+  },
+  {
+    "role": "Lance",
+    "sourceId": "ice/ice-lance",
+    "sourceHash": "4d5168e7ce7a5fc1f37e150c6d8227258962833d47e7b42dcc3da792f2e063a4",
+    "variantHash": "47ca56f3e7c11e7d46d69f0688021bfe69543dd3ec6763404a6bd4a58ab8b489",
+    "changedSourceFunctions": false,
+    "alphaEdge": {
+      "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+    },
+    "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Lance/frame-map.json",
+    "edgePixels": 0
+  },
+  {
+    "role": "SkyLance",
+    "sourceId": "ice/ice-lance",
+    "sourceHash": "4d5168e7ce7a5fc1f37e150c6d8227258962833d47e7b42dcc3da792f2e063a4",
+    "variantHash": "47ca56f3e7c11e7d46d69f0688021bfe69543dd3ec6763404a6bd4a58ab8b489",
+    "changedSourceFunctions": false,
+    "alphaEdge": {
+      "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+    },
+    "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/SkyLance/frame-map.json",
+    "edgePixels": 0
+  },
+  {
+    "role": "LanceHit",
+    "sourceId": "holy/smite",
+    "sourceHash": "f0958ff226cb9114de31722b917c50867f715b9029f210c251186565895ea69b",
+    "variantHash": "120945cda573789d388a0e6b324afb0902c77b16392c668e0715f8d221a4d32f",
+    "changedSourceFunctions": false,
+    "alphaEdge": {
+      "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+    },
+    "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/LanceHit/frame-map.json",
+    "edgePixels": 0
+  },
+  {
+    "role": "Dash",
+    "sourceId": "status/haste",
+    "sourceHash": "141fb1c06ebe581afd7d76a2f8ea6f7dd67e4b8babbd1417b5eb787bf4cb1946",
+    "variantHash": "690088690f87809db9867dce85aaebeff4ac672766d5c6455502fa6e8d0ad192",
+    "changedSourceFunctions": false,
+    "alphaEdge": {
+      "alphaEdgeSeconds": [
+        0.016,
+        0.04
+      ],
+      "operation": "straight RGBA direct-copy atlas packing, alpha edge multiplication only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+    },
+    "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Dash/frame-map.json",
+    "edgePixels": 0
+  },
+  {
+    "role": "Jump",
+    "sourceId": "impacts/heavy-landing",
+    "sourceHash": "317027b70876cdbc974d74c982935e698327215fdd98335ec5c98cf984aed6a7",
+    "variantHash": "88ab91146ab4dc6c46f771c3e7f3fa31f4c39ad009ccf32ff963e95564115063",
+    "changedSourceFunctions": false,
+    "alphaEdge": {
+      "alphaEdgeSeconds": [
+        0.008,
+        0.05
+      ],
+      "operation": "straight RGBA direct-copy atlas packing, alpha edge multiplication only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+    },
+    "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Jump/frame-map.json",
+    "edgePixels": 0
+  },
+  {
+    "role": "Land",
+    "sourceId": "impacts/heavy-landing",
+    "sourceHash": "317027b70876cdbc974d74c982935e698327215fdd98335ec5c98cf984aed6a7",
+    "variantHash": "5be28648576c752a508ca9a08d5eca8364d73cce45ed7406e99a5dae07ff6621",
+    "changedSourceFunctions": false,
+    "alphaEdge": {
+      "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+    },
+    "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Land/frame-map.json",
+    "edgePixels": 0
+  },
+  {
+    "role": "Swap",
+    "sourceId": "arcane/mana-burst",
+    "sourceHash": "5e13cd03df803020cdae40c62b9113548d41ca1a1c268c6221616413840b06ee",
+    "variantHash": "97888c5665a1f276a0f9d022f0e986965214be3a46892585c6f788ac0e286d40",
+    "changedSourceFunctions": false,
+    "alphaEdge": {
+      "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+    },
+    "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Swap/frame-map.json",
+    "edgePixels": 0
+  }
+]

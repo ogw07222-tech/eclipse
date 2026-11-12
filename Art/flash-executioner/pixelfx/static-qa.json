@@ -1,0 +1,9 @@
+{
+  "effects": 15,
+  "sourceHashesMatch": true,
+  "pngHashesMatch": true,
+  "noBorderPixels": true,
+  "oneShotEndsEmpty": true,
+  "actorTestsRun": false,
+  "githubWrites": false
+}

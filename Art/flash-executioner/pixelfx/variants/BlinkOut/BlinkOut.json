@@ -1,0 +1,561 @@
+{
+ "frames": [
+  {
+   "filename": "BlinkOut 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 1",
+   "frame": {
+    "x": 288,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 2",
+   "frame": {
+    "x": 576,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 3",
+   "frame": {
+    "x": 864,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 4",
+   "frame": {
+    "x": 0,
+    "y": 224,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 5",
+   "frame": {
+    "x": 288,
+    "y": 224,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 6",
+   "frame": {
+    "x": 576,
+    "y": 224,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 7",
+   "frame": {
+    "x": 864,
+    "y": 224,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 8",
+   "frame": {
+    "x": 0,
+    "y": 448,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 9",
+   "frame": {
+    "x": 288,
+    "y": 448,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 10",
+   "frame": {
+    "x": 576,
+    "y": 448,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 11",
+   "frame": {
+    "x": 864,
+    "y": 448,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 12",
+   "frame": {
+    "x": 0,
+    "y": 672,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 13",
+   "frame": {
+    "x": 288,
+    "y": 672,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 14",
+   "frame": {
+    "x": 576,
+    "y": 672,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 15",
+   "frame": {
+    "x": 864,
+    "y": 672,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 16",
+   "frame": {
+    "x": 0,
+    "y": 896,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 17",
+   "frame": {
+    "x": 288,
+    "y": 896,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 18",
+   "frame": {
+    "x": 576,
+    "y": 896,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "BlinkOut 19",
+   "frame": {
+    "x": 864,
+    "y": 896,
+    "w": 288,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 224
+   },
+   "duration": 17
+  }
+ ],
+ "meta": {
+  "app": "https://github.com/patch-gg/pixelfx",
+  "version": "1",
+  "image": "BlinkOut.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1152,
+   "h": 1120
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "BlinkOut",
+    "from": 0,
+    "to": 19,
+    "direction": "forward"
+   }
+  ],
+  "pixelfx": {
+   "id": "executor-v2/blinkout",
+   "name": "Blink out",
+   "fps": 60,
+   "loop": false,
+   "frames": 20,
+   "frameSize": [
+    288,
+    224
+   ],
+   "pivot": [
+    144,
+    174
+   ],
+   "columns": 4,
+   "act": {
+    "windup": 0.36,
+    "recovery": 1.28,
+    "onBody": true,
+    "targets": [],
+    "hits": [],
+    "poses": [
+     {
+      "t": -0.36,
+      "how": "smooth",
+      "pose": {
+       "crouch": 3,
+       "fx": 11,
+       "fy": -21,
+       "bx": 9,
+       "by": -21,
+       "ffx": 7,
+       "fbx": -7
+      }
+     },
+     {
+      "t": -0.1,
+      "how": "smooth",
+      "pose": {
+       "turn": 1,
+       "crouch": 4,
+       "fx": -2,
+       "fy": -25,
+       "bx": 2,
+       "by": -25,
+       "armsFront": true,
+       "ffx": 0,
+       "fbx": 2
+      }
+     },
+     {
+      "t": 0.2,
+      "how": "smooth",
+      "pose": {
+       "turn": 1,
+       "crouch": 5,
+       "fx": -2,
+       "fy": -25,
+       "bx": 2,
+       "by": -25,
+       "armsFront": true,
+       "ffx": 0,
+       "fbx": 2
+      }
+     },
+     {
+      "t": 0.32,
+      "how": "snap",
+      "pose": {
+       "turn": 1,
+       "crouch": 0,
+       "fx": -2,
+       "fy": -25,
+       "bx": 2,
+       "by": -25,
+       "armsFront": true,
+       "ffx": 0,
+       "fbx": 2
+      }
+     },
+     {
+      "t": 1.6,
+      "how": "smooth",
+      "pose": {
+       "turn": 1,
+       "crouch": 0,
+       "fx": -2,
+       "fy": -25,
+       "bx": 2,
+       "by": -25,
+       "armsFront": true,
+       "ffx": 0,
+       "fbx": 2
+      }
+     }
+    ]
+   }
+  }
+ }
+}

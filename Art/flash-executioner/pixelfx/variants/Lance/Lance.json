@@ -1,0 +1,1095 @@
+{
+ "frames": [
+  {
+   "filename": "Lance 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 1",
+   "frame": {
+    "x": 208,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 2",
+   "frame": {
+    "x": 416,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 3",
+   "frame": {
+    "x": 624,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 4",
+   "frame": {
+    "x": 832,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 5",
+   "frame": {
+    "x": 0,
+    "y": 96,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 6",
+   "frame": {
+    "x": 208,
+    "y": 96,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 7",
+   "frame": {
+    "x": 416,
+    "y": 96,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 8",
+   "frame": {
+    "x": 624,
+    "y": 96,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 9",
+   "frame": {
+    "x": 832,
+    "y": 96,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 10",
+   "frame": {
+    "x": 0,
+    "y": 192,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 11",
+   "frame": {
+    "x": 208,
+    "y": 192,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 12",
+   "frame": {
+    "x": 416,
+    "y": 192,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 13",
+   "frame": {
+    "x": 624,
+    "y": 192,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 14",
+   "frame": {
+    "x": 832,
+    "y": 192,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 15",
+   "frame": {
+    "x": 0,
+    "y": 288,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 16",
+   "frame": {
+    "x": 208,
+    "y": 288,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 17",
+   "frame": {
+    "x": 416,
+    "y": 288,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 18",
+   "frame": {
+    "x": 624,
+    "y": 288,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 19",
+   "frame": {
+    "x": 832,
+    "y": 288,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 20",
+   "frame": {
+    "x": 0,
+    "y": 384,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 21",
+   "frame": {
+    "x": 208,
+    "y": 384,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 22",
+   "frame": {
+    "x": 416,
+    "y": 384,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 23",
+   "frame": {
+    "x": 624,
+    "y": 384,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 24",
+   "frame": {
+    "x": 832,
+    "y": 384,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 25",
+   "frame": {
+    "x": 0,
+    "y": 480,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 26",
+   "frame": {
+    "x": 208,
+    "y": 480,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 27",
+   "frame": {
+    "x": 416,
+    "y": 480,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 28",
+   "frame": {
+    "x": 624,
+    "y": 480,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 29",
+   "frame": {
+    "x": 832,
+    "y": 480,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 30",
+   "frame": {
+    "x": 0,
+    "y": 576,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 31",
+   "frame": {
+    "x": 208,
+    "y": 576,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 32",
+   "frame": {
+    "x": 416,
+    "y": 576,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 33",
+   "frame": {
+    "x": 624,
+    "y": 576,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 34",
+   "frame": {
+    "x": 832,
+    "y": 576,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 35",
+   "frame": {
+    "x": 0,
+    "y": 672,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 36",
+   "frame": {
+    "x": 208,
+    "y": 672,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 37",
+   "frame": {
+    "x": 416,
+    "y": 672,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 38",
+   "frame": {
+    "x": 624,
+    "y": 672,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 39",
+   "frame": {
+    "x": 832,
+    "y": 672,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 40",
+   "frame": {
+    "x": 0,
+    "y": 768,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 41",
+   "frame": {
+    "x": 208,
+    "y": 768,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 42",
+   "frame": {
+    "x": 416,
+    "y": 768,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 43",
+   "frame": {
+    "x": 624,
+    "y": 768,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 44",
+   "frame": {
+    "x": 832,
+    "y": 768,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 45",
+   "frame": {
+    "x": 0,
+    "y": 864,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 46",
+   "frame": {
+    "x": 208,
+    "y": 864,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Lance 47",
+   "frame": {
+    "x": 416,
+    "y": 864,
+    "w": 208,
+    "h": 96
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 208,
+    "h": 96
+   },
+   "sourceSize": {
+    "w": 208,
+    "h": 96
+   },
+   "duration": 17
+  }
+ ],
+ "meta": {
+  "app": "https://github.com/patch-gg/pixelfx",
+  "version": "1",
+  "image": "Lance.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1040,
+   "h": 960
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "Lance",
+    "from": 0,
+    "to": 47,
+    "direction": "forward"
+   }
+  ],
+  "pixelfx": {
+   "id": "executor-v2/lance",
+   "name": "Ice lance",
+   "fps": 60,
+   "loop": true,
+   "frames": 48,
+   "frameSize": [
+    208,
+    96
+   ],
+   "pivot": [
+    170,
+    48
+   ],
+   "columns": 5
+  }
+ }
+}

@@ -1,0 +1,122 @@
+[
+ {
+  "output": 0,
+  "sourceFrame": 0,
+  "sourceTime": 0,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 1,
+  "sourceFrame": 5,
+  "sourceTime": 0.08421052631578947,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 2,
+  "sourceFrame": 10,
+  "sourceTime": 0.16842105263157894,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 3,
+  "sourceFrame": 15,
+  "sourceTime": 0.25263157894736843,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 4,
+  "sourceFrame": 20,
+  "sourceTime": 0.3368421052631579,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 5,
+  "sourceFrame": 25,
+  "sourceTime": 0.42105263157894735,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 6,
+  "sourceFrame": 30,
+  "sourceTime": 0.5052631578947369,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 7,
+  "sourceFrame": 35,
+  "sourceTime": 0.5894736842105263,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 8,
+  "sourceFrame": 40,
+  "sourceTime": 0.6736842105263158,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 9,
+  "sourceFrame": 45,
+  "sourceTime": 0.7578947368421053,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 10,
+  "sourceFrame": 51,
+  "sourceTime": 0.8421052631578947,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 11,
+  "sourceFrame": 56,
+  "sourceTime": 0.9263157894736843,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 12,
+  "sourceFrame": 61,
+  "sourceTime": 1.0105263157894737,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 13,
+  "sourceFrame": 66,
+  "sourceTime": 1.0947368421052632,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 14,
+  "sourceFrame": 71,
+  "sourceTime": 1.1789473684210525,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 15,
+  "sourceFrame": 76,
+  "sourceTime": 1.2631578947368423,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 16,
+  "sourceFrame": 81,
+  "sourceTime": 1.3473684210526315,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 17,
+  "sourceFrame": 86,
+  "sourceTime": 1.431578947368421,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 18,
+  "sourceFrame": 91,
+  "sourceTime": 1.5157894736842106,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 19,
+  "sourceFrame": 96,
+  "sourceTime": 1.6,
+  "alphaEnvelope": 1
+ }
+]

@@ -1,0 +1,242 @@
+[
+ {
+  "output": 0,
+  "sourceFrame": 33,
+  "sourceTime": 0.55,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 1,
+  "sourceFrame": 36,
+  "sourceTime": 0.6076923076923078,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 2,
+  "sourceFrame": 40,
+  "sourceTime": 0.6653846153846155,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 3,
+  "sourceFrame": 43,
+  "sourceTime": 0.7230769230769232,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 4,
+  "sourceFrame": 47,
+  "sourceTime": 0.7807692307692308,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 5,
+  "sourceFrame": 50,
+  "sourceTime": 0.8384615384615385,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 6,
+  "sourceFrame": 54,
+  "sourceTime": 0.8961538461538462,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 7,
+  "sourceFrame": 57,
+  "sourceTime": 0.9538461538461539,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 8,
+  "sourceFrame": 61,
+  "sourceTime": 1.0115384615384615,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 9,
+  "sourceFrame": 64,
+  "sourceTime": 1.0692307692307694,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 10,
+  "sourceFrame": 68,
+  "sourceTime": 1.126923076923077,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 11,
+  "sourceFrame": 71,
+  "sourceTime": 1.1846153846153846,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 12,
+  "sourceFrame": 75,
+  "sourceTime": 1.2423076923076923,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 13,
+  "sourceFrame": 78,
+  "sourceTime": 1.3,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 14,
+  "sourceFrame": 81,
+  "sourceTime": 1.3576923076923078,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 15,
+  "sourceFrame": 85,
+  "sourceTime": 1.4153846153846155,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 16,
+  "sourceFrame": 88,
+  "sourceTime": 1.4730769230769232,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 17,
+  "sourceFrame": 92,
+  "sourceTime": 1.5307692307692309,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 18,
+  "sourceFrame": 95,
+  "sourceTime": 1.5884615384615386,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 19,
+  "sourceFrame": 99,
+  "sourceTime": 1.646153846153846,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 20,
+  "sourceFrame": 102,
+  "sourceTime": 1.7038461538461538,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 21,
+  "sourceFrame": 106,
+  "sourceTime": 1.7615384615384615,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 22,
+  "sourceFrame": 109,
+  "sourceTime": 1.8192307692307692,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 23,
+  "sourceFrame": 113,
+  "sourceTime": 1.876923076923077,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 24,
+  "sourceFrame": 116,
+  "sourceTime": 1.9346153846153846,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 25,
+  "sourceFrame": 120,
+  "sourceTime": 1.9923076923076926,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 26,
+  "sourceFrame": 123,
+  "sourceTime": 2.05,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 27,
+  "sourceFrame": 126,
+  "sourceTime": 2.1076923076923078,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 28,
+  "sourceFrame": 130,
+  "sourceTime": 2.1653846153846157,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 29,
+  "sourceFrame": 133,
+  "sourceTime": 2.223076923076923,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 30,
+  "sourceFrame": 137,
+  "sourceTime": 2.2807692307692307,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 31,
+  "sourceFrame": 140,
+  "sourceTime": 2.338461538461538,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 32,
+  "sourceFrame": 144,
+  "sourceTime": 2.396153846153846,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 33,
+  "sourceFrame": 147,
+  "sourceTime": 2.453846153846154,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 34,
+  "sourceFrame": 151,
+  "sourceTime": 2.5115384615384615,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 35,
+  "sourceFrame": 154,
+  "sourceTime": 2.569230769230769,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 36,
+  "sourceFrame": 158,
+  "sourceTime": 2.6269230769230774,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 37,
+  "sourceFrame": 161,
+  "sourceTime": 2.684615384615385,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 38,
+  "sourceFrame": 165,
+  "sourceTime": 2.7423076923076923,
+  "alphaEnvelope": 1
+ },
+ {
+  "output": 39,
+  "sourceFrame": 168,
+  "sourceTime": 2.8,
+  "alphaEnvelope": 1
+ }
+]

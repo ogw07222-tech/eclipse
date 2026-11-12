@@ -1,0 +1,919 @@
+{
+ "frames": [
+  {
+   "filename": "LanceHit 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 1",
+   "frame": {
+    "x": 288,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 2",
+   "frame": {
+    "x": 576,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 3",
+   "frame": {
+    "x": 864,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 4",
+   "frame": {
+    "x": 1152,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 5",
+   "frame": {
+    "x": 1440,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 6",
+   "frame": {
+    "x": 0,
+    "y": 232,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 7",
+   "frame": {
+    "x": 288,
+    "y": 232,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 8",
+   "frame": {
+    "x": 576,
+    "y": 232,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 9",
+   "frame": {
+    "x": 864,
+    "y": 232,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 10",
+   "frame": {
+    "x": 1152,
+    "y": 232,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 11",
+   "frame": {
+    "x": 1440,
+    "y": 232,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 12",
+   "frame": {
+    "x": 0,
+    "y": 464,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 13",
+   "frame": {
+    "x": 288,
+    "y": 464,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 14",
+   "frame": {
+    "x": 576,
+    "y": 464,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 15",
+   "frame": {
+    "x": 864,
+    "y": 464,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 16",
+   "frame": {
+    "x": 1152,
+    "y": 464,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 17",
+   "frame": {
+    "x": 1440,
+    "y": 464,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 18",
+   "frame": {
+    "x": 0,
+    "y": 696,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 19",
+   "frame": {
+    "x": 288,
+    "y": 696,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 20",
+   "frame": {
+    "x": 576,
+    "y": 696,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 21",
+   "frame": {
+    "x": 864,
+    "y": 696,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 22",
+   "frame": {
+    "x": 1152,
+    "y": 696,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 23",
+   "frame": {
+    "x": 1440,
+    "y": 696,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 24",
+   "frame": {
+    "x": 0,
+    "y": 928,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 25",
+   "frame": {
+    "x": 288,
+    "y": 928,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 26",
+   "frame": {
+    "x": 576,
+    "y": 928,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 27",
+   "frame": {
+    "x": 864,
+    "y": 928,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 28",
+   "frame": {
+    "x": 1152,
+    "y": 928,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 29",
+   "frame": {
+    "x": 1440,
+    "y": 928,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 30",
+   "frame": {
+    "x": 0,
+    "y": 1160,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 31",
+   "frame": {
+    "x": 288,
+    "y": 1160,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 32",
+   "frame": {
+    "x": 576,
+    "y": 1160,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 33",
+   "frame": {
+    "x": 864,
+    "y": 1160,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 34",
+   "frame": {
+    "x": 1152,
+    "y": 1160,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 35",
+   "frame": {
+    "x": 1440,
+    "y": 1160,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 36",
+   "frame": {
+    "x": 0,
+    "y": 1392,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 37",
+   "frame": {
+    "x": 288,
+    "y": 1392,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 38",
+   "frame": {
+    "x": 576,
+    "y": 1392,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  },
+  {
+   "filename": "LanceHit 39",
+   "frame": {
+    "x": 864,
+    "y": 1392,
+    "w": 288,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 288,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 288,
+    "h": 232
+   },
+   "duration": 17
+  }
+ ],
+ "meta": {
+  "app": "https://github.com/patch-gg/pixelfx",
+  "version": "1",
+  "image": "LanceHit.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1728,
+   "h": 1624
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "LanceHit",
+    "from": 0,
+    "to": 39,
+    "direction": "forward"
+   }
+  ],
+  "pixelfx": {
+   "id": "executor-v2/lancehit",
+   "name": "Smite",
+   "fps": 60,
+   "loop": false,
+   "frames": 40,
+   "frameSize": [
+    288,
+    232
+   ],
+   "pivot": [
+    144,
+    188
+   ],
+   "columns": 6
+  }
+ }
+}

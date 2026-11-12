@@ -1,0 +1,77 @@
+[
+  {
+    "role": "Slash",
+    "source_sha256_matches_commit": true,
+    "variant_hash_matches": true
+  },
+  {
+    "role": "Rush",
+    "source_sha256_matches_commit": true,
+    "variant_hash_matches": true
+  },
+  {
+    "role": "Command",
+    "source_sha256_matches_commit": true,
+    "variant_hash_matches": true
+  },
+  {
+    "role": "BlinkOut",
+    "source_sha256_matches_commit": true,
+    "variant_hash_matches": true
+  },
+  {
+    "role": "BlinkIn",
+    "source_sha256_matches_commit": true,
+    "variant_hash_matches": true
+  },
+  {
+    "role": "Verdict",
+    "source_sha256_matches_commit": true,
+    "variant_hash_matches": true
+  },
+  {
+    "role": "Impact",
+    "source_sha256_matches_commit": true,
+    "variant_hash_matches": true
+  },
+  {
+    "role": "Orb",
+    "source_sha256_matches_commit": true,
+    "variant_hash_matches": true
+  },
+  {
+    "role": "Lance",
+    "source_sha256_matches_commit": true,
+    "variant_hash_matches": true
+  },
+  {
+    "role": "SkyLance",
+    "source_sha256_matches_commit": true,
+    "variant_hash_matches": true
+  },
+  {
+    "role": "LanceHit",
+    "source_sha256_matches_commit": true,
+    "variant_hash_matches": true
+  },
+  {
+    "role": "Dash",
+    "source_sha256_matches_commit": true,
+    "variant_hash_matches": true
+  },
+  {
+    "role": "Jump",
+    "source_sha256_matches_commit": true,
+    "variant_hash_matches": true
+  },
+  {
+    "role": "Land",
+    "source_sha256_matches_commit": true,
+    "variant_hash_matches": true
+  },
+  {
+    "role": "Swap",
+    "source_sha256_matches_commit": true,
+    "variant_hash_matches": true
+  }
+]

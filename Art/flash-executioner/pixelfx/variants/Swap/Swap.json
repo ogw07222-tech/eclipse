@@ -1,0 +1,589 @@
+{
+ "frames": [
+  {
+   "filename": "Swap 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 1",
+   "frame": {
+    "x": 256,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 2",
+   "frame": {
+    "x": 512,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 3",
+   "frame": {
+    "x": 768,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 4",
+   "frame": {
+    "x": 1024,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 5",
+   "frame": {
+    "x": 0,
+    "y": 224,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 6",
+   "frame": {
+    "x": 256,
+    "y": 224,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 7",
+   "frame": {
+    "x": 512,
+    "y": 224,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 8",
+   "frame": {
+    "x": 768,
+    "y": 224,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 9",
+   "frame": {
+    "x": 1024,
+    "y": 224,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 10",
+   "frame": {
+    "x": 0,
+    "y": 448,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 11",
+   "frame": {
+    "x": 256,
+    "y": 448,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 12",
+   "frame": {
+    "x": 512,
+    "y": 448,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 13",
+   "frame": {
+    "x": 768,
+    "y": 448,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 14",
+   "frame": {
+    "x": 1024,
+    "y": 448,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 15",
+   "frame": {
+    "x": 0,
+    "y": 672,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 16",
+   "frame": {
+    "x": 256,
+    "y": 672,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 17",
+   "frame": {
+    "x": 512,
+    "y": 672,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 18",
+   "frame": {
+    "x": 768,
+    "y": 672,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 19",
+   "frame": {
+    "x": 1024,
+    "y": 672,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 20",
+   "frame": {
+    "x": 0,
+    "y": 896,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 21",
+   "frame": {
+    "x": 256,
+    "y": 896,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 22",
+   "frame": {
+    "x": 512,
+    "y": 896,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 23",
+   "frame": {
+    "x": 768,
+    "y": 896,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  },
+  {
+   "filename": "Swap 24",
+   "frame": {
+    "x": 1024,
+    "y": 896,
+    "w": 256,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 256,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 256,
+    "h": 224
+   },
+   "duration": 17
+  }
+ ],
+ "meta": {
+  "app": "https://github.com/patch-gg/pixelfx",
+  "version": "1",
+  "image": "Swap.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1280,
+   "h": 1120
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "Swap",
+    "from": 0,
+    "to": 24,
+    "direction": "forward"
+   }
+  ],
+  "pixelfx": {
+   "id": "executor-v2/swap",
+   "name": "Mana burst",
+   "fps": 60,
+   "loop": false,
+   "frames": 25,
+   "frameSize": [
+    256,
+    224
+   ],
+   "pivot": [
+    128,
+    174
+   ],
+   "columns": 5
+  }
+ }
+}

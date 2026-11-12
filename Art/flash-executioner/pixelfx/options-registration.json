@@ -1,0 +1,429 @@
+[
+  {
+    "role": "Slash",
+    "id": "melee/sword-slash",
+    "options": {
+      "radius": 60,
+      "sparks": [
+        "#ffffff",
+        "#fff5c4",
+        "#f7d47c",
+        "#b78f46"
+      ]
+    },
+    "canvas": [
+      256,
+      216
+    ],
+    "pivot": [
+      105,
+      165
+    ],
+    "duration": 0.4,
+    "span": [
+      0,
+      0.75
+    ],
+    "scale": 2,
+    "focal": [
+      6,
+      -26
+    ],
+    "mode": "actor-feet",
+    "peak": 0.06
+  },
+  {
+    "role": "Rush",
+    "id": "melee/thrust",
+    "options": {
+      "reach": 80,
+      "sparks": [
+        "#ffffff",
+        "#fff5c4",
+        "#f7d47c",
+        "#b78f46"
+      ]
+    },
+    "canvas": [
+      320,
+      160
+    ],
+    "pivot": [
+      80,
+      110
+    ],
+    "duration": 0.35,
+    "span": [
+      0,
+      0.75
+    ],
+    "scale": 2,
+    "focal": [
+      9,
+      -20
+    ],
+    "mode": "actor-feet",
+    "peak": 0.07
+  },
+  {
+    "role": "Command",
+    "id": "arcane/spell-charge",
+    "options": {},
+    "canvas": [
+      160,
+      144
+    ],
+    "pivot": [
+      64,
+      124
+    ],
+    "duration": 0.4,
+    "span": [
+      0.3,
+      0.7
+    ],
+    "scale": 2.1,
+    "focal": [
+      15,
+      -22
+    ],
+    "mode": "actor-feet",
+    "peak": 0.5,
+    "alphaEdge": [
+      0.025,
+      0.06
+    ]
+  },
+  {
+    "role": "BlinkOut",
+    "id": "arcane/blink-out",
+    "options": {
+      "actor": "actor-input-BlinkOut.json"
+    },
+    "canvas": [
+      288,
+      224
+    ],
+    "pivot": [
+      144,
+      174
+    ],
+    "duration": 0.32,
+    "span": [
+      0,
+      1.6
+    ],
+    "scale": 1.4,
+    "focal": [
+      0,
+      0
+    ],
+    "mode": "actor-feet",
+    "peak": 0.32
+  },
+  {
+    "role": "BlinkIn",
+    "id": "arcane/blink-in",
+    "options": {
+      "actor": "actor-input-BlinkIn.json"
+    },
+    "canvas": [
+      288,
+      224
+    ],
+    "pivot": [
+      144,
+      174
+    ],
+    "duration": 0.36,
+    "span": [
+      0,
+      1.4
+    ],
+    "scale": 1.4,
+    "focal": [
+      0,
+      0
+    ],
+    "mode": "actor-feet",
+    "peak": 0.48
+  },
+  {
+    "role": "Verdict",
+    "id": "holy/holy-pillar",
+    "options": {
+      "shafts": 7
+    },
+    "canvas": [
+      256,
+      280
+    ],
+    "pivot": [
+      128,
+      230
+    ],
+    "duration": 0.728,
+    "span": [
+      0,
+      3.5
+    ],
+    "scale": 1.7,
+    "focal": [
+      0,
+      0
+    ],
+    "mode": "actor-feet",
+    "peak": 0.66
+  },
+  {
+    "role": "Impact",
+    "id": "impacts/crit-hit",
+    "options": {
+      "height": 0
+    },
+    "canvas": [
+      320,
+      224
+    ],
+    "pivot": [
+      130,
+      112
+    ],
+    "duration": 0.5,
+    "span": [
+      0,
+      0.9
+    ],
+    "scale": 1.7,
+    "focal": [
+      0,
+      0
+    ],
+    "mode": "impact-center",
+    "peak": 0.025
+  },
+  {
+    "role": "Orb",
+    "id": "arcane/arcane-orb",
+    "options": {},
+    "canvas": [
+      136,
+      112
+    ],
+    "pivot": [
+      68,
+      104
+    ],
+    "duration": 2.4,
+    "span": [
+      0,
+      2.4
+    ],
+    "loop": true,
+    "scale": 0.3,
+    "focal": [
+      0,
+      -52
+    ],
+    "mode": "effect-focal",
+    "peak": 0
+  },
+  {
+    "role": "Lance",
+    "id": "ice/ice-lance",
+    "options": {
+      "length": 48
+    },
+    "canvas": [
+      208,
+      96
+    ],
+    "pivot": [
+      170,
+      48
+    ],
+    "duration": 0.8,
+    "span": [
+      0,
+      0.8
+    ],
+    "loop": true,
+    "scale": 1.3,
+    "focal": [
+      0,
+      0
+    ],
+    "mode": "projectile-tip",
+    "peak": 0
+  },
+  {
+    "role": "SkyLance",
+    "id": "ice/ice-lance",
+    "options": {
+      "length": 48
+    },
+    "canvas": [
+      208,
+      96
+    ],
+    "pivot": [
+      170,
+      48
+    ],
+    "duration": 0.8,
+    "span": [
+      0,
+      0.8
+    ],
+    "loop": true,
+    "scale": 1.8,
+    "focal": [
+      0,
+      0
+    ],
+    "mode": "projectile-tip",
+    "peak": 0
+  },
+  {
+    "role": "LanceHit",
+    "id": "holy/smite",
+    "options": {
+      "stone": "#796449"
+    },
+    "canvas": [
+      288,
+      232
+    ],
+    "pivot": [
+      144,
+      188
+    ],
+    "duration": 0.65,
+    "span": [
+      0.55,
+      2.8
+    ],
+    "scale": 1.5,
+    "focal": [
+      0,
+      0
+    ],
+    "mode": "target-ground",
+    "peak": 0.55
+  },
+  {
+    "role": "Dash",
+    "id": "status/haste",
+    "options": {
+      "actor": "actor-input-Dash.json",
+      "dust": "#d9c991"
+    },
+    "canvas": [
+      320,
+      224
+    ],
+    "pivot": [
+      190,
+      174
+    ],
+    "duration": 0.25,
+    "span": [
+      0,
+      1.2
+    ],
+    "scale": 1.4,
+    "focal": [
+      0,
+      0
+    ],
+    "mode": "actor-feet",
+    "peak": 0,
+    "alphaEdge": [
+      0.016,
+      0.04
+    ]
+  },
+  {
+    "role": "Jump",
+    "id": "impacts/heavy-landing",
+    "options": {
+      "stone": "#86745f"
+    },
+    "canvas": [
+      208,
+      128
+    ],
+    "pivot": [
+      104,
+      88
+    ],
+    "duration": 0.25,
+    "span": [
+      0,
+      0.65
+    ],
+    "scale": 0.55,
+    "focal": [
+      0,
+      0
+    ],
+    "mode": "actor-feet",
+    "peak": 0.01,
+    "alphaEdge": [
+      0.008,
+      0.05
+    ]
+  },
+  {
+    "role": "Land",
+    "id": "impacts/heavy-landing",
+    "options": {
+      "stone": "#86745f"
+    },
+    "canvas": [
+      208,
+      128
+    ],
+    "pivot": [
+      104,
+      88
+    ],
+    "duration": 0.3,
+    "span": [
+      0,
+      1.6
+    ],
+    "scale": 1,
+    "focal": [
+      0,
+      0
+    ],
+    "mode": "actor-feet",
+    "peak": 0.01
+  },
+  {
+    "role": "Swap",
+    "id": "arcane/mana-burst",
+    "options": {},
+    "canvas": [
+      256,
+      224
+    ],
+    "pivot": [
+      128,
+      174
+    ],
+    "duration": 0.4,
+    "span": [
+      0,
+      1.8
+    ],
+    "scale": 1.6,
+    "focal": [
+      0,
+      -28
+    ],
+    "mode": "actor-feet",
+    "peak": 0.22
+  }
+]

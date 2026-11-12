@@ -1,0 +1,2 @@
+# Rejected custom PixelFX effects v1
+User explicitly discarded these custom15 effect designs in favor of existing finished PixelFX library resources with small variations. Source is retained for historical audit only. None of these effects may be bound, rendered or packaged into the current runtime. Old PNGs remain in Git history. See the active Art/flash-executioner/pixelfx folder for reviewed v2 upstream-based resources once imported.

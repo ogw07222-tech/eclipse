@@ -122,3 +122,13 @@ Status: Pixelbolt CLI sample rendering SUCCESS in ChatGPT container. ECLIPSE art
 - Historical branch workflow definitions changed to manual workflow_dispatch only before publication. No Actions, builds or owner tests run.
 - Library unavailable: /ECLIPSE/eclipse main/ and historical Library archives are NOT synchronized or purged. GitHub PR refs/cached commits, forks and other clones may retain old bytes; branch history cleanup cannot guarantee physical server erasure.
 - Existing eclipse-integration working directory has owner changes and was not overwritten. It must not be pushed to restore old history.
+
+## 2026-11-13 — Replace rejected custom FX with existing PixelFX resources v2
+
+- Owner rejected all15 custom v1 effects. Their source is marked historical/rejected in Art/flash-executioner/archive/rejected-custom-v1; none is active or packaged.
+- Main reviewed all15 existing-resource variants, pinned upstream recipes at5294518ce7c72e48b6100a744596e0acf57f2826, original leaf hashes, side-by-side variants and light/dark actor registration.
+-7 approved actor PNGs unchanged.15 active effect roles now bind reviewed upstream-based variants; runtime has exactly22 PNG files and no v1 effect hash.
+- Added metadata-driven source peak lead/spawn ages, absolute Blink departure age, focal offsets, direct fps selection and native projectile direction. Game contact/damage/physics values are unchanged.
+- Full source loops replace v1 flight-frame-range samples. Importer cleans superseded PNGs and requires actual upstream effect identity.
+- Exact sources, MIT license, prompts/actor sources, options, frame maps and baseline PNGs retained in Art. Library remains NOT SYNCED; supply matching-byte delta ZIP plus deletion list.
+- Static validation/main visual review only. Game tests, builds, APK/device checks and GitHub Actions NOT RUN.
