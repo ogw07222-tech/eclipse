@@ -11,6 +11,7 @@
 #include "forest_generator.hpp"
 #include "forest_layers.hpp"
 #include "demon_castle_entrance.hpp"
+#include "flash_executioner_assets.hpp"
 
 namespace eclipse {
 class Presentation {
@@ -23,6 +24,15 @@ class Presentation {
     SDL_Texture* titleMenu_=nullptr;
     SDL_Texture* whiteNightLance_=nullptr;
     SDL_Texture* whiteNightMotion_=nullptr;
+    std::array<SDL_Texture*,static_cast<int>(FlashActor::Count)> flashActorTextures_{};
+    std::array<SDL_Texture*,static_cast<int>(FlashFx::Count)> flashFxTextures_{};
+    struct ReviewedFlashEvent {FlashFx role;float x,y,born;int facing;bool follow;};
+    std::vector<ReviewedFlashEvent> reviewedFlashEvents_;
+    float reviewedFlashClock_=-1,reviewedFlashMoveAge_=0;
+    WhiteMove reviewedFlashMove_=WhiteMove::None;
+    unsigned long long reviewedFlashBurstSerial_=0;
+    int reviewedFlashLandingSerial_=-1;
+    bool reviewedFlashDash_=false,reviewedFlashSwap_=false,reviewedFlashAirborne_=false;
     SDL_Texture* goldLance_=nullptr;
     SDL_Texture* goldTrail_=nullptr;
     SDL_Texture* goldOrb_=nullptr;
@@ -814,7 +824,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_,riftSlash_,riftTrace_})if(fx)SDL_DestroyTexture(fx);for(auto* fx:whiteFxTextures_)if(fx)SDL_DestroyTexture(fx);if(whiteNightMotion_)SDL_DestroyTexture(whiteNightMotion_);if(whiteNightLance_)SDL_DestroyTexture(whiteNightLance_);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleBg_)SDL_DestroyTexture(titleBg_);if(titleKnightFg_)SDL_DestroyTexture(titleKnightFg_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);if(knightSkillFx_)SDL_DestroyTexture(knightSkillFx_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:whiteSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){for(auto* image:flashActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_,riftSlash_,riftTrace_})if(fx)SDL_DestroyTexture(fx);for(auto* fx:whiteFxTextures_)if(fx)SDL_DestroyTexture(fx);if(whiteNightMotion_)SDL_DestroyTexture(whiteNightMotion_);if(whiteNightLance_)SDL_DestroyTexture(whiteNightLance_);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleBg_)SDL_DestroyTexture(titleBg_);if(titleKnightFg_)SDL_DestroyTexture(titleKnightFg_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);if(knightSkillFx_)SDL_DestroyTexture(knightSkillFx_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:whiteSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -872,8 +882,216 @@ public:
     static constexpr SDL_FRect titleBack{26,25,190,50};
     static constexpr float titleReadyTime=0.85f;
 
+
+    bool loadReviewedFlashSheets(){
+        auto load=[&](const FlashSheet& sheet,SDL_Texture*& texture)->bool{
+            if(!sheet.file||texture)return true;
+            const std::string file=asset(sheet.file);
+            texture=IMG_LoadTexture(renderer,file.c_str());
+            if(!texture){
+                const std::string cause=SDL_GetError();
+                SDL_SetError("ECLIPSE ASSET ERROR: %s: %s",file.c_str(),cause.c_str());
+                return false;
+            }
+            float w=0,h=0;
+            if(!SDL_GetTextureSize(texture,&w,&h)||w!=sheet.cellW*sheet.columns||h!=sheet.cellH*sheet.rows){
+                SDL_SetError("ECLIPSE ASSET ERROR: %s expected %dx%d, got %.0fx%.0f",
+                    file.c_str(),sheet.cellW*sheet.columns,sheet.cellH*sheet.rows,w,h);
+                SDL_DestroyTexture(texture);texture=nullptr;return false;
+            }
+            SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST);
+            SDL_SetTextureBlendMode(texture,SDL_BLENDMODE_BLEND);
+            return true;
+        };
+        for(size_t i=0;i<flashActors.size();++i)if(!load(flashActors[i],flashActorTextures_[i]))return false;
+        for(size_t i=0;i<flashEffects.size();++i)if(!load(flashEffects[i],flashFxTextures_[i]))return false;
+        return true;
+    }
+    void reviewedFlashSprite(const FlashSheet& sheet,SDL_Texture* texture,int frame,float x,float y,int facing,Uint8 alpha=255,double angle=0){
+        if(!texture||!sheet.file)return;
+        frame=std::clamp(frame,0,sheet.count-1);
+        const SDL_FRect source{float(frame%sheet.columns*sheet.cellW),float(frame/sheet.columns*sheet.cellH),float(sheet.cellW),float(sheet.cellH)};
+        const float anchorX=facing>0?sheet.pivotX:sheet.cellW-sheet.pivotX;
+        const SDL_FRect dest{std::round(x-offset-anchorX*sheet.scale),std::round(y-sheet.pivotY*sheet.scale),
+                            sheet.cellW*sheet.scale,sheet.cellH*sheet.scale};
+        const SDL_FPoint pivot{anchorX*sheet.scale,sheet.pivotY*sheet.scale};
+        SDL_SetTextureAlphaMod(texture,alpha);
+        SDL_RenderTextureRotated(renderer,texture,&source,&dest,angle,&pivot,facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
+        SDL_SetTextureAlphaMod(texture,255);
+    }
+    static int reviewedFlashFrame(const FlashSheet& sheet,float age,float duration,float contact=-1){
+        float position=std::clamp(age/std::max(.001f,duration),0.f,1.f)*sheet.count;
+        if(sheet.contactFrame>=0&&contact>0&&contact<duration){
+            position=age<contact?age/contact*sheet.contactFrame:
+                sheet.contactFrame+(age-contact)/(duration-contact)*(sheet.count-sheet.contactFrame);
+        }
+        return std::clamp(static_cast<int>(position),0,sheet.count-1);
+    }
+
+    static bool hasReviewedFlashFx(FlashFx role){
+        return flashEffects[static_cast<int>(role)].file!=nullptr;
+    }
+    bool reviewedFlashFx(FlashFx role,float age,float x,float y,int facing,bool front,double angle=0,float playbackDuration=0){
+        const int index=static_cast<int>(role);
+        const auto& sheet=flashEffects[index];
+        if(!sheet.file||sheet.front!=front||!flashFxTextures_[index])return false;
+        const float duration=playbackDuration>0?playbackDuration:sheet.duration;
+        if(!sheet.loop&&(age<0||age>=duration))return false;
+        const float t=sheet.loop?std::fmod(std::max(0.f,age),duration):age;
+        reviewedFlashSprite(sheet,flashFxTextures_[index],reviewedFlashFrame(sheet,t,duration),x,y,facing,255,angle);
+        return true;
+    }
+
+    void updateReviewedFlashEffects(const Combat& g,const Animation& a){
+        if(g.clock==reviewedFlashClock_)return;
+        const auto& p=g.player;
+        if(g.clock<reviewedFlashClock_){
+            reviewedFlashEvents_.clear();reviewedFlashBurstSerial_=0;
+            reviewedFlashMove_=WhiteMove::None;reviewedFlashMoveAge_=0;
+            reviewedFlashLandingSerial_=p.landingSerial;
+            reviewedFlashDash_=reviewedFlashSwap_=reviewedFlashAirborne_=false;
+        }
+        reviewedFlashClock_=g.clock;
+        reviewedFlashEvents_.erase(std::remove_if(reviewedFlashEvents_.begin(),reviewedFlashEvents_.end(),
+            [&](const ReviewedFlashEvent& event){return g.clock-event.born>=flashEffects[static_cast<int>(event.role)].duration;}),
+            reviewedFlashEvents_.end());
+        auto spawn=[&](FlashFx role,float x,float y,int facing,bool follow,float delay=0.f){
+            if(hasReviewedFlashFx(role))
+                reviewedFlashEvents_.push_back({role,x,y,g.clock-delay,facing,follow});
+        };
+        const bool newMove=p.whiteMove!=reviewedFlashMove_||p.whiteAge<reviewedFlashMoveAge_;
+        const float before=newMove?0.f:reviewedFlashMoveAge_;
+        if(p.whiteNight&&p.whiteMove!=WhiteMove::None){
+            FlashFx role=FlashFx::Slash;float trigger=0;
+            switch(p.whiteMove){
+                case WhiteMove::Slash:role=FlashFx::Slash;trigger=.184f;break;
+                case WhiteMove::Rush:role=FlashFx::Rush;trigger=.125f;break;
+                case WhiteMove::Command:role=FlashFx::Command;trigger=.23f;break;
+                case WhiteMove::Blink:role=FlashFx::BlinkOut;trigger=0;break;
+                case WhiteMove::Verdict:role=FlashFx::Verdict;trigger=0;break;
+                default:break;
+            }
+            if((newMove&&trigger==0)||(before<trigger&&p.whiteAge>=trigger))
+                spawn(role,p.x,p.y,p.facing,p.whiteMove!=WhiteMove::Blink,
+                      std::max(0.f,p.whiteAge-trigger)/
+                      (p.whiteMove==WhiteMove::Slash?std::max(.001f,p.whiteSlashSpeed):1.f));
+        }
+        for(const auto& burst:g.lightBursts){
+            if(burst.visualSerial<=reviewedFlashBurstSerial_)continue;
+            reviewedFlashBurstSerial_=std::max(reviewedFlashBurstSerial_,burst.visualSerial);
+            const float age=std::max(0.f,.24f-burst.life);
+            if(burst.kind==LightFx::Impact){
+                // One verdict collision publishes both burst kinds. Keep the
+                // large reviewed verdict hit, not a second stacked impact.
+                const bool verdictPair=hasReviewedFlashFx(FlashFx::LanceHit)&&
+                    std::any_of(g.lightBursts.begin(),g.lightBursts.end(),[&](const LightBurst& other){
+                        return other.kind==LightFx::Verdict&&std::abs(other.life-burst.life)<.001f&&
+                               std::abs(other.x-burst.x)<1.f&&std::abs(other.y-burst.y)<1.f;
+                    });
+                // Impact source draws its focal point30px above its origin.
+                if(!verdictPair)spawn(FlashFx::Impact,burst.x,burst.y+30.f,burst.facing,false,age);
+            }else if(burst.kind==LightFx::Verdict){
+                // Verdict impact is ground-authored. Locate the actual target's
+                // feet from this collision's center without altering combat.
+                float ground=burst.y+38.f,best=128.f;
+                for(const auto& enemy:g.enemies){
+                    const auto bounds=enemyBounds(enemy);
+                    const float distance=std::abs(enemy.x-burst.x)+
+                        std::abs((bounds.top+bounds.bottom)*.5f-burst.y);
+                    if(distance<best){best=distance;ground=enemy.y;}
+                }
+                spawn(FlashFx::LanceHit,burst.x,ground,burst.facing,false,age);
+            }else if(burst.kind==LightFx::Arrive&&p.whiteMove==WhiteMove::Blink)
+                spawn(FlashFx::BlinkIn,burst.x,burst.y+48.f,burst.facing,false,age);
+        }
+        const bool dash=p.whiteNight&&p.dashLeft>0;
+        const bool swap=p.whiteNight&&p.swapFlash>0;
+        const bool airborne=p.whiteNight&&!p.grounded;
+        if(dash&&!reviewedFlashDash_)spawn(FlashFx::Dash,p.x,p.y,p.facing,true,.15f-p.dashLeft);
+        if(swap&&!reviewedFlashSwap_)spawn(FlashFx::Swap,p.x,p.y,p.facing,true,.24f-p.swapFlash);
+        if(airborne&&!reviewedFlashAirborne_&&p.vy<0)spawn(FlashFx::Jump,p.x,p.y,p.facing,false);
+        if(p.whiteNight&&p.landingSerial!=reviewedFlashLandingSerial_&&a.state==10)
+            spawn(FlashFx::Land,p.x,p.y,p.facing,false);
+        reviewedFlashDash_=dash;reviewedFlashSwap_=swap;reviewedFlashAirborne_=airborne;
+        reviewedFlashLandingSerial_=p.landingSerial;
+        reviewedFlashMove_=p.whiteMove;reviewedFlashMoveAge_=p.whiteAge;
+    }
+    void drawReviewedFlashEffects(const Combat& g,const Animation&,bool front){
+        const auto& p=g.player;
+        for(const auto& event:reviewedFlashEvents_){
+            reviewedFlashFx(event.role,g.clock-event.born,event.follow?p.x:event.x,event.follow?p.y:event.y,
+                            event.follow?p.facing:event.facing,front);
+        }
+        if(p.whiteNight&&hasReviewedFlashFx(FlashFx::Orb)){
+            for(int i=0;i<p.storedLightLances;++i){
+                const float phase=g.clock*2.8f+i*6.2831853f/p.storedLightLances;
+                reviewedFlashFx(FlashFx::Orb,g.clock,p.x+std::cos(phase)*57.f,
+                    p.y-61.f+std::sin(phase)*37.f,1,front);
+            }
+        }
+        for(const auto& lance:g.lightLances){
+            if(lance.delay>0)continue;
+            const FlashFx role=lance.verdict?FlashFx::SkyLance:FlashFx::Lance;
+            const int index=static_cast<int>(role);
+            const auto& sheet=flashEffects[index];
+            if(!sheet.file||sheet.front!=front||!flashFxTextures_[index])continue;
+            // Main review specifies the nonblank flight-body range. It stays
+            // visible until actual collision/removal, independent of sheet fade.
+            if(sheet.flightFirst>=0&&sheet.flightLast>=sheet.flightFirst){
+                const int span=sheet.flightLast-sheet.flightFirst+1;
+                const int frame=sheet.flightFirst+
+                    static_cast<int>(lance.visualFlightAge*60.f)%span;
+                reviewedFlashSprite(sheet,flashFxTextures_[index],frame,lance.x,lance.y,1,255,
+                                    lance.angle-(lance.verdict?90.f:0.f));
+            }else{
+                reviewedFlashFx(role,lance.visualFlightAge,lance.x,lance.y,1,front,
+                                lance.angle-(lance.verdict?90.f:0.f));
+            }
+        }
+    }
+    bool drawReviewedFlashActor(const Combat& g,const Animation& a){
+        const auto& p=g.player;
+        if(!p.whiteNight||p.health<=0)return false;
+        FlashActor role=FlashActor::Idle;
+        float phase=0,age=0,duration=1,contact=-1;
+        bool phaseDriven=false;
+        if(p.whiteMove!=WhiteMove::None){
+            constexpr FlashActor moves[]{FlashActor::Idle,FlashActor::Basic,FlashActor::Skill1,
+                FlashActor::Skill2,FlashActor::Skill3,FlashActor::Ultimate};
+            role=moves[static_cast<int>(p.whiteMove)];
+            const auto clip=whiteClips[static_cast<int>(p.whiteMove)];
+            age=p.whiteAge;duration=clip.duration;contact=clip.contact;
+        }else if(p.dashLeft>0){
+            role=FlashActor::Dash;age=.15f-p.dashLeft;duration=.15f;
+        }else if(p.swapFlash>0){
+            role=FlashActor::Swap;age=.24f-p.swapFlash;duration=.24f;
+        }else if(!p.grounded){
+            role=p.vy<0?FlashActor::Jump:FlashActor::Fall;
+            phase=a.posePhase;phaseDriven=true;
+        }else if(a.state==10){
+            role=FlashActor::Land;phase=a.posePhase;phaseDriven=true;
+        }else if(a.state==1||a.state==11){
+            role=FlashActor::Run;phase=a.travelPhase;phaseDriven=true;
+        }else{
+            const auto& idle=flashActors[static_cast<int>(role)];
+            age=idle.duration>0?std::fmod(a.time,idle.duration):0;
+            duration=std::max(.001f,idle.duration);
+        }
+        const int index=static_cast<int>(role);
+        const auto& sheet=flashActors[index];
+        if(!sheet.file)return false; // This role has no newly approved replacement.
+        auto* texture=flashActorTextures_[index];
+        if(!texture)return false; // loadWhiteNight already reports required load failure.
+        const int frame=phaseDriven?std::clamp(static_cast<int>(phase*sheet.count),0,sheet.count-1):
+            reviewedFlashFrame(sheet,age,duration,contact);
+        if(p.hurtTint>0)SDL_SetTextureColorMod(texture,255,150,160);
+        reviewedFlashSprite(sheet,texture,frame,p.x,p.y,p.facing);
+        SDL_SetTextureColorMod(texture,255,255,255);
+        return true;
+    }
+
     bool loadWhiteNight(){
-        if(whiteNightLance_&&whiteNightMotion_)return true;
+        if(whiteNightLance_&&whiteNightMotion_)return loadReviewedFlashSheets();
         const auto path=asset("ui/white_night_lance.png");
         auto* texture=IMG_LoadTexture(renderer,path.c_str());
         if(!texture){
@@ -932,7 +1150,7 @@ public:
            !loadGold(goldImpact_,"ui/impact_gold.png",96,96)||
            !loadGold(riftSlash_,"ui/rift_slash.png",192,64)||
            !loadGold(riftTrace_,"ui/rift_trace.png",256,32))return false;
-        return true;
+        return loadReviewedFlashSheets();
     }
 
     static constexpr std::array<SDL_FRect,4> qaCharacterButtons{{
@@ -1302,6 +1520,7 @@ public:
         offset=std::round(camera)-640;SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);SDL_SetRenderDrawColor(renderer,21,35,52,255);SDL_RenderClear(renderer);
         forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.enemyVisualClock);
         const auto& caster=g.player;
+        updateReviewedFlashEffects(g,a);
         const bool verdictFreeze=caster.whiteNight&&caster.whiteMove==WhiteMove::Verdict&&
             caster.whiteAge>=.12f&&caster.whiteAge<.66f;
         if(verdictFreeze){
@@ -1312,6 +1531,8 @@ public:
         // contracts rather than exploding into a diffuse magical glow.
         if(caster.whiteNight){
             for(const auto& scar:g.riftScars){
+                if((scar.slash&&hasReviewedFlashFx(FlashFx::Slash))||
+                   (!scar.slash&&hasReviewedFlashFx(FlashFx::Lance)))continue;
                 const float progress=std::clamp(scar.life/(scar.slash?.21f:.15f),0.f,1.f);
                 const float width=(scar.slash?230.f:91.f)*(0.35f+.65f*progress);
                 const float height=(scar.slash?78.f:13.f)*(.4f+.6f*progress);
@@ -1338,7 +1559,7 @@ public:
         }
         // Gold-white light effects are sourced from PNG textures.
         SDL_Texture* lanceArt=goldLance_?goldLance_:whiteNightLance_;
-        if(lanceArt&&caster.whiteNight&&caster.storedLightLances>0){
+        if(lanceArt&&caster.whiteNight&&caster.storedLightLances>0&&!hasReviewedFlashFx(FlashFx::Orb)){
             for(int i=0;i<caster.storedLightLances;++i){
                 const float phase=g.clock*2.8f+i*6.2831853f/caster.storedLightLances;
                 const float x=caster.x+std::cos(phase)*57.f-offset;
@@ -1357,6 +1578,7 @@ public:
             }
         }
         if(lanceArt)for(const auto& lance:g.lightLances){
+            if(hasReviewedFlashFx(lance.verdict?FlashFx::SkyLance:FlashFx::Lance))continue;
             // Do not reveal queued sky spears before their staggered drop.
             if(lance.verdict&&lance.delay>0.f)continue;
             const float x=lance.x-offset,y=lance.y;
@@ -1407,7 +1629,13 @@ public:
         for(const auto& burst:g.lightBursts){
             // The basic sword slash is now driven by the *current sword pose*
             // below, not by a detached world-space burst with its own clock.
-            if(burst.kind!=LightFx::Slash)goldenImpactParticles(burst);
+            const bool replaced=(burst.kind==LightFx::Impact&&hasReviewedFlashFx(FlashFx::Impact))||
+                (burst.kind==LightFx::Verdict&&hasReviewedFlashFx(FlashFx::LanceHit))||
+                (burst.kind==LightFx::Depart&&hasReviewedFlashFx(FlashFx::BlinkOut))||
+                (burst.kind==LightFx::Arrive&&hasReviewedFlashFx(FlashFx::BlinkIn))||
+                (burst.kind==LightFx::Rush&&hasReviewedFlashFx(FlashFx::Rush))||
+                (burst.kind==LightFx::Command&&hasReviewedFlashFx(FlashFx::Command));
+            if(burst.kind!=LightFx::Slash&&!replaced)goldenImpactParticles(burst);
         }
         for(const auto& b:g.projectiles){
             const int radius=b.empowered?14:8;
@@ -1487,7 +1715,10 @@ public:
             // apply the old 4-key/4-midpoint row offset to those frames.
             frame+=knightMidpointStart;
         }
-        if(p.whiteNight&&whiteNightMotion_&&(p.whiteMove!=WhiteMove::None||p.health>0)){
+        drawReviewedFlashEffects(g,a,false);
+        if(drawReviewedFlashActor(g,a)){
+            // Approved separate sheets replace only their own motion role.
+        }else if(p.whiteNight&&whiteNightMotion_&&(p.whiteMove!=WhiteMove::None||p.health>0)){
             int whiteFrame=30;
             if(p.whiteMove!=WhiteMove::None){
                 const auto clip=whiteClips[static_cast<int>(p.whiteMove)];
@@ -1525,7 +1756,7 @@ public:
             // attack-speed boosts) as the 15 authored slash poses. The PNG
             // silhouette/palette is unchanged; only position, scale and opacity
             // are registered to the active swing instead of a detached burst.
-            if(p.whiteMove==WhiteMove::Slash && riftSlash_){
+            if(p.whiteMove==WhiteMove::Slash && riftSlash_&&!hasReviewedFlashFx(FlashFx::Slash)){
                 const auto slashClip=whiteClips[static_cast<int>(WhiteMove::Slash)];
                 const float phase=std::clamp(p.whiteAge/slashClip.duration,0.f,1.f);
                 constexpr float arcIn=.26f,arcPeak=.40f,arcOut=.76f;
@@ -1547,7 +1778,7 @@ public:
             }
             SDL_RenderTextureRotated(renderer,whiteNightMotion_,&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
             SDL_SetTextureColorMod(whiteNightMotion_,255,255,255);
-            if(p.whiteMove==WhiteMove::Command&&p.whiteAge>=.08f&&p.whiteAge<.46f&&goldOrb_){
+            if(p.whiteMove==WhiteMove::Command&&p.whiteAge>=.08f&&p.whiteAge<.46f&&goldOrb_&&!hasReviewedFlashFx(FlashFx::Command)){
                 // A sword-tip flash builds while the blade extends, then the
                 // stored lances all release on the authored contact frame.
                 const float local=p.whiteAge;
@@ -1563,7 +1794,7 @@ public:
                         static_cast<Uint8>(160*strength));
                 }
             }
-            if(p.whiteMove==WhiteMove::Verdict&&p.whiteAge>=.23f&&p.whiteAge<.91f&&(goldOrb_||whiteFxTextures_[3])){
+            if(p.whiteMove==WhiteMove::Verdict&&p.whiteAge>=.23f&&p.whiteAge<.91f&&(goldOrb_||whiteFxTextures_[3])&&!hasReviewedFlashFx(FlashFx::Verdict)){
                 // PNG glow layer at the opposite (left) hand. The spherical light contracts
                 // when the fist closes, then flares as every marked target is struck.
                 const float t=std::clamp((p.whiteAge-.23f)/.68f,0.f,1.f);
@@ -1617,7 +1848,8 @@ public:
             }
         }else mage(p);
         }
-        if(p.swapFlash>0)ring(p.x-offset,p.y-36,44,0xe3bd72);
+        drawReviewedFlashEffects(g,a,true);
+        if(p.swapFlash>0&&(!p.whiteNight||!hasReviewedFlashFx(FlashFx::Swap)))ring(p.x-offset,p.y-36,44,0xe3bd72);
         static const ControlLayout defaultLayout{};
         const ControlLayout& layout=customLayout?*customLayout:defaultLayout;
         if(layout.showNumbers)for(const auto& popup:g.popups)number(popup.amount,popup.x-offset-12,popup.y,3,popup.kind==DamageKind::Fire?0xff9155:(popup.kind==DamageKind::Bleed||popup.kind==DamageKind::Execute)?0xe76878:0xf2d48c);

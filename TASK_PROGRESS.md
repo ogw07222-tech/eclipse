@@ -101,3 +101,15 @@ Status: Pixelbolt CLI sample rendering SUCCESS in ChatGPT container. ECLIPSE art
 2. Only packaged sample recipe rendered, not a novel ECLIPSE sprite. Existing game asset PNGs untouched.
 3. Need a validated native Pixelbolt recipe for a specific ECLIPSE effect, then native-size alpha/frame/contact review and user art approval. Never treat procedural character frames as hand-authored final poses.
 4. Production integration, external Library synchronization, Termux device execution, CMU adapter and Sprite Fusion remain unverified/not implemented.
+
+
+## 2026-11-13 — Flash Executioner reviewed asset/button integration
+
+- Main agent statically reviewed and approved 7 actor sheets (Basic, Rush/Skill1, opposite-hand Command/Skill2, Blink/Skill3, Dash, entering-class Swap, Landing) and 15 independent PixelFX light effects.
+- Source PNG/JS/prompt/receipt/license and verified hashes: Art/flash-executioner/. Exact runtime PNG copies: Assets/Resources/Eclipse/flash_executioner/.
+- Native descriptors, strict dimension-checked loading, nearest-neighbor anchored/mirrored rendering, desktop/Android packaging, contact-timed visual event pool and per-projectile nonblank flight cycles are prepared.
+- Combat changes are presentation-only serial/flight clock fields. Damage, physics, hitboxes, cooldowns, target rules and exactly20 ultimate lances are unchanged.
+- Ultimate, Idle, Run, Jump/Fall use existing legacy actor art; rejected candidates were not imported into runtime. True60-pose/sec migration remains incomplete for those roles.
+- Static diff/PNG/hash/source checks only. Builds, tests, device playback and GitHub Actions NOT RUN.
+- Library mirror is NOT SYNCED: no ChatGPT Library capability. Matching-byte changed-file ZIP supplied separately for manual /ECLIPSE/eclipse main/ import. GitHub commit without Library upload is partial sync, not a complete mirror.
+- Remaining owner validation: device timing and both facing directions; skill2 hands; teleport frame/target position; FX front/back occlusion/performance. Remaining art: full qualified Ultimate/Idle/Run/Jump/Fall re-authoring and review.

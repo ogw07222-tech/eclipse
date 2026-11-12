@@ -1,0 +1,20 @@
+warn  executor/basic-slash
+      slow: 6.0 ms a frame
+ok    executor/blink-arrive
+ok    executor/blink-depart
+ok    executor/class-swap
+ok    executor/command-release
+ok    executor/dash-trail
+ok    executor/jump-takeoff
+ok    executor/landing
+warn  executor/light-impact
+      slow: 5.1 ms a frame
+ok    executor/light-lance
+ok    executor/light-orb
+ok    executor/rush-trail
+ok    executor/sky-lance
+ok    executor/verdict-charge
+warn  executor/verdict-impact
+      slow: 39.3 ms a frame
+
+15 effects: 15 pass, 0 fail, 3 with warnings

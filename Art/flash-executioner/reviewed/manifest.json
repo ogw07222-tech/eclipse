@@ -1,0 +1,1673 @@
+{
+  "review_manifest": "Art/flash-executioner/review-approval.json",
+  "review_status": "approved individual assets only",
+  "assets": [
+    {
+      "role": "Dash",
+      "file": "flash_executioner/actor_dash.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 3,
+      "rows": 3,
+      "count": 9,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.15,
+      "contactFrame": -1,
+      "loop": false,
+      "sourceFile": "dash_raw.png",
+      "rawColumns": 3,
+      "uniquePixelFrames": 9,
+      "emptyFrames": [],
+      "bounds": [
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          46,
+          68,
+          164,
+          133
+        ],
+        [
+          51,
+          69,
+          164,
+          133
+        ],
+        [
+          56,
+          69,
+          160,
+          133
+        ],
+        [
+          48,
+          67,
+          151,
+          133
+        ],
+        [
+          38,
+          64,
+          131,
+          133
+        ],
+        [
+          33,
+          61,
+          117,
+          133
+        ],
+        [
+          28,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ]
+      ],
+      "sha256": "fb2f6c21ceb24655355163bc1233f97e343800c2dd4b73d0c858aece073b870c",
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "model": "PixMiniMax H3",
+      "timing": "fixed duration",
+      "approved": true,
+      "sourceFrameMap": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "review": "Main agent inspected every numbered pose: coherent physical body/sword, no baked light effects, stable grounded baseline, count=round(duration*60). Static visual approval; device playback remains owner validation.",
+      "source_path": "Art/flash-executioner/reviewed/actor_dash.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/actor_dash.png",
+      "library_status": "not synced: no ChatGPT Library file capability available",
+      "source_path_raw": "Art/flash-executioner/pixellab/dash_raw.png"
+    },
+    {
+      "role": "Swap",
+      "file": "flash_executioner/actor_swap.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 4,
+      "rows": 4,
+      "count": 14,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.24,
+      "contactFrame": -1,
+      "loop": false,
+      "sourceFile": "swap_raw.png",
+      "rawColumns": 5,
+      "uniquePixelFrames": 14,
+      "emptyFrames": [],
+      "bounds": [
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          23,
+          60,
+          120,
+          133
+        ],
+        [
+          24,
+          64,
+          129,
+          133
+        ],
+        [
+          22,
+          69,
+          128,
+          133
+        ],
+        [
+          22,
+          65,
+          117,
+          133
+        ],
+        [
+          26,
+          64,
+          111,
+          133
+        ],
+        [
+          26,
+          62,
+          108,
+          133
+        ],
+        [
+          28,
+          61,
+          108,
+          133
+        ],
+        [
+          29,
+          60,
+          108,
+          133
+        ],
+        [
+          29,
+          60,
+          108,
+          134
+        ],
+        [
+          30,
+          60,
+          108,
+          133
+        ],
+        [
+          29,
+          59,
+          108,
+          133
+        ],
+        [
+          28,
+          59,
+          108,
+          133
+        ],
+        [
+          26,
+          59,
+          108,
+          133
+        ]
+      ],
+      "sha256": "ee201cfdf14641af685ff567614f71523c173a3c86f5e9e081961a769e74ff29",
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "model": "PixMiniMax H3",
+      "timing": "fixed duration",
+      "approved": true,
+      "sourceFrameMap": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        9,
+        10,
+        11,
+        12,
+        14,
+        15,
+        16
+      ],
+      "review": "Main agent inspected every numbered pose: coherent physical body/sword, no baked light effects, stable grounded baseline, count=round(duration*60). Static visual approval; device playback remains owner validation.",
+      "source_path": "Art/flash-executioner/reviewed/actor_swap.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/actor_swap.png",
+      "library_status": "not synced: no ChatGPT Library file capability available",
+      "source_path_raw": "Art/flash-executioner/pixellab/swap_raw.png"
+    },
+    {
+      "role": "Land",
+      "file": "flash_executioner/actor_land.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 3,
+      "rows": 3,
+      "count": 7,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.12,
+      "contactFrame": -1,
+      "loop": false,
+      "sourceFile": "land_raw.png",
+      "rawColumns": 3,
+      "uniquePixelFrames": 7,
+      "emptyFrames": [],
+      "bounds": [
+        [
+          23,
+          59,
+          119,
+          133
+        ],
+        [
+          22,
+          66,
+          124,
+          133
+        ],
+        [
+          21,
+          70,
+          124,
+          133
+        ],
+        [
+          24,
+          69,
+          124,
+          133
+        ],
+        [
+          27,
+          67,
+          122,
+          133
+        ],
+        [
+          29,
+          62,
+          116,
+          133
+        ],
+        [
+          28,
+          59,
+          109,
+          133
+        ]
+      ],
+      "sha256": "57ce4d9b633a9d1a7b224b2562be4e59a44bcad3790e3c9de0790ea6f2f5699b",
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "model": "PixMiniMax H3",
+      "timing": "fixed duration",
+      "approved": true,
+      "sourceFrameMap": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        8
+      ],
+      "review": "Main agent inspected every numbered pose: coherent physical body/sword, no baked light effects, stable grounded baseline, count=round(duration*60). Static visual approval; device playback remains owner validation.",
+      "source_path": "Art/flash-executioner/reviewed/actor_land.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/actor_land.png",
+      "library_status": "not synced: no ChatGPT Library file capability available",
+      "source_path_raw": "Art/flash-executioner/pixellab/land_raw.png"
+    },
+    {
+      "role": "Skill3",
+      "file": "flash_executioner/actor_skill3.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 5,
+      "rows": 5,
+      "count": 22,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.36,
+      "contactFrame": 11,
+      "loop": false,
+      "sourceFile": "skill3_raw.png",
+      "rawColumns": 5,
+      "uniquePixelFrames": 22,
+      "emptyFrames": [
+        11
+      ],
+      "bounds": [
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          25,
+          64,
+          119,
+          133
+        ],
+        [
+          23,
+          65,
+          81,
+          133
+        ],
+        [
+          27,
+          65,
+          81,
+          133
+        ],
+        [
+          25,
+          65,
+          89,
+          133
+        ],
+        [
+          25,
+          65,
+          96,
+          133
+        ],
+        [
+          25,
+          65,
+          99,
+          133
+        ],
+        [
+          25,
+          65,
+          98,
+          133
+        ],
+        null,
+        [
+          27,
+          68,
+          135,
+          133
+        ],
+        [
+          27,
+          73,
+          135,
+          133
+        ],
+        [
+          27,
+          72,
+          135,
+          133
+        ],
+        [
+          31,
+          74,
+          135,
+          133
+        ],
+        [
+          36,
+          77,
+          135,
+          133
+        ],
+        [
+          31,
+          68,
+          121,
+          133
+        ],
+        [
+          25,
+          60,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ]
+      ],
+      "sha256": "faae8d1ba9fe2a237b3d578627b26af0c67930a9cc402694e2fca4e3d11851c4",
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "model": "PixMiniMax H3",
+      "timing": "fixed duration",
+      "approved": true,
+      "sourceFrameMap": [
+        0,
+        1,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
+      "review": "All 22 sequential poses inspected. Intentional blank at11 bridges physical tuck into braced arrival; source foot baseline stable. Map contactFrame11 to original gameplay teleport contact .15s. AI-generated artwork, no hand-authorship claim. Runtime/device playback remains owner validation.",
+      "source_path": "Art/flash-executioner/reviewed/actor_skill3.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/actor_skill3.png",
+      "library_status": "not synced: no ChatGPT Library file capability available",
+      "source_path_raw": "Art/flash-executioner/pixellab/skill3_raw.png"
+    },
+    {
+      "role": "Basic",
+      "file": "flash_executioner/actor_basic.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 6,
+      "rows": 5,
+      "count": 28,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.46,
+      "contactFrame": 6,
+      "loop": false,
+      "sourceFile": "basic_raw.png",
+      "rawColumns": 6,
+      "uniquePixelFrames": 28,
+      "emptyFrames": [],
+      "bounds": [
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          28,
+          61,
+          119,
+          133
+        ],
+        [
+          31,
+          54,
+          104,
+          133
+        ],
+        [
+          33,
+          56,
+          105,
+          133
+        ],
+        [
+          34,
+          56,
+          106,
+          133
+        ],
+        [
+          36,
+          56,
+          106,
+          133
+        ],
+        [
+          33,
+          65,
+          158,
+          134
+        ],
+        [
+          32,
+          64,
+          154,
+          134
+        ],
+        [
+          34,
+          64,
+          154,
+          134
+        ],
+        [
+          37,
+          64,
+          154,
+          134
+        ],
+        [
+          38,
+          64,
+          154,
+          134
+        ],
+        [
+          38,
+          64,
+          154,
+          134
+        ],
+        [
+          38,
+          64,
+          154,
+          134
+        ],
+        [
+          38,
+          64,
+          154,
+          134
+        ],
+        [
+          36,
+          64,
+          154,
+          134
+        ],
+        [
+          36,
+          64,
+          154,
+          134
+        ],
+        [
+          36,
+          64,
+          154,
+          134
+        ],
+        [
+          39,
+          64,
+          154,
+          134
+        ],
+        [
+          38,
+          64,
+          154,
+          134
+        ],
+        [
+          38,
+          64,
+          154,
+          134
+        ],
+        [
+          37,
+          64,
+          154,
+          134
+        ],
+        [
+          33,
+          62,
+          146,
+          134
+        ],
+        [
+          30,
+          60,
+          129,
+          133
+        ],
+        [
+          29,
+          59,
+          116,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ]
+      ],
+      "sha256": "19022ccec1ab305c8789791d9f2377124a3146c38bd05c5a8ef62b01de8745e7",
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "model": "PixMiniMax H3",
+      "timing": "fixed duration",
+      "approved": true,
+      "sourceFrameMap": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ],
+      "review": "All sequential numbered poses inspected. Attached physical sword, consistent armor and grounded recovery; contactFrame6 must map to unchanged gameplay contact. Basic excludes source6 baked FX; Skill1 includes a newly AI-generated bridge pose, never a duplicate. Static art approval; device verification pending.",
+      "source_path": "Art/flash-executioner/reviewed/actor_basic.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/actor_basic.png",
+      "library_status": "not synced: no ChatGPT Library file capability available",
+      "source_path_raw": "Art/flash-executioner/pixellab/basic_raw.png"
+    },
+    {
+      "role": "Skill1",
+      "file": "flash_executioner/actor_skill1.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 6,
+      "rows": 5,
+      "count": 30,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.5,
+      "contactFrame": 6,
+      "loop": false,
+      "sourceFrameMap": [
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 0,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 1,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 2,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 3,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 4,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 5,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 6,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 7,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 8,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_bridge_raw.png",
+          "index": 1,
+          "columns": 3
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 9,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 10,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 11,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 12,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 13,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 14,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 15,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 16,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 17,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 18,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 19,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 20,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 21,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 22,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 23,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 24,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 25,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 26,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 27,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 28,
+          "columns": 6
+        }
+      ],
+      "uniquePixelFrames": 30,
+      "sha256": "be42b691a3258aea3c426d83beca7085856cdd1a036275c76ff100653cf4825b",
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "notes": "One newly AI-generated intermediate pose inserted after original8. No duplicated/warped poses. Contact6 must map to original gameplay .125s via piecewise phase.",
+      "approved": true,
+      "review": "All sequential numbered poses inspected. Attached physical sword, consistent armor and grounded recovery; contactFrame6 must map to unchanged gameplay contact. Basic excludes source6 baked FX; Skill1 includes a newly AI-generated bridge pose, never a duplicate. Static art approval; device verification pending.",
+      "source_path": "Art/flash-executioner/reviewed/actor_skill1.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/actor_skill1.png",
+      "library_status": "not synced: no ChatGPT Library file capability available"
+    },
+    {
+      "role": "Skill2",
+      "file": "flash_executioner/actor_skill2.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 6,
+      "rows": 5,
+      "count": 28,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.46,
+      "contactFrame": 14,
+      "loop": false,
+      "sourceFile": "skill2_raw.png",
+      "rawColumns": 6,
+      "uniquePixelFrames": 28,
+      "emptyFrames": [],
+      "bounds": [
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ]
+      ],
+      "sha256": "b04e566291e4a6b1eae982aec2aed12c19eefad01de58c5d844f2592cf0ddc1d",
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "model": "PixMiniMax H3",
+      "timing": "fixed duration",
+      "approved": true,
+      "sourceFrameMap": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ],
+      "review": "Main inspected all28 poses and enlarged frame16: sword remains in lowered hand, separate opposite empty fist rises beside helmet and recovers. Both hands visible, no sword transfer or baked effects. ContactFrame14 maps to .23s. Static visual approval; owner runtime verification pending.",
+      "source_path": "Art/flash-executioner/reviewed/actor_skill2.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/actor_skill2.png",
+      "library_status": "not synced: no ChatGPT Library file capability available",
+      "source_path_raw": "Art/flash-executioner/pixellab/skill2_raw.png"
+    },
+    {
+      "role": "Slash",
+      "name": "basic-slash",
+      "file": "flash_executioner/effect_slash.png",
+      "cell": [
+        256,
+        224
+      ],
+      "columns": 5,
+      "rows": 5,
+      "count": 25,
+      "pivot": [
+        116,
+        163
+      ],
+      "scale": 1.0,
+      "duration": 0.4,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "Attack contact .184s",
+      "sha256": "fbeb2f5ef4ea74664e04175dc2f2c2014c24f6afe263fc7596ccf41895e6d30d",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 24,
+      "approved": true,
+      "front": true,
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "review": "Main agent inspected every effect contact, all15 actor-scale compositions on dark/light backgrounds, revised impact/command/blink cores. Procedural VFX-only source; actor stays separate. No claim of gameplay validation.",
+      "source_path": "Art/flash-executioner/reviewed/effect_slash.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_slash.png",
+      "library_status": "not synced: no ChatGPT Library file capability available"
+    },
+    {
+      "role": "Rush",
+      "name": "rush-trail",
+      "file": "flash_executioner/effect_rush.png",
+      "cell": [
+        320,
+        176
+      ],
+      "columns": 4,
+      "rows": 6,
+      "count": 22,
+      "pivot": [
+        190,
+        132
+      ],
+      "scale": 1.0,
+      "duration": 0.35,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "Skill1 contact .125s",
+      "sha256": "2433a6c03d6006d01fe7413114e1a4756e1f7c95093b277a01992d728965d5f1",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 20,
+      "approved": true,
+      "front": true,
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "review": "Main agent inspected every effect contact, all15 actor-scale compositions on dark/light backgrounds, revised impact/command/blink cores. Procedural VFX-only source; actor stays separate. No claim of gameplay validation.",
+      "source_path": "Art/flash-executioner/reviewed/effect_rush.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_rush.png",
+      "library_status": "not synced: no ChatGPT Library file capability available"
+    },
+    {
+      "role": "Command",
+      "name": "command-release",
+      "file": "flash_executioner/effect_command.png",
+      "cell": [
+        224,
+        200
+      ],
+      "columns": 5,
+      "rows": 5,
+      "count": 25,
+      "pivot": [
+        112,
+        154
+      ],
+      "scale": 1.0,
+      "duration": 0.4,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "Skill2 contact .23s",
+      "sha256": "e11cc72d79bfe5eb6645f0aeb39341a0dbf9ddc7ffe0395d1f6447fdbddd0bea",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 24,
+      "approved": true,
+      "front": true,
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "review": "Main agent inspected every effect contact, all15 actor-scale compositions on dark/light backgrounds, revised impact/command/blink cores. Procedural VFX-only source; actor stays separate. No claim of gameplay validation.",
+      "source_path": "Art/flash-executioner/reviewed/effect_command.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_command.png",
+      "library_status": "not synced: no ChatGPT Library file capability available"
+    },
+    {
+      "role": "BlinkOut",
+      "name": "blink-depart",
+      "file": "flash_executioner/effect_blinkout.png",
+      "cell": [
+        224,
+        208
+      ],
+      "columns": 5,
+      "rows": 4,
+      "count": 20,
+      "pivot": [
+        112,
+        160
+      ],
+      "scale": 1.0,
+      "duration": 0.32,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "Skill3 starts, source world location",
+      "sha256": "05c52d6aac71678cbdfcd23d86df234723c490cfdd8b03a2a765d138ff18612d",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 19,
+      "approved": true,
+      "front": true,
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "review": "Main agent inspected every effect contact, all15 actor-scale compositions on dark/light backgrounds, revised impact/command/blink cores. Procedural VFX-only source; actor stays separate. No claim of gameplay validation.",
+      "source_path": "Art/flash-executioner/reviewed/effect_blinkout.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_blinkout.png",
+      "library_status": "not synced: no ChatGPT Library file capability available"
+    },
+    {
+      "role": "BlinkIn",
+      "name": "blink-arrive",
+      "file": "flash_executioner/effect_blinkin.png",
+      "cell": [
+        224,
+        208
+      ],
+      "columns": 5,
+      "rows": 5,
+      "count": 23,
+      "pivot": [
+        112,
+        160
+      ],
+      "scale": 1.0,
+      "duration": 0.36,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "Skill3 contact .15s, destination world location",
+      "sha256": "9d3e73d6a0cc338aeb1163ee3a32df5d1e02991b91af5fbb59f8e1ae1f828bef",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 21,
+      "approved": true,
+      "front": true,
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "review": "Main agent inspected every effect contact, all15 actor-scale compositions on dark/light backgrounds, revised impact/command/blink cores. Procedural VFX-only source; actor stays separate. No claim of gameplay validation.",
+      "source_path": "Art/flash-executioner/reviewed/effect_blinkin.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_blinkin.png",
+      "library_status": "not synced: no ChatGPT Library file capability available"
+    },
+    {
+      "role": "Verdict",
+      "name": "verdict-charge",
+      "file": "flash_executioner/effect_verdict.png",
+      "cell": [
+        288,
+        256
+      ],
+      "columns": 7,
+      "rows": 7,
+      "count": 45,
+      "pivot": [
+        144,
+        206
+      ],
+      "scale": 1.0,
+      "duration": 0.728,
+      "fps": 60,
+      "loop": false,
+      "layer": "back",
+      "trigger": "Ultimate starts, attach to actor feet",
+      "sha256": "91f4e3fc12fed1fd0fb13e1880d8095015a6186309b51da758dc0c2911dd115d",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 43,
+      "approved": true,
+      "front": false,
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "review": "Main agent inspected every effect contact, all15 actor-scale compositions on dark/light backgrounds, revised impact/command/blink cores. Procedural VFX-only source; actor stays separate. No claim of gameplay validation.",
+      "source_path": "Art/flash-executioner/reviewed/effect_verdict.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_verdict.png",
+      "library_status": "not synced: no ChatGPT Library file capability available"
+    },
+    {
+      "role": "Impact",
+      "name": "light-impact",
+      "file": "flash_executioner/effect_impact.png",
+      "cell": [
+        224,
+        200
+      ],
+      "columns": 6,
+      "rows": 6,
+      "count": 31,
+      "pivot": [
+        112,
+        130
+      ],
+      "scale": 1.0,
+      "duration": 0.5,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "actual basic/rush enemy impact",
+      "sha256": "85604a1229cd4fceb9b95ad5bb83a5d8547aa029b6c8c5db1b6913a0f08d6a9c",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 30,
+      "approved": true,
+      "front": true,
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "review": "Main agent inspected every effect contact, all15 actor-scale compositions on dark/light backgrounds, revised impact/command/blink cores. Procedural VFX-only source; actor stays separate. No claim of gameplay validation.",
+      "source_path": "Art/flash-executioner/reviewed/effect_impact.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_impact.png",
+      "library_status": "not synced: no ChatGPT Library file capability available"
+    },
+    {
+      "role": "Orb",
+      "name": "light-orb",
+      "file": "flash_executioner/effect_orb.png",
+      "cell": [
+        48,
+        48
+      ],
+      "columns": 8,
+      "rows": 8,
+      "count": 60,
+      "pivot": [
+        24,
+        24
+      ],
+      "scale": 1.0,
+      "duration": 1.0,
+      "fps": 60,
+      "loop": true,
+      "layer": "front",
+      "trigger": "one per existing stored orb, gameplay orbit location",
+      "sha256": "4dd4f55b4443acf0b2aa726948e89b5d0eed83c36921e0aa29177a527124b915",
+      "empty_first": false,
+      "empty_last": false,
+      "unique_frames": 57,
+      "approved": true,
+      "front": true,
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "review": "Main agent inspected every effect contact, all15 actor-scale compositions on dark/light backgrounds, revised impact/command/blink cores. Procedural VFX-only source; actor stays separate. No claim of gameplay validation.",
+      "source_path": "Art/flash-executioner/reviewed/effect_orb.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_orb.png",
+      "library_status": "not synced: no ChatGPT Library file capability available"
+    },
+    {
+      "role": "Lance",
+      "name": "light-lance",
+      "file": "flash_executioner/effect_lance.png",
+      "cell": [
+        192,
+        80
+      ],
+      "columns": 3,
+      "rows": 7,
+      "count": 19,
+      "pivot": [
+        90,
+        45
+      ],
+      "scale": 0.85,
+      "duration": 0.3,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "existing projectile world location and flight rotation",
+      "sha256": "6ce03cb08c2a50b8a74d5f17ddb822840f0c95b7fac9a8bc40963548b371cf18",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 9,
+      "flightFrameRange": [
+        3,
+        8
+      ],
+      "flightFrameFps": 60,
+      "flightFramePolicy": "cycle inclusive frames3..8 using per-projectile visualFlightAge until actual collision, excluding fade endpoints",
+      "nativeDirectionDegrees": 0,
+      "approved": true,
+      "front": true,
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "review": "Main agent inspected every effect contact, all15 actor-scale compositions on dark/light backgrounds, revised impact/command/blink cores. Procedural VFX-only source; actor stays separate. No claim of gameplay validation.",
+      "source_path": "Art/flash-executioner/reviewed/effect_lance.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_lance.png",
+      "library_status": "not synced: no ChatGPT Library file capability available"
+    },
+    {
+      "role": "SkyLance",
+      "name": "sky-lance",
+      "file": "flash_executioner/effect_skylance.png",
+      "cell": [
+        80,
+        208
+      ],
+      "columns": 8,
+      "rows": 3,
+      "count": 20,
+      "pivot": [
+        40,
+        152
+      ],
+      "scale": 0.85,
+      "duration": 0.32,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "existing verdict projectile world location, vertically downward; do not rotate twice",
+      "sha256": "61dba045d28a2a818daf311c34e7f847ef62377d028f63f3b4bb1c6c5cb87d91",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 10,
+      "flightFrameRange": [
+        3,
+        8
+      ],
+      "flightFrameFps": 60,
+      "flightFramePolicy": "cycle inclusive frames3..8 using per-projectile visualFlightAge until actual collision, excluding fade endpoints",
+      "nativeDirectionDegrees": 90,
+      "approved": true,
+      "front": true,
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "review": "Main agent inspected every effect contact, all15 actor-scale compositions on dark/light backgrounds, revised impact/command/blink cores. Procedural VFX-only source; actor stays separate. No claim of gameplay validation.",
+      "source_path": "Art/flash-executioner/reviewed/effect_skylance.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_skylance.png",
+      "library_status": "not synced: no ChatGPT Library file capability available"
+    },
+    {
+      "role": "LanceHit",
+      "name": "verdict-impact",
+      "file": "flash_executioner/effect_lancehit.png",
+      "cell": [
+        336,
+        320
+      ],
+      "columns": 7,
+      "rows": 6,
+      "count": 40,
+      "pivot": [
+        168,
+        232
+      ],
+      "scale": 1.0,
+      "duration": 0.65,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "existing verdict projectile collision",
+      "sha256": "948a8b8f0286b15fe826ca43fea8bb2696c0718db31396905a548fda05f9d80f",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 38,
+      "approved": true,
+      "front": true,
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "review": "Main agent inspected every effect contact, all15 actor-scale compositions on dark/light backgrounds, revised impact/command/blink cores. Procedural VFX-only source; actor stays separate. No claim of gameplay validation.",
+      "source_path": "Art/flash-executioner/reviewed/effect_lancehit.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_lancehit.png",
+      "library_status": "not synced: no ChatGPT Library file capability available"
+    },
+    {
+      "role": "Dash",
+      "name": "dash-trail",
+      "file": "flash_executioner/effect_dash.png",
+      "cell": [
+        256,
+        160
+      ],
+      "columns": 4,
+      "rows": 4,
+      "count": 16,
+      "pivot": [
+        150,
+        122
+      ],
+      "scale": 1.0,
+      "duration": 0.25,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "normal dash start",
+      "sha256": "a292088ad8e2ae224dd6ba033d4e6c8b305ef6db040918b4f8f403e958c6fdcb",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 15,
+      "approved": true,
+      "front": true,
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "review": "Main agent inspected every effect contact, all15 actor-scale compositions on dark/light backgrounds, revised impact/command/blink cores. Procedural VFX-only source; actor stays separate. No claim of gameplay validation.",
+      "source_path": "Art/flash-executioner/reviewed/effect_dash.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_dash.png",
+      "library_status": "not synced: no ChatGPT Library file capability available"
+    },
+    {
+      "role": "Jump",
+      "name": "jump-takeoff",
+      "file": "flash_executioner/effect_jump.png",
+      "cell": [
+        208,
+        176
+      ],
+      "columns": 4,
+      "rows": 4,
+      "count": 16,
+      "pivot": [
+        104,
+        100
+      ],
+      "scale": 1.0,
+      "duration": 0.25,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "jump takeoff edge",
+      "sha256": "f9060d4476d378a88d68545a53a854a67514c8a13a69d62b26e5f7dcfdb419ad",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 15,
+      "approved": true,
+      "front": true,
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "review": "Main agent inspected every effect contact, all15 actor-scale compositions on dark/light backgrounds, revised impact/command/blink cores. Procedural VFX-only source; actor stays separate. No claim of gameplay validation.",
+      "source_path": "Art/flash-executioner/reviewed/effect_jump.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_jump.png",
+      "library_status": "not synced: no ChatGPT Library file capability available"
+    },
+    {
+      "role": "Land",
+      "name": "landing",
+      "file": "flash_executioner/effect_land.png",
+      "cell": [
+        208,
+        176
+      ],
+      "columns": 5,
+      "rows": 4,
+      "count": 19,
+      "pivot": [
+        104,
+        100
+      ],
+      "scale": 1.0,
+      "duration": 0.3,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "grounded landing edge",
+      "sha256": "38c319e451b8e5658d5a606c52c6d29cb10f4ccbbc6b49ba8926950ede419835",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 17,
+      "approved": true,
+      "front": true,
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "review": "Main agent inspected every effect contact, all15 actor-scale compositions on dark/light backgrounds, revised impact/command/blink cores. Procedural VFX-only source; actor stays separate. No claim of gameplay validation.",
+      "source_path": "Art/flash-executioner/reviewed/effect_land.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_land.png",
+      "library_status": "not synced: no ChatGPT Library file capability available"
+    },
+    {
+      "role": "Swap",
+      "name": "class-swap",
+      "file": "flash_executioner/effect_swap.png",
+      "cell": [
+        256,
+        224
+      ],
+      "columns": 5,
+      "rows": 5,
+      "count": 25,
+      "pivot": [
+        128,
+        172
+      ],
+      "scale": 1.0,
+      "duration": 0.4,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "trigger": "equipped class swap start",
+      "sha256": "93db8054d094cc6bde4b28621771d837502eb2a3a90902b7c39cbfce42c18494",
+      "empty_first": true,
+      "empty_last": true,
+      "unique_frames": 24,
+      "approved": true,
+      "front": true,
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "review": "Main agent inspected every effect contact, all15 actor-scale compositions on dark/light backgrounds, revised impact/command/blink cores. Procedural VFX-only source; actor stays separate. No claim of gameplay validation.",
+      "source_path": "Art/flash-executioner/reviewed/effect_swap.png",
+      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_swap.png",
+      "library_status": "not synced: no ChatGPT Library file capability available"
+    }
+  ],
+  "gameplay_changed": false,
+  "tests_run": false,
+  "library_synced": false
+}

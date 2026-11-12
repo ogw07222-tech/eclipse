@@ -100,9 +100,9 @@ struct Enemy {
     bool dead()const{return health<=0;}
 };
 struct Projectile {float x,y;int facing,damage;bool empowered;float life=1.6f,remainingDrop=0;};
-struct LightLance {size_t target;float x,y,life=.65f;float offset=0,angle=90;bool verdict=false,seeking=false,markOnHit=false;float delay=0,morphTotal=0;};
+struct LightLance {size_t target;float x,y,life=.65f;float offset=0,angle=90;bool verdict=false,seeking=false,markOnHit=false;float delay=0,morphTotal=0;float visualFlightAge=0;};
 enum class LightFx { Impact, Slash, Rush, Command, Depart, Arrive, Verdict };
-struct LightBurst {float x,y,life=.24f;LightFx kind=LightFx::Impact;int facing=1;};
+struct LightBurst {float x,y,life=.24f;LightFx kind=LightFx::Impact;int facing=1;unsigned long long visualSerial=0;};
 struct RiftScar {float x,y,angle,life=.16f;bool slash=false;};
 enum class DamageKind{Normal,Fire,Bleed,Execute};
 struct BleedSpread {float fromX,fromY,toX,toY,life=.23f;};
@@ -354,7 +354,7 @@ class Combat {
         return target;
     }
     void whiteEffect(LightFx kind,float x,float y){
-        lightBursts.push_back({x,y,.24f,kind,player.facing});
+        lightBursts.push_back({x,y,.24f,kind,player.facing,++lightBurstVisualSerial});
     }
     bool stepWhiteMove(float dt,const Actions& a){
         auto& p=player;
@@ -634,6 +634,7 @@ class Combat {
         lightLances.erase(std::remove_if(lightLances.begin(),lightLances.end(),[&](LightLance& lance){
             if((lance.life-=dt)<=0)return true;
             const auto& target=enemies[lance.target];
+            if(lance.delay<=0)lance.visualFlightAge+=dt; // Cosmetic frame clock only.
             if(lance.seeking){
                 if(target.dead())return true;
                 const auto bounds=enemyBounds(target);
@@ -650,7 +651,7 @@ class Combat {
                     damageEnemy(enemies[lance.target],(lance.verdict?8:10)+player.gear.attack(),DamageKind::Normal,false);
                     if(lance.markOnHit&&!enemies[lance.target].dead())enemies[lance.target].lightMark=5.f;
                     if(lance.verdict)whiteEffect(LightFx::Verdict,tx,ty);
-                    lightBursts.push_back({tx,ty});
+                    whiteEffect(LightFx::Impact,tx,ty);
                     return true;
                 }
                 const float traveled=std::min(movement,distance);
@@ -703,6 +704,7 @@ public:
     std::vector<Projectile> projectiles;
     std::vector<LightLance> lightLances;
     std::vector<LightBurst> lightBursts;
+    unsigned long long lightBurstVisualSerial=0; // Presentation identity only; no combat timing/state effects.
     std::vector<RiftScar> riftScars;
     float cameraCenter=viewWidth*.5f;
     std::vector<Popup> popups;
