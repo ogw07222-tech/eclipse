@@ -855,14 +855,13 @@ public:
         titleBg_=IMG_LoadTexture(renderer,asset("title/bg_clean.png").c_str());
         titleKnightFg_=IMG_LoadTexture(renderer,asset("title/knight_fg.png").c_str());
         if(!titleBg_ || !titleKnightFg_){
-            if(titleBg_){SDL_DestroyTexture(titleBg_);titleBg_=nullptr;}
-            if(titleKnightFg_){SDL_DestroyTexture(titleKnightFg_);titleKnightFg_=nullptr;}
-            SDL_Log("ECLIPSE title: clean three-layer pack absent; using legacy backdrop");
-        }else{
-            for(SDL_Texture* layer:{titleBg_,titleKnightFg_}){
-                SDL_SetTextureScaleMode(layer,SDL_SCALEMODE_NEAREST);
-                SDL_SetTextureBlendMode(layer,SDL_BLENDMODE_BLEND);
-            }
+            const std::string missing=!titleBg_?"title/bg_clean.png":"title/knight_fg.png";
+            SDL_SetError("ECLIPSE ASSET ERROR: required corrected title layer %s missing or invalid",missing.c_str());
+            return false;
+        }
+        for(SDL_Texture* layer:{titleBg_,titleKnightFg_}){
+            SDL_SetTextureScaleMode(layer,SDL_SCALEMODE_NEAREST);
+            SDL_SetTextureBlendMode(layer,SDL_BLENDMODE_BLEND);
         }
         SDL_SetTextureScaleMode(titleTexture_,SDL_SCALEMODE_NEAREST);
         SDL_SetTextureBlendMode(titleTexture_,SDL_BLENDMODE_BLEND);
@@ -1340,6 +1339,15 @@ public:
         }
         mageRun_=loadOptionalTexture("mage_run.png",motionWidth*motionColumns,motionHeight);
         mageMotion_=loadOptionalTexture("mage_motion.png",motionWidth*mageMotionColumns,motionHeight*mageMotionRows);
+        // User-authored sprite sheets are production assets, not procedural
+        // placeholders. A missing pack must be reported instead of silently
+        // showing an old mage or a mismatched knight skill animation.
+        if(!knightSkillMotion_||!mageRun_||!mageMotion_){
+            const char* missing=!knightSkillMotion_?"knight_skill_motion.png":
+                                !mageRun_?"mage_run.png":"mage_motion.png";
+            SDL_SetError("ECLIPSE ASSET ERROR: required character animation %s missing or has an invalid size",missing);
+            return false;
+        }
         if(!settingsGear_)settingsGear_=loadOptionalTexture("ui/settings_gear.png");
         settingsPanel_=loadOptionalTexture("ui/settings_menu_panel.png");
         settingsWindow_=loadOptionalTexture("ui/settings_window.png");
