@@ -8,7 +8,9 @@ namespace eclipse::CastleTerrain {
 struct Node { float x,y; };
 struct Platform { float left,right,y; };
 struct Profile { const Node* nodes; int nodeCount; const Platform* platforms; int platformCount; float width,spawnX,spawnY,gapL,gapR; };
-inline constexpr Node a1Nodes[]={{0,565},{1800,565}};
+// A1 2172x724 original art maps to 2160x720 world units. Ground traced
+// against the visible footpath; small gradual rise toward the entry gate.
+inline constexpr Node a1Nodes[]={{0,526},{580,527},{1150,524},{1450,522},{1550,515},{1650,501},{1740,486},{2160,486}};
 inline constexpr Node a2Nodes[]={{0,640},{1710,640},{1840,500},{1970,340},{2160,340}};
 inline constexpr Platform a2Platforms[]={{0,305,458},{565,965,450}};
 inline constexpr Node a3Nodes[]={{0,575},{460,575},{680,445},{900,445},{980,480},{1120,480},{1140,575},{1250,575},{1510,535},{1660,535},{1900,340},{2160,340}};
@@ -17,7 +19,7 @@ inline constexpr Node a4Nodes[]={{0,625},{510,625},{690,535},{1060,535},{1230,45
 inline constexpr Node a5Nodes[]={{0,580},{2160,580}};
 inline constexpr Platform a5Platforms[]={{1880,2160,415}};
 inline constexpr Profile profiles[]={
- {a1Nodes,2,nullptr,0,1800,130,565,-1,-1},
+ {a1Nodes,8,nullptr,0,2160,130,526,-1,-1},
  {a2Nodes,5,a2Platforms,2,2160,120,458,-1,-1},
  {a3Nodes,12,a3Platforms,2,2160,115,575,1150,1220},
  {a4Nodes,8,nullptr,0,2160,140,625,-1,-1},
