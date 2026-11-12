@@ -113,3 +113,12 @@ Status: Pixelbolt CLI sample rendering SUCCESS in ChatGPT container. ECLIPSE art
 - Static diff/PNG/hash/source checks only. Builds, tests, device playback and GitHub Actions NOT RUN.
 - Library mirror is NOT SYNCED: no ChatGPT Library capability. Matching-byte changed-file ZIP supplied separately for manual /ECLIPSE/eclipse main/ import. GitHub commit without Library upload is partial sync, not a complete mirror.
 - Remaining owner validation: device timing and both facing directions; skill2 hands; teleport frame/target position; FX front/back occlusion/performance. Remaining art: full qualified Ultimate/Idle/Run/Jump/Fall re-authoring and review.
+
+
+## 2026-11-13 — Owner-requested character archive purge
+
+- Preserve all today's Flash Executioner source, actor and effect sheets, original_192.png and production sources; preserve backgrounds, enemies and UI. Static comparison confirmed 184 existing main asset/source files retain identical Git blob IDs.
+- Purge 226 historical paths: obsolete playable character sprite sheets, associated art sources/reviews, legacy archived game trees and obsolete character art scripts. Rewrite all 78 branch histories to remove these paths. Existing game implementation is otherwise retained.
+- Historical branch workflow definitions changed to manual workflow_dispatch only before publication. No Actions, builds or owner tests run.
+- Library unavailable: /ECLIPSE/eclipse main/ and historical Library archives are NOT synchronized or purged. GitHub PR refs/cached commits, forks and other clones may retain old bytes; branch history cleanup cannot guarantee physical server erasure.
+- Existing eclipse-integration working directory has owner changes and was not overwritten. It must not be pushed to restore old history.

@@ -14,10 +14,3 @@ This repository contains the production **ECLIPSE Game**, developed with **C++17
 Read [AGENTS.md](AGENTS.md) before changes. **Never run GitHub Actions without explicit approval for that particular run.** The owner tests on their own device.
 
 Keep sprite atlases, runtime animation mappings, and game resources consistent. Required game assets must fail with an explicit error rather than silently falling back to unrelated art.
-
-## Archived game versions
-
-- [Legacy/Unity/](Legacy/Unity/README.md) — Unity 6.3 snapshot.
-- [Legacy/Godot/](Legacy/Godot/README.md) — archived Godot game.
-
-The active game is SDL3, not the archived Unity or Godot implementations.
