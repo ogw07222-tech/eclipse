@@ -34,8 +34,8 @@ public:
     template<class Resolve>
     bool load(SDL_Renderer* renderer,Resolve resolve){
         clear();renderer_=renderer;
-        constexpr int expectedW[]={900,2172,2172,2172,2172};
-        constexpr int expectedH[]={360,724,724,724,724};
+        constexpr int expectedW[]={2172,2172,2172,2172,2172};
+        constexpr int expectedH[]={724,724,724,724,724};
         for(int i=0;i<5;++i){
             const std::string path=resolve(files_[i]);
             SDL_Surface* surface=IMG_Load(path.c_str());
