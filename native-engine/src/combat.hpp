@@ -9,6 +9,7 @@
 #include "forest_layers.hpp"
 #include "slime_motion.hpp"
 #include "monster_collision.hpp"
+#include "castle_terrain.hpp" // ECLIPSE_CASTLE_FIXED_TERRAIN_V32
 
 namespace eclipse {
 constexpr double fixedStep=1.0/60.0;
@@ -114,14 +115,16 @@ struct GroundSurface {
 
 class Combat {
     float surfaceBelow(float x,float y) const {
-        float nearest=y<=floorY?floorY:std::numeric_limits<float>::infinity();
+        const float base=castleArea?CastleTerrain::groundAt(castleArea,x):floorY;
+        float nearest=y<=base?base:std::numeric_limits<float>::infinity();
         for(const auto& surface:platforms)
             if(surface.covers(x)&&surface.y>=y)nearest=std::min(nearest,surface.y);
         return nearest;
     }
     float crossedGround(float x,float y,float nextX,float nextY) const {
         if(nextY<y)return std::numeric_limits<float>::infinity();
-        float contact=y<=floorY&&nextY>=floorY?floorY:std::numeric_limits<float>::infinity();
+        const float base=castleArea?CastleTerrain::groundAt(castleArea,nextX):floorY;
+        float contact=y<=base&&nextY>=base?base:std::numeric_limits<float>::infinity();
         for(const auto& surface:platforms){
             if(surface.y<y||surface.y>nextY||surface.y>=contact)continue;
             const float t=surface.y>y?(surface.y-y)/(nextY-y):1.f;
@@ -387,7 +390,7 @@ class Combat {
                 auto& e=enemies[p.whiteTarget];
                 whiteEffect(LightFx::Depart,p.x,p.y-48);
                 const float side=e.x>=p.x?1.f:-1.f;
-                p.x=std::clamp(e.x+side*58,25.f,1550.f);p.y=floorY;
+                p.x=std::clamp(e.x+side*58,25.f,castleArea?castleWorldWidth()-35.f:1550.f);p.y=castleArea?CastleTerrain::groundAt(castleArea,p.x):floorY;
                 p.facing=e.x>=p.x?1:-1;
                 whiteEffect(LightFx::Arrive,p.x,p.y-48);
             }else if(move==WhiteMove::Verdict){
@@ -401,7 +404,7 @@ class Combat {
             const float travel=std::max(0.f,std::min(.36f,p.whiteAge)-std::max(clip.contact,old));
             if(travel>0){
                 const float from=p.x;
-                p.x=std::clamp(from+p.facing*1080*travel,25.f,1550.f);
+                p.x=std::clamp(from+p.facing*1080*travel,25.f,castleArea?castleWorldWidth()-35.f:1550.f);
                 if(static_cast<int>(old*60)%2==0)whiteEffect(LightFx::Rush,p.x,p.y-47);
                 const BodyRect strike{std::min(from,p.x)-18,p.y-83,std::max(from,p.x)+18,p.y+2};
                 for(size_t i=0;i<enemies.size();++i){
@@ -497,14 +500,35 @@ class Combat {
         else if(p.meleeLeft>0&&p.strike!=SwordStrike::Basic)
             p.vx=p.strike==SwordStrike::Thrust?p.facing*65.f:0.f;
 
-        const float nextX=std::clamp(p.x+p.vx*dt,25.f,1550.f);
+        const float nextX=std::clamp(p.x+p.vx*dt,25.f,castleArea?castleWorldWidth()-35.f:1550.f);
         const float nextY=p.y+p.vy*dt;
-        const float contact=crossedGround(p.x,p.y,nextX,nextY);
+        float contact=crossedGround(p.x,p.y,nextX,nextY);
+        if(castleArea>0 && p.grounded && p.vy>=0.f){
+            const float nextBase=CastleTerrain::standingAt(castleArea,nextX,p.y);
+            if(std::isfinite(nextBase)&&std::fabs(nextBase-p.y)<=12.f)
+                contact=std::min(contact,nextBase);
+        }
         const bool landed=std::isfinite(contact)&&(!p.grounded||p.y!=contact);
         if(p.grounded&&!std::isfinite(contact))p.meleeLeft=0;
         p.x=nextX;
         p.grounded=std::isfinite(contact);
         p.y=p.grounded?contact:nextY;
+        if(castleArea>0&&p.y>CastleTerrain::pitTriggerY){
+            // ECLIPSE_CASTLE_PIT_DAMAGE_V33: percent max HP, no armor mitigation.
+            const int fallDamage=std::max(1,(p.maxHealth()*CastleTerrain::pitDamagePercent+99)/100);
+            holdHealthTrail(p,.12f);
+            p.health=std::max(0,p.health-fallDamage);
+            p.hurtTint=.18f;
+            p.invulnerable=std::max(p.invulnerable,CastleTerrain::pitInvulnerabilitySeconds);
+            const auto& area=CastleTerrain::profile(castleArea);
+            p.x=area.spawnX;p.y=area.spawnY;
+            p.vx=p.vy=0.f;p.grounded=true;
+            p.jumpBuffer=p.coyote=0.f;
+            p.airSlam=false;p.slamAge=0.f;p.slamRecover=0.f;
+            p.dashLeft=0.f;p.meleeLeft=0.f;
+            ++pitRespawnSerial;
+            if(p.health<=0){ended=true;won=false;inventory=false;}
+        }
         if(p.grounded){
             p.vy=0;
             if(landed){
@@ -537,6 +561,7 @@ class Combat {
     }
     void stepEnemy(Enemy& e,float dt){
         if(e.dead())return;
+        const float oldEnemyX=e.x;
         e.lightMark=down(e.lightMark,dt);
         e.attackTimer=down(e.attackTimer,dt);e.hitFlash=down(e.hitFlash,dt);e.reactionFlash=down(e.reactionFlash,dt);e.stagger=down(e.stagger,dt);e.knockback=toward(e.knockback,650*dt);
         // DOT ticks keep adding to the same white damage segment; after the hold
@@ -570,7 +595,8 @@ class Combat {
                 const float t=std::clamp((phase-.22f)/(.68f-.22f),0.f,1.f);
                 const float eased=t*t*(3-2*t);
                 e.x=e.attackFromX+(e.attackToX-e.attackFromX)*eased;
-                e.y=floorY-4*t*(1-t)*120.f;
+                const float takeoffY=castleArea?CastleTerrain::groundAt(castleArea,e.attackFromX):floorY;
+                e.y=(std::isfinite(takeoffY)?takeoffY:floorY)-4*t*(1-t)*120.f;
             }else{
                 const float lunge=std::sin(phase*3.14159265f);
                 e.x=e.attackFromX+e.facing*(e.kind==0?18.f:30.f)*lunge*lunge;
@@ -580,7 +606,7 @@ class Combat {
                 const BodyRect playerBody{player.x-14,player.y-86,player.x+14,player.y};
                 if(overlaps(enemyAttackBounds(e),playerBody))damagePlayer(e.damage);
             }
-            if(e.attackAge>=spec.attackDuration){e.attackAge=-1;e.y=floorY;}
+            if(e.attackAge>=spec.attackDuration){e.attackAge=-1;e.y=castleArea?CastleTerrain::groundAt(castleArea,e.x):floorY;}
         }else{
             if(std::abs(dx)>1)e.facing=dx>0?1:-1;
             const float gap=enemyFrontGap(e,player);
@@ -592,10 +618,17 @@ class Combat {
         }
         e.travelPhase=std::fmod(e.travelPhase+std::abs(vx)*dt/64.f,1.f);
         e.x+=(vx+e.knockback)*dt;
+        if(castleArea>0){
+            const float foot=CastleTerrain::groundAt(castleArea,e.x);
+            if(!std::isfinite(foot)){e.x=oldEnemyX;e.knockback=0.f;}
+            const float safeFoot=CastleTerrain::groundAt(castleArea,e.x);
+            if(std::isfinite(safeFoot)&&!(e.kind==1&&e.attackAge>=0.f))e.y=safeFoot;
+        }
         // World clipping follows the same visible silhouette as hit detection.
         const auto body=enemyBounds(e);
         if(body.left<0)e.x-=body.left;
-        if(body.right>worldWidth)e.x-=body.right-worldWidth;
+        const float rightEdge=castleArea?castleWorldWidth():worldWidth;
+        if(body.right>rightEdge)e.x-=body.right-rightEdge;
     }
     void stepLightLances(float dt){
         lightLances.erase(std::remove_if(lightLances.begin(),lightLances.end(),[&](LightLance& lance){
@@ -653,6 +686,19 @@ class Combat {
 public:
     Player player;
     std::vector<GroundSurface> platforms;
+    int castleArea=0; // 0 retains the legacy scene until the five approved single-image PNGs are published
+    unsigned pitRespawnSerial=0; // ECLIPSE_CASTLE_PIT_DAMAGE_V33
+    float castleWorldWidth() const {return castleArea?CastleTerrain::profile(castleArea).width:1600.f;}
+    void configureCastleArea(int area){
+        castleArea=std::clamp(area,1,5);
+        platforms.clear();
+        const auto& layout=CastleTerrain::profile(castleArea);
+        for(int i=0;i<layout.platformCount;++i){
+            const auto& item=layout.platforms[i];
+            platforms.push_back({item.left,item.right,item.y});
+        }
+        restart();
+    }
     std::array<Enemy,4> enemies;
     std::vector<Projectile> projectiles;
     std::vector<LightLance> lightLances;
@@ -664,7 +710,7 @@ public:
     bool ended=false,won=false,inventory=false;
     float clock=0,enemyVisualClock=0;
     Combat(){projectiles.reserve(16);popups.reserve(32);restart();}
-    void restart(){const auto jobs=player.equippedJobs;player={};player.equippedJobs=jobs;player.activeJob=0;player.form=jobs[0]==1?1:0;player.whiteNight=jobs[0]==2;enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};projectiles.clear();lightLances.clear();lightBursts.clear();riftScars.clear();cameraCenter=viewWidth*.5f;popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=enemyVisualClock=0;}
+    void restart(){const auto jobs=player.equippedJobs;player={};if(castleArea){const auto& area=CastleTerrain::profile(castleArea);player.x=area.spawnX;player.y=area.spawnY;}player.equippedJobs=jobs;player.activeJob=0;player.form=jobs[0]==1?1:0;player.whiteNight=jobs[0]==2;enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};projectiles.clear();lightLances.clear();lightBursts.clear();riftScars.clear();cameraCenter=viewWidth*.5f;popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=enemyVisualClock=0;}
     int foes()const{int count=0;for(const auto& e:enemies)if(!e.dead())++count;return count;}
     void hit(Enemy& e,int amount,bool fire,int bleed=0,bool slam=false){
         if(e.dead()||ended)return;
