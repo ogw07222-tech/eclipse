@@ -340,6 +340,7 @@ int main(int argc,char** argv){
         view.reset();cleanup();return 1;
     }
     view->setDemonCastleEntrance(true);
+    game.configureCastleArea(1); // Side-view A1 art and fixed collision share the same area.
     SDL_Log("ECLIPSE first playable scene: demon castle entrance (combat playtest; tutorial later)");
     float titleSeconds=0;
     Uint64 last=SDL_GetTicksNS();double accumulator=0;
