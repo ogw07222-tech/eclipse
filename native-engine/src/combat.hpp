@@ -50,7 +50,7 @@ struct Player {
     int storedLightLances=0;
     bool grounded=true,whiteNight=false;
     // Only these two QA-selected jobs are available to the swap button.
-    std::array<int,2> equippedJobs{{0,1}};
+    std::array<int,2> equippedJobs{{1,2}};
     int activeJob=0;
     WhiteMove whiteMove=WhiteMove::None;
     float whiteAge=0,whiteBoost=0,whiteSlashSpeed=1.f;

@@ -12,7 +12,7 @@ C++17 + SDL3 3.2.22 + SDL3_image 3.2.4. The native runtime now contains ECLIPSE'
 - Sword three-hit combo12/15/23, 0.8s combo window, third-hit bleed; sword skill; mage basic/empowered projectiles, burn, +22 reaction consuming bleed.
 - Both form-swap entry attacks, dash immunity/cooldowns, hit stop, recoil, floating damage and pixel status effects.
 - Nine original equipment stat sets across weapon/armor/charm; max-health adjustment; inventory, clear, defeat and retry.
-- Original knight atlas with correct idle/run/jump/fall/three attacks/dash/hurt/death ranges; procedural pixel forest, mage, enemies, HUD and original PNG button artwork.
+- Two selectable jobs only: Space Ruler (reviewed actor and effect sheets) and White Night / Flash Executioner (reviewed actor and effect sheets). The retired Knight art loaders and selection entry are removed; monsters fall back to procedural pixel art when no atlas is packaged.
 - Keyboard and independently owned touch pointers; upward joystick jump, simultaneous actions, fast press-edge buffering, focus release and restart cleanup.
 
 | Action | Keyboard | Touch |
@@ -46,7 +46,7 @@ ctest --test-dir native-engine/build --output-on-failure
 
 Core checks also run without SDL: `c++ -std=c++17 native-engine/tests/core_tests.cpp -o /tmp/eclipse-tests && /tmp/eclipse-tests`.
 
-Desktop CMake packages exactly five original PNGs beside the executable. Source image bytes are untouched. UI sheets are reduced once at startup to 128px per state for compact GPU textures. SDL shared libraries must remain available for a standalone desktop distribution.
+Desktop CMake packages only PNGs present in the canonical resource tree, plus the reviewed Space Ruler and Flash Executioner sheets. Retired Knight, Mage atlas, and custom legacy FX paths are not build inputs. UI sheets are reduced once at startup to 128px per state for compact GPU textures. SDL shared libraries must remain available for a standalone desktop distribution.
 
 ## Resource and validation boundary
 
@@ -54,9 +54,9 @@ PNG decoding only, no image encoders; fixed-size touch storage; fixed60Hz simula
 
 [Combat port validation](COMBAT_PORT.md) documents model and render checks, APK/Android results and remaining real-device QA. [SCOPE.md](SCOPE.md) keeps engine responsibilities limited to actual game requirements. The prior foundation size snapshot in VALIDATION.md is historical and must not be used as the new APK size.
 
-## Coarse knight motion update
+## Reviewed combat art
 
-The current native knight uses the 104-frame coarse motion sheet described in [KNIGHT_MOTION.md](KNIGHT_MOTION.md), replacing the original knight atlas in native packaging. Run/walk phase follows distance, attacks have separate full clips, and Actions uploads a renderer replay video. Earlier original-atlas descriptions above document the previous port baseline.
+Space Ruler and Flash Executioner actor/effect sheets are loaded from `Assets/Resources/Eclipse/space_ruler/` and `Assets/Resources/Eclipse/flash_executioner/`. Combat startup no longer requires retired Knight, Mage, White Night, or custom gold-effect PNG atlases. The QA job picker exposes Space Ruler and White Night only; all controls and missing optional sprite fallbacks continue to render procedurally.
 
 ## Seed-based forest placement engine
 

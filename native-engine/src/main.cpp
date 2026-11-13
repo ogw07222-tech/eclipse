@@ -68,7 +68,7 @@ void updateKeyboard(){const auto& k=keyState;eclipse::Actions a;
 void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
     const bool wasTitle=titleActive;
     auto beginGame=[&](int first,int second)->bool{
-        if(first==second||first<0||first>2||second<0||second>2)return false;
+        if(first==second||first<1||first>2||second<1||second>2)return false;
         if((first==2||second==2)&&!view.loadWhiteNight()){
             const std::string reason=SDL_GetError();
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",reason.c_str());
@@ -137,10 +137,11 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
                 waitingForVacode=false;continue;
             }
             if(titlePage==TitlePage::QaCharacters){
-                if(selection==3){qaFirstJob=-1;titlePage=TitlePage::Main;continue;}
-                if(selection>=0&&selection<3){
-                    if(qaFirstJob<0)qaFirstJob=selection;
-                    else if(selection!=qaFirstJob)beginGame(qaFirstJob,selection);
+                if(selection==2){qaFirstJob=-1;titlePage=TitlePage::Main;continue;}
+                if(selection>=0&&selection<2){
+                    const int job=selection+1;
+                    if(qaFirstJob<0)qaFirstJob=job;
+                    else if(job!=qaFirstJob)beginGame(qaFirstJob,job);
                     // Duplicate selection is ignored: exactly two distinct jobs.
                 }
                 continue;
@@ -151,9 +152,9 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
                     break;
                 case TitlePage::StartOptions:
                     if(selection==0){
-                        if(vacodeSessionReady()){waitingForVacode=false;beginGame(0,1);}
+                        if(vacodeSessionReady()){waitingForVacode=false;beginGame(1,2);}
                         else if(!waitingForVacode){waitingForVacode=true;requestVacodeLogin();}
-                    }else if(selection==1){waitingForVacode=false;beginGame(0,1);}
+                    }else if(selection==1){waitingForVacode=false;beginGame(1,2);}
                     break;
                 case TitlePage::Gear:
                     if(selection==0)titlePage=TitlePage::Settings;
@@ -247,7 +248,7 @@ int main(int argc,char** argv){
         }
         view->setDemonCastleEntrance(true);
     }
-    SDL_Log("ECLIPSE ready: five UI/knight textures, three slime atlases, combat scene, 1280x720");
+    SDL_Log("ECLIPSE ready: reviewed Space Ruler and Flash Executioner sheets, procedural fallback art, 1280x720");
     if(argc>2&&std::string(argv[1])=="--slime-review"){
         // Simulate the real AI/physics, including the red slime's leap arc.
         std::array<eclipse::Combat,3> reviews;
@@ -358,7 +359,7 @@ int main(int argc,char** argv){
             titleSeconds+=static_cast<float>(elapsed);
             if(waitingForVacode&&vacodeSessionReady()&&titlePage==TitlePage::StartOptions){
                 waitingForVacode=false;
-                game.player.equippedJobs={{0,1}};
+                game.player.equippedJobs={{1,2}};
                 game.restart();animation.reset();input.reset();keyState.fill(false);
                 camera=640;titlePage=TitlePage::Main;titleActive=false;
                 SDL_Log("VACODE verified: default two-job loadout");

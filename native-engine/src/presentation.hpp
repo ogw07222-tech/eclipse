@@ -6,8 +6,6 @@
 #include <cstring>
 #include <vector>
 #include "core.hpp"
-#include "sword_trails.hpp"
-#include "knight_skill_blades.hpp"
 #include "forest_generator.hpp"
 #include "forest_layers.hpp"
 #include "demon_castle_entrance.hpp"
@@ -19,12 +17,7 @@ class Presentation {
     SDL_Renderer* renderer;
     std::array<SDL_Texture*,5> textures{};
     SDL_Texture* titleTexture_=nullptr;
-    SDL_Texture* titleBg_=nullptr;
-    SDL_Texture* titleKnightFg_=nullptr;
-    SDL_Texture* titleCape_=nullptr;
     SDL_Texture* titleMenu_=nullptr;
-    SDL_Texture* whiteNightLance_=nullptr;
-    SDL_Texture* whiteNightMotion_=nullptr;
     std::array<SDL_Texture*,static_cast<int>(FlashActor::Count)> flashActorTextures_{};
     std::array<SDL_Texture*,static_cast<int>(FlashFx::Count)> flashFxTextures_{};
     struct ReviewedFlashEvent {FlashFx role;float x,y,born;int facing;bool follow;};
@@ -40,21 +33,12 @@ class Presentation {
     SDL_Texture* goldImpact_=nullptr;
     SDL_Texture* riftSlash_=nullptr;
     SDL_Texture* riftTrace_=nullptr;
-    std::array<SDL_Texture*,5> whiteFxTextures_{};
-    std::array<SDL_Texture*,3> slimeTextures_{};
     SDL_Texture* enemyBarFrame_=nullptr;
     SDL_Texture* executeIcon_=nullptr;
-    std::array<SDL_Texture*,3> knightSkillTextures_{};
-    std::array<SDL_Texture*,4> whiteSkillTextures_{};
     float offset=0;
-    SDL_Texture* knightSkillMotion_=nullptr;
-    // Effects remain in an independent transparent atlas, never baked onto the actor.
-    SDL_Texture* knightSkillFx_=nullptr;
     int spaceRole_=-1;float spaceRoleBorn_=0;
     std::array<SDL_Texture*,12> spaceActorTextures_{};
     std::array<SDL_Texture*,6> spaceFxTextures_{};
-    SDL_Texture* mageRun_=nullptr;
-    SDL_Texture* mageMotion_=nullptr;
     SDL_Texture* settingsGear_=nullptr;
     SDL_Texture* settingsPanel_=nullptr;
     SDL_Texture* settingsWindow_=nullptr;
@@ -351,10 +335,18 @@ class Presentation {
         const int frame=enemyFrame(e);
         SDL_FRect source{float(frame%4*slimeCell),float(frame/4*slimeCell),slimeCell,slimeCell};
         SDL_FRect target{std::round(e.x-offset-slimePivotX*scale),std::round(e.y-slimePivotY*scale),slimeCell*scale,slimeCell*scale};
-        auto* texture=slimeTextures_[e.kind];
-        SDL_SetTextureColorMod(texture,255,e.hitFlash>0?135:255,e.hitFlash>0?135:255);
-        SDL_RenderTextureRotated(renderer,texture,&source,&target,0,nullptr,e.facing>0?SDL_FLIP_HORIZONTAL:SDL_FLIP_NONE);
-        SDL_SetTextureColorMod(texture,255,255,255);
+        SDL_Texture* texture=nullptr;
+        if(texture){
+            SDL_SetTextureColorMod(texture,255,e.hitFlash>0?135:255,e.hitFlash>0?135:255);
+            SDL_RenderTextureRotated(renderer,texture,&source,&target,0,nullptr,e.facing>0?SDL_FLIP_HORIZONTAL:SDL_FLIP_NONE);
+            SDL_SetTextureColorMod(texture,255,255,255);
+        }else{
+            const unsigned body=e.kind==0?0x63c779:e.kind==1?0xd95762:0x8e72d9;
+            disk(e.x-offset,e.y-h*.48f,27.f*scale,e.hitFlash>0?0xffe8df:body);
+            rect(e.x-offset-17.f*scale,e.y-h*.56f,34.f*scale,24.f*scale,body);
+            disk(e.x-offset-8.f*scale,e.y-h*.52f,3.f*scale,0xf5eee4);
+            disk(e.x-offset+8.f*scale,e.y-h*.52f,3.f*scale,0xf5eee4);
+        }
         // Pixel-art PNG bezel, with independent clipped fills for immediate HP and
         // the delayed white segment. 88x18, more than twice the former height.
         const float barX=std::round(e.x-offset-44),barY=std::round(e.y-h-25);
@@ -466,38 +458,6 @@ class Presentation {
         }
     }
 
-    void swordTrail(const Player& p,const Animation& a){
-        if(p.health<=0||((a.state<4||a.state>6)&&a.state!=12))return;
-        // The weak slash's actor and blade effect must use the same PNG pose.
-        // a.frame remains the original gameplay-independent clip key.
-        const int displayedFrame=p.form==0&&!p.whiteNight&&a.state==4?
-            knightWeakFrame(a.posePhase):a.frame;
-        const auto frame=swordTrailFrames[displayedFrame];
-        for(int i=frame.start;i<frame.start+frame.count;++i){const auto s=swordTrailSpans[i];
-            float x=p.facing>0?p.x+(s.x-motionPivotX)*motionScale:p.x-(s.x+s.width-motionPivotX)*motionScale;
-            rect(x-offset,p.y+(s.y-motionPivotY)*motionScale,s.width*motionScale,motionScale,swordTrailColors[s.shade],static_cast<Uint8>(swordTrailAlpha[s.shade]*frame.alpha/255));
-        }
-    }
-    void knightSkillPngEffect(const Player& p,const Animation& a){
-        if(!knightSkillFx_||!isSkillMotion(a.state)||p.health<=0)return;
-        // Key frames are stored in the first three rows of the 4x6 FX sheet.
-        // The character's separately authored midpoint rows do not change
-        // effect frame IDs, so sword trails cannot jump to another atlas row.
-        const auto& clip=motionClips[a.state];
-        const int pose=std::clamp(a.frame-clip.start,0,clip.count-1);
-        const int fxRow=a.state-thrustSkillState;
-        // FX atlas keeps four key-effect phases per skill, independent of
-        // the actor atlas's twelve authored source-based display poses.
-        const int fxPose=std::clamp(pose/3,0,3);
-        const SDL_FRect src{float(fxPose*skillMotionWidth),
-            float(fxRow*motionHeight),float(skillMotionWidth),float(motionHeight)};
-        const SDL_FRect dest{
-            std::round(p.x-offset-skillMotionPivotX*motionScale),
-            std::round(p.y-motionPivotY*motionScale),
-            skillMotionWidth*motionScale,motionHeight*motionScale};
-        SDL_RenderTextureRotated(renderer,knightSkillFx_,&src,&dest,0,nullptr,
-            p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
-    }
     void spaceSprite(SDL_Texture* texture,const SpaceSheet& sheet,float age,float x,float y,int facing){
         int frame=static_cast<int>(std::max(0.f,age)*sheet.count/sheet.duration);
         frame=sheet.loop?frame%sheet.count:std::min(sheet.count-1,frame);
@@ -546,6 +506,7 @@ class Presentation {
         for(size_t i=0;i<spaceFxTextures_.size();++i)if(!load(eclipse::spaceEffects[i],spaceFxTextures_[i]))return false;
         return true;
     }
+
     void icon(int texture,int col,int row,float x,float y,float size,bool down){
         SDL_FRect source{col*128.f,row*128.f,128,128},target{x,y,size,size};
         SDL_SetTextureColorMod(textures[texture],down?180:255,down?180:255,down?180:255);
@@ -557,35 +518,7 @@ class Presentation {
                      bool pressed,unsigned accent,bool enabled=true,int art=-1){
         const float ready=remaining>0&&duration>0
             ?1.f-std::clamp(remaining/duration,0.f,1.f):1.f;
-        SDL_Texture* skillArt=art>=3&&art<7?whiteSkillTextures_[art-3]:
-            art>=0&&art<3?knightSkillTextures_[art]:nullptr;
-        if(skillArt){
-            SDL_Texture* image=skillArt;
-            float width=0,height=0;
-            if(SDL_GetTextureSize(image,&width,&height)){
-                const float size=std::round(b.size);
-                SDL_FRect target{std::round(b.x),std::round(b.y),size,size};
-                SDL_SetTextureAlphaMod(image,pressed?240:205);
-                const float filled=std::round(size*ready);
-                const float sourceFill=height*filled/size;
-                if(filled<size){
-                    const SDL_FRect source{0,0,width,height-sourceFill};
-                    const SDL_FRect mask{target.x,target.y,size,size-filled};
-                    SDL_SetTextureColorMod(image,95,99,110);
-                    SDL_RenderTexture(renderer,image,&source,&mask);
-                }
-                if(filled>0){
-                    const SDL_FRect source{0,height-sourceFill,width,sourceFill};
-                    const SDL_FRect fill{target.x,target.y+size-filled,size,filled};
-                    SDL_SetTextureColorMod(image,pressed?255:220,pressed?255:225,pressed?255:230);
-                    SDL_RenderTexture(renderer,image,&source,&fill);
-                }
-                SDL_SetTextureColorMod(image,255,255,255);
-                SDL_SetTextureAlphaMod(image,255);
-                if(ready>=1.f)rect(b.x+b.size*.39f,b.y+b.size*.83f,b.size*.22f,3,accent,210);
-                return;
-            }
-        }
+        (void)art; // Legacy character-specific icon sheets were removed.
 
         // The lower portion brightens as the skill becomes available.
         const float unit=std::max(2.f,std::floor(b.size/18.f));
@@ -697,46 +630,18 @@ class Presentation {
             rect(stick.x,stick.y-10,stick.size,5,0x26163a);
             rect(stick.x,stick.y-10,stick.size*p.spaceFuel,5,0xb36bf0);
         }else{
-            const bool knight=p.form==0;
-            skillSlot(c[ControlLayout::Skill],1,knight?"STAB":"FIRE",
-                knight?p.skillCooldown:p.mageSkillCooldown,knight?thrustCooldown:4.1f,held.skill,0xcaa2a4,true,knight?0:-1);
-            skillSlot(c[ControlLayout::Sweep],2,knight?"SWEEP":"-",p.sweepReady,sweepCooldown,held.skillSweep,0x92b5ce,knight,knight?1:-1);
-            skillSlot(c[ControlLayout::Buff],3,knight?"PREP":"-",p.buffReady,buffCooldown,held.skillBuff,0xe3bd72,knight,knight?2:-1);
-            if(knight&&p.preparation>0){
-                const auto& buff=c[ControlLayout::Buff];
-                rect(buff.x+buff.size*.25f,buff.y+buff.size*.88f,buff.size*.5f*p.preparation/preparationDuration,3,0xffdc91);
-            }
+            skillSlot(c[ControlLayout::Skill],1,"FIRE",p.mageSkillCooldown,4.1f,
+                held.skill,0xcaa2a4,true);
+            skillSlot(c[ControlLayout::Sweep],2,"-",p.sweepReady,sweepCooldown,
+                held.skillSweep,0x92b5ce,false);
+            skillSlot(c[ControlLayout::Buff],3,"-",p.buffReady,buffCooldown,
+                held.skillBuff,0xe3bd72,false);
             if(p.swapCooldown>0)number(static_cast<int>(std::ceil(p.swapCooldown)),c[ControlLayout::Swap].x+20,c[ControlLayout::Swap].y+25,3,0xffd277);
         }
         if(g.inventory){rect(46,135,460,340,0xe3bd72);rect(50,139,452,332,0x1c2a34);text("EQUIPMENT",66,153,3);
             for(int i=0;i<3;++i){text(p.gear.name(i),66,200+i*42,2);rect(66+i*143,413,132,45,0x304039);text(i==0?"WEAPON":i==1?"ARMOR":"CHARM",75+i*143,428,2);}
             text("ATK",66,340,2);number(p.gear.attack(),120,340,2);text("DEF",200,340,2);number(p.gear.defense(),250,340,2);text("MAX HP",66,373,2);number(p.maxHealth(),160,373,2);
         }
-    }
-    // Every White Night combat flash is a transparent 4-frame PNG atlas.
-    // No procedural colored rectangles are used for these effects.
-    void drawWhiteEffect(const LightBurst& burst){
-        int kind=0;
-        switch(burst.kind){
-            case LightFx::Slash: kind=0;break;
-            case LightFx::Rush: kind=1;break;
-            case LightFx::Depart: kind=2;break;
-            case LightFx::Arrive: kind=3;break;
-            case LightFx::Verdict: kind=4;break;
-            default: return;
-        }
-        SDL_Texture* sheet=whiteFxTextures_[kind];
-        if(!sheet)return;
-        const float t=std::clamp(1.f-burst.life/.24f,0.f,1.f);
-        const int frame=std::clamp(static_cast<int>(t*4.f),0,3);
-        const SDL_FRect source{float(frame*96),0,96,96};
-        const float size=kind==4?270.f:kind==3?232.f:kind==0?220.f:kind==1?205.f:185.f;
-        const SDL_FRect dest{std::round(burst.x-offset-size*.5f),
-                             std::round(burst.y-size*.5f),size,size};
-        SDL_SetTextureAlphaMod(sheet,static_cast<Uint8>(255.f*(1.f-.22f*t)));
-        SDL_RenderTextureRotated(renderer,sheet,&source,&dest,0,nullptr,
-                                 burst.facing<0?SDL_FLIP_HORIZONTAL:SDL_FLIP_NONE);
-        SDL_SetTextureAlphaMod(sheet,255);
     }
     void menuTile(float x,float y,float w,float h,unsigned fill,unsigned edge){
         rect(x+4,y+4,w,h,0x070b12);
@@ -884,8 +789,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){for(auto* image:spaceActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:spaceFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_,riftSlash_,riftTrace_})if(fx)SDL_DestroyTexture(fx);for(auto* fx:whiteFxTextures_)if(fx)SDL_DestroyTexture(fx);if(whiteNightMotion_)SDL_DestroyTexture(whiteNightMotion_);if(whiteNightLance_)SDL_DestroyTexture(whiteNightLance_);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleBg_)SDL_DestroyTexture(titleBg_);if(titleKnightFg_)SDL_DestroyTexture(titleKnightFg_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);if(knightSkillFx_)SDL_DestroyTexture(knightSkillFx_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:whiteSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
-        for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){for(auto* image:spaceActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:spaceFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_,riftSlash_,riftTrace_})if(fx)SDL_DestroyTexture(fx);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestV3Textures_)if(texture)SDL_DestroyTexture(texture);}
@@ -904,26 +808,8 @@ public:
         // Canonical game title assets use the title/ namespace.
         titleTexture_=IMG_LoadTexture(renderer,asset("title/eclipse.png").c_str());
         if(!titleTexture_){SDL_SetError("ECLIPSE ASSET ERROR: title/eclipse.png missing or invalid");return false;}
-        titleCape_=IMG_LoadTexture(renderer,asset("title/cape.png").c_str());
-        if(!titleCape_){SDL_SetError("ECLIPSE ASSET ERROR: title/cape.png missing or invalid");return false;}
-        if(titleCape_){
-            SDL_SetTextureScaleMode(titleCape_,SDL_SCALEMODE_NEAREST);
-            SDL_SetTextureBlendMode(titleCape_,SDL_BLENDMODE_BLEND);
-        }
-        // A clean background and foreground armor are paired: never mix half
-        // of a new title set with the old flattened composition.
-        titleBg_=IMG_LoadTexture(renderer,asset("title/bg_clean.png").c_str());
-        titleKnightFg_=IMG_LoadTexture(renderer,asset("title/knight_fg.png").c_str());
-        if(!titleBg_ || !titleKnightFg_){
-            if(titleBg_){SDL_DestroyTexture(titleBg_);titleBg_=nullptr;}
-            if(titleKnightFg_){SDL_DestroyTexture(titleKnightFg_);titleKnightFg_=nullptr;}
-            SDL_Log("ECLIPSE title: clean three-layer pack absent; using legacy backdrop");
-        }else{
-            for(SDL_Texture* layer:{titleBg_,titleKnightFg_}){
-                SDL_SetTextureScaleMode(layer,SDL_SCALEMODE_NEAREST);
-                SDL_SetTextureBlendMode(layer,SDL_BLENDMODE_BLEND);
-            }
-        }
+        // Use the self-contained title PNG; removed cape/knight overlay paths
+        // belonged to a discarded multi-layer title pack.
         SDL_SetTextureScaleMode(titleTexture_,SDL_SCALEMODE_NEAREST);
         SDL_SetTextureBlendMode(titleTexture_,SDL_BLENDMODE_BLEND);
         titleMenu_=IMG_LoadTexture(renderer,asset("ui/title_menu.png").c_str());
@@ -1179,8 +1065,8 @@ public:
         return loadReviewedFlashSheets();
     }
 
-    static constexpr std::array<SDL_FRect,4> qaCharacterButtons{{
-        {410,374,460,52},{410,436,460,52},{410,498,460,52},{530,562,220,44}
+    static constexpr std::array<SDL_FRect,3> qaCharacterButtons{{
+        {410,374,460,52},{410,436,460,52},{530,562,220,44}
     }};
 
     void drawTitle(float seconds,int page=0,bool loggingIn=false,int qaFirstJob=-1){
@@ -1192,57 +1078,7 @@ public:
         const float eased=reveal*reveal*(3-2*reveal);
         SDL_SetRenderDrawColor(renderer,11,10,18,255);
         SDL_RenderClear(renderer);
-        SDL_RenderTexture(renderer,titleBg_?titleBg_:titleTexture_,&lowerSource,&lowerScene);
-
-        // Source-aligned transparent cape is the only deforming texture.
-        // The old mesh pinned the far-left cloth tips to its boundary, making
-        // the center stretch while the visible tail barely moved.
-        // Overscan the alpha bounds; pin the shoulder (upper-right) instead.
-        constexpr int columns=28, rows=20;
-        std::array<SDL_Vertex,(columns+1)*(rows+1)> vertices{};
-        for(int row=0;row<=rows;++row){
-            const float v=static_cast<float>(row)/rows;
-            for(int col=0;col<=columns;++col){
-                const float u=static_cast<float>(col)/columns;
-                const float x=185.f+505.f*u, y=215.f+415.f*v;
-                const float loose=std::pow(1.f-u,1.6f);
-                const float vertical=std::clamp((v-0.02f)/0.26f,0.f,1.f);
-                const float shoulderPin=std::clamp((690.f-x)/75.f,0.f,1.f);
-                const float weight=loose*vertical*shoulderPin;
-                const float phase=seconds*2.45f+u*6.8f+v*2.1f;
-                const float flutter=std::sin(phase)+0.20f*std::sin(phase*1.7f+v*3.f);
-                vertices[row*(columns+1)+col]={{
-                    x+weight*4.0f*std::sin(phase+1.f),
-                    y+weight*12.f*flutter
-                },{1,1,1,1},{x/width,y/height}};
-            }
-        }
-        static const auto indices=[]{
-            std::array<int,columns*rows*6> triangles{};
-            int i=0;
-            for(int row=0;row<rows;++row){
-                for(int col=0;col<columns;++col){
-                    const int a=row*(columns+1)+col, b=a+columns+1;
-                    triangles[i++]=a;triangles[i++]=a+1;triangles[i++]=b;
-                    triangles[i++]=a+1;triangles[i++]=b+1;triangles[i++]=b;
-                }
-            }
-            return triangles;
-        }();
-        // A transparent source-aligned cape layer prevents nearby characters,
-        // knight armor and sword from deforming with the cloth mesh.
-        if(titleCape_){
-            // The clean backdrop contains no baked-in cape; draw cloth fully
-            // opaque in its solid pixels to avoid a static double-cape ghost.
-            SDL_SetTextureAlphaMod(titleCape_,titleBg_?255:220);
-            SDL_RenderGeometry(renderer,titleCape_,vertices.data(),static_cast<int>(vertices.size()),
-                               indices.data(),static_cast<int>(indices.size()));
-        }
-        // Re-cover the cape root with stationary armor, helmet and sword.
-        if(titleBg_ && titleKnightFg_){
-            const SDL_FRect screen{0.f,0.f,width,height};
-            SDL_RenderTexture(renderer,titleKnightFg_,nullptr,&screen);
-        }
+        SDL_RenderTexture(renderer,titleTexture_,&lowerSource,&lowerScene);
 
         // The logo and eclipse share the upper artwork strip. Fade its
         // lower edge into the fully visible scene while the lettering appears.
@@ -1259,12 +1095,12 @@ public:
             rect(386,320,508,304,0x101223);
             rect(386,320,508,3,0xad95c7);
             text(qaFirstJob<0?"QA: PICK FIRST JOB":"QA: PICK SECOND JOB",453,340,3,0xffe2b7);
-            constexpr const char* labels[]={"1 KNIGHT","2 SPACE RULER","3 WHITE NIGHT","BACK"};
+            constexpr const char* labels[]={"1 SPACE RULER","2 WHITE NIGHT","BACK"};
             for(size_t i=0;i<qaCharacterButtons.size();++i){
                 const auto& target=qaCharacterButtons[i];
                 const SDL_FRect source{0,0,112,30};
                 SDL_RenderTexture(renderer,titleMenu_,&source,&target);
-                const bool chosen=qaFirstJob==static_cast<int>(i);
+                const bool chosen=i<2&&qaFirstJob==static_cast<int>(i)+1;
                 text(labels[i],target.x+(target.w-std::strlen(labels[i])*18.f)*.5f,
                     target.y+(target.h-21)*.5f,3,chosen?0xffd17c:0xece3f4);
                 if(chosen)rect(target.x+7,target.y+10,5,target.h-20,0xffd17c);
@@ -1316,27 +1152,18 @@ public:
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                 "ECLIPSE castle asset preload failed (castle scene unavailable): %s",SDL_GetError());
         } else SDL_Log("ECLIPSE demon castle entrance assets: ready");
-        constexpr const char* files[]={"knight_motion.png","ui/attack_states.png","ui/dash_states.png","ui/swap_skill_states.png","ui/joystick_arrows_new.png"};
-        for(int i=0;i<5;++i){const auto path=asset(files[i]);SDL_Surface* image=IMG_Load(path.c_str());
+        // Knight motion and monster atlases were removed from the canonical
+        // resource pack. Load only the still-present combat control sheets.
+        constexpr const char* files[]={nullptr,"ui/attack_states.png","ui/dash_states.png","ui/swap_skill_states.png","ui/joystick_arrows_new.png"};
+        for(int i=1;i<5;++i){const auto path=asset(files[i]);SDL_Surface* image=IMG_Load(path.c_str());
             if(!image){SDL_Log("Required PNG missing or invalid: %s (%s)",path.c_str(),SDL_GetError());return false;}
-            if(i==0&&(image->w!=motionWidth*motionColumns||image->h!=motionHeight*motionRows)){SDL_Log("Expected %dx%d motion atlas",motionWidth*motionColumns,motionHeight*motionRows);SDL_DestroySurface(image);return false;}
             // Compact oversized button sheets once, keeping only 128px per state on the GPU.
             if(i>0){int cols=(i==1||i==2||i==3)?2:1,rows=i==3?2:1;auto* scaled=SDL_ScaleSurface(image,128*cols,128*rows,SDL_SCALEMODE_NEAREST);SDL_DestroySurface(image);image=scaled;if(!image)return false;}
             textures[i]=SDL_CreateTextureFromSurface(renderer,image);SDL_DestroySurface(image);
             if(!textures[i])return false;
             SDL_SetTextureScaleMode(textures[i],SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(textures[i],SDL_BLENDMODE_BLEND);
         }
-        constexpr const char* slimes[]={"monsters/slime_green.png","monsters/slime_red.png","monsters/slime_purple.png"};
-        for(int i=0;i<3;++i){
-            auto path=asset(slimes[i]);auto* image=IMG_Load(path.c_str());
-            if(!image){SDL_Log("Required slime atlas missing: %s",path.c_str());return false;}
-            if(image->w!=slimeCell*4||image->h!=slimeCell*4){SDL_DestroySurface(image);SDL_Log("Invalid slime atlas dimensions: %s",path.c_str());return false;}
-            slimeTextures_[i]=SDL_CreateTextureFromSurface(renderer,image);SDL_DestroySurface(image);
-            if(!slimeTextures_[i])return false;
-            SDL_SetTextureScaleMode(slimeTextures_[i],SDL_SCALEMODE_NEAREST);
-            SDL_SetTextureBlendMode(slimeTextures_[i],SDL_BLENDMODE_BLEND);
-        }
-        // Optional sprite textures allow older asset packs to keep rendering.
+        // Optional UI decorations never block gameplay startup.
         auto loadOptionalTexture=[&](const char* name,int width=0,int height=0)->SDL_Texture* {
             const auto path=asset(name);SDL_Surface* image=IMG_Load(path.c_str());
             if(!image)return nullptr;
@@ -1346,45 +1173,14 @@ public:
             if(texture){SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(texture,SDL_BLENDMODE_BLEND);}
             return texture;
         };
-        constexpr const char* whiteFxFiles[]={
-            "ui/white_fx_slash.png","ui/white_fx_rush.png",
-            "ui/white_fx_depart.png","ui/white_fx_arrive.png",
-            "ui/white_fx_verdict.png"};
-        for(int i=0;i<5;++i){
-            whiteFxTextures_[i]=loadOptionalTexture(whiteFxFiles[i],384,96);
-            if(!whiteFxTextures_[i]){
-                SDL_SetError("ECLIPSE ASSET ERROR: required White Night PNG %s missing or invalid (expected 384x96)",whiteFxFiles[i]);
-                return false;
-            }
-        }
-        knightSkillMotion_=loadOptionalTexture("knight_skill_motion.png",
-            skillMotionWidth*skillMotionColumns,motionHeight*skillMotionRows);
-        knightSkillFx_=loadOptionalTexture("knight_skill_fx_layer.png",
-            skillMotionWidth*skillMotionColumns,motionHeight*skillFxRows);
-        if(!knightSkillFx_){
-            SDL_SetError("ECLIPSE ASSET ERROR: knight_skill_fx_layer.png missing or invalid (expected 448x564)");
-            return false;
-        }
-        mageRun_=loadOptionalTexture("mage_run.png",motionWidth*motionColumns,motionHeight);
-        mageMotion_=loadOptionalTexture("mage_motion.png",motionWidth*mageMotionColumns,motionHeight*mageMotionRows);
+        // Legacy Knight, Mage and White Night optional atlases/icons are not
+        // loaded here; current approved Flash Executioner sheets are loaded by
+        // loadWhiteNight(), and the remaining renderer uses procedural fallbacks.
         if(!settingsGear_)settingsGear_=loadOptionalTexture("ui/settings_gear.png");
         settingsPanel_=loadOptionalTexture("ui/settings_menu_panel.png");
         settingsWindow_=loadOptionalTexture("ui/settings_window.png");
         enemyBarFrame_=loadOptionalTexture("ui/enemy_bar_frame.png");
         executeIcon_=loadOptionalTexture("ui/execute_skull.png");
-        knightSkillTextures_[0]=loadOptionalTexture("ui/knight_skill_stab.png");
-        knightSkillTextures_[1]=loadOptionalTexture("ui/knight_skill_sweep.png");
-        knightSkillTextures_[2]=loadOptionalTexture("ui/knight_skill_prep.png");
-        constexpr const char* whiteButtonFiles[]={
-            "ui/white_skill_rush.png","ui/white_skill_release.png",
-            "ui/white_skill_blink.png","ui/white_skill_verdict.png"};
-        for(int i=0;i<4;++i){
-            whiteSkillTextures_[i]=loadOptionalTexture(whiteButtonFiles[i],128,128);
-            if(!whiteSkillTextures_[i]){
-                SDL_SetError("ECLIPSE ASSET ERROR: required White Night skill button PNG %s missing or invalid (expected 128x128)",whiteButtonFiles[i]);
-                return false;
-            }
-        }
         // Optional sprite library: the procedural renderer remains functional without it.
         // Only startup loads textures; no per-frame filesystem work.
         constexpr const char* forestFiles[40]={
@@ -1584,75 +1380,6 @@ public:
                 }
             }
         }
-        // Gold-white light effects are sourced from PNG textures.
-        SDL_Texture* lanceArt=goldLance_?goldLance_:whiteNightLance_;
-        if(lanceArt&&caster.whiteNight&&caster.storedLightLances>0&&!hasReviewedFlashFx(FlashFx::Orb)){
-            for(int i=0;i<caster.storedLightLances;++i){
-                const float phase=g.clock*2.8f+i*6.2831853f/caster.storedLightLances;
-                const float x=caster.x+std::cos(phase)*57.f-offset;
-                const float y=caster.y-61.f+std::sin(phase)*37.f;
-                // Idle stock is a compact sphere, never an already-formed spear.
-                // Five bright cores communicate the full +40% basic-speed passive.
-                const float pulse=1.f+.08f*std::sin(g.clock*5.f+i*1.7f);
-                goldenSprite(goldOrb_,x,y,37.f*pulse,37.f*pulse,0,225);
-                goldenSprite(goldOrb_,x,y,16.f,16.f,0,255);
-                // Tiny orbiting light fragments are also sampled from the orb PNG.
-                for(int j=0;j<3;++j){
-                    const float sparkPhase=phase+j*2.0943951f;
-                    goldenSprite(goldOrb_,x+std::cos(sparkPhase)*24.f,
-                        y+std::sin(sparkPhase)*24.f,9,9,0,155);
-                }
-            }
-        }
-        if(lanceArt)for(const auto& lance:g.lightLances){
-            if(hasReviewedFlashFx(lance.verdict?FlashFx::SkyLance:FlashFx::Lance))continue;
-            // Do not reveal queued sky spears before their staggered drop.
-            if(lance.verdict&&lance.delay>0.f)continue;
-            const float x=lance.x-offset,y=lance.y;
-            const float angle=lance.angle*.017453293f;
-            const float dx=std::cos(angle),dy=std::sin(angle);
-            // Newly released light remains an orb while rotating toward its
-            // target, then stretches in place to full spear length over 0.11s.
-            if(lance.morphTotal>0.f&&lance.delay>0.f){
-                const float phase=std::clamp(1.f-lance.delay/lance.morphTotal,0.f,1.f);
-                const float eased=phase*phase*(3.f-2.f*phase);
-                const float bodyW=14.f+82.f*eased;
-                const float bodyH=27.f-3.f*eased;
-                goldenSprite(goldOrb_,x,y,38.f-15.f*eased,38.f-15.f*eased,0,245);
-                goldenSprite(lanceArt,x,y,bodyW,bodyH,lance.angle,
-                             static_cast<Uint8>(25+230*eased));
-                if(eased>.35f)
-                    goldenSprite(riftTrace_,x-std::cos(angle)*bodyW*.3f,
-                        y-std::sin(angle)*bodyW*.3f,bodyW*.75f,8.f,
-                        lance.angle,static_cast<Uint8>(160*eased));
-                continue;
-            }
-            const bool launched=lance.delay<=0;
-            if(launched){
-                // A narrow, almost-white spatial cut travels with the spear.
-                // The broader golden wake stays secondary to the clean incision.
-                goldenSprite(riftTrace_,x-dx*93.f,y-dy*93.f,225.f,17.f,
-                    lance.angle,235);
-                // Four layered PNG trails create a bright white center and a long gold wake.
-                for(int i=0;i<2;++i){
-                    const float distance=34.f+i*39.f;
-                    goldenSprite(goldTrail_,x-dx*distance,y-dy*distance,
-                        120.f+27.f*i,21.f-i*5.f,lance.angle,
-                        static_cast<Uint8>(95-i*35));
-                }
-                // Spatial particles persist behind each moving spear.
-                for(int i=0;i<5;++i){
-                    const float distance=28.f+i*28.f;
-                    const float sideways=std::sin(g.clock*19.f+i*2.4f)*(7.f+i*2.f);
-                    const float sx=x-dx*distance-dy*sideways;
-                    const float sy=y-dy*distance+dx*sideways;
-                    goldenSprite(goldOrb_,sx,sy,13.f-i,13.f-i,0,
-                        static_cast<Uint8>(225-i*32));
-                }
-            }
-            goldenSprite(goldOrb_,x-dx*19,y-dy*19,50,50,0,150);
-            goldenSprite(lanceArt,x-dx*10,y-dy*10,96,24,lance.angle);
-        }
         for(const auto& burst:g.lightBursts){
             // The basic sword slash is now driven by the *current sword pose*
             // below, not by a detached world-space burst with its own clock.
@@ -1685,199 +1412,9 @@ public:
             }
         }
         slamShockwave(p);
-        if(p.form==0&&!p.whiteNight){
-            if(isSkillMotion(a.state)&&knightSkillMotion_)knightSkillPngEffect(p,a);
-            else if(isSkillMotion(a.state)&&a.state!=prepSkillState){
-                Animation fallback=a;
-                fallback.state=a.state==thrustSkillState?6:5;
-                const auto& clip=motionClips[fallback.state];
-                fallback.frame=clip.start+static_cast<int>(clip.contact*clip.count);
-                if(a.frame>=motionClips[a.state].start+2)swordTrail(p,fallback);
-            }else swordTrail(p,a);
-        }
-        SDL_Texture* actorTexture=textures[0];
-        int columns=motionColumns,frame=a.frame,width=motionWidth,pivotX=motionPivotX;
-        if(p.form==0&&isSkillMotion(a.state)){
-            if(knightSkillMotion_){
-                actorTexture=knightSkillMotion_;
-                columns=skillMotionColumns;
-                frame-=skillMotionStart;
-                width=skillMotionWidth;
-                pivotX=skillMotionPivotX;
-            }else{
-                const auto& clip=motionClips[a.state];
-                const auto& fallback=motionClips[a.state==thrustSkillState?6:a.state==sweepSkillState?5:0];
-                frame=fallback.start+(frame-clip.start)*(fallback.count-1)/(clip.count-1);
-            }
-        }
-        if(p.form!=0){
-            actorTexture=nullptr;
-            if(a.state==1&&mageRun_&&p.mageCastLeft<=0){
-                actorTexture=mageRun_;
-                frame-=motionClips[1].start;
-            }else if(mageMotion_&&a.state>=0&&!isSkillMotion(a.state)){
-                // The mage atlas stores eight poses per clip. Sprint uses its own 16-frame strip.
-                constexpr int rows[]={0,1,2,3,8,8,8,5,6,7,4,1,3};
-                const auto clip=motionClips[a.state];
-                const bool basicCast=p.mageCastLeft>0;
-                const int row=(basicCast||(a.state>=4&&a.state<=6))?
-                    (p.grounded?mageGroundCastRow:mageAirCastRow):rows[a.state];
-                const int index=basicCast?
-                    std::clamp(static_cast<int>((1-p.mageCastLeft/mageCastDuration)*mageMotionColumns),0,mageMotionColumns-1):
-                    (a.state==2||a.state==3)?
-                    mageAirPose(a.posePhase):
-                    (a.frame-clip.start)*(mageMotionColumns-1)/std::max(1,clip.count-1);
-                actorTexture=mageMotion_;
-                columns=mageMotionColumns;
-                frame=row*columns+index;
-            }
-        }
-        if(p.form==0&&a.state==4){
-            frame=knightWeakFrame(a.posePhase);
-        }else if(p.form==0&&a.state==1){
-            const int playbackFrame=std::clamp(
-                static_cast<int>(a.travelPhase*knightSprintPlaybackFrames),0,knightSprintPlaybackFrames-1);
-            frame=knightSprintStart+std::clamp(
-                playbackFrame*knightSprintFrames/knightSprintPlaybackFrames,0,knightSprintFrames-1);
-        }else if(p.form==0&&a.midpoint&&a.state!=4&&!isSkillMotion(a.state)){
-            // Skill atlas has twelve actual display poses per clip, so do not
-            // apply the old 4-key/4-midpoint row offset to those frames.
-            frame+=knightMidpointStart;
-        }
         drawReviewedFlashEffects(g,a,false);
-        if(p.form==1&&!p.whiteNight){spaceActor(g,a);}
-        else if(drawReviewedFlashActor(g,a)){
-            // Approved separate sheets replace only their own motion role.
-        }else if(p.whiteNight&&whiteNightMotion_&&(p.whiteMove!=WhiteMove::None||p.health>0)){
-            int whiteFrame=30;
-            if(p.whiteMove!=WhiteMove::None){
-                const auto clip=whiteClips[static_cast<int>(p.whiteMove)];
-                whiteFrame=clip.start+std::min(clip.count-1,static_cast<int>(p.whiteAge*clip.count/clip.duration));
-                if(p.whiteMove==WhiteMove::Command&&p.whiteAge>=.18f&&p.whiteAge<=.36f)
-                    whiteFrame=clip.start+6; // Hold the sword-pointing release silhouette.
-                if(p.whiteMove==WhiteMove::Verdict&&p.whiteAge>=.23f&&p.whiteAge<.70f)
-                    whiteFrame=clip.start+9; // Hold the off-hand fist during the time stop.
-            }else if(a.state==7){
-                whiteFrame=3;
-            }else if(!p.grounded){
-                // The takeoff and landing sprites share the same world foot anchor.
-                // Airborne poses progress with vertical velocity, not horizontal travel.
-                const float phase=std::clamp((p.vy+650.f)/1300.f,0.f,1.f);
-                whiteFrame=8+std::min(6,static_cast<int>(phase*7));
-            }else if(a.state==10){
-                whiteFrame=15;
-            }else if(a.state==1||a.state==11){
-                // One distance-driven 32-frame run cycle at every movement speed.
-                whiteFrame=whiteNightRunStart+std::clamp(
-                    static_cast<int>(a.travelPhase*whiteNightRunFrames),0,whiteNightRunFrames-1);
-            }
-            const SDL_FRect source{float(whiteFrame%8*64),float(whiteFrame/8*96),64,96};
-            const SDL_FRect dest{std::round(p.x-offset-32*motionScale),std::round(p.y-88*motionScale),64*motionScale,96*motionScale};
-            if(p.whiteMove==WhiteMove::Rush&&p.whiteAge>=.125f&&p.whiteAge<.36f){
-                SDL_SetTextureColorMod(whiteNightMotion_,255,245,173);
-                for(int i=3;i>0;--i){
-                    SDL_FRect ghost=dest;ghost.x-=p.facing*i*18;
-                    SDL_SetTextureAlphaMod(whiteNightMotion_,static_cast<Uint8>(120-i*24));
-                    SDL_RenderTextureRotated(renderer,whiteNightMotion_,&source,&ghost,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
-                }
-                SDL_SetTextureAlphaMod(whiteNightMotion_,255);
-            }else if(p.hurtTint>0)SDL_SetTextureColorMod(whiteNightMotion_,255,150,160);
-            // The sword arc tracks the SAME clip clock (including stored-lance
-            // attack-speed boosts) as the 15 authored slash poses. The PNG
-            // silhouette/palette is unchanged; only position, scale and opacity
-            // are registered to the active swing instead of a detached burst.
-            if(p.whiteMove==WhiteMove::Slash && riftSlash_&&!hasReviewedFlashFx(FlashFx::Slash)){
-                const auto slashClip=whiteClips[static_cast<int>(WhiteMove::Slash)];
-                const float phase=std::clamp(p.whiteAge/slashClip.duration,0.f,1.f);
-                constexpr float arcIn=.26f,arcPeak=.40f,arcOut=.76f;
-                if(phase>=arcIn&&phase<arcOut){
-                    const float emerge=std::clamp((phase-arcIn)/(arcPeak-arcIn),0.f,1.f);
-                    const float decay=std::clamp((arcOut-phase)/(arcOut-arcPeak),0.f,1.f);
-                    const float opacity=std::min(emerge,decay);
-                    const float sweep=std::clamp((phase-arcIn)/(arcOut-arcIn),0.f,1.f);
-                    // Follow the forward-moving blade, with the center of
-                    // the incision close to the sword rather than 140px ahead.
-                    const float bladeX=p.x-offset+p.facing*(43.f+33.f*sweep);
-                    const float bladeY=p.y-60.f+7.f*sweep;
-                    const float width=175.f+58.f*emerge;
-                    const float height=45.f+24.f*emerge;
-                    goldenSprite(riftSlash_,bladeX,bladeY,width,height,
-                        p.facing>0?-14.f:194.f,
-                        static_cast<Uint8>(225.f*opacity));
-                }
-            }
-            SDL_RenderTextureRotated(renderer,whiteNightMotion_,&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
-            SDL_SetTextureColorMod(whiteNightMotion_,255,255,255);
-            if(p.whiteMove==WhiteMove::Command&&p.whiteAge>=.08f&&p.whiteAge<.46f&&goldOrb_&&!hasReviewedFlashFx(FlashFx::Command)){
-                // A sword-tip flash builds while the blade extends, then the
-                // stored lances all release on the authored contact frame.
-                const float local=p.whiteAge;
-                const float strength=local<.23f?local/.23f:std::max(0.f,1.f-(local-.23f)/.23f);
-                const float x=p.x+p.facing*92.f-offset,y=p.y-59.f;
-                goldenSprite(goldOrb_,x,y,48.f+32.f*strength,48.f+32.f*strength,0,
-                             static_cast<Uint8>(180*strength));
-                for(int i=0;i<5;++i){
-                    const float angle=(i-2.f)*.46f;
-                    const float distance=24.f+47.f*strength;
-                    goldenSprite(goldTrail_,x+p.facing*distance,y+std::sin(angle)*distance,
-                        49.f+40.f*strength,10.f,p.facing>0?angle*57.29578:180-angle*57.29578,
-                        static_cast<Uint8>(160*strength));
-                }
-            }
-            if(p.whiteMove==WhiteMove::Verdict&&p.whiteAge>=.04f&&p.whiteAge<.91f&&(goldOrb_||whiteFxTextures_[3])){
-                // Gather a compact sphere at the off-hand before the sky volley.
-                const auto clip=whiteClips[static_cast<int>(WhiteMove::Verdict)];
-                const float t=std::clamp(p.whiteAge/clip.contact,0.f,1.f);
-                const float release=std::clamp((p.whiteAge-clip.contact)/.14f,0.f,1.f);
-                const float pulse=1.f+.055f*std::sin(g.clock*14.f);
-                const float size=(37.f+14.f*(1.f-t)+25.f*release)*pulse;
-                const float handX=p.x-p.facing*24.f-offset;
-                const float handY=p.y-57.f;
-                const SDL_FRect glowSrc{0,0,96,96};
-                SDL_Texture* orb=goldOrb_?goldOrb_:whiteFxTextures_[3];
-                const SDL_FRect glowDst{std::round(handX-size*.5f),
-                    std::round(handY-size*.5f),size,size};
-                SDL_SetTextureAlphaMod(orb,static_cast<Uint8>(190+65*release));
-                SDL_RenderTexture(renderer,orb,goldOrb_?nullptr:&glowSrc,&glowDst);
-                SDL_SetTextureAlphaMod(orb,255);
-                // Round motes orbit while gathering, then burst outward on release.
-                for(int i=0;i<9;++i){
-                    const float angle=i*.6981317f-p.whiteAge*(5.2f+(i%3)*.55f);
-                    const float radius=(1.f-t)*50.f+10.f+release*(38.f+i%3*8.f);
-                    const float x=handX+std::cos(angle)*radius;
-                    const float y=handY+std::sin(angle)*radius*.76f;
-                    const float mote=5.f+2.f*(1.f-t)+2.f*release;
-                    goldenSprite(goldOrb_,x,y,mote,mote,0,
-                        static_cast<Uint8>(215*(1.f-.45f*release)));
-                }
-            }
-            if(p.whiteBoost>0 && whiteFxTextures_[3]){
-                const SDL_FRect glowSrc{0,0,96,96};
-                const SDL_FRect glowDst{p.x-offset-48,p.y-62,96,96};
-                SDL_SetTextureAlphaMod(whiteFxTextures_[3],145);
-                SDL_RenderTexture(renderer,whiteFxTextures_[3],&glowSrc,&glowDst);
-                SDL_SetTextureAlphaMod(whiteFxTextures_[3],255);
-            }
-        }else{
-        afterimages(g,a,actorTexture,frame,columns);
-        if(actorTexture){
-            SDL_FRect source{static_cast<float>(frame%columns*width),static_cast<float>(frame/columns*motionHeight),static_cast<float>(width),motionHeight};
-            SDL_FRect dest{std::round(p.x-offset-(p.facing>0?pivotX:width-pivotX)*motionScale),std::round(p.y-motionPivotY*motionScale),width*motionScale,motionHeight*motionScale};
-            const bool white=p.hurtTint>.13f,red=p.hurtTint>0&&!white;
-            if(red)SDL_SetTextureColorMod(actorTexture,255,125,140);
-            SDL_RenderTextureRotated(renderer,actorTexture,&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
-            if(red)SDL_SetTextureColorMod(actorTexture,255,255,255);
-            if(white){
-                SDL_SetTextureBlendMode(actorTexture,SDL_BLENDMODE_ADD);
-                SDL_SetTextureColorMod(actorTexture,255,244,237);
-                SDL_SetTextureAlphaMod(actorTexture,185);
-                SDL_RenderTextureRotated(renderer,actorTexture,&source,&dest,0,nullptr,p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
-                SDL_SetTextureAlphaMod(actorTexture,255);
-                SDL_SetTextureColorMod(actorTexture,255,255,255);
-                SDL_SetTextureBlendMode(actorTexture,SDL_BLENDMODE_BLEND);
-            }
-        }else mage(p);
-        }
+        if(p.form==1&&!p.whiteNight)spaceActor(g,a);
+        else if(!drawReviewedFlashActor(g,a))mage(p);
         drawReviewedFlashEffects(g,a,true);
         if(p.swapFlash>0&&(!p.whiteNight||!hasReviewedFlashFx(FlashFx::Swap)))ring(p.x-offset,p.y-36,44,0xe3bd72);
         static const ControlLayout defaultLayout{};

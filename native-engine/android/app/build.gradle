@@ -15,7 +15,7 @@ def artSource = file('../../../Assets/Resources/Eclipse')
 def packagedArt = layout.buildDirectory.dir('generated/eclipseAssets')
 tasks.register('packageEclipseAssets', Sync) {
     from artSource
-    include 'ui/lance_gold.png', 'ui/trail_gold.png', 'ui/orb_gold.png', 'ui/impact_gold.png', 'ui/rift_slash.png', 'ui/rift_trace.png', 'ui/white_night_lance.png', 'ui/white_night_motion.png', 'title/eclipse.png', 'title/cape.png', 'ui/title_menu.png', 'knight_motion.png', 'knight_skill_motion.png', 'knight_skill_fx_layer.png', 'mage_run.png', 'mage_motion.png', 'ui/attack_states.png', 'ui/dash_states.png', 'ui/swap_skill_states.png', 'ui/joystick_arrows_new.png', 'ui/settings_gear.png', 'ui/settings_menu_panel.png', 'ui/settings_window.png', 'ui/enemy_bar_frame.png', 'ui/execute_skull.png', 'ui/knight_skill_*.png', 'ui/white_skill_*.png', 'monsters/**/*.png', 'forest/**/*.png', 'forest_v2/**/*.png', 'forest_v3/**/*.png', 'forest_entrance/**/*.png', 'demon_castle/**/*.png'
+    include 'title/eclipse.png', 'ui/title_menu.png', 'ui/attack_states.png', 'ui/dash_states.png', 'ui/swap_skill_states.png', 'ui/joystick_arrows_new.png', 'ui/settings_gear.png', 'ui/settings_menu_panel.png', 'ui/settings_window.png', 'ui/enemy_bar_frame.png', 'ui/execute_skull.png', 'forest/**/*.png', 'forest_v2/**/*.png', 'forest_v3/**/*.png', 'forest_entrance/**/*.png', 'demon_castle/**/*.png'
     include 'flash_executioner/*.png'
     include 'space_ruler/*.png', 'space_ruler/*.json'
     into packagedArt
