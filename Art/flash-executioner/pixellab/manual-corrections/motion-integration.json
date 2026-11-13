@@ -107,6 +107,23 @@
         23,
         27
       ]
+    },
+    "Slash": {
+      "file": "Art/flash-executioner/reviewed/effect_slash.png",
+      "cell": [
+        256,
+        216
+      ],
+      "columns": 5,
+      "rows": 4,
+      "frames": 20,
+      "visible_frames": 19,
+      "fps": 60,
+      "nominal_duration_seconds": 0.3333333333333333,
+      "contact_lead_seconds": 0.03333333333333333,
+      "duration_tracks_basic_speed": true,
+      "sha256": "103b5ce971fa29e828db722de34b7b593f21d04cdebe571fbb1a425d284abd1f"
     }
-  }
+  },
+  "basic_attack_effect": "Slash keeps 19 visible arc frames plus a transparent release frame at 60 fps. Its remaining duration is (.46-.184)/attack_speed + .033333s, so it ends with Basic recovery and stays synchronized under attack-speed scaling."
 }

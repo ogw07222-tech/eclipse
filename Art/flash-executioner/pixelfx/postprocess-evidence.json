@@ -3,12 +3,12 @@
     "role": "Slash",
     "sourceId": "melee/sword-slash",
     "sourceHash": "3abcde4466df41bddd1da0c9c9824aa2450185de39c61c3b7d156272dcc9327a",
-    "variantHash": "7bf115c7862f15749bd0513320260cb0a286bd252a044c3dc85c9f321dd420a3",
+    "variantHash": "103b5ce971fa29e828db722de34b7b593f21d04cdebe571fbb1a425d284abd1f",
     "changedSourceFunctions": false,
     "alphaEdge": {
-      "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      "operation": "trimmed to 19 visible source frames plus terminal transparent frame; no source drawing pixels changed"
     },
-    "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Slash/frame-map.json",
+    "frameMap": "Art/flash-executioner/pixelfx/variants/Slash/frame-map.json",
     "edgePixels": 0
   },
   {

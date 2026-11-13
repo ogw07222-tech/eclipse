@@ -1086,10 +1086,10 @@
         165
       ],
       "scale": 2,
-      "count": 25,
+      "count": 20,
       "columns": 5,
-      "rows": 5,
-      "duration": 0.4,
+      "rows": 4,
+      "duration": 0.3333333333333333,
       "fps": 60,
       "loop": false,
       "layer": "front",
@@ -1139,11 +1139,11 @@
         "light": 0.85
       },
       "postprocess": {
-        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+        "operation": "kept 19 visible source samples plus one transparent release frame; trimmed five additional transparent tail frames; straight RGBA direct-copy packing retained"
       },
-      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Slash/frame-map.json",
-      "sha256": "7bf115c7862f15749bd0513320260cb0a286bd252a044c3dc85c9f321dd420a3",
-      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Slash/original-60fps.png",
+      "frameMap": "Art/flash-executioner/pixelfx/variants/Slash/frame-map.json",
+      "sha256": "103b5ce971fa29e828db722de34b7b593f21d04cdebe571fbb1a425d284abd1f",
+      "baselinePng": "Art/flash-executioner/pixelfx/variants/Slash/original-60fps.png",
       "baselineFps": 60,
       "status": "main-approved original-resource derivative v2",
       "firstAlphaEmpty": false,
@@ -1153,7 +1153,8 @@
       "peakCoverageFrame": 3,
       "approved": true,
       "front": true,
-      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run."
+      "review": "Kept the 19 visible sword-slash samples and one transparent release frame; removed five extra transparent tail frames. Playback follows Basic recovery at current attack speed; contact registration remains unchanged.",
+      "reviewNote": "Owner requested the Basic effect be retimed to the revised 12-pose attack. Existing golden arc pixels and palette are preserved."
     },
     {
       "role": "Rush",

@@ -33,7 +33,7 @@ inline constexpr std::array<FlashSheet,static_cast<int>(FlashActor::Count)> flas
     {"flash_executioner/actor_swap.png", 192, 192, 4, 4, 14, 70.0f, 133.0f, 1.4f, 0.24f, -1, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Swap
 }};
 inline constexpr std::array<FlashSheet,static_cast<int>(FlashFx::Count)> flashEffects{{
-    {"flash_executioner/effect_slash.png", 256, 216, 5, 5, 25, 105.0f, 165.0f, 2.0f, 0.4f, -1, false, true, -1, -1, 0.03333333333333333f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Slash
+    {"flash_executioner/effect_slash.png", 256, 216, 5, 4, 20, 105.0f, 165.0f, 2.0f, 0.3333333333333333f, -1, false, true, -1, -1, 0.03333333333333333f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Slash
     {"flash_executioner/effect_rush.png", 320, 160, 4, 6, 22, 80.0f, 110.0f, 2.0f, 0.35f, -1, false, true, -1, -1, 0.05f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Rush
     {"flash_executioner/effect_command.png", 160, 144, 5, 5, 25, 64.0f, 124.0f, 2.1f, 0.4f, -1, false, true, -1, -1, 0.2f, 0.0f, 0.0f, 60.0f, 10.0f, -25.0f, 0, 60.0f, -1.0f}, // Command
     {"flash_executioner/effect_blinkout.png", 288, 224, 4, 5, 20, 144.0f, 174.0f, 1.4f, 0.32f, -1, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, 0.033333333333333326f}, // BlinkOut

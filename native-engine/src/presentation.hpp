@@ -20,7 +20,7 @@ class Presentation {
     SDL_Texture* titleMenu_=nullptr;
     std::array<SDL_Texture*,static_cast<int>(FlashActor::Count)> flashActorTextures_{};
     std::array<SDL_Texture*,static_cast<int>(FlashFx::Count)> flashFxTextures_{};
-    struct ReviewedFlashEvent {FlashFx role;float x,y,born;int facing;bool follow;};
+    struct ReviewedFlashEvent {FlashFx role;float x,y,born;int facing;bool follow;float playbackDuration=0;};
     std::vector<ReviewedFlashEvent> reviewedFlashEvents_;
     float reviewedFlashClock_=-1,reviewedFlashMoveAge_=0;
     WhiteMove reviewedFlashMove_=WhiteMove::None;
@@ -902,7 +902,8 @@ public:
         const float duration=playbackDuration>0?playbackDuration:sheet.duration;
         if(!sheet.loop&&(age<0||age>=duration))return false;
         const float t=sheet.loop?std::fmod(std::max(0.f,age),duration):age;
-        const int frame=std::clamp(static_cast<int>(t*sheet.fps),0,sheet.count-1);
+        const float frameRate=playbackDuration>0?sheet.fps*sheet.duration/duration:sheet.fps;
+        const int frame=std::clamp(static_cast<int>(t*frameRate),0,sheet.count-1);
         reviewedFlashSprite(sheet,flashFxTextures_[index],frame,x,y,facing,255,angle);
         return true;
     }
@@ -929,12 +930,14 @@ public:
         }
         reviewedFlashClock_=g.clock;
         reviewedFlashEvents_.erase(std::remove_if(reviewedFlashEvents_.begin(),reviewedFlashEvents_.end(),
-            [&](const ReviewedFlashEvent& event){return g.clock-event.born>=flashEffects[static_cast<int>(event.role)].duration;}),
+            [&](const ReviewedFlashEvent& event){const auto& sheet=flashEffects[static_cast<int>(event.role)];
+                const float lifetime=event.playbackDuration>0?event.playbackDuration:sheet.duration;
+                return g.clock-event.born>=lifetime;}),
             reviewedFlashEvents_.end());
-        auto spawn=[&](FlashFx role,float x,float y,int facing,bool follow,float delay=0.f){
+        auto spawn=[&](FlashFx role,float x,float y,int facing,bool follow,float delay=0.f,float playbackDuration=0.f){
             if(hasReviewedFlashFx(role)){
                 const auto& sheet=flashEffects[static_cast<int>(role)];
-                reviewedFlashEvents_.push_back({role,x,y,g.clock-delay-sheet.spawnAgeSeconds,facing,follow});
+                reviewedFlashEvents_.push_back({role,x,y,g.clock-delay-sheet.spawnAgeSeconds,facing,follow,playbackDuration});
             }
         };
         const bool newMove=p.whiteMove!=reviewedFlashMove_||p.whiteAge<reviewedFlashMoveAge_;
@@ -964,7 +967,12 @@ public:
             if((newMove&&trigger==0)||(before<trigger&&p.whiteAge>=trigger)){
                 const float sourceAge=std::max(0.f,p.whiteAge-trigger)/speed+skippedPrelude+
                     (p.whiteMove==WhiteMove::Verdict?.20f:0.f);
-                spawn(role,p.x,p.y,p.facing,p.whiteMove!=WhiteMove::Blink,sourceAge);
+                float playbackDuration=0.f;
+                if(p.whiteMove==WhiteMove::Slash){
+                    const auto& clip=whiteClips[static_cast<int>(WhiteMove::Slash)];
+                    playbackDuration=(clip.duration-clip.contact)/speed+fxSheet.triggerLeadSeconds;
+                }
+                spawn(role,p.x,p.y,p.facing,p.whiteMove!=WhiteMove::Blink,sourceAge,playbackDuration);
             }
         }
         for(const auto& burst:g.lightBursts){
@@ -998,7 +1006,7 @@ public:
         const auto& p=g.player;
         for(const auto& event:reviewedFlashEvents_){
             reviewedFlashFx(event.role,g.clock-event.born,event.follow?p.x:event.x,event.follow?p.y:event.y,
-                            event.follow?p.facing:event.facing,front);
+                            event.follow?p.facing:event.facing,front,0,event.playbackDuration);
         }
         if(p.whiteNight&&hasReviewedFlashFx(FlashFx::Orb)){
             for(int i=0;i<p.storedLightLances;++i){

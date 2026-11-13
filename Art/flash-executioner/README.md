@@ -26,7 +26,7 @@ Effects retain straight RGBA pixels. Export packing corrects upstream atlas doub
 
 | Event | v2 source-frame registration |
 | --- | --- |
-| Basic slash | Start1/30s before unchanged contact; account for basic-speed multiplier |
+| Basic slash | 19 visible frames plus transparent release frame; starts 1/30s before unchanged contact and scales its lifetime with Basic attack speed |
 | Rush | Start.05s before unchanged contact |
 | Command | Start.2s before unchanged contact; hand offset10,-25 |
 | Blink departure | Start at action age1/30s; collapse aligns with teleport.15s |

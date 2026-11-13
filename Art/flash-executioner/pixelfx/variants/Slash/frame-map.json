@@ -118,35 +118,5 @@
   "sourceFrame": 36,
   "sourceTime": 0.59375,
   "alphaEnvelope": 1
- },
- {
-  "output": 20,
-  "sourceFrame": 38,
-  "sourceTime": 0.625,
-  "alphaEnvelope": 1
- },
- {
-  "output": 21,
-  "sourceFrame": 39,
-  "sourceTime": 0.65625,
-  "alphaEnvelope": 1
- },
- {
-  "output": 22,
-  "sourceFrame": 41,
-  "sourceTime": 0.6875,
-  "alphaEnvelope": 1
- },
- {
-  "output": 23,
-  "sourceFrame": 43,
-  "sourceTime": 0.71875,
-  "alphaEnvelope": 1
- },
- {
-  "output": 24,
-  "sourceFrame": 45,
-  "sourceTime": 0.75,
-  "alphaEnvelope": 1
  }
 ]

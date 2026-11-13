@@ -439,116 +439,6 @@
     "h": 216
    },
    "duration": 17
-  },
-  {
-   "filename": "Slash 20",
-   "frame": {
-    "x": 0,
-    "y": 864,
-    "w": 256,
-    "h": 216
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 256,
-    "h": 216
-   },
-   "sourceSize": {
-    "w": 256,
-    "h": 216
-   },
-   "duration": 17
-  },
-  {
-   "filename": "Slash 21",
-   "frame": {
-    "x": 256,
-    "y": 864,
-    "w": 256,
-    "h": 216
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 256,
-    "h": 216
-   },
-   "sourceSize": {
-    "w": 256,
-    "h": 216
-   },
-   "duration": 17
-  },
-  {
-   "filename": "Slash 22",
-   "frame": {
-    "x": 512,
-    "y": 864,
-    "w": 256,
-    "h": 216
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 256,
-    "h": 216
-   },
-   "sourceSize": {
-    "w": 256,
-    "h": 216
-   },
-   "duration": 17
-  },
-  {
-   "filename": "Slash 23",
-   "frame": {
-    "x": 768,
-    "y": 864,
-    "w": 256,
-    "h": 216
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 256,
-    "h": 216
-   },
-   "sourceSize": {
-    "w": 256,
-    "h": 216
-   },
-   "duration": 17
-  },
-  {
-   "filename": "Slash 24",
-   "frame": {
-    "x": 1024,
-    "y": 864,
-    "w": 256,
-    "h": 216
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 256,
-    "h": 216
-   },
-   "sourceSize": {
-    "w": 256,
-    "h": 216
-   },
-   "duration": 17
   }
  ],
  "meta": {
@@ -558,7 +448,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 1280,
-   "h": 1080
+   "h": 864
   },
   "scale": "1",
   "frameTags": [
@@ -574,7 +464,7 @@
    "name": "Sword slash",
    "fps": 60,
    "loop": false,
-   "frames": 25,
+   "frames": 20,
    "frameSize": [
     256,
     216
@@ -740,7 +630,8 @@
       }
      }
     ]
-   }
+   },
+   "duration": 0.3333333333333333
   }
  }
 }
