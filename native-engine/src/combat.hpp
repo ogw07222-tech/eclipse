@@ -574,7 +574,10 @@ class Combat {
             if(std::isfinite(nextBase)&&std::fabs(nextBase-p.y)<=12.f)
                 contact=std::min(contact,nextBase);
         }
-        const bool landed=std::isfinite(contact)&&(!p.grounded||p.y!=contact);
+        // A change in ground height while walking a slope is not a landing.
+        // Only count the transition from airborne to grounded; otherwise
+        // sloped areas retrigger the landing animation/effect every tick.
+        const bool landed=std::isfinite(contact)&&!p.grounded;
         if(p.grounded&&!std::isfinite(contact))p.meleeLeft=0;
         p.x=nextX;
         p.grounded=std::isfinite(contact);
