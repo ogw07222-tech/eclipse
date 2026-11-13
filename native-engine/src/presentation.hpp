@@ -816,8 +816,6 @@ public:
     int castlePortalSide(float x) const {return castleEntranceActive_?castleEntrance_.portalSide(x):-1;}
     bool setDemonCastleArea(int area) {return castleEntrance_.setArea(area);}
     bool demonCastleEntranceReady() const {return castleEntrance_.ready();}
-    bool setDemonCastleArea(int area) {return castleEntrance_.setArea(area);}
-    int castlePortalSide(float playerX) const {return castleEntrance_.portalSide(playerX);}
     const ForestGenerator& forestGenerator() const {return forestGenerator_;}
     static std::string asset(const char* name){
 #ifdef SDL_PLATFORM_ANDROID
