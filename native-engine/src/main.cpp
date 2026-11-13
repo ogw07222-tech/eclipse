@@ -341,7 +341,7 @@ int main(int argc,char** argv){
             eclipse::Actions action{};action.right=n<45;action.jump=n==15;action.dash=n==60;
             action.attack=n==95||n==120||n==150;action.skill=n==190||n==285;action.skillSweep=n==218;action.skillBuff=n==90;action.swap=n==245;action.restart=n==390;
             if(n==345)game.damagePlayer(999);
-            tick(action);if(n%5)continue;
+            tick(action,*view);if(n%5)continue;
             char filename[64];std::snprintf(filename,sizeof(filename),"/frame-%04d.bmp",captureIndex++);
             const auto capture=std::string(argv[2])+filename;
             positions<<captureIndex-1<<","<<game.player.x-camera+640<<","<<game.player.y<<",COMBAT REPLAY\n";
