@@ -20,6 +20,8 @@ class Presentation {
     SDL_Texture* titleMenu_=nullptr;
     std::array<SDL_Texture*,static_cast<int>(FlashActor::Count)> flashActorTextures_{};
     std::array<SDL_Texture*,static_cast<int>(FlashFx::Count)> flashFxTextures_{};
+    std::array<SDL_Texture*,castleEnemyCount> castleEnemyMoveTextures_{};
+    std::array<SDL_Texture*,castleEnemyCount> castleEnemyAttackTextures_{};
     struct ReviewedFlashEvent {FlashFx role;float x,y,born;int facing;bool follow;float playbackDuration=0;};
     std::vector<ReviewedFlashEvent> reviewedFlashEvents_;
     float reviewedFlashClock_=-1,reviewedFlashMoveAge_=0;
@@ -330,31 +332,43 @@ class Presentation {
         }
     }
     void enemy(const Enemy& e,float clock){
-        const float scale=slimeSpec(e.kind).scale,h=(e.kind==0?80:100)*scale;
-        const int frame=enemyFrame(e);
-        SDL_FRect source{float(frame%4*slimeCell),float(frame/4*slimeCell),slimeCell,slimeCell};
-        SDL_FRect target{std::round(e.x-offset-slimePivotX*scale),std::round(e.y-slimePivotY*scale),slimeCell*scale,slimeCell*scale};
-        SDL_Texture* texture=nullptr;
-        if(texture){
+        const auto spec=enemySpec(e.kind);
+        const float scale=spec.scale;
+        const float visualHeight=e.kind>=AshInfantry?spec.bodyHeight*scale:(e.kind==0?80:100)*scale;
+        const float h=visualHeight;
+        if(e.kind>=AshInfantry){
+            const int index=e.kind-AshInfantry;
+            const bool attacking=e.attackAge>=0;
+            SDL_Texture* texture=attacking?castleEnemyAttackTextures_[index]:castleEnemyMoveTextures_[index];
+            const int frame=enemyFrame(e);
+            const int columns=attacking?castleEnemyAttackFrames:castleEnemyMoveFrames;
+            const SDL_FRect source{float(frame%columns*192),0.f,192.f,192.f};
+            const float anchorX=e.facing>0?spec.pivotX:192.f-spec.pivotX;
+            const SDL_FRect target{std::round(e.x-offset-anchorX*scale),
+                std::round(e.y-spec.pivotY*scale),192.f*scale,192.f*scale};
             SDL_SetTextureColorMod(texture,255,e.hitFlash>0?135:255,e.hitFlash>0?135:255);
-            SDL_RenderTextureRotated(renderer,texture,&source,&target,0,nullptr,e.facing>0?SDL_FLIP_HORIZONTAL:SDL_FLIP_NONE);
+            SDL_RenderTextureRotated(renderer,texture,&source,&target,0,nullptr,
+                e.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
             SDL_SetTextureColorMod(texture,255,255,255);
         }else{
+            const int frame=enemyFrame(e);
+            SDL_FRect source{float(frame%4*slimeCell),float(frame/4*slimeCell),slimeCell,slimeCell};
+            SDL_FRect target{std::round(e.x-offset-slimePivotX*scale),std::round(e.y-slimePivotY*scale),slimeCell*scale,slimeCell*scale};
             const unsigned body=e.kind==0?0x63c779:e.kind==1?0xd95762:0x8e72d9;
-            disk(e.x-offset,e.y-h*.48f,27.f*scale,e.hitFlash>0?0xffe8df:body);
-            rect(e.x-offset-17.f*scale,e.y-h*.56f,34.f*scale,24.f*scale,body);
-            disk(e.x-offset-8.f*scale,e.y-h*.52f,3.f*scale,0xf5eee4);
-            disk(e.x-offset+8.f*scale,e.y-h*.52f,3.f*scale,0xf5eee4);
+            disk(e.x-offset,e.y-visualHeight*.48f,27.f*scale,e.hitFlash>0?0xffe8df:body);
+            rect(e.x-offset-17.f*scale,e.y-visualHeight*.56f,34.f*scale,24.f*scale,body);
+            disk(e.x-offset-8.f*scale,e.y-visualHeight*.52f,3.f*scale,0xf5eee4);
+            disk(e.x-offset+8.f*scale,e.y-visualHeight*.52f,3.f*scale,0xf5eee4);
         }
         // Pixel-art PNG bezel, with independent clipped fills for immediate HP and
         // the delayed white segment. 88x18, more than twice the former height.
-        const float barX=std::round(e.x-offset-44),barY=std::round(e.y-h-25);
+        const float barX=std::round(e.x-offset-(e.boss?54.f:44.f)),barY=std::round(e.y-visualHeight-25);
         if(enemyBarFrame_) {
-            SDL_FRect dest{barX,barY,88.f,18.f};
+            SDL_FRect dest{barX,barY,e.boss?108.f:88.f,18.f};
             SDL_RenderTexture(renderer,enemyBarFrame_,nullptr,&dest);
         } else {
-            rect(barX,barY,88,18,0x0b0b12);
-            rect(barX+2,barY+2,84,14,0x61505d);
+            rect(barX,barY,e.boss?108.f:88.f,18,0x0b0b12);
+            rect(barX+2,barY+2,e.boss?104.f:84.f,14,0x61505d);
         }
         if(e.lightMark>0){
             const float x=e.x-offset,y=barY-12;
@@ -364,10 +378,10 @@ class Presentation {
         }
         const float hpRatio=std::clamp(float(e.health)/e.maxHealth,0.f,1.f);
         const float trailRatio=std::clamp(std::max(float(e.health),e.trailingHealth)/e.maxHealth,0.f,1.f);
-        const float fillX=barX+4,fillY=barY+5,fillW=80.f;
+        const float fillX=barX+4,fillY=barY+5,fillW=e.boss?100.f:80.f;
         // Never render a minimum one-pixel fill for zero HP.
         if(trailRatio>0)rect(fillX,fillY,fillW*trailRatio,8,0xf3f0ea);
-        if(hpRatio>0)rect(fillX,fillY,fillW*hpRatio,8,e.kind==2?0xbb526c:0xc74b53);
+        if(hpRatio>0)rect(fillX,fillY,fillW*hpRatio,8,e.boss?0x8b4da8:e.kind==2?0xbb526c:0xc74b53);
         if(e.bleedStacks==bleedMaxStacks&&!e.boss){
             // 10% execution threshold appears only while 10-stack bleed is active.
             rect(fillX+8-1,fillY-2,2,12,0xf0a8b2);
@@ -381,7 +395,7 @@ class Presentation {
             if(ready)text("EXECUTE",barX+2,barY-15,2,0xffb5bf);
         }
         if(e.bleedStacks>0){
-            const float x=e.x-offset-19,y=e.y-h-44;
+            const float x=e.x-offset-19,y=e.y-visualHeight-44;
             rect(x+4,y,4,4,0xf2a0aa);
             rect(x+2,y+4,8,8,0xc84f65);
             rect(x+4,y+12,4,3,0x92354b);
@@ -793,12 +807,14 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){for(auto* image:spaceActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:spaceFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_,riftSlash_,riftTrace_})if(fx)SDL_DestroyTexture(fx);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){for(auto* image:spaceActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:spaceFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:castleEnemyMoveTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:castleEnemyAttackTextures_)if(image)SDL_DestroyTexture(image);for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_,riftSlash_,riftTrace_})if(fx)SDL_DestroyTexture(fx);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestV3Textures_)if(texture)SDL_DestroyTexture(texture);}
     void setForestSettings(ForestSettings settings) {forestGenerator_.regenerate(settings);}
     void setDemonCastleEntrance(bool enabled) {castleEntranceActive_=enabled && castleEntrance_.ready();}
+    int castlePortalSide(float x) const {return castleEntranceActive_?castleEntrance_.portalSide(x):-1;}
+    bool setDemonCastleArea(int area) {return castleEntrance_.setArea(area);}
     bool demonCastleEntranceReady() const {return castleEntrance_.ready();}
     bool setDemonCastleArea(int area) {return castleEntrance_.setArea(area);}
     int castlePortalSide(float playerX) const {return castleEntrance_.portalSide(playerX);}
@@ -847,6 +863,29 @@ public:
     static constexpr SDL_FRect titleBack{26,25,190,50};
     static constexpr float titleReadyTime=0.85f;
 
+
+    bool loadCastleEnemyAtlases(){
+        for(int i=0;i<castleEnemyCount;++i){
+            const auto& spec=castleEnemySpecs[i];
+            const std::string base=std::string("monsters/demon_castle/")+spec.folder+"/";
+            for(int state=0;state<2;++state){
+                auto*& texture=state==0?castleEnemyMoveTextures_[i]:castleEnemyAttackTextures_[i];
+                const char* sheet=state==0?"이동_sheet.png":"공격_sheet.png";
+                const int width=state==0?castleEnemyMoveFrames*192:castleEnemyAttackFrames*192;
+                const std::string file=asset((base+sheet).c_str());
+                texture=IMG_LoadTexture(renderer,file.c_str());
+                if(!texture){SDL_SetError("ECLIPSE ENEMY ASSET ERROR: %s: %s",file.c_str(),SDL_GetError());return false;}
+                float actualW=0,actualH=0;
+                if(!SDL_GetTextureSize(texture,&actualW,&actualH)||actualW!=width||actualH!=192){
+                    SDL_SetError("ECLIPSE ENEMY ASSET ERROR: %s expected %dx192, got %.0fx%.0f",file.c_str(),width,actualW,actualH);
+                    SDL_DestroyTexture(texture);texture=nullptr;return false;
+                }
+                SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST);
+                SDL_SetTextureBlendMode(texture,SDL_BLENDMODE_BLEND);
+            }
+        }
+        return true;
+    }
 
     bool loadReviewedFlashSheets(){
         auto load=[&](const FlashSheet& sheet,SDL_Texture*& texture)->bool{
@@ -1166,6 +1205,7 @@ public:
 
     bool load(){
         if(!loadSpaceRuler())return false;
+        if(!loadCastleEnemyAtlases())return false;
         // Preload the castle for its future tutorial scene, but do not require
         // tutorial art to start an unrelated forest gameplay scene.
         // The explicit castle preview request checks readiness and raises an error.

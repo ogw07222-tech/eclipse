@@ -8,6 +8,7 @@
 #include "motion.hpp"
 #include "forest_layers.hpp"
 #include "slime_motion.hpp"
+#include "castle_enemy.hpp"
 #include "monster_collision.hpp"
 #include "castle_terrain.hpp" // ECLIPSE_CASTLE_FIXED_TERRAIN_V32
 
@@ -99,8 +100,10 @@ struct Enemy {
     int bleedStacks=0;
     float lightMark=0;
     bool boss=false;
-    float knockbackResistance() const {return boss?1.f:slimeSpec(kind).knockbackResistance;}
-    Enemy(int type=0,float at=0):kind(std::clamp(type,0,2)),health(slimeSpec(kind).health),maxHealth(health),damage(slimeSpec(kind).damage),x(at),speed(slimeSpec(kind).speed){}
+    float knockbackResistance() const {return boss?1.f:enemySpec(kind).knockbackResistance;}
+    Enemy(int type=0,float at=0,int area=0):kind(std::clamp(type,0,static_cast<int>(VoidShade))),
+        health(enemyHealth(kind,area)),maxHealth(health),damage(enemyDamage(kind,area)),
+        x(at),speed(enemySpeed(kind,area)),boss(kind==VoidShade){}
     bool dead()const{return health<=0;}
 };
 struct Projectile {float x,y;int facing,damage;bool empowered;float life=1.6f,remainingDrop=0;bool voidBolt=false;};
@@ -179,16 +182,16 @@ class Combat {
     void releaseStoredLances(){
         auto& p=player;
         if(p.storedLightLances<=0)return;
-        std::array<size_t,4> candidates{};
-        size_t count=0;
+        std::vector<size_t> candidates;
+        candidates.reserve(enemies.size());
         const float left=cameraCenter-viewWidth*.5f;
         for(size_t i=0;i<enemies.size();++i)
-            if(!enemies[i].dead()&&enemies[i].x>=left&&enemies[i].x<=left+viewWidth)candidates[count++]=i;
-        if(count==0)return;
+            if(!enemies[i].dead()&&enemies[i].x>=left&&enemies[i].x<=left+viewWidth)candidates.push_back(i);
+        if(candidates.empty())return;
         static std::mt19937 random{std::random_device{}()};
         const int total=p.storedLightLances;
         for(int i=0;i<total;++i){
-            const size_t target=candidates[std::uniform_int_distribution<size_t>{0,count-1}(random)];
+            const size_t target=candidates[std::uniform_int_distribution<size_t>{0,candidates.size()-1}(random)];
             const float spread=(i-(total-1)*.5f)*16.f;
             const float phase=clock*2.8f+i*6.2831853f/total;
             const float orbX=p.x+std::cos(phase)*57.f;
@@ -655,11 +658,11 @@ class Combat {
         if(e.burn>0){e.burn=down(e.burn,dt);e.burnTick+=dt;if(e.burnTick>=.6f){e.burnTick-=.6f;damageEnemy(e,2,DamageKind::Fire,true);}}
         if(e.dead())return;
         const float dx=player.x-e.x;float vx=0;
-        const auto& spec=slimeSpec(e.kind);
+        const auto spec=enemySpec(e.kind);
         if(e.attackAge>=0){
             const float before=e.attackAge;e.attackAge+=dt;
             const float phase=std::min(1.f,e.attackAge/spec.attackDuration);
-            if(e.kind==1){
+            if(spec.behavior==EnemyPounce){
                 // Commit to a destination at takeoff; the player can dodge it.
                 const float t=std::clamp((phase-.22f)/(.68f-.22f),0.f,1.f);
                 const float eased=t*t*(3-2*t);
@@ -668,7 +671,7 @@ class Combat {
                 e.y=(std::isfinite(takeoffY)?takeoffY:floorY)-4*t*(1-t)*120.f;
             }else{
                 const float lunge=std::sin(phase*3.14159265f);
-                e.x=e.attackFromX+e.facing*(e.kind==0?18.f:30.f)*lunge*lunge;
+                e.x=e.attackFromX+e.facing*std::max(18.f,spec.attackReach*.65f)*lunge*lunge;
             }
             const float contact=spec.attackDuration*spec.contact;
             if(before<contact&&e.attackAge>=contact){
@@ -679,8 +682,14 @@ class Combat {
         }else{
             if(std::abs(dx)>1)e.facing=dx>0?1:-1;
             const float gap=enemyFrontGap(e,player);
-            if(gap>spec.engageGap)vx=e.facing*e.speed*(e.bleedStacks>=bleedSlowStacks?.8f:1.f);
-            else if(e.attackTimer<=0&&std::abs(player.y-e.y)<100){
+            const float chaseScale=e.bleedStacks>=bleedSlowStacks?.8f:1.f;
+            if(spec.behavior==EnemyRanged){
+                const float rangedReach=spec.attackReach*spec.scale;
+                if(gap>rangedReach)vx=e.facing*e.speed*chaseScale;
+                else if(gap<spec.engageGap)vx=-e.facing*e.speed*.65f*chaseScale;
+                else if(e.attackTimer<=0){e.attackAge=0;e.attackTimer=spec.cooldown;e.attackFromX=e.x;e.attackToX=e.x;}
+            }else if(gap>spec.engageGap)vx=e.facing*e.speed*chaseScale;
+            else if(e.attackTimer<=0&&std::abs(player.y-e.y)<120){
                 e.attackAge=0;e.attackTimer=spec.cooldown;e.attackFromX=e.x;
                 e.attackToX=e.x+e.facing*std::clamp(std::abs(dx),60.f,240.f);
             }
@@ -692,7 +701,7 @@ class Combat {
             const float foot=CastleTerrain::groundAt(castleArea,e.x);
             if(!std::isfinite(foot)){e.x=oldEnemyX;e.knockback=0.f;}
             const float safeFoot=CastleTerrain::groundAt(castleArea,e.x);
-            if(std::isfinite(safeFoot)&&!(e.kind==1&&e.attackAge>=0.f))e.y=safeFoot;
+            if(std::isfinite(safeFoot)&&!(spec.behavior==EnemyPounce&&e.attackAge>=0.f))e.y=safeFoot;
         }
         // World clipping follows the same visible silhouette as hit detection.
         const auto body=enemyBounds(e);
@@ -761,7 +770,7 @@ class Combat {
 public:
     Player player;
     std::vector<GroundSurface> platforms;
-    int castleArea=0; // 0 retains the legacy scene until the five approved single-image PNGs are published
+    int castleArea=0; // 0 retains the legacy scene outside the A1-A5 castle route
     unsigned pitRespawnSerial=0; // ECLIPSE_CASTLE_PIT_DAMAGE_V33
     float castleWorldWidth() const {return castleArea?CastleTerrain::profile(castleArea).width:1600.f;}
     void configureCastleArea(int area){
@@ -780,11 +789,23 @@ public:
         auto& p=player;p.x=std::clamp(entryX,25.f,layout.width-35.f);const float floor=CastleTerrain::groundAt(castleArea,p.x);
         p.y=std::isfinite(floor)?floor:layout.spawnY;p.vx=p.vy=0.f;p.grounded=true;p.facing=entryX<layout.width*.5f?1:-1;
         p.meleeLeft=0.f;p.mageCastLeft=0.f;p.whiteMove=WhiteMove::None;p.spaceMove=0;p.dashLeft=0.f;p.attackFlash=0.f;p.invulnerable=std::max(p.invulnerable,.65f);
-        enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};
-        for(auto& enemy:enemies){const float foot=CastleTerrain::groundAt(castleArea,enemy.x);if(std::isfinite(foot))enemy.y=foot;}
+        populateCastleEnemies();
         projectiles.clear();lightLances.clear();lightBursts.clear();riftScars.clear();spaceEffects.clear();popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=enemyVisualClock=0;cameraCenter=viewWidth*.5f;
     }
-    std::array<Enemy,4> enemies;
+    std::vector<Enemy> enemies;
+    void populateCastleEnemies(){
+        enemies.clear();
+        if(castleArea<=0){
+            enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};
+        }else{
+            for(const auto& spawn:castleEnemySpawns(castleArea))
+                enemies.emplace_back(spawn.kind,spawn.x,castleArea);
+        }
+        for(auto& enemy:enemies){
+            const float foot=CastleTerrain::groundAt(castleArea,enemy.x);
+            if(std::isfinite(foot))enemy.y=foot;
+        }
+    }
     std::vector<SpaceEffect> spaceEffects;
     std::vector<Projectile> projectiles;
     std::vector<LightLance> lightLances;
@@ -797,11 +818,7 @@ public:
     bool ended=false,won=false,inventory=false;
     float clock=0,enemyVisualClock=0;
     Combat(){projectiles.reserve(16);popups.reserve(32);restart();}
-    void restart(){const auto jobs=player.equippedJobs;player={};if(castleArea){const auto& area=CastleTerrain::profile(castleArea);player.x=area.spawnX;player.y=area.spawnY;}player.equippedJobs=jobs;player.activeJob=0;player.form=jobs[0]==1?1:0;player.whiteNight=jobs[0]==2;enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};
-        if(castleArea)for(auto& enemy:enemies){
-            const float foot=CastleTerrain::groundAt(castleArea,enemy.x);
-            if(std::isfinite(foot))enemy.y=foot;
-        }
+    void restart(){const auto jobs=player.equippedJobs;player={};if(castleArea){const auto& area=CastleTerrain::profile(castleArea);player.x=area.spawnX;player.y=area.spawnY;}player.equippedJobs=jobs;player.activeJob=0;player.form=jobs[0]==1?1:0;player.whiteNight=jobs[0]==2;populateCastleEnemies();
         spaceEffects.clear();projectiles.clear();lightLances.clear();lightBursts.clear();riftScars.clear();cameraCenter=viewWidth*.5f;popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=enemyVisualClock=0;}
     int foes()const{int count=0;for(const auto& e:enemies)if(!e.dead())++count;return count;}
     void hit(Enemy& e,int amount,bool fire,int bleed=0,bool slam=false){
