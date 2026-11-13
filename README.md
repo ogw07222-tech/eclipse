@@ -28,6 +28,7 @@ ECLIPSE is a dark-fantasy 2D action roguelite built with **C++17 and SDL3**. Thi
 - `Assets/Resources/Eclipse/` — production game art and runtime pixel assets.
 - `Art/` — editable sources and reviewed artwork.
 - [Art pipeline](Docs/ART_PIPELINE_V2.md) and [pixel art guidelines](Docs/DESIGN_GUIDELINE_1_PIXEL.md).
+- [Castle background pixel standard](Docs/CASTLE_BACKGROUND_PIXEL_STANDARD.md) — A1–A5 canvas, pixel-density, camera and composition rules.
 - [Castle terrain status](Docs/CASTLE_FIXED_TERRAIN_STATUS.md) and [tutorial/prologue flow](Docs/TUTORIAL_PROLOGUE_FLOW.md).
 
 ## Android and development
