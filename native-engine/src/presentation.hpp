@@ -799,7 +799,15 @@ public:
     const ForestGenerator& forestGenerator() const {return forestGenerator_;}
     static std::string asset(const char* name){
 #ifdef SDL_PLATFORM_ANDROID
-        return name;
+        // Match the Studio importer's generic asset namespace.
+        const std::string logical(name);
+        const auto slash=logical.find('/');
+        const std::string root=logical.substr(0,slash);
+        if(root=="ui"||root=="title"||root=="monsters"||
+           root=="forest"||root=="forest_v2"||root=="forest_v3"||
+           root=="forest_entrance")return logical;
+        if(logical=="knight_motion.png")return logical;
+        return "ui/__studio_all__/"+logical;
 #else
         const char* base=SDL_GetBasePath();return std::string(base?base:"")+"assets/"+name;
 #endif
