@@ -3,7 +3,7 @@ namespace eclipse {
 struct SpaceSheet {const char* file;int width,height,columns,count,pivotX,pivotY;float scale,duration;bool loop;};
 inline constexpr SpaceSheet spaceActors[]={
     {"space_ruler/idle.png",192,192,9,9,96,132,1.600000f,0.900000f,true},
-    {"space_ruler/hover_move.png",192,192,9,9,96,132,1.600000f,0.720000f,true},
+    {"space_ruler/walk.png",192,192,8,8,96,132,1.600000f,0.720000f,true},
     {"space_ruler/flight_rise.png",192,192,9,9,96,132,1.600000f,0.720000f,false},
     {"space_ruler/flight_hold.png",192,192,9,9,96,132,1.600000f,0.900000f,true},
     {"space_ruler/flight_descend.png",192,192,9,9,96,132,1.600000f,0.720000f,false},

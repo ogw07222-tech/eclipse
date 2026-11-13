@@ -46,6 +46,67 @@
     "status": "integrated-owner-device-review-pending"
   },
   {
+    "name": "walk",
+    "kind": "actor",
+    "source_path": "Art/space-ruler/walk.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/walk.png",
+    "sha256": "a56d9cd2f60c60d335331431c4cb155107e37b2d874ed5d3869183e26e5671ee",
+    "width": 1536,
+    "height": 192,
+    "cell": [
+      192,
+      192
+    ],
+    "columns": 8,
+    "frames": 8,
+    "pivot": [
+      96,
+      132
+    ],
+    "duration": 0.72,
+    "loop": true,
+    "scale": 1.6,
+    "status": "Pixellab grounded-walk east export; runtime flips horizontally for west",
+    "source_animation": "Pixellab grounded-walk",
+    "source_character_id": "7385bc1d-2cae-426c-a7b5-ca37866d825a",
+    "source_group_id": "47502d73-f659-4618-a9c8-d9322a5f217d",
+    "source_direction": "east",
+    "source_frames": [
+      {
+        "path": "Art/space-ruler/walk-source/east/frame_000.png",
+        "sha256": "c812575be9a89b549230b179a9589d695f92161f944f65f9fb2303fa936651aa"
+      },
+      {
+        "path": "Art/space-ruler/walk-source/east/frame_001.png",
+        "sha256": "b487a8c46e92abb0a13b0da6831e8d908a9ebe1c0c390ea191a736fc8886a8ba"
+      },
+      {
+        "path": "Art/space-ruler/walk-source/east/frame_002.png",
+        "sha256": "1c5a6abd20132b3a1958007d7bb29cdb7a2a359c78a73903be63ccfa07dfa832"
+      },
+      {
+        "path": "Art/space-ruler/walk-source/east/frame_003.png",
+        "sha256": "6a403f61b5a731c7eb8d5348ca0e581bf78c6629bbc33389a6384ae4db923472"
+      },
+      {
+        "path": "Art/space-ruler/walk-source/east/frame_004.png",
+        "sha256": "9f72f19a656971403f227ff1dcf0c519437ce512f6ad04baefe6c22eb0b07257"
+      },
+      {
+        "path": "Art/space-ruler/walk-source/east/frame_005.png",
+        "sha256": "43eb1a97b8f2776fac260b54984b51d02154ff8801eefb88007eef41cdaea211"
+      },
+      {
+        "path": "Art/space-ruler/walk-source/east/frame_006.png",
+        "sha256": "8fc618b6c59266a093c378b50ca135c5ad521035ef3ae28772a372c945e8ccb3"
+      },
+      {
+        "path": "Art/space-ruler/walk-source/east/frame_007.png",
+        "sha256": "f3e1035e3d2c394c78629e17bb9fce12740da91f53d2a7361c9610d8f58cdb93"
+      }
+    ]
+  },
+  {
     "name": "flight_rise",
     "kind": "actor",
     "source_path": "Art/space-ruler/flight_rise.png",
