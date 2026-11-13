@@ -631,11 +631,11 @@ class Presentation {
             rect(stick.x,stick.y-10,stick.size*p.spaceFuel,5,0xb36bf0);
         }else{
             skillSlot(c[ControlLayout::Skill],1,"FIRE",p.mageSkillCooldown,4.1f,
-                held.skill,0xcaa2a4,true);
+                held.skill,0xcaa2a4,true,0);
             skillSlot(c[ControlLayout::Sweep],2,"-",p.sweepReady,sweepCooldown,
-                held.skillSweep,0x92b5ce,false);
+                held.skillSweep,0x92b5ce,false,0);
             skillSlot(c[ControlLayout::Buff],3,"-",p.buffReady,buffCooldown,
-                held.skillBuff,0xe3bd72,false);
+                held.skillBuff,0xe3bd72,false,0);
             if(p.swapCooldown>0)number(static_cast<int>(std::ceil(p.swapCooldown)),c[ControlLayout::Swap].x+20,c[ControlLayout::Swap].y+25,3,0xffd277);
         }
         if(g.inventory){rect(46,135,460,340,0xe3bd72);rect(50,139,452,332,0x1c2a34);text("EQUIPMENT",66,153,3);
