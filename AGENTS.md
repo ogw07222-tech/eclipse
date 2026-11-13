@@ -41,16 +41,13 @@ ECLIPSE tells its story without character dialogue, voice lines, narration, subt
 - Review each major beat for legibility without text and without audio, then enrich with sound; never rely solely on color, audio, or opaque effects.
 - Reference: `Docs/TUTORIAL_PROLOGUE_FLOW.md`.
 
-## GitHub + ChatGPT Library PNG exchange (mandatory)
+## GitHub-only source and asset workflow (mandatory)
 
-For every PNG or sprite edit/import/replacement, follow [`Docs/PNG_GITHUB_LIBRARY_WORKFLOW.md`](Docs/PNG_GITHUB_LIBRARY_WORKFLOW.md).
-
-- **GitHub is the canonical versioned source of truth.** `Art/` holds editable originals and authored poses; `Assets/Resources/Eclipse/` holds only approved runtime assets at exact existing paths. The ChatGPT Library is an optional companion shelf for source references, drafts and approved exports, **not** an automatic GitHub mirror.
-- Track stable asset identity, exact GitHub source/runtime paths, image dimensions, frame metadata, version/status and real content hashes/refs where available. Never fabricate Library IDs or assume a file named alike is identical.
-- For “modify existing PNG”, retrieve and inspect the **actual original binary image** first. If current tools can only read GitHub text and cannot retrieve binary PNGs, state that limitation and seek accessible Library/uploaded source; never claim a newly generated approximation is a faithful edit.
-- For “bring PNG from Library”, verify item bytes, compare with GitHub, keep original, and commit only the approved change with matching runtime/metadata/packaging updates. For “save PNG to Library”, explicitly upload and verify if supported; otherwise provide the file for manual import. **Never claim background or bidirectional sync.**
-- Maintain a reviewable before/after with native-resolution visual checks. Do not silently overwrite canonical PNGs, alter silhouettes/hitboxes, or move runtime paths. Preserve pre-edit version via Git and report which of GitHub / Library / local draft actually changed.
-- This rule does **not** authorize GitHub Actions, unrequested tests, or automatic builds. Observe the absolute owner-approval rule above.
+- **GitHub `ogw07222-tech/eclipse` `main` is the sole canonical project source.** No parallel ChatGPT Library upload, synchronization, or Library SHA comparison is required.
+- Preserve editable original art and key poses in `Art/`, and approved runtime assets in `Assets/Resources/Eclipse/`. Record actual paths, dimensions, frame metadata and content hashes when available.
+- For edits to existing PNGs, retrieve and inspect the actual original binary before modifying it. Preserve reviewable before/after results and originals through Git history.
+- ChatGPT Library or conversation attachments are optional input sources only, not mandatory destinations.
+- Update relevant runtime mappings, metadata and packaging. Never trigger GitHub Actions without explicit approval.
 
 ## Asset loading: fail loudly (mandatory)
 
@@ -81,32 +78,14 @@ For all ECLIPSE playable characters and enemies, animation **artwork** must be a
 - **Gameplay invariants:** Do not change movement speed, collision, hit windows, damage, cooldowns or other mechanics merely to alter animation FPS. Keep PNG atlases, frame indices and runtime timing consistent with approved artwork.
 - **Acceptance:** Inspect actual motion at intended playback speed and native pixel resolution, including loop boundaries and effects synchronization. Owner performs final game/device tests. Never run GitHub Actions without explicit approval.
 
-## Character art: GitHub + ChatGPT Library working-copy bridge
-
-- The **GitHub game repository main** is the authoritative runtime/source version; ChatGPT **Library `/ECLIPSE/characters/`** is a separately uploaded, versioned working copy for directly inspecting/editing PNGs.
-- Read `Art/character-library/README.md` and `Art/character-library/character-asset-manifest.json` at the start of every character/sprite task.
-- Retrieve matching production PNG files from Library when present, but check their SHA-256 against the intended GitHub revision first. Never substitute a similar-looking concept image or silently assume the Library mirror is synchronized.
-- After approved manual pixel-art edits and PNG inspection, update the GitHub runtime PNG **and** its Library working copy with identical bytes and record the verified source revision. Keep original/editable `Art/` sources. Do not claim completion if the actual PNG or mirror is still missing.
-- Library does not auto-sync with GitHub; use an explicit snapshot and integrity check. Creating an index or folders is not copying runtime PNGs. Preserve all prior prohibitions on unapproved GitHub Actions and owner-owned tests.
-
-## Full main branch ↔ ChatGPT Library mirror (mandatory)
-
-- The canonical ChatGPT Library mirror is **`/ECLIPSE/eclipse main/`**, with the **same relative filenames and directory layout** as `ogw07222-tech/eclipse` `main`. This supersedes the previous character-only `/ECLIPSE/characters/` workflow and the dated `/ECLIPSE/main-snapshots/...` location as the active working mirror. Historical archives may remain separately.
-- **Whenever changing GitHub `main`, update the corresponding Library files within that same work session**, including additions, changes, renames and deletions. This covers code, PNGs, art sources, configuration, documentation and `AGENTS.md`, not only character assets. Prefer a single reviewed source revision; never mix arbitrary commits in the active mirror.
-- Before a GitHub write, read the current GitHub `AGENTS.md`, inspect `.github/workflows/` for automatic triggers, and compare the target file against the Library counterpart. For text or image work, create the actual modified file, not a description or a claimed future sync.
-- After GitHub changes, upload the **actual matching file bytes** into `/ECLIPSE/eclipse main/<repository-relative-path>` (or update/remove the corresponding Library file for renames and deletions). Verify SHA-256 where accessible and record the updated commit SHA and any unverified files. Preserve original image/source files as appropriate.
-- **A GitHub commit without its Library update is a partial result**, not a synchronized completion. If file size, tool limitations, permissions or an interrupted upload block updating Library, clearly report the divergence and required manual step; never silently declare both sides synchronized.
-- GitHub is authoritative for released/game assets; Library is a manually maintained mirror, not a live link. `main` commits made outside this ChatGPT work session cannot automatically change Library. At the next relevant interaction, detect the changed GitHub commit and reconcile explicitly.
-- Do **not** trigger GitHub Actions or user-owned tests just to synchronize. This policy does not grant approval for GitHub Actions runs.
-
 ## Mandatory autonomous quality gate — repeat until accepted or blocked
 
 For ECLIPSE game assets, sprites, animation, and other implementation deliverables:
 
-1. Translate the request into concrete, verifiable acceptance criteria before production. For sprite work, include original character identity, actual transparent PNG frames, intended cell dimensions, true distinct authored poses at 60 poses per playback second, animation continuity, weapon/limb/foot contact, atlas metadata, and runtime integration where requested.
+1. Translate the request into concrete, verifiable acceptance criteria before production. For sprite work, include original character identity, actual transparent PNG frames, intended cell dimensions, motion-appropriate authored pose count and playback timing, animation continuity, weapon/limb/foot contact, atlas metadata, and runtime integration where requested.
 2. Produce the actual requested deliverable, not a concept sheet, illustration of a sprite sheet, placeholder, or code-drawn character substituted for authored art. Use scripts only for packing, format conversion, metadata, and static checks, never to fabricate hand-authored animation frames.
 3. Inspect the result against every criterion. A generated image, successful script, frame count, or file existence is not proof of visual quality or runtime readiness.
 4. On any failed criterion, revise the defective frames or rebuild the asset and verify again **without asking the owner to say “retry”**. Repeat while tools and execution budget permit. Do not present a failing candidate as final or silently lower the acceptance threshold.
 5. Only label work complete after the applicable quality gates genuinely pass. Clearly distinguish static checks from owner-only runtime/device testing. Never claim a test or approval that did not occur.
 6. If tool availability, access, or execution limits prevent completion, update `TASK_PROGRESS.md` with completed steps, exact modified files, failed checks, remaining work, blockers, and precise next actions so a subsequent “이어서” resumes without duplicating work.
-7. Do not run GitHub Actions or owner-owned tests without the separately required explicit approval. Follow all GitHub/Library synchronization rules above.
+7. Do not run GitHub Actions or owner-owned tests without the separately required explicit approval. Use GitHub as the sole project source; no Library synchronization is required.
