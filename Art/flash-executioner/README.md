@@ -1,10 +1,10 @@
 # Flash Executioner reviewed motion and resource-based light effects v2
 
-Six previously approved actor sheets are unchanged. Basic Attack now uses one fixed impact pose; five motion sheets are added below. All fifteen custom v1 effects have been rejected by the owner and removed from active bindings. Their source is historical only at `archive/rejected-custom-v1/`; old PNG bytes remain in Git history. Every active v2 effect comes from an existing finished [PixelFX resource](https://github.com/patch-gg/pixelfx/tree/5294518ce7c72e48b6100a744596e0acf57f2826/src/fx), pinned to commit5294518ce7c72e48b6100a744596e0acf57f2826.
+Six previously approved actor sheets are unchanged. Basic Attack now uses a compact 12-pose sequence with a 45°→30°→15° sword follow-through; five motion sheets are added below. All fifteen custom v1 effects have been rejected by the owner and removed from active bindings. Their source is historical only at `archive/rejected-custom-v1/`; old PNG bytes remain in Git history. Every active v2 effect comes from an existing finished [PixelFX resource](https://github.com/patch-gg/pixelfx/tree/5294518ce7c72e48b6100a744596e0acf57f2826/src/fx), pinned to commit5294518ce7c72e48b6100a744596e0acf57f2826.
 
 | Control | Actor sheet | Gameplay duration / contact |
 | --- | --- | --- |
-| Attack (J/Z or Attack button) | actor_basic.png | One fixed pose for .46s / .184s gameplay contact; existing attack-speed scaling |
+| Attack (J/Z or Attack button) | actor_basic.png | 12 poses over .46s / .184s gameplay contact; 45°→30°→15° sword follow-through; existing attack-speed scaling |
 | Skill 1 (K/X) | actor_skill1.png | .50s / .125s |
 | Skill 2 (U) | actor_skill2.png | .46s / .23s; sword lowered, opposite empty fist |
 | Skill 3 (O) | actor_skill3.png | .36s / .15s; blank contact frame and arrival |
@@ -16,7 +16,7 @@ Six previously approved actor sheets are unchanged. Basic Attack now uses one fi
 | Run (move input) | actor_run.png | 29-pose distance-driven loop; nominal .80s |
 | Jump/Fall (jump and vertical velocity) | actor_jump.png / actor_fall.png | 29 / 9 poses; .80s / .60s nominal playback |
 
-Ultimate, idle, run, jump and fall now use the owner-reviewed motion sheets. Idle, movement and airborne motions are selected automatically from the current character state; the P/VERDICT control selects Ultimate through the existing Verdict action. Basic Attack stays one fixed contact pose. Only repeated Ultimate preparation frames were trimmed; no physics, cooldown, damage, target, hitbox or twenty-lance behavior changed.
+Ultimate, idle, run, jump and fall now use the owner-reviewed motion sheets. Idle, movement and airborne motions are selected automatically from the current character state; the P/VERDICT control selects Ultimate through the existing Verdict action. Basic Attack uses 12 poses with fewer repeated centered sword frames and angled follow-through poses. Only repeated Ultimate preparation frames were trimmed; no physics, cooldown, damage, target, hitbox or twenty-lance behavior changed.
 
 Actor sheets have192×192 cells, pivot70/133, scale1.4. `reviewed/manifest.json` records dimensions, frame counts, hashes and provenance. `review-approval.json` records the owner-reviewed additions and exact hashes. Clip rates are motion-specific: Idle 18.9 poses/s, Run 36.3 nominal poses/s, Jump 36.3 nominal poses/s, Fall 15 poses/s and Ultimate 22.3 poses/s. The runtime maps Ultimate contact to frame 16 and retains its unchanged .728s gameplay contact. All actor cells are 192×192 RGBA at pivot70/133 and scale1.4.
 
@@ -40,7 +40,7 @@ Effect frame selection uses metadata fps directly, including endpoint samples, i
 
 `native-engine/src/flash_executioner_assets.hpp` is generated only from approved metadata. `Tools/art/import_flash_executioner.py` requires explicit main approval, SHA256 matches, and sourceId/sourceCommit/sourceSha256 for every effect. It removes superseded PNGs from runtime and reviewed-source folders, preventing stale CMake/Android glob packaging. Roles without an approved actor sheet retain legacy art. Declared missing/wrong-dimension sheets fail via `loadWhiteNight` and the existing `ECLIPSE ASSET ERROR` modal; failed required loads never silently substitute candidates.
 
-Static inspection confirms27 runtime PNG files (12 actor roles,13 effect roles), zero active v1 effect hashes. Six previously approved actor sheets remain byte-identical; Basic is now a one-pose sheet. Lance and SkyLance intentionally share the same source PNG pixels but use separate scales/descriptors.
+Static inspection confirms25 runtime PNG files (12 actor roles,13 effect roles), zero active v1 effect hashes. Six previously approved actor sheets remain byte-identical; Basic is a 12-pose sheet with contact mapped to pose 6. Lance and SkyLance intentionally share the same source PNG pixels but use separate scales/descriptors.
 
 GitHub main is the sole canonical project source.
 

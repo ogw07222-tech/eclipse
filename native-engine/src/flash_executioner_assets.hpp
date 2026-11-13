@@ -19,7 +19,7 @@ struct FlashSheet {
 };
 // Only explicitly approved entries are bound. Other roles retain legacy art.
 inline constexpr std::array<FlashSheet,static_cast<int>(FlashActor::Count)> flashActors{{
-    {"flash_executioner/actor_basic.png", 192, 192, 1, 1, 1, 70.0f, 133.0f, 1.4f, 0.46f, -1, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 2.1739f, -1.0f}, // Basic
+    {"flash_executioner/actor_basic.png", 192, 192, 4, 3, 12, 70.0f, 133.0f, 1.4f, 0.46f, 5, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 26.08695652173913f, -1.0f}, // Basic
     {"flash_executioner/actor_skill1.png", 192, 192, 6, 5, 30, 70.0f, 133.0f, 1.4f, 0.5f, 6, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Skill1
     {"flash_executioner/actor_skill2.png", 192, 192, 6, 5, 28, 70.0f, 133.0f, 1.4f, 0.46f, 14, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Skill2
     {"flash_executioner/actor_skill3.png", 192, 192, 5, 5, 22, 70.0f, 133.0f, 1.4f, 0.36f, 11, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Skill3

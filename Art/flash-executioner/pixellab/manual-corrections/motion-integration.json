@@ -1,7 +1,7 @@
 {
   "generation_source_manifest": "/data/data/com.termux/files/home/flash_executioner_pixellab_output/manifest.json",
   "owner_approved_motion_policy": "Motion-specific cadence; no universal 60fps target.",
-  "basic_attack": "One fixed contact pose; previous multi-pose sheet retained as backup.",
+  "basic_attack": "12-pose compact sequence; reduced repeated centered thrusts and added 45°→30°→15° sword follow-through. Gameplay contact remains .184s in the .46s attack.",
   "roles": {
     "Idle": {
       "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_idle.png",
@@ -77,6 +77,36 @@
       "loop": false,
       "contact_frame": 16,
       "sha256": "570dd07a71625dbe679e78f34e4bed68a67b21d5381cc69b4be62404bc8999eb"
+    },
+    "Basic": {
+      "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_basic.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 4,
+      "rows": 3,
+      "frames": 12,
+      "duration_seconds": 0.46,
+      "effective_pose_rate": 26.09,
+      "loop": false,
+      "contact_frame": 5,
+      "sha256": "20cc4e32db88d176a03f40862ecab56d38803d6c387b43d6fca80c3c12352708",
+      "source_file": "Art/flash-executioner/pixellab/manual-corrections/basic/actor_basic_28_pose_angle_edit_source.png",
+      "selected_source_frames": [
+        0,
+        1,
+        2,
+        4,
+        6,
+        8,
+        9,
+        10,
+        11,
+        20,
+        23,
+        27
+      ]
     }
   }
 }

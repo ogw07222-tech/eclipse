@@ -1,6 +1,6 @@
 {
   "review_status": "approved",
-  "review_scope": "Owner approved five new motion roles at motion-specific cadence after playback review; Basic attack fixed to one pose. No device tests.",
+  "review_scope": "Owner-approved compact 12-pose Basic attack with angled sword follow-through, alongside five reviewed motion roles. No device tests.",
   "actors": [
     {
       "role": "Dash",
@@ -502,25 +502,39 @@
         192,
         192
       ],
-      "columns": 1,
-      "rows": 1,
-      "count": 1,
+      "columns": 4,
+      "rows": 3,
+      "count": 12,
       "pivot": [
         70,
         133
       ],
       "scale": 1.4,
       "duration": 0.46,
-      "contactFrame": -1,
+      "contactFrame": 5,
       "loop": false,
-      "sourceFile": "manual-corrections/basic/actor_basic_28_pose_backup.png",
-      "uniquePixelFrames": 1,
-      "sha256": "344ac76e1215d724e296a09fcac7524bc4b149ed7c62c706a5d426211887d018",
+      "sourceFile": "manual-corrections/basic/actor_basic_28_pose_angle_edit_source.png",
+      "uniquePixelFrames": 12,
+      "sha256": "20cc4e32db88d176a03f40862ecab56d38803d6c387b43d6fca80c3c12352708",
       "approved": true,
-      "review": "One fixed contact pose is displayed for the complete .46s attack. Existing gameplay contact timing stays .184s.",
-      "fixedPose": true,
-      "reviewNote": "One fixed contact pose per owner request; previous 28-pose version preserved.",
-      "fps": 2.1739
+      "review": "12-frame basic attack with shortened repeated centered thrusts and 45°→30°→15° sword follow-through. Original gameplay contact remains .184s in the .46s attack.",
+      "fixedPose": false,
+      "reviewNote": "Owner requested a tighter basic-attack sequence and intermediate sword angles; selected from the edited 28-pose PixelLab sheet. Original 28-pose backup preserved.",
+      "fps": 26.08695652173913,
+      "sourceFrameMap": [
+        0,
+        1,
+        2,
+        4,
+        6,
+        8,
+        9,
+        10,
+        11,
+        20,
+        23,
+        27
+      ]
     },
     {
       "role": "Skill1",
