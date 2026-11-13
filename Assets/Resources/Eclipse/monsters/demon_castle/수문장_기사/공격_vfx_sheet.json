@@ -1,0 +1,49 @@
+{
+  "name": "수문장_기사 attack with PixelFX",
+  "frameSize": [
+    416,
+    256
+  ],
+  "frames": 14,
+  "fps": 12,
+  "loop": false,
+  "transparent": true,
+  "characterSource": "공격_sheet.png",
+  "characterOffset": [
+    112,
+    32
+  ],
+  "effect": "melee/hammer-smash",
+  "effectSource": "hammer-smash.png",
+  "effectFps": 12,
+  "effectFrameStart": 9,
+  "effectFirstFrame": 0,
+  "effectPivot": [
+    80,
+    92
+  ],
+  "effectAnchor": [
+    236,
+    172
+  ],
+  "palette": [
+    "#0b111e",
+    "#182b4b",
+    "#294978",
+    "#4675ad",
+    "#78a9d7",
+    "#bbd9f4",
+    "#f0f7ff",
+    "#ffffff"
+  ],
+  "effectFramesUsed": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "effectScale": 1.25,
+  "effectForwardOffsetPx": 28,
+  "effectCanvasNote": "VFX composite expanded for large uncropped effects; character pixels remain native size."
+}

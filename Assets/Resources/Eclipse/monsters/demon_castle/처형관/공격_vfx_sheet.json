@@ -1,0 +1,53 @@
+{
+  "name": "처형관 attack with PixelFX",
+  "frameSize": [
+    416,
+    256
+  ],
+  "frames": 14,
+  "fps": 12,
+  "loop": false,
+  "transparent": true,
+  "characterSource": "공격_sheet.png",
+  "characterOffset": [
+    112,
+    32
+  ],
+  "effect": "melee/heavy-cleave",
+  "effectSource": "heavy-cleave.png",
+  "effectFps": 12,
+  "effectFrameStart": 5,
+  "effectFirstFrame": 0,
+  "effectPivot": [
+    68,
+    96
+  ],
+  "effectAnchor": [
+    236,
+    156
+  ],
+  "palette": [
+    "#10040a",
+    "#34060d",
+    "#641019",
+    "#981b27",
+    "#cf2e32",
+    "#f55b44",
+    "#ffae78",
+    "#fff0cf"
+  ],
+  "effectFramesUsed": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "effectScale": 1.25,
+  "effectForwardOffsetPx": 28,
+  "effectCanvasNote": "VFX composite expanded for large uncropped effects; character pixels remain native size."
+}

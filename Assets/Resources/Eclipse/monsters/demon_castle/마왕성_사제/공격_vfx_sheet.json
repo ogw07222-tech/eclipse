@@ -1,0 +1,53 @@
+{
+  "name": "마왕성_사제 attack with PixelFX",
+  "frameSize": [
+    416,
+    256
+  ],
+  "frames": 14,
+  "fps": 12,
+  "loop": false,
+  "transparent": true,
+  "characterSource": "공격_sheet.png",
+  "characterOffset": [
+    112,
+    32
+  ],
+  "effect": "arcane/mana-burst",
+  "effectSource": "mana-burst.png",
+  "effectFps": 12,
+  "effectFrameStart": 5,
+  "effectFirstFrame": 0,
+  "effectPivot": [
+    104,
+    124
+  ],
+  "effectAnchor": [
+    236,
+    172
+  ],
+  "palette": [
+    "#24150c",
+    "#52300e",
+    "#8a5215",
+    "#c38020",
+    "#e5b850",
+    "#f6df9b",
+    "#fff2cf",
+    "#ffffff"
+  ],
+  "effectFramesUsed": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "effectScale": 1.25,
+  "effectForwardOffsetPx": 28,
+  "effectCanvasNote": "VFX composite expanded for large uncropped effects; character pixels remain native size."
+}

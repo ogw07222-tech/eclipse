@@ -1,0 +1,51 @@
+{
+  "name": "허무의_잔영 attack with PixelFX",
+  "frameSize": [
+    416,
+    256
+  ],
+  "frames": 14,
+  "fps": 12,
+  "loop": false,
+  "transparent": true,
+  "characterSource": "공격_sheet.png",
+  "characterOffset": [
+    112,
+    32
+  ],
+  "effect": "melee/scythe-reap",
+  "effectSource": "scythe-reap.png",
+  "effectFps": 12,
+  "effectFrameStart": 7,
+  "effectFirstFrame": 0,
+  "effectPivot": [
+    84,
+    98
+  ],
+  "effectAnchor": [
+    236,
+    165
+  ],
+  "palette": [
+    "#080611",
+    "#170c29",
+    "#2e194b",
+    "#513070",
+    "#7955a4",
+    "#aa91d2",
+    "#e2d8ff",
+    "#ffffff"
+  ],
+  "effectFramesUsed": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "effectScale": 1.25,
+  "effectForwardOffsetPx": 28,
+  "effectCanvasNote": "VFX composite expanded for large uncropped effects; character pixels remain native size."
+}

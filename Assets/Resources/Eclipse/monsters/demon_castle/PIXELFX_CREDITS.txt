@@ -1,0 +1,9 @@
+PixelFX-derived attack effects
+
+The *_vfx_sheet.png and *_vfx_layer.png assets use effects rendered from PixelFX.
+PixelFX repository: https://github.com/patch-gg/pixelfx
+PixelFX license: MIT, Copyright (c) 2026 Patch and Hugo Duprez.
+Some library effects adapt Sprite Fusion open-source pixel-art VFX by Hugo Duprez:
+https://www.spritefusion.com/pixel-art-vfx
+
+Selected effects are identified in each enemy folder's 공격_vfx_sheet.json.

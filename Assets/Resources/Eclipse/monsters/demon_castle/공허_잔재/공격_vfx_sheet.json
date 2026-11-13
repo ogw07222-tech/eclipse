@@ -1,0 +1,58 @@
+{
+  "name": "공허_잔재 attack with PixelFX",
+  "frameSize": [
+    416,
+    256
+  ],
+  "frames": 14,
+  "fps": 12,
+  "loop": false,
+  "transparent": true,
+  "characterSource": "공격_sheet.png",
+  "characterOffset": [
+    112,
+    32
+  ],
+  "effect": "shadow/shadow-tendrils",
+  "effectSource": "shadow-tendrils.png",
+  "effectFps": 12,
+  "effectFrameStart": 0,
+  "effectFirstFrame": 6,
+  "effectPivot": [
+    104,
+    106
+  ],
+  "effectAnchor": [
+    236,
+    153
+  ],
+  "palette": [
+    "#06020b",
+    "#130824",
+    "#24113c",
+    "#3b1c64",
+    "#6032a3",
+    "#9360d1",
+    "#d3b0ff",
+    "#ffffff"
+  ],
+  "effectFramesUsed": [
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+  ],
+  "effectScale": 1.25,
+  "effectForwardOffsetPx": 28,
+  "effectCanvasNote": "VFX composite expanded for large uncropped effects; character pixels remain native size."
+}

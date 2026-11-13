@@ -1,0 +1,52 @@
+{
+  "name": "가고일 attack with PixelFX",
+  "frameSize": [
+    416,
+    256
+  ],
+  "frames": 14,
+  "fps": 12,
+  "loop": false,
+  "transparent": true,
+  "characterSource": "공격_sheet.png",
+  "characterOffset": [
+    112,
+    32
+  ],
+  "effect": "melee/claw-swipe",
+  "effectSource": "claw-swipe.png",
+  "effectFps": 12,
+  "effectFrameStart": 6,
+  "effectFirstFrame": 0,
+  "effectPivot": [
+    36,
+    84
+  ],
+  "effectAnchor": [
+    236,
+    146
+  ],
+  "palette": [
+    "#101116",
+    "#242531",
+    "#3e4353",
+    "#676c7d",
+    "#969dad",
+    "#c9d0dc",
+    "#f0f5ff",
+    "#ffffff"
+  ],
+  "effectFramesUsed": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "effectScale": 1.25,
+  "effectForwardOffsetPx": 28,
+  "effectCanvasNote": "VFX composite expanded for large uncropped effects; character pixels remain native size."
+}
