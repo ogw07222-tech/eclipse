@@ -1112,65 +1112,10 @@ public:
     }
 
     bool loadWhiteNight(){
-        if(whiteNightLance_&&whiteNightMotion_)return loadReviewedFlashSheets();
-        const auto path=asset("ui/white_night_lance.png");
-        auto* texture=IMG_LoadTexture(renderer,path.c_str());
-        if(!texture){
-            const std::string cause=SDL_GetError();
-            SDL_SetError("ECLIPSE ASSET ERROR: %s: %s",path.c_str(),cause.c_str());
-            return false;
-        }
-        float width=0,height=0;
-        if(!SDL_GetTextureSize(texture,&width,&height)||width!=64||height!=3){
-            SDL_DestroyTexture(texture);
-            SDL_SetError("ECLIPSE ASSET ERROR: %s expected 64x3, got %.0fx%.0f",path.c_str(),width,height);
-            return false;
-        }
-        SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST);
-        const auto motionPath=asset("ui/white_night_motion.png");
-        auto* motion=IMG_LoadTexture(renderer,motionPath.c_str());
-        if(!motion){
-            const std::string cause=SDL_GetError();
-            SDL_DestroyTexture(texture);
-            SDL_SetError("ECLIPSE ASSET ERROR: %s: %s",motionPath.c_str(),cause.c_str());
-            return false;
-        }
-        if(!SDL_GetTextureSize(motion,&width,&height)||width!=512||height!=1440){
-            SDL_DestroyTexture(motion);
-            SDL_DestroyTexture(texture);
-            SDL_SetError("ECLIPSE ASSET ERROR: %s expected 512x1440, got %.0fx%.0f",motionPath.c_str(),width,height);
-            return false;
-        }
-        SDL_SetTextureScaleMode(motion,SDL_SCALEMODE_NEAREST);
-        whiteNightLance_=texture;
-        whiteNightMotion_=motion;
-        // Gold/white effects are mandatory game assets, not optional decoration.
-        // Validate dimensions so the game fails visibly instead of drawing fake fallbacks.
-        auto loadGold=[&](SDL_Texture*& destination,const char* name,float expectedW,float expectedH)->bool{
-            if(destination)return true;
-            const std::string file=asset(name);
-            destination=IMG_LoadTexture(renderer,file.c_str());
-            if(!destination){
-                SDL_SetError("ECLIPSE ASSET ERROR: required PNG %s missing or invalid",file.c_str());
-                return false;
-            }
-            float w=0,h=0;
-            if(!SDL_GetTextureSize(destination,&w,&h)||w!=expectedW||h!=expectedH){
-                SDL_SetError("ECLIPSE ASSET ERROR: %s expected %.0fx%.0f, got %.0fx%.0f",
-                    file.c_str(),expectedW,expectedH,w,h);
-                SDL_DestroyTexture(destination);destination=nullptr;
-                return false;
-            }
-            SDL_SetTextureScaleMode(destination,SDL_SCALEMODE_NEAREST);
-            SDL_SetTextureBlendMode(destination,SDL_BLENDMODE_BLEND);
-            return true;
-        };
-        if(!loadGold(goldLance_,"ui/lance_gold.png",96,24)||
-           !loadGold(goldTrail_,"ui/trail_gold.png",128,32)||
-           !loadGold(goldOrb_,"ui/orb_gold.png",64,64)||
-           !loadGold(goldImpact_,"ui/impact_gold.png",96,96)||
-           !loadGold(riftSlash_,"ui/rift_slash.png",192,64)||
-           !loadGold(riftTrace_,"ui/rift_trace.png",256,32))return false;
+        // The reviewed actor/effect sheets are the active combat assets. The
+        // former white_night_motion/lance and ui/*_gold PNGs were removed when
+        // the reviewed sheets replaced the legacy pack, so never gate combat
+        // entry on those obsolete paths.
         return loadReviewedFlashSheets();
     }
 
