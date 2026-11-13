@@ -1,0 +1,2173 @@
+{
+ "frames": [
+  {
+   "filename": "repulsion-wave 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 1",
+   "frame": {
+    "x": 320,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 2",
+   "frame": {
+    "x": 640,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 3",
+   "frame": {
+    "x": 960,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 4",
+   "frame": {
+    "x": 1280,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 5",
+   "frame": {
+    "x": 1600,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 6",
+   "frame": {
+    "x": 1920,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 7",
+   "frame": {
+    "x": 2240,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 8",
+   "frame": {
+    "x": 2560,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 9",
+   "frame": {
+    "x": 0,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 10",
+   "frame": {
+    "x": 320,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 11",
+   "frame": {
+    "x": 640,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 12",
+   "frame": {
+    "x": 960,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 13",
+   "frame": {
+    "x": 1280,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 14",
+   "frame": {
+    "x": 1600,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 15",
+   "frame": {
+    "x": 1920,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 16",
+   "frame": {
+    "x": 2240,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 17",
+   "frame": {
+    "x": 2560,
+    "y": 224,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 18",
+   "frame": {
+    "x": 0,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 19",
+   "frame": {
+    "x": 320,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 20",
+   "frame": {
+    "x": 640,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 21",
+   "frame": {
+    "x": 960,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 22",
+   "frame": {
+    "x": 1280,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 23",
+   "frame": {
+    "x": 1600,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 24",
+   "frame": {
+    "x": 1920,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 25",
+   "frame": {
+    "x": 2240,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 26",
+   "frame": {
+    "x": 2560,
+    "y": 448,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 27",
+   "frame": {
+    "x": 0,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 28",
+   "frame": {
+    "x": 320,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 29",
+   "frame": {
+    "x": 640,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 30",
+   "frame": {
+    "x": 960,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 31",
+   "frame": {
+    "x": 1280,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 32",
+   "frame": {
+    "x": 1600,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 33",
+   "frame": {
+    "x": 1920,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 34",
+   "frame": {
+    "x": 2240,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 35",
+   "frame": {
+    "x": 2560,
+    "y": 672,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 36",
+   "frame": {
+    "x": 0,
+    "y": 896,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 37",
+   "frame": {
+    "x": 320,
+    "y": 896,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 38",
+   "frame": {
+    "x": 640,
+    "y": 896,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 39",
+   "frame": {
+    "x": 960,
+    "y": 896,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 40",
+   "frame": {
+    "x": 1280,
+    "y": 896,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 41",
+   "frame": {
+    "x": 1600,
+    "y": 896,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 42",
+   "frame": {
+    "x": 1920,
+    "y": 896,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 43",
+   "frame": {
+    "x": 2240,
+    "y": 896,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 44",
+   "frame": {
+    "x": 2560,
+    "y": 896,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 45",
+   "frame": {
+    "x": 0,
+    "y": 1120,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 46",
+   "frame": {
+    "x": 320,
+    "y": 1120,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 47",
+   "frame": {
+    "x": 640,
+    "y": 1120,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 48",
+   "frame": {
+    "x": 960,
+    "y": 1120,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 49",
+   "frame": {
+    "x": 1280,
+    "y": 1120,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 50",
+   "frame": {
+    "x": 1600,
+    "y": 1120,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 51",
+   "frame": {
+    "x": 1920,
+    "y": 1120,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 52",
+   "frame": {
+    "x": 2240,
+    "y": 1120,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 53",
+   "frame": {
+    "x": 2560,
+    "y": 1120,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 54",
+   "frame": {
+    "x": 0,
+    "y": 1344,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 55",
+   "frame": {
+    "x": 320,
+    "y": 1344,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 56",
+   "frame": {
+    "x": 640,
+    "y": 1344,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 57",
+   "frame": {
+    "x": 960,
+    "y": 1344,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 58",
+   "frame": {
+    "x": 1280,
+    "y": 1344,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 59",
+   "frame": {
+    "x": 1600,
+    "y": 1344,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 60",
+   "frame": {
+    "x": 1920,
+    "y": 1344,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 61",
+   "frame": {
+    "x": 2240,
+    "y": 1344,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 62",
+   "frame": {
+    "x": 2560,
+    "y": 1344,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 63",
+   "frame": {
+    "x": 0,
+    "y": 1568,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 64",
+   "frame": {
+    "x": 320,
+    "y": 1568,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 65",
+   "frame": {
+    "x": 640,
+    "y": 1568,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 66",
+   "frame": {
+    "x": 960,
+    "y": 1568,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 67",
+   "frame": {
+    "x": 1280,
+    "y": 1568,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 68",
+   "frame": {
+    "x": 1600,
+    "y": 1568,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 69",
+   "frame": {
+    "x": 1920,
+    "y": 1568,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 70",
+   "frame": {
+    "x": 2240,
+    "y": 1568,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 71",
+   "frame": {
+    "x": 2560,
+    "y": 1568,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 72",
+   "frame": {
+    "x": 0,
+    "y": 1792,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 73",
+   "frame": {
+    "x": 320,
+    "y": 1792,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 74",
+   "frame": {
+    "x": 640,
+    "y": 1792,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 75",
+   "frame": {
+    "x": 960,
+    "y": 1792,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 76",
+   "frame": {
+    "x": 1280,
+    "y": 1792,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 77",
+   "frame": {
+    "x": 1600,
+    "y": 1792,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 78",
+   "frame": {
+    "x": 1920,
+    "y": 1792,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 79",
+   "frame": {
+    "x": 2240,
+    "y": 1792,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 80",
+   "frame": {
+    "x": 2560,
+    "y": 1792,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 81",
+   "frame": {
+    "x": 0,
+    "y": 2016,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 82",
+   "frame": {
+    "x": 320,
+    "y": 2016,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 83",
+   "frame": {
+    "x": 640,
+    "y": 2016,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 84",
+   "frame": {
+    "x": 960,
+    "y": 2016,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 85",
+   "frame": {
+    "x": 1280,
+    "y": 2016,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 86",
+   "frame": {
+    "x": 1600,
+    "y": 2016,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 87",
+   "frame": {
+    "x": 1920,
+    "y": 2016,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 88",
+   "frame": {
+    "x": 2240,
+    "y": 2016,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 89",
+   "frame": {
+    "x": 2560,
+    "y": 2016,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 90",
+   "frame": {
+    "x": 0,
+    "y": 2240,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 91",
+   "frame": {
+    "x": 320,
+    "y": 2240,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 92",
+   "frame": {
+    "x": 640,
+    "y": 2240,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 93",
+   "frame": {
+    "x": 960,
+    "y": 2240,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 94",
+   "frame": {
+    "x": 1280,
+    "y": 2240,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 95",
+   "frame": {
+    "x": 1600,
+    "y": 2240,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  },
+  {
+   "filename": "repulsion-wave 96",
+   "frame": {
+    "x": 1920,
+    "y": 2240,
+    "w": 320,
+    "h": 224
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 224
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 224
+   },
+   "duration": 33
+  }
+ ],
+ "meta": {
+  "app": "https://github.com/patch-gg/pixelfx",
+  "version": "1",
+  "image": "repulsion-wave.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 2880,
+   "h": 2464
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "repulsion-wave",
+    "from": 0,
+    "to": 96,
+    "direction": "forward"
+   }
+  ],
+  "pixelfx": {
+   "id": "arcane/repulsion-wave",
+   "name": "Repulsion Wave",
+   "fps": 30,
+   "loop": false,
+   "frames": 97,
+   "frameSize": [
+    320,
+    224
+   ],
+   "pivot": [
+    160,
+    176
+   ],
+   "columns": 9
+  }
+ }
+}

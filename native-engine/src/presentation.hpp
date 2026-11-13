@@ -12,6 +12,7 @@
 #include "forest_layers.hpp"
 #include "demon_castle_entrance.hpp"
 #include "flash_executioner_assets.hpp"
+#include "space_ruler_assets.hpp"
 
 namespace eclipse {
 class Presentation {
@@ -49,6 +50,9 @@ class Presentation {
     SDL_Texture* knightSkillMotion_=nullptr;
     // Effects remain in an independent transparent atlas, never baked onto the actor.
     SDL_Texture* knightSkillFx_=nullptr;
+    int spaceRole_=-1;float spaceRoleBorn_=0;
+    std::array<SDL_Texture*,12> spaceActorTextures_{};
+    std::array<SDL_Texture*,6> spaceFxTextures_{};
     SDL_Texture* mageRun_=nullptr;
     SDL_Texture* mageMotion_=nullptr;
     SDL_Texture* settingsGear_=nullptr;
@@ -494,6 +498,54 @@ class Presentation {
         SDL_RenderTextureRotated(renderer,knightSkillFx_,&src,&dest,0,nullptr,
             p.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
     }
+    void spaceSprite(SDL_Texture* texture,const SpaceSheet& sheet,float age,float x,float y,int facing){
+        int frame=static_cast<int>(std::max(0.f,age)*sheet.count/sheet.duration);
+        frame=sheet.loop?frame%sheet.count:std::min(sheet.count-1,frame);
+        const SDL_FRect src{float(frame%sheet.columns*sheet.width),float(frame/sheet.columns*sheet.height),float(sheet.width),float(sheet.height)};
+        const float pivot=facing>0?sheet.pivotX:sheet.width-sheet.pivotX;
+        const SDL_FRect dst{std::round(x-offset-pivot*sheet.scale),std::round(y-sheet.pivotY*sheet.scale),sheet.width*sheet.scale,sheet.height*sheet.scale};
+        SDL_RenderTextureRotated(renderer,texture,&src,&dst,0,nullptr,facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
+    }
+    void spaceActor(const Combat& g,const Animation& a){
+        const auto& p=g.player;int role=0;float age=g.clock;
+        if(p.health<=0){role=6;age=a.time;}
+        else if(p.hurtTint>0){role=5;age=.18f-p.hurtTint;}
+        else if(p.spaceMove){role=6+p.spaceMove;age=p.spaceAge;}
+        else if(!p.grounded){role=p.vy< -5?2:p.vy>5?4:3;}
+        else if(std::abs(p.vx)>1)role=1;
+        if(role!=spaceRole_||g.clock<spaceRoleBorn_){spaceRole_=role;spaceRoleBorn_=g.clock;}
+        if(!p.spaceMove&&p.health>0&&p.hurtTint<=0)age=g.clock-spaceRoleBorn_;
+        const float y=p.y-10+(p.health>0?std::sin(g.clock*3)*1.8f:0);
+        spaceSprite(spaceActorTextures_[role],spaceActors[role],age,p.x,y,p.facing);
+    }
+    void drawSpaceEffects(const Combat& g){
+        const auto& p=g.player;
+        for(const auto& fx:g.spaceEffects){
+            if(fx.kind==4)rect(0,0,viewWidth,viewHeight,0x10051f,static_cast<Uint8>(65*std::sin(std::min(1.f,fx.age/2.f)*3.14159265f)));
+            spaceSprite(spaceFxTextures_[fx.kind],spaceEffects[fx.kind],fx.age,fx.x,fx.y,fx.facing);
+        }
+        if(p.form!=1||p.whiteNight||p.health<=0)return;
+        if(p.spaceField>0)spaceSprite(spaceFxTextures_[1],eclipse::spaceEffects[1],3-p.spaceField,p.x,p.y-20,1);
+        if(!p.grounded)spaceSprite(spaceFxTextures_[5],eclipse::spaceEffects[5],g.clock,p.x,p.y-12,p.facing);
+    }
+    bool loadSpaceRuler(){
+        auto load=[&](const SpaceSheet& sheet,SDL_Texture*& texture){
+            const auto path=asset(sheet.file);auto* surface=IMG_Load(path.c_str());
+            const int expectedW=sheet.width*sheet.columns,expectedH=sheet.height*((sheet.count+sheet.columns-1)/sheet.columns);
+            if(!surface||surface->w!=expectedW||surface->h!=expectedH){
+                const int w=surface?surface->w:0,h=surface?surface->h:0;
+                const std::string error="ECLIPSE ASSET ERROR: "+path+" expected "+std::to_string(expectedW)+"x"+std::to_string(expectedH)+" actual "+std::to_string(w)+"x"+std::to_string(h)+" "+SDL_GetError();
+                if(surface)SDL_DestroySurface(surface);
+                SDL_SetError("%s",error.c_str());SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",error.c_str());SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"ECLIPSE ASSET ERROR",error.c_str(),nullptr);return false;
+            }
+            texture=SDL_CreateTextureFromSurface(renderer,surface);SDL_DestroySurface(surface);
+            if(!texture){const std::string error="ECLIPSE ASSET ERROR: "+path+" "+SDL_GetError();SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"ECLIPSE ASSET ERROR",error.c_str(),nullptr);return false;}
+            SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(texture,SDL_BLENDMODE_BLEND);return true;
+        };
+        for(size_t i=0;i<spaceActorTextures_.size();++i)if(!load(spaceActors[i],spaceActorTextures_[i]))return false;
+        for(size_t i=0;i<spaceFxTextures_.size();++i)if(!load(eclipse::spaceEffects[i],spaceFxTextures_[i]))return false;
+        return true;
+    }
     void icon(int texture,int col,int row,float x,float y,float size,bool down){
         SDL_FRect source{col*128.f,row*128.f,128,128},target{x,y,size,size};
         SDL_SetTextureColorMod(textures[texture],down?180:255,down?180:255,down?180:255);
@@ -608,7 +660,7 @@ class Presentation {
         const auto& p=g.player;
         playerHealthBar(p);
         for(int i=0;i<4;++i){rect(765+i*74,21,66,61,0x080d17);rect(771+i*74,27,54,49,0x667482);rect(777+i*74,33,42,37,0x222c3d);}
-        text("GEAR",780,44,2);text(p.whiteNight?"WHITE NIGHT":p.form==0?"BLADE":"FIRE",28,73,2,0x9ed7ff);number(g.foes(),1180,43,5,0xece7d2);text("FOES",1090,25,2);
+        text("GEAR",780,44,2);text(p.whiteNight?"WHITE NIGHT":p.form==0?"BLADE":"SPACE RULER",28,73,2,0x9ed7ff);number(g.foes(),1180,43,5,0xece7d2);text("FOES",1090,25,2);
         const auto& c=layout.buttons;
         const auto& js=c[ControlLayout::Stick];
         const bool stickActive=held.left||held.right||held.jump;
@@ -636,6 +688,14 @@ class Presentation {
             skillSlot(c[ControlLayout::Sweep],2,"RELEASE",p.sweepReady,1.f,held.skillSweep,0x9bb9d6,true,4);
             skillSlot(c[ControlLayout::Buff],3,"BLINK",p.buffReady,1.5f,held.skillBuff,0xd9ecf5,true,5);
             skillSlot(c[ControlLayout::Ultimate],4,"VERDICT",p.verdictCooldown,9.f,held.ultimate,0xc4d7ed,true,6);
+        }else if(p.form==1){
+            skillButton(c[ControlLayout::Skill],"1",p.mageSkillCooldown,7,held.skill,0xaa66ee);
+            skillButton(c[ControlLayout::Sweep],"2",p.sweepReady,7,held.skillSweep,0xaa66ee);
+            skillButton(c[ControlLayout::Buff],"3",p.buffReady,5,held.skillBuff,0xaa66ee);
+            skillButton(c[ControlLayout::Ultimate],"4",p.verdictCooldown,20,held.ultimate,0xcc88ff);
+            const auto& stick=c[ControlLayout::Stick];
+            rect(stick.x,stick.y-10,stick.size,5,0x26163a);
+            rect(stick.x,stick.y-10,stick.size*p.spaceFuel,5,0xb36bf0);
         }else{
             const bool knight=p.form==0;
             skillSlot(c[ControlLayout::Skill],1,knight?"STAB":"FIRE",
@@ -824,7 +884,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){for(auto* image:flashActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_,riftSlash_,riftTrace_})if(fx)SDL_DestroyTexture(fx);for(auto* fx:whiteFxTextures_)if(fx)SDL_DestroyTexture(fx);if(whiteNightMotion_)SDL_DestroyTexture(whiteNightMotion_);if(whiteNightLance_)SDL_DestroyTexture(whiteNightLance_);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleBg_)SDL_DestroyTexture(titleBg_);if(titleKnightFg_)SDL_DestroyTexture(titleKnightFg_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);if(knightSkillFx_)SDL_DestroyTexture(knightSkillFx_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:whiteSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){for(auto* image:spaceActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:spaceFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_,riftSlash_,riftTrace_})if(fx)SDL_DestroyTexture(fx);for(auto* fx:whiteFxTextures_)if(fx)SDL_DestroyTexture(fx);if(whiteNightMotion_)SDL_DestroyTexture(whiteNightMotion_);if(whiteNightLance_)SDL_DestroyTexture(whiteNightLance_);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleBg_)SDL_DestroyTexture(titleBg_);if(titleKnightFg_)SDL_DestroyTexture(titleKnightFg_);if(titleCape_)SDL_DestroyTexture(titleCape_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(knightSkillMotion_)SDL_DestroyTexture(knightSkillMotion_);if(knightSkillFx_)SDL_DestroyTexture(knightSkillFx_);for(auto* image:knightSkillTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:whiteSkillTextures_)if(image)SDL_DestroyTexture(image);if(mageMotion_)SDL_DestroyTexture(mageMotion_);if(mageRun_)SDL_DestroyTexture(mageRun_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:slimeTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
@@ -1199,7 +1259,7 @@ public:
             rect(386,320,508,304,0x101223);
             rect(386,320,508,3,0xad95c7);
             text(qaFirstJob<0?"QA: PICK FIRST JOB":"QA: PICK SECOND JOB",453,340,3,0xffe2b7);
-            constexpr const char* labels[]={"1 KNIGHT","2 FIRE MAGE","3 WHITE NIGHT","BACK"};
+            constexpr const char* labels[]={"1 KNIGHT","2 SPACE RULER","3 WHITE NIGHT","BACK"};
             for(size_t i=0;i<qaCharacterButtons.size();++i){
                 const auto& target=qaCharacterButtons[i];
                 const SDL_FRect source{0,0,112,30};
@@ -1248,6 +1308,7 @@ public:
     }
 
     bool load(){
+        if(!loadSpaceRuler())return false;
         // Preload the castle for its future tutorial scene, but do not require
         // tutorial art to start an unrelated forest gameplay scene.
         // The explicit castle preview request checks readiness and raises an error.
@@ -1603,7 +1664,9 @@ public:
                 (burst.kind==LightFx::Command&&hasReviewedFlashFx(FlashFx::Command));
             if(burst.kind!=LightFx::Slash&&!replaced)goldenImpactParticles(burst);
         }
+        drawSpaceEffects(g);
         for(const auto& b:g.projectiles){
+            if(b.voidBolt){spaceSprite(spaceFxTextures_[0],spaceEffects[0],1.6f-b.life,b.x,b.y,b.facing);continue;}
             const int radius=b.empowered?14:8;
             const float x=b.x-offset;
             rect(x-b.facing*radius*1.5f-3,b.y-2,6,4,0xa33524);
@@ -1682,7 +1745,8 @@ public:
             frame+=knightMidpointStart;
         }
         drawReviewedFlashEffects(g,a,false);
-        if(drawReviewedFlashActor(g,a)){
+        if(p.form==1&&!p.whiteNight){spaceActor(g,a);}
+        else if(drawReviewedFlashActor(g,a)){
             // Approved separate sheets replace only their own motion role.
         }else if(p.whiteNight&&whiteNightMotion_&&(p.whiteMove!=WhiteMove::None||p.health>0)){
             int whiteFrame=30;

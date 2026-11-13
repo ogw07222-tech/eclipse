@@ -63,6 +63,10 @@ struct Player {
     float hurtTint=0; // visual-only: short white flash and muted-red impact
     bool airSlam=false;
     float slamAge=0,slamRecover=0,slamImpact=0,slamImpactX=0,slamImpactY=floorY;
+    // Space Ruler occupies the ranged job slot (form 1).
+    int spaceMove=0; // 0 none, 1 attack, 2 field, 3 spikes, 4 repulsion, 5 collapse
+    float spaceAge=0,spaceFuel=1,spaceFlightBase=floorY,spaceField=0,spaceFieldTick=0;
+    bool spaceReleased=false,spaceExhausted=false;
     float mageCastLeft=0;
     int mageCastDamage=0;
     float meleeLeft=0,meleeReach=0;
@@ -99,10 +103,11 @@ struct Enemy {
     Enemy(int type=0,float at=0):kind(std::clamp(type,0,2)),health(slimeSpec(kind).health),maxHealth(health),damage(slimeSpec(kind).damage),x(at),speed(slimeSpec(kind).speed){}
     bool dead()const{return health<=0;}
 };
-struct Projectile {float x,y;int facing,damage;bool empowered;float life=1.6f,remainingDrop=0;};
+struct Projectile {float x,y;int facing,damage;bool empowered;float life=1.6f,remainingDrop=0;bool voidBolt=false;};
 struct LightLance {size_t target;float x,y,life=.65f;float offset=0,angle=90;bool verdict=false,seeking=false,markOnHit=false;float delay=0,morphTotal=0;float visualFlightAge=0;};
 enum class LightFx { Impact, Slash, Rush, Command, Depart, Arrive, Verdict };
 struct LightBurst {float x,y,life=.24f;LightFx kind=LightFx::Impact;int facing=1;unsigned long long visualSerial=0;};
+struct SpaceEffect {int kind;float x,y,age=0;int facing=1;};
 struct RiftScar {float x,y,angle,life=.16f;bool slash=false;};
 enum class DamageKind{Normal,Fire,Bleed,Execute};
 struct BleedSpread {float fromX,fromY,toX,toY,life=.23f;};
@@ -426,6 +431,51 @@ class Combat {
         if(p.whiteAge>=clip.duration)p.whiteMove=WhiteMove::None;
         return true;
     }
+    void stepSpace(float dt,Actions& a){
+        auto& p=player;
+        if(p.form!=1||p.whiteNight)return;
+        constexpr float durations[]={0,.55f,.65f,.75f,.6f,2.f};
+        constexpr float contacts[]={0,.18f,.22f,.24f,.15f,1.68f};
+        if(p.spaceMove==0&&p.hurtTint<=0&&p.dashLeft<=0){
+            int move=0;
+            if(a.ultimate&&p.verdictCooldown<=0){move=5;p.verdictCooldown=20;}
+            else if(a.skillBuff&&p.buffReady<=0){move=4;p.buffReady=5;}
+            else if(a.skillSweep&&p.sweepReady<=0){move=3;p.sweepReady=7;}
+            else if(a.skill&&p.mageSkillCooldown<=0){move=2;p.mageSkillCooldown=7;}
+            else if(a.attack&&p.attackCooldown<=0){move=1;p.attackCooldown=.55f;}
+            if(move){p.spaceMove=move;p.spaceAge=0;p.spaceReleased=false;++p.attackSerial;
+                if(move==5)spaceEffects.push_back({4,p.x,p.y,0,p.facing});}
+        }
+        a.attack=a.skill=a.skillSweep=a.skillBuff=a.ultimate=false;
+        if(p.spaceMove){
+            const int move=p.spaceMove;p.spaceAge+=dt;
+            if(move==5&&p.spaceAge<1.68f){
+                for(auto& e:enemies)if(!e.dead()&&std::abs(e.x-p.x)<340){
+                    const float amount=std::min(std::abs(p.x-e.x),100*dt*(1-e.knockbackResistance()));
+                    const float nx=e.x+(e.x<p.x?amount:-amount);
+                    if(!castleArea||std::isfinite(CastleTerrain::groundAt(castleArea,nx)))e.x=nx;
+                }
+            }
+            if(!p.spaceReleased&&p.spaceAge>=contacts[move]){
+                p.spaceReleased=true;
+                if(move==1){projectiles.push_back({p.x+p.facing*30,p.y-48,p.facing,11+p.gear.attack(),false});projectiles.back().voidBolt=true;}
+                if(move==2){p.spaceField=3;p.spaceFieldTick=0;}
+                if(move==3){
+                    spaceEffects.push_back({2,p.x+p.facing*24,p.y,0,p.facing});
+                    const BodyRect area{p.facing>0?p.x:p.x-245,p.y-130,p.facing>0?p.x+245:p.x,p.y+15};
+                    for(auto& e:enemies)if(!e.dead()&&enemyOverlaps(e,area))damageEnemy(e,24+p.gear.attack(),DamageKind::Normal,false);
+                }
+                if(move==4){spaceEffects.push_back({3,p.x,p.y,0,p.facing});
+                    for(auto& e:enemies)if(!e.dead()&&std::hypot(e.x-p.x,e.y-p.y)<180){damageEnemy(e,12+p.gear.attack(),DamageKind::Normal,false);e.knockback=(e.x<p.x?-1:1)*400*(1-e.knockbackResistance());}}
+                if(move==5){for(auto& e:enemies)if(!e.dead()&&std::hypot(e.x-p.x,e.y-p.y)<340)damageEnemy(e,65+p.gear.attack(),DamageKind::Normal,false);}
+            }
+            if(p.spaceAge>=durations[move])p.spaceMove=0;
+        }
+        if(p.spaceField>0){
+            p.spaceField=down(p.spaceField,dt);p.spaceFieldTick+=dt;
+            while(p.spaceFieldTick>=.5f){p.spaceFieldTick-=.5f;for(auto& e:enemies)if(!e.dead()&&std::hypot(e.x-p.x,e.y-p.y)<150)damageEnemy(e,6,DamageKind::Normal,true);}
+        }
+    }
     void stepPlayer(float dt,Actions a){
         auto& p=player;
         p.dashLeft=down(p.dashLeft,dt);p.dashCooldown=down(p.dashCooldown,dt);p.attackCooldown=down(p.attackCooldown,dt);
@@ -446,17 +496,18 @@ class Combat {
             const int next=p.equippedJobs[p.activeJob];
             p.whiteNight=next==2;
             p.form=next==1?1:0;
-            p.whiteMove=WhiteMove::None;p.whiteAge=0;
+            p.whiteMove=WhiteMove::None;p.whiteAge=0;p.spaceMove=0;p.spaceField=0;p.spaceFlightBase=p.y;
             p.swapCooldown=1.f;p.attackFlash=.22f;p.combo=0;
             p.comboWindow=0;p.attackPose=0;p.swapFlash=.24f;
             if(mayEntryAttack){
                 ++p.attackSerial;
                 if(p.whiteNight)whiteEffect(LightFx::Arrive,p.x,p.y-48);
                 else if(p.form==0)melee(13,false,112);
-                else projectile(14,false);
+                else {p.spaceMove=1;p.spaceAge=0;p.spaceReleased=false;}
             }
             return;
         }
+        stepSpace(dt,a);
         if(p.whiteNight&&stepWhiteMove(dt,a))return;
         if(p.whiteNight){
             a.skill=a.skillSweep=a.skillBuff=a.ultimate=false;
@@ -472,8 +523,16 @@ class Combat {
         if(p.dashLeft>0){p.vx=780*p.facing*p.gear.speed();p.vy=0;}
         else {
             p.vx=axis*280*p.gear.speed()*p.movementMultiplier();
-            p.vy+=1250*dt;
-            if((p.jumpBuffer>0||(a.jumpHeld&&p.grounded))&&p.coyote>0&&!p.airSlam&&p.slamRecover<=0)
+            if(p.form==1&&!p.whiteNight){
+                if(p.grounded)p.spaceFlightBase=p.y;
+                if(!a.jumpHeld&&p.grounded)p.spaceExhausted=false;
+                const bool flying=a.jumpHeld&&p.spaceFuel>0&&!p.spaceExhausted;
+                if(flying){p.spaceFuel=std::max(0.f,p.spaceFuel-dt*.25f);if(p.spaceFuel<=0)p.spaceExhausted=true;p.vy=p.y>p.spaceFlightBase-160?-120.f:0.f;}
+                else if(!p.grounded)p.vy=110.f;
+                else {p.vy=0;p.spaceFuel=std::min(1.f,p.spaceFuel+dt*.2f);}
+                if(p.spaceMove==5)p.vx=0;
+            }else p.vy+=1250*dt;
+            if(p.form!=1&&(p.jumpBuffer>0||(a.jumpHeld&&p.grounded))&&p.coyote>0&&!p.airSlam&&p.slamRecover<=0)
                 launchJump();
         }
         const bool attackAllowed=canAttack();
@@ -541,7 +600,7 @@ class Combat {
             if(landed){
                 ++p.landingSerial;
                 if(p.airSlam)landAirSlam();
-                if((a.jumpHeld||p.jumpBuffer>0)&&p.dashLeft<=0&&p.slamRecover<=0)
+                if(p.form!=1&&(a.jumpHeld||p.jumpBuffer>0)&&p.dashLeft<=0&&p.slamRecover<=0)
                     launchJump();
             }
         }
@@ -623,6 +682,7 @@ class Combat {
                 e.attackToX=e.x+e.facing*std::clamp(std::abs(dx),60.f,240.f);
             }
         }
+        if(player.form==1&&!player.whiteNight&&player.spaceField>0&&std::hypot(e.x-player.x,e.y-player.y)<150)vx*=.7f;
         e.travelPhase=std::fmod(e.travelPhase+std::abs(vx)*dt/64.f,1.f);
         e.x+=(vx+e.knockback)*dt;
         if(castleArea>0){
@@ -686,7 +746,11 @@ class Combat {
             b.remainingDrop-=drop;
             for(auto& e:enemies){if(remove||e.dead())continue;
                 float r=b.empowered?14:8;
-                if(enemySweptDisc(e,old,b.x,b.y,r)){hit(e,b.damage,true);remove=true;}
+                if(enemySweptDisc(e,old,b.x,b.y,r)){
+                    if(b.voidBolt){damageEnemy(e,b.damage,DamageKind::Normal,false);
+                        const float nx=e.x+(b.x-e.x)*.2f*(1-e.knockbackResistance());
+                        if(!castleArea||std::isfinite(CastleTerrain::groundAt(castleArea,nx)))e.x=nx;
+                    }else hit(e,b.damage,true);remove=true;}
             }
             if(remove)projectiles.erase(projectiles.begin()+i);
         }
@@ -708,6 +772,7 @@ public:
         restart();
     }
     std::array<Enemy,4> enemies;
+    std::vector<SpaceEffect> spaceEffects;
     std::vector<Projectile> projectiles;
     std::vector<LightLance> lightLances;
     std::vector<LightBurst> lightBursts;
@@ -724,7 +789,7 @@ public:
             const float foot=CastleTerrain::groundAt(castleArea,enemy.x);
             if(std::isfinite(foot))enemy.y=foot;
         }
-        projectiles.clear();lightLances.clear();lightBursts.clear();riftScars.clear();cameraCenter=viewWidth*.5f;popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=enemyVisualClock=0;}
+        spaceEffects.clear();projectiles.clear();lightLances.clear();lightBursts.clear();riftScars.clear();cameraCenter=viewWidth*.5f;popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=enemyVisualClock=0;}
     int foes()const{int count=0;for(const auto& e:enemies)if(!e.dead())++count;return count;}
     void hit(Enemy& e,int amount,bool fire,int bleed=0,bool slam=false){
         if(e.dead()||ended)return;
@@ -741,12 +806,14 @@ public:
     void damagePlayer(int amount){
         auto& p=player;if(ended||p.invulnerable>0||p.health<=0)return;
         holdHealthTrail(p,.12f);
-        p.health=std::max(0,p.health-std::max(1,amount-p.gear.defense()));p.hurtTint=.18f;cancelAirSlam();cancelMageCast();p.meleeLeft=0;p.invulnerable=.7f;p.attackFlash=0;++p.hurtSerial;p.combo=0;p.comboWindow=0;
+        p.health=std::max(0,p.health-std::max(1,amount-p.gear.defense()));p.hurtTint=.18f;p.spaceMove=0;cancelAirSlam();cancelMageCast();p.meleeLeft=0;p.invulnerable=.7f;p.attackFlash=0;++p.hurtSerial;p.combo=0;p.comboWindow=0;
         if(p.health==0){ended=true;won=false;inventory=false;}
     }
     void step(float dt,Actions a){
         if(a.restart){restart();return;}
         clock+=dt;
+        for(auto& effect:spaceEffects)effect.age+=dt;
+        spaceEffects.erase(std::remove_if(spaceEffects.begin(),spaceEffects.end(),[](const SpaceEffect& e){return e.age>=(e.kind==2?91.f/30:e.kind==3?97.f/30:2.f);}),spaceEffects.end());
         player.hurtTint=down(player.hurtTint,dt);
         for(auto& scar:riftScars)scar.life-=dt;
         riftScars.erase(std::remove_if(riftScars.begin(),riftScars.end(),

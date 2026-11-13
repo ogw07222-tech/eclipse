@@ -1,0 +1,416 @@
+[
+  {
+    "name": "idle",
+    "kind": "actor",
+    "source_path": "Art/space-ruler/idle.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/idle.png",
+    "sha256": "c4a9dea56201f0cd97f4a42afc290ed7cf65f407c56f63b07f06951f79aa2a72",
+    "width": 1728,
+    "height": 192,
+    "cell": [
+      192,
+      192
+    ],
+    "columns": 9,
+    "frames": 9,
+    "pivot": [
+      96,
+      132
+    ],
+    "duration": 0.9,
+    "loop": true,
+    "scale": 1.6,
+    "status": "integrated-owner-device-review-pending"
+  },
+  {
+    "name": "hover_move",
+    "kind": "actor",
+    "source_path": "Art/space-ruler/hover_move.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/hover_move.png",
+    "sha256": "7a9a970073e009c659bad13b417e897ac47be3904569f450f66ae6c54886e4e1",
+    "width": 1728,
+    "height": 192,
+    "cell": [
+      192,
+      192
+    ],
+    "columns": 9,
+    "frames": 9,
+    "pivot": [
+      96,
+      132
+    ],
+    "duration": 0.72,
+    "loop": true,
+    "scale": 1.6,
+    "status": "integrated-owner-device-review-pending"
+  },
+  {
+    "name": "flight_rise",
+    "kind": "actor",
+    "source_path": "Art/space-ruler/flight_rise.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/flight_rise.png",
+    "sha256": "e563f0652b4df6d4b4b574f9597db99fe6bfe4ad8e936dd332b7e3cb954e8566",
+    "width": 1728,
+    "height": 192,
+    "cell": [
+      192,
+      192
+    ],
+    "columns": 9,
+    "frames": 9,
+    "pivot": [
+      96,
+      132
+    ],
+    "duration": 0.72,
+    "loop": false,
+    "scale": 1.6,
+    "status": "integrated-owner-device-review-pending"
+  },
+  {
+    "name": "flight_hold",
+    "kind": "actor",
+    "source_path": "Art/space-ruler/flight_hold.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/flight_hold.png",
+    "sha256": "ae408361329e6c3a688d6353468e0f37a68e4d4cb97bdfbf688faf4cbbb85745",
+    "width": 1728,
+    "height": 192,
+    "cell": [
+      192,
+      192
+    ],
+    "columns": 9,
+    "frames": 9,
+    "pivot": [
+      96,
+      132
+    ],
+    "duration": 0.9,
+    "loop": true,
+    "scale": 1.6,
+    "status": "integrated-owner-device-review-pending"
+  },
+  {
+    "name": "flight_descend",
+    "kind": "actor",
+    "source_path": "Art/space-ruler/flight_descend.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/flight_descend.png",
+    "sha256": "abf3c744cde5276880e21c5164a2d2f1400dfbb44d032e1a47b39d7d614d7e8d",
+    "width": 1728,
+    "height": 192,
+    "cell": [
+      192,
+      192
+    ],
+    "columns": 9,
+    "frames": 9,
+    "pivot": [
+      96,
+      132
+    ],
+    "duration": 0.72,
+    "loop": false,
+    "scale": 1.6,
+    "status": "integrated-owner-device-review-pending"
+  },
+  {
+    "name": "hurt",
+    "kind": "actor",
+    "source_path": "Art/space-ruler/hurt.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/hurt.png",
+    "sha256": "27ae5cf724424da1a3a9ea0259ae77bedaab5d402ed0f6b541f84bc283532f0c",
+    "width": 1728,
+    "height": 192,
+    "cell": [
+      192,
+      192
+    ],
+    "columns": 9,
+    "frames": 9,
+    "pivot": [
+      96,
+      132
+    ],
+    "duration": 0.36,
+    "loop": false,
+    "scale": 1.6,
+    "status": "integrated-owner-device-review-pending"
+  },
+  {
+    "name": "death",
+    "kind": "actor",
+    "source_path": "Art/space-ruler/death.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/death.png",
+    "sha256": "c27530ed704584427c5081a2646502fa5552bc189ff66ad1d00e6cc7e8f01037",
+    "width": 1728,
+    "height": 192,
+    "cell": [
+      192,
+      192
+    ],
+    "columns": 9,
+    "frames": 9,
+    "pivot": [
+      96,
+      132
+    ],
+    "duration": 0.9,
+    "loop": false,
+    "scale": 1.6,
+    "status": "integrated-owner-device-review-pending"
+  },
+  {
+    "name": "attack",
+    "kind": "actor",
+    "source_path": "Art/space-ruler/attack.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/attack.png",
+    "sha256": "f54c6d43b5330ae5478a40a299d668c6b2cab979806921e794923925fc736cf6",
+    "width": 1728,
+    "height": 192,
+    "cell": [
+      192,
+      192
+    ],
+    "columns": 9,
+    "frames": 9,
+    "pivot": [
+      96,
+      132
+    ],
+    "duration": 0.55,
+    "loop": false,
+    "scale": 1.6,
+    "status": "integrated-owner-device-review-pending"
+  },
+  {
+    "name": "skill1",
+    "kind": "actor",
+    "source_path": "Art/space-ruler/skill1.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/skill1.png",
+    "sha256": "aa9ad76745694c47759cb24785369a0a3923890910754f58d93b9e8738ea1899",
+    "width": 1728,
+    "height": 192,
+    "cell": [
+      192,
+      192
+    ],
+    "columns": 9,
+    "frames": 9,
+    "pivot": [
+      96,
+      132
+    ],
+    "duration": 0.65,
+    "loop": false,
+    "scale": 1.6,
+    "status": "integrated-owner-device-review-pending"
+  },
+  {
+    "name": "skill2",
+    "kind": "actor",
+    "source_path": "Art/space-ruler/skill2.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/skill2.png",
+    "sha256": "76f5b5d49a8f45677e09712b57bd504ae03c7ad38547ae88c40e3f3687862eee",
+    "width": 1728,
+    "height": 192,
+    "cell": [
+      192,
+      192
+    ],
+    "columns": 9,
+    "frames": 9,
+    "pivot": [
+      96,
+      132
+    ],
+    "duration": 0.75,
+    "loop": false,
+    "scale": 1.6,
+    "status": "integrated-owner-device-review-pending"
+  },
+  {
+    "name": "skill3",
+    "kind": "actor",
+    "source_path": "Art/space-ruler/skill3.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/skill3.png",
+    "sha256": "534283815c8dcd43676c8a97c752a35043897c4d70d4749023af9c5e28f66f55",
+    "width": 1728,
+    "height": 192,
+    "cell": [
+      192,
+      192
+    ],
+    "columns": 9,
+    "frames": 9,
+    "pivot": [
+      96,
+      132
+    ],
+    "duration": 0.6,
+    "loop": false,
+    "scale": 1.6,
+    "status": "integrated-owner-device-review-pending"
+  },
+  {
+    "name": "ultimate",
+    "kind": "actor",
+    "source_path": "Art/space-ruler/ultimate.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/ultimate.png",
+    "sha256": "fbbc4059138f7d788f7da0c42fc67e368e41cc3a6d17ea31e3651599f84d88a3",
+    "width": 2496,
+    "height": 192,
+    "cell": [
+      192,
+      192
+    ],
+    "columns": 13,
+    "frames": 13,
+    "pivot": [
+      96,
+      132
+    ],
+    "duration": 2.0,
+    "loop": false,
+    "scale": 1.6,
+    "status": "integrated-owner-device-review-pending"
+  },
+  {
+    "name": "void-bolt",
+    "kind": "fx",
+    "source_path": "Art/space-ruler/void-bolt.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/void-bolt.png",
+    "sha256": "8c54835001075258b52c5fca332c1a2ef261da3e42d3371651ded816c101cfd3",
+    "width": 736,
+    "height": 528,
+    "cell": [
+      184,
+      88
+    ],
+    "columns": 4,
+    "frames": 24,
+    "pivot": [
+      140,
+      44
+    ],
+    "duration": 0.8,
+    "loop": true,
+    "scale": 0.7,
+    "status": "integrated-owner-device-review-pending"
+  },
+  {
+    "name": "gravity-field",
+    "kind": "fx",
+    "source_path": "Art/space-ruler/gravity-field.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/gravity-field.png",
+    "sha256": "7b9bda60f8bc886fdbc0f0c0802c19532a1bb2698cb413d598150c41292e8035",
+    "width": 1920,
+    "height": 1584,
+    "cell": [
+      240,
+      176
+    ],
+    "columns": 8,
+    "frames": 72,
+    "pivot": [
+      120,
+      100
+    ],
+    "duration": 2.4,
+    "loop": true,
+    "scale": 1.7,
+    "status": "integrated-owner-device-review-pending"
+  },
+  {
+    "name": "dimensional-spikes",
+    "kind": "fx",
+    "source_path": "Art/space-ruler/dimensional-spikes.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/dimensional-spikes.png",
+    "sha256": "2deb01ce87ce4e825746b94c6d3bf9e51533e9a824ed4f51fec8c498afdd255f",
+    "width": 2128,
+    "height": 2028,
+    "cell": [
+      304,
+      156
+    ],
+    "columns": 7,
+    "frames": 91,
+    "pivot": [
+      24,
+      116
+    ],
+    "duration": 3.033333333333333,
+    "loop": false,
+    "scale": 1.1,
+    "status": "integrated-owner-device-review-pending"
+  },
+  {
+    "name": "repulsion-wave",
+    "kind": "fx",
+    "source_path": "Art/space-ruler/repulsion-wave.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/repulsion-wave.png",
+    "sha256": "8f2223d916dead26a5ec880dbf6ef60b438e55d321dde4d38fdaa101cd4ee3a2",
+    "width": 2880,
+    "height": 2464,
+    "cell": [
+      320,
+      224
+    ],
+    "columns": 9,
+    "frames": 97,
+    "pivot": [
+      160,
+      176
+    ],
+    "duration": 3.2333333333333334,
+    "loop": false,
+    "scale": 1.15,
+    "status": "integrated-owner-device-review-pending"
+  },
+  {
+    "name": "singularity-collapse",
+    "kind": "fx",
+    "source_path": "Art/space-ruler/singularity-collapse.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/singularity-collapse.png",
+    "sha256": "062e5d2e653f095d965cf76845ec311231c844cfc2ebdc3eb5491c5e2820f2a4",
+    "width": 3520,
+    "height": 3124,
+    "cell": [
+      320,
+      284
+    ],
+    "columns": 11,
+    "frames": 115,
+    "pivot": [
+      160,
+      240
+    ],
+    "duration": 2.0,
+    "loop": false,
+    "scale": 1.65,
+    "status": "integrated-owner-device-review-pending"
+  },
+  {
+    "name": "flight-trail",
+    "kind": "fx",
+    "source_path": "Art/space-ruler/flight-trail.png",
+    "runtime_path": "Assets/Resources/Eclipse/space_ruler/flight-trail.png",
+    "sha256": "3f282653dc7740da5e0b3975d4a35869e751c8773f6648cbd4b8f1c67bc203e2",
+    "width": 560,
+    "height": 576,
+    "cell": [
+      112,
+      72
+    ],
+    "columns": 5,
+    "frames": 36,
+    "pivot": [
+      70,
+      52
+    ],
+    "duration": 1.2,
+    "loop": true,
+    "scale": 1.6,
+    "status": "integrated-owner-device-review-pending"
+  }
+]

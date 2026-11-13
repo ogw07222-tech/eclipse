@@ -174,3 +174,9 @@ Status: IMPLEMENTED — all existing effect roles remain in runtime; Lance/SkyLa
 - Updated runtime PNGs, reviewed sources, approval hashes, PixelFX manifest, project documentation and audit record.
 - Static review at 1x and 4x confirms the long shaft and pointed tip; all15 effects remain active. The script reproduces the runtime atlas SHA exactly.
 - No tests, builds, game/device playback or GitHub Actions were run.
+
+## 2026-11-13 — Space Ruler Download pack runtime integration
+
+Implemented from main 5b82db1 and rebased onto e04c4a7 (preserving obsolete White Night dependency cleanup): imported 12 actor sheets and 6 Pixelfx sheets with source/runtime hashes, generated `space_ruler_assets.hpp`, connected ranged job hover/flight/fuel, casting and combat effects, numeric skill controls, renderer and Android/desktop asset packaging. Sources: native-engine/src/combat.hpp, presentation.hpp, main.cpp, new space_ruler_assets.hpp, native-engine/CMakeLists.txt, native-engine/android/app/build.gradle, scripts/import_space_ruler.py, Art/space-ruler, Assets/Resources/Eclipse/space_ruler. Details and owner acceptance steps: Docs/SPACE_RULER_INTEGRATION.md.
+
+Static asset metadata/hash inspection and source diff inspection completed. No builds/tests/device checks/Actions run. Owner device acceptance remains outstanding; no runtime success claimed.
