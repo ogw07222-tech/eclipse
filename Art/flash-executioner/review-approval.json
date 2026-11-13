@@ -1,10 +1,10 @@
 {
   "review_status": "approved",
-  "review_scope": "Static sprite/sequence and metadata review; no game/device tests run",
+  "review_scope": "Owner approved five new motion roles at motion-specific cadence after playback review; Basic attack fixed to one pose. No device tests.",
   "actors": [
     {
       "role": "Dash",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/dash.png",
+      "file": "Art/flash-executioner/reviewed/actor_dash.png",
       "cell": [
         192,
         192
@@ -100,7 +100,7 @@
     },
     {
       "role": "Swap",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/swap.png",
+      "file": "Art/flash-executioner/reviewed/actor_swap.png",
       "cell": [
         192,
         192
@@ -231,7 +231,7 @@
     },
     {
       "role": "Land",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/land.png",
+      "file": "Art/flash-executioner/reviewed/actor_land.png",
       "cell": [
         192,
         192
@@ -313,7 +313,7 @@
     },
     {
       "role": "Skill3",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/skill3.png",
+      "file": "Art/flash-executioner/reviewed/actor_skill3.png",
       "cell": [
         192,
         192
@@ -497,236 +497,34 @@
     },
     {
       "role": "Basic",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/basic.png",
+      "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_basic.png",
       "cell": [
         192,
         192
       ],
-      "columns": 6,
-      "rows": 5,
-      "count": 28,
+      "columns": 1,
+      "rows": 1,
+      "count": 1,
       "pivot": [
         70,
         133
       ],
       "scale": 1.4,
       "duration": 0.46,
-      "contactFrame": 6,
+      "contactFrame": -1,
       "loop": false,
-      "sourceFile": "basic_raw.png",
-      "rawColumns": 6,
-      "uniquePixelFrames": 28,
-      "emptyFrames": [],
-      "bounds": [
-        [
-          26,
-          59,
-          109,
-          133
-        ],
-        [
-          28,
-          61,
-          119,
-          133
-        ],
-        [
-          31,
-          54,
-          104,
-          133
-        ],
-        [
-          33,
-          56,
-          105,
-          133
-        ],
-        [
-          34,
-          56,
-          106,
-          133
-        ],
-        [
-          36,
-          56,
-          106,
-          133
-        ],
-        [
-          33,
-          65,
-          158,
-          134
-        ],
-        [
-          32,
-          64,
-          154,
-          134
-        ],
-        [
-          34,
-          64,
-          154,
-          134
-        ],
-        [
-          37,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          36,
-          64,
-          154,
-          134
-        ],
-        [
-          36,
-          64,
-          154,
-          134
-        ],
-        [
-          36,
-          64,
-          154,
-          134
-        ],
-        [
-          39,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          37,
-          64,
-          154,
-          134
-        ],
-        [
-          33,
-          62,
-          146,
-          134
-        ],
-        [
-          30,
-          60,
-          129,
-          133
-        ],
-        [
-          29,
-          59,
-          116,
-          133
-        ],
-        [
-          26,
-          59,
-          110,
-          133
-        ],
-        [
-          26,
-          59,
-          110,
-          133
-        ],
-        [
-          26,
-          59,
-          110,
-          133
-        ],
-        [
-          26,
-          59,
-          110,
-          133
-        ]
-      ],
-      "sha256": "19022ccec1ab305c8789791d9f2377124a3146c38bd05c5a8ef62b01de8745e7",
-      "status": "main-review-approved",
-      "model": "PixMiniMax H3",
-      "timing": "fixed duration",
+      "sourceFile": "manual-corrections/basic/actor_basic_28_pose_backup.png",
+      "uniquePixelFrames": 1,
+      "sha256": "344ac76e1215d724e296a09fcac7524bc4b149ed7c62c706a5d426211887d018",
       "approved": true,
-      "sourceFrameMap": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18,
-        19,
-        20,
-        21,
-        22,
-        23,
-        24,
-        25,
-        26,
-        27,
-        28
-      ],
-      "review": "All sequential numbered poses inspected. Attached physical sword, consistent armor and grounded recovery; contactFrame6 must map to unchanged gameplay contact. Basic excludes source6 baked FX; Skill1 includes a newly AI-generated bridge pose, never a duplicate. Static art approval; device verification pending."
+      "review": "One fixed contact pose is displayed for the complete .46s attack. Existing gameplay contact timing stays .184s.",
+      "fixedPose": true,
+      "reviewNote": "One fixed contact pose per owner request; previous 28-pose version preserved.",
+      "fps": 2.1739
     },
     {
       "role": "Skill1",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/skill1.png",
+      "file": "Art/flash-executioner/reviewed/actor_skill1.png",
       "cell": [
         192,
         192
@@ -903,7 +701,7 @@
     },
     {
       "role": "Skill2",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/skill2.png",
+      "file": "Art/flash-executioner/reviewed/actor_skill2.png",
       "cell": [
         192,
         192
@@ -1129,12 +927,142 @@
         27
       ],
       "review": "Main inspected all28 poses and enlarged frame16: sword remains in lowered hand, separate opposite empty fist rises beside helmet and recovers. Both hands visible, no sword transfer or baked effects. ContactFrame14 maps to .23s. Static visual approval; owner runtime verification pending."
+    },
+    {
+      "role": "Idle",
+      "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_idle.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 5,
+      "rows": 4,
+      "count": 17,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.9,
+      "contactFrame": -1,
+      "loop": true,
+      "fps": 18.8889,
+      "approved": true,
+      "sha256": "598595bc3c069116eb7fe19837e38c65a29056a9fab8e88824431f8b0fd65009",
+      "sourceFile": "manual-corrections/atlas/actor_idle.png",
+      "poseSource": "Selected PixelLab frames; hand-corrected pixels recorded separately; no generated inbetweens.",
+      "ownerReview": "Owner approved these motions for play after viewing, requested shorter waits/faster playback, and accepted motion-specific pose cadence.",
+      "reviewNote": "Shortened/reduced repetitive preparation where specified; transparent RGBA, native 192x192 cells."
+    },
+    {
+      "role": "Run",
+      "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_run.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 5,
+      "rows": 6,
+      "count": 29,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.8,
+      "contactFrame": -1,
+      "loop": true,
+      "fps": 36.25,
+      "approved": true,
+      "sha256": "f9f81bc46b7d23ea6631335bdb1925d7f54ff2734c675485618603c97f741746",
+      "sourceFile": "manual-corrections/atlas/actor_run.png",
+      "poseSource": "Selected PixelLab frames; hand-corrected pixels recorded separately; no generated inbetweens.",
+      "ownerReview": "Owner approved these motions for play after viewing, requested shorter waits/faster playback, and accepted motion-specific pose cadence.",
+      "reviewNote": "Shortened/reduced repetitive preparation where specified; transparent RGBA, native 192x192 cells."
+    },
+    {
+      "role": "Jump",
+      "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_jump.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 5,
+      "rows": 6,
+      "count": 29,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.8,
+      "contactFrame": -1,
+      "loop": false,
+      "fps": 36.25,
+      "approved": true,
+      "sha256": "27184853230ebf76119e529b15b8472da561c31f6e3309aa6f1c45b780e4c3f1",
+      "sourceFile": "manual-corrections/atlas/actor_jump.png",
+      "poseSource": "Selected PixelLab frames; hand-corrected pixels recorded separately; no generated inbetweens.",
+      "ownerReview": "Owner approved these motions for play after viewing, requested shorter waits/faster playback, and accepted motion-specific pose cadence.",
+      "reviewNote": "Shortened/reduced repetitive preparation where specified; transparent RGBA, native 192x192 cells."
+    },
+    {
+      "role": "Fall",
+      "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_fall.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 5,
+      "rows": 2,
+      "count": 9,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.6,
+      "contactFrame": -1,
+      "loop": false,
+      "fps": 15.0,
+      "approved": true,
+      "sha256": "d3ab0e81d544d9c2f80af3db966845d1ca6db077ed2b330df4da5dcfff805469",
+      "sourceFile": "manual-corrections/atlas/actor_fall.png",
+      "poseSource": "Selected PixelLab frames; hand-corrected pixels recorded separately; no generated inbetweens.",
+      "ownerReview": "Owner approved these motions for play after viewing, requested shorter waits/faster playback, and accepted motion-specific pose cadence.",
+      "reviewNote": "Shortened/reduced repetitive preparation where specified; transparent RGBA, native 192x192 cells."
+    },
+    {
+      "role": "Ultimate",
+      "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_ultimate.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 5,
+      "rows": 5,
+      "count": 25,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 1.12,
+      "contactFrame": 16,
+      "loop": false,
+      "fps": 22.3214,
+      "approved": true,
+      "sha256": "570dd07a71625dbe679e78f34e4bed68a67b21d5381cc69b4be62404bc8999eb",
+      "sourceFile": "manual-corrections/atlas/actor_ultimate.png",
+      "poseSource": "Selected PixelLab frames; hand-corrected pixels recorded separately; no generated inbetweens.",
+      "ownerReview": "Owner approved these motions for play after viewing, requested shorter waits/faster playback, and accepted motion-specific pose cadence.",
+      "reviewNote": "Trimmed four repetitive opening wind-up frames; 25 poses play across the existing 1.12s Verdict action. Sword contact remains on the unchanged .728s gameplay timing."
     }
   ],
   "effects": [
     {
       "role": "Slash",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/effects_v2/Slash.png",
+      "file": "Art/flash-executioner/reviewed/effect_slash.png",
       "cell": [
         256,
         216
@@ -1215,7 +1143,7 @@
     },
     {
       "role": "Rush",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/effects_v2/Rush.png",
+      "file": "Art/flash-executioner/reviewed/effect_rush.png",
       "cell": [
         320,
         160
@@ -1296,7 +1224,7 @@
     },
     {
       "role": "Command",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/effects_v2/Command.png",
+      "file": "Art/flash-executioner/reviewed/effect_command.png",
       "cell": [
         160,
         144
@@ -1374,7 +1302,7 @@
     },
     {
       "role": "BlinkOut",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/effects_v2/BlinkOut.png",
+      "file": "Art/flash-executioner/reviewed/effect_blinkout.png",
       "cell": [
         288,
         224
@@ -1450,7 +1378,7 @@
     },
     {
       "role": "BlinkIn",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/effects_v2/BlinkIn.png",
+      "file": "Art/flash-executioner/reviewed/effect_blinkin.png",
       "cell": [
         288,
         224
@@ -1525,7 +1453,7 @@
     },
     {
       "role": "Verdict",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/effects_v2/Verdict.png",
+      "file": "Art/flash-executioner/reviewed/effect_verdict.png",
       "cell": [
         256,
         280
@@ -1600,7 +1528,7 @@
     },
     {
       "role": "Impact",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/effects_v2/Impact.png",
+      "file": "Art/flash-executioner/reviewed/effect_impact.png",
       "cell": [
         320,
         224
@@ -1675,7 +1603,7 @@
     },
     {
       "role": "Orb",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/effects_v2/Orb.png",
+      "file": "Art/flash-executioner/reviewed/effect_orb.png",
       "cell": [
         136,
         112
@@ -1749,7 +1677,7 @@
     },
     {
       "role": "Lance",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/effects_v2/Lance.png",
+      "file": "Art/flash-executioner/reviewed/effect_lance.png",
       "cell": [
         208,
         96
@@ -1825,7 +1753,7 @@
     },
     {
       "role": "SkyLance",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/effects_v2/SkyLance.png",
+      "file": "Art/flash-executioner/reviewed/effect_skylance.png",
       "cell": [
         208,
         96
@@ -1901,7 +1829,7 @@
     },
     {
       "role": "LanceHit",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/effects_v2/LanceHit.png",
+      "file": "Art/flash-executioner/reviewed/effect_lancehit.png",
       "cell": [
         288,
         232
@@ -1976,7 +1904,7 @@
     },
     {
       "role": "Dash",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/effects_v2/Dash.png",
+      "file": "Art/flash-executioner/reviewed/effect_dash.png",
       "cell": [
         320,
         224
@@ -2056,7 +1984,7 @@
     },
     {
       "role": "Jump",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/effects_v2/Jump.png",
+      "file": "Art/flash-executioner/reviewed/effect_jump.png",
       "cell": [
         208,
         128
@@ -2135,7 +2063,7 @@
     },
     {
       "role": "Land",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/effects_v2/Land.png",
+      "file": "Art/flash-executioner/reviewed/effect_land.png",
       "cell": [
         208,
         128
@@ -2210,7 +2138,7 @@
     },
     {
       "role": "Swap",
-      "file": "/storage/emulated/0/Download/flash executioner/approved/effects_v2/Swap.png",
+      "file": "Art/flash-executioner/reviewed/effect_swap.png",
       "cell": [
         256,
         224

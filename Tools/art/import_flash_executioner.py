@@ -60,7 +60,12 @@ def main():
             art=source_root/name
             target.parent.mkdir(parents=True,exist_ok=True)
             art.parent.mkdir(parents=True,exist_ok=True)
-            shutil.copyfile(source,target);shutil.copyfile(source,art)
+            # Existing reviewed assets can be their own editable source. Avoid
+            # shutil SameFileError when source and reviewed output already match.
+            if source.resolve()!=target.resolve():
+                shutil.copyfile(source,target)
+            if source.resolve()!=art.resolve():
+                shutil.copyfile(source,art)
             record={**row,'file':'flash_executioner/'+name,'source_path':str(art.relative_to(ROOT)),
                     'runtime_path':str(target.relative_to(ROOT)),'sha256':sha,
                     'status':'reviewed; runtime binding prepared; owner device verification pending',
@@ -123,7 +128,9 @@ struct FlashSheet {
     record={'review_manifest':'Art/flash-executioner/review-approval.json','review_status':'approved individual assets only',
             'assets':imported,'gameplay_changed':False,'tests_run':False,'library_synced':False}
     source_root.mkdir(parents=True,exist_ok=True)
-    shutil.copyfile(args.manifest,ROOT/'Art/flash-executioner/review-approval.json')
+    approval_path=ROOT/'Art/flash-executioner/review-approval.json'
+    if args.manifest.resolve()!=approval_path.resolve():
+        shutil.copyfile(args.manifest,approval_path)
     (source_root/'manifest.json').write_text(json.dumps(record,indent=2,ensure_ascii=False))
     print('Imported '+str(len(imported))+' main-reviewed PNG sheets; no game tests/builds run.')
 

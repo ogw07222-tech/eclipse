@@ -1,0 +1,82 @@
+{
+  "generation_source_manifest": "/data/data/com.termux/files/home/flash_executioner_pixellab_output/manifest.json",
+  "owner_approved_motion_policy": "Motion-specific cadence; no universal 60fps target.",
+  "basic_attack": "One fixed contact pose; previous multi-pose sheet retained as backup.",
+  "roles": {
+    "Idle": {
+      "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_idle.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 5,
+      "rows": 4,
+      "frames": 17,
+      "duration_seconds": 0.9,
+      "effective_pose_rate": 18.89,
+      "loop": true,
+      "contact_frame": -1,
+      "sha256": "598595bc3c069116eb7fe19837e38c65a29056a9fab8e88824431f8b0fd65009"
+    },
+    "Run": {
+      "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_run.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 5,
+      "rows": 6,
+      "frames": 29,
+      "duration_seconds": 0.8,
+      "effective_pose_rate": 36.25,
+      "loop": true,
+      "contact_frame": -1,
+      "sha256": "f9f81bc46b7d23ea6631335bdb1925d7f54ff2734c675485618603c97f741746"
+    },
+    "Jump": {
+      "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_jump.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 5,
+      "rows": 6,
+      "frames": 29,
+      "duration_seconds": 0.8,
+      "effective_pose_rate": 36.25,
+      "loop": false,
+      "contact_frame": -1,
+      "sha256": "27184853230ebf76119e529b15b8472da561c31f6e3309aa6f1c45b780e4c3f1"
+    },
+    "Fall": {
+      "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_fall.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 5,
+      "rows": 2,
+      "frames": 9,
+      "duration_seconds": 0.6,
+      "effective_pose_rate": 15.0,
+      "loop": false,
+      "contact_frame": -1,
+      "sha256": "d3ab0e81d544d9c2f80af3db966845d1ca6db077ed2b330df4da5dcfff805469"
+    },
+    "Ultimate": {
+      "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_ultimate.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 5,
+      "rows": 5,
+      "frames": 25,
+      "duration_seconds": 1.12,
+      "effective_pose_rate": 22.32,
+      "loop": false,
+      "contact_frame": 16,
+      "sha256": "570dd07a71625dbe679e78f34e4bed68a67b21d5381cc69b4be62404bc8999eb"
+    }
+  }
+}

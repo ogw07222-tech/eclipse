@@ -132,3 +132,33 @@ Status: Pixelbolt CLI sample rendering SUCCESS in ChatGPT container. ECLIPSE art
 - Full source loops replace v1 flight-frame-range samples. Importer cleans superseded PNGs and requires actual upstream effect identity.
 - Exact sources, MIT license, prompts/actor sources, options, frame maps and baseline PNGs retained in Art. Library remains NOT SYNCED; supply matching-byte delta ZIP plus deletion list.
 - Static validation/main visual review only. Game tests, builds, APK/device checks and GitHub Actions NOT RUN.
+
+
+## 2026-11-13 — Flash Executioner manual pixel correction (partial)
+
+Status: PARTIAL — corrected one visible Ultimate artifact; no runtime asset was approved or replaced.
+
+- Kept the existing Basic actor sheet and its single fixed attack pose unchanged.
+- Recolored 150 individual pixels on Ultimate frame 8 around the sword blade using exact source-coordinate RGBA assignments; no generation, AI image edit, interpolation or raster copy was used.
+- Preserved the edited frame, updated contact pages and pixel audit under `Art/flash-executioner/pixellab/manual-corrections/ultimate/`.
+- Visual check confirms the saturated violet blade block is now a silver/lilac blade.
+- Did not import this animation into `Assets/Resources/` or change runtime descriptors: selected candidate is 29 frames at 100 ms/frame (10 authored poses/sec), below the repository requirement of 60 distinct poses/sec. Idle/run/jump/fall/ultimate motion as a whole also has not passed continuity and contact review.
+- No GitHub main write or Library upload was performed. Library mirror capability is unavailable in this session; main requires matching Library files in the same work session.
+- No builds, tests, device playback or GitHub Actions were run.
+
+Next steps: continue direct pixel authoring of the deficient non-Basic motions to 60 distinct coherent poses/sec, inspect all frames for continuity, update atlas metadata, and only then prepare runtime import plus the corresponding Library mirror update.
+
+
+## 2026-11-13 — Owner-approved Flash Executioner motion integration
+
+Status: IMPLEMENTED — actor sheets and existing state/button bindings are connected in the latest main-based worktree.
+
+- Owner clarified that motion-specific pose rates are acceptable, asked for shorter waits/preparation and faster playback, and approved the current generated motions after trying them. Latest `AGENTS.md` now explicitly removes a universal 60-pose/sec target.
+- Added Idle (17 poses/.90s loop), Run (29-pose distance-driven loop/.80s nominal), Jump (29/.80s nominal), Fall (9/.60s nominal), and Ultimate (25/1.12s). Ultimate opening repetitive prep frames 1–4 are trimmed; contact stays frame 16 at the existing .728s action contact.
+- Basic Attack is now one fixed impact pose for the full .46s action. Original 28-pose sheet is preserved at `Art/flash-executioner/pixellab/manual-corrections/basic/actor_basic_28_pose_backup.png`.
+- Existing presentation mapping connects Slash/Basic, Rush/Skill1, Command/Skill2, Blink/Skill3, Verdict/Ultimate; Idle, Run, Jump and Fall are selected from movement state and vertical velocity. P/VERDICT and the existing J/Z/Attack controls are unchanged.
+- Added 5 runtime actor PNGs and updated Basic PNG, approved metadata, generated descriptors, source frames, atlases, owner review notes and documentation. Manual Ultimate blade recolor is included in runtime frame 5. No VFX was added.
+- `Tools/art/import_flash_executioner.py` now safely skips copying an input file onto itself, so approved existing source sheets can be imported from `Art/flash-executioner/reviewed/`.
+- Static PNG dimension, alpha mode, runtime/source byte hash and manifest-count checks passed: 27 runtime sheets (12 actors + 15 effects).
+- No tests, builds, game/device playback or GitHub Actions were run in this integration turn. Owner previously reported trying the motions and finding playback acceptable; both-facing/device verification remains outstanding.
+- GitHub main head at integration start: `74a224e4f832075a19a9dca14a2f001e55166ea2`.

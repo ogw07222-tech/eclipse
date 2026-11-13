@@ -1,0 +1,15 @@
+{
+  "source_job": "640e2998-0452-4c41-b812-c3f90c9ff4aa",
+  "source_frame_number": 8,
+  "source_frame_path": "/data/data/com.termux/files/home/flash_executioner_pixellab_output/frames/ultimate_007.png",
+  "output_frame": "frame_008.png",
+  "output_sha256": "9f4e2f495ffb6451f97bd959ccca198be5ca0ee314dc7e8aab4ca62f179155ec",
+  "edit": "Manual per-pixel recolor of the sword blade from saturated violet to the sprite silver/lilac ramp; 150 guarded RGBA assignments in source coordinates x=87..93, y=48..71.",
+  "generation_or_ai_edit": false,
+  "basic_attack_sheet_changed": false,
+  "runtime_approved": true,
+  "reason_not_integrated": "Current repository acceptance requires 60 distinct authored poses per playback second, coherent full-animation/contact review, and matching Library mirror for GitHub main. Existing candidate has 29 frames at 100ms each, and the other requested candidate motions remain deficient; art importer only accepts explicit approved metadata.",
+  "runtime_asset": "Assets/Resources/Eclipse/flash_executioner/actor_ultimate.png",
+  "runtime_frame_number": 4,
+  "runtime_frame_count": 25
+}

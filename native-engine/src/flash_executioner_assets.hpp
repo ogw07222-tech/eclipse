@@ -19,15 +19,15 @@ struct FlashSheet {
 };
 // Only explicitly approved entries are bound. Other roles retain legacy art.
 inline constexpr std::array<FlashSheet,static_cast<int>(FlashActor::Count)> flashActors{{
-    {"flash_executioner/actor_basic.png", 192, 192, 6, 5, 28, 70.0f, 133.0f, 1.4f, 0.46f, 6, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Basic
+    {"flash_executioner/actor_basic.png", 192, 192, 1, 1, 1, 70.0f, 133.0f, 1.4f, 0.46f, -1, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 2.1739f, -1.0f}, // Basic
     {"flash_executioner/actor_skill1.png", 192, 192, 6, 5, 30, 70.0f, 133.0f, 1.4f, 0.5f, 6, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Skill1
     {"flash_executioner/actor_skill2.png", 192, 192, 6, 5, 28, 70.0f, 133.0f, 1.4f, 0.46f, 14, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Skill2
     {"flash_executioner/actor_skill3.png", 192, 192, 5, 5, 22, 70.0f, 133.0f, 1.4f, 0.36f, 11, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Skill3
-    {}, // Ultimate: legacy retained
-    {}, // Idle: legacy retained
-    {}, // Run: legacy retained
-    {}, // Jump: legacy retained
-    {}, // Fall: legacy retained
+    {"flash_executioner/actor_ultimate.png", 192, 192, 5, 5, 25, 70.0f, 133.0f, 1.4f, 1.12f, 16, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 22.3214f, -1.0f}, // Ultimate
+    {"flash_executioner/actor_idle.png", 192, 192, 5, 4, 17, 70.0f, 133.0f, 1.4f, 0.9f, -1, true, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 18.8889f, -1.0f}, // Idle
+    {"flash_executioner/actor_run.png", 192, 192, 5, 6, 29, 70.0f, 133.0f, 1.4f, 0.8f, -1, true, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 36.25f, -1.0f}, // Run
+    {"flash_executioner/actor_jump.png", 192, 192, 5, 6, 29, 70.0f, 133.0f, 1.4f, 0.8f, -1, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 36.25f, -1.0f}, // Jump
+    {"flash_executioner/actor_fall.png", 192, 192, 5, 2, 9, 70.0f, 133.0f, 1.4f, 0.6f, -1, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 15.0f, -1.0f}, // Fall
     {"flash_executioner/actor_land.png", 192, 192, 3, 3, 7, 70.0f, 133.0f, 1.4f, 0.12f, -1, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Land
     {"flash_executioner/actor_dash.png", 192, 192, 3, 3, 9, 70.0f, 133.0f, 1.4f, 0.15f, -1, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Dash
     {"flash_executioner/actor_swap.png", 192, 192, 4, 4, 14, 70.0f, 133.0f, 1.4f, 0.24f, -1, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Swap
