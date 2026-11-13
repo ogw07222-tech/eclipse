@@ -40,7 +40,7 @@ Effect frame selection uses metadata fps directly, including endpoint samples, i
 
 `native-engine/src/flash_executioner_assets.hpp` is generated only from approved metadata. `Tools/art/import_flash_executioner.py` requires explicit main approval, SHA256 matches, and sourceId/sourceCommit/sourceSha256 for every effect. It removes superseded PNGs from runtime and reviewed-source folders, preventing stale CMake/Android glob packaging. Roles without an approved actor sheet retain legacy art. Declared missing/wrong-dimension sheets fail via `loadWhiteNight` and the existing `ECLIPSE ASSET ERROR` modal; failed required loads never silently substitute candidates.
 
-Static inspection confirms27 runtime PNG files (12 actor roles,15 effect roles), zero active v1 effect hashes. Six previously approved actor sheets remain byte-identical; Basic is now a one-pose sheet. Lance and SkyLance intentionally share the same source PNG pixels but use separate scales/descriptors.
+Static inspection confirms27 runtime PNG files (12 actor roles,13 effect roles), zero active v1 effect hashes. Six previously approved actor sheets remain byte-identical; Basic is now a one-pose sheet. Lance and SkyLance intentionally share the same source PNG pixels but use separate scales/descriptors.
 
 GitHub main is the sole canonical project source.
 

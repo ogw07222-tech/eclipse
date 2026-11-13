@@ -2,7 +2,7 @@
 #include <array>
 namespace eclipse {
 enum class FlashActor { Basic, Skill1, Skill2, Skill3, Ultimate, Idle, Run, Jump, Fall, Land, Dash, Swap, Count };
-enum class FlashFx { Slash, Rush, Command, BlinkOut, BlinkIn, Verdict, Impact, Orb, Lance, SkyLance, LanceHit, Dash, Jump, Land, Swap, Count };
+enum class FlashFx { Slash, Rush, Command, BlinkOut, BlinkIn, Verdict, Impact, Orb, Lance, SkyLance, LanceHit, Dash, Swap, Count };
 struct FlashSheet {
     const char* file=nullptr;
     int cellW=0,cellH=0,columns=0,rows=0,count=0;
@@ -45,8 +45,6 @@ inline constexpr std::array<FlashSheet,static_cast<int>(FlashFx::Count)> flashEf
     {"flash_executioner/effect_skylance.png", 208, 96, 5, 10, 48, 170.0f, 48.0f, 1.8f, 0.8f, -1, true, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // SkyLance
     {"flash_executioner/effect_lancehit.png", 288, 232, 6, 7, 40, 144.0f, 188.0f, 1.5f, 0.65f, -1, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 1, 60.0f, -1.0f}, // LanceHit
     {"flash_executioner/effect_dash.png", 320, 224, 4, 4, 16, 190.0f, 174.0f, 1.4f, 0.25f, -1, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Dash
-    {"flash_executioner/effect_jump.png", 208, 128, 4, 4, 16, 104.0f, 88.0f, 0.55f, 0.25f, -1, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Jump
-    {"flash_executioner/effect_land.png", 208, 128, 4, 5, 19, 104.0f, 88.0f, 1.0f, 0.3f, -1, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Land
     {"flash_executioner/effect_swap.png", 256, 224, 5, 5, 25, 128.0f, 174.0f, 1.6f, 0.4f, -1, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Swap
 }};
 }

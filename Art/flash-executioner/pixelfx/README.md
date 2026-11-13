@@ -1,5 +1,5 @@
 # Flash Executioner — upstream PixelFX resource variants v2
-All 15 roles use existing finished resources from https://github.com/patch-gg/pixelfx commit5294518ce7c72e48b6100a744596e0acf57f2826.
+All 13 active roles use existing finished resources from https://github.com/patch-gg/pixelfx commit5294518ce7c72e48b6100a744596e0acf57f2826.
 No old executor custom drawKind or _lib.js recipe reused. Every effect draw/create and upstream helper/core file is byte-identical to its source. source-verification.json verifies leaf hashes against git show; source-original/ preserves the actual originals, dependencies and MIT license.
 
 Changes are palette, existing options(radius/reach/height/length/stone), supplied actual actor masks, canvas registration, uniform runtime scale, and timing/frame selection. Exception requested by the owner: `Lance` and `SkyLance` atlases are additionally edited pixel-by-pixel in `manual-corrections/lance/` to replace the broad sword silhouette with a long, thin shaft and tapered point. No AI or effect re-render was used; the exact source recipe and pre-edit atlas remain preserved.

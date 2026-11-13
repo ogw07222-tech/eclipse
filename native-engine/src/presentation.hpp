@@ -25,8 +25,7 @@ class Presentation {
     float reviewedFlashClock_=-1,reviewedFlashMoveAge_=0;
     WhiteMove reviewedFlashMove_=WhiteMove::None;
     unsigned long long reviewedFlashBurstSerial_=0;
-    int reviewedFlashLandingSerial_=-1;
-    bool reviewedFlashDash_=false,reviewedFlashSwap_=false,reviewedFlashAirborne_=false;
+    bool reviewedFlashDash_=false,reviewedFlashSwap_=false;
     SDL_Texture* goldLance_=nullptr;
     SDL_Texture* goldTrail_=nullptr;
     SDL_Texture* goldOrb_=nullptr;
@@ -915,14 +914,13 @@ public:
         }
         return ground;
     }
-    void updateReviewedFlashEffects(const Combat& g,const Animation& a){
+    void updateReviewedFlashEffects(const Combat& g){
         if(g.clock==reviewedFlashClock_)return;
         const auto& p=g.player;
         if(g.clock<reviewedFlashClock_){
             reviewedFlashEvents_.clear();reviewedFlashBurstSerial_=0;
             reviewedFlashMove_=WhiteMove::None;reviewedFlashMoveAge_=0;
-            reviewedFlashLandingSerial_=p.landingSerial;
-            reviewedFlashDash_=reviewedFlashSwap_=reviewedFlashAirborne_=false;
+            reviewedFlashDash_=reviewedFlashSwap_=false;
         }
         reviewedFlashClock_=g.clock;
         reviewedFlashEvents_.erase(std::remove_if(reviewedFlashEvents_.begin(),reviewedFlashEvents_.end(),
@@ -986,14 +984,9 @@ public:
         }
         const bool dash=p.whiteNight&&p.dashLeft>0;
         const bool swap=p.whiteNight&&p.swapFlash>0;
-        const bool airborne=p.whiteNight&&!p.grounded;
         if(dash&&!reviewedFlashDash_)spawn(FlashFx::Dash,p.x,p.y,p.facing,true,.15f-p.dashLeft);
         if(swap&&!reviewedFlashSwap_)spawn(FlashFx::Swap,p.x,p.y,p.facing,true,.24f-p.swapFlash);
-        if(airborne&&!reviewedFlashAirborne_&&p.vy<0)spawn(FlashFx::Jump,p.x,p.y,p.facing,false);
-        if(p.whiteNight&&p.landingSerial!=reviewedFlashLandingSerial_&&a.state==10)
-            spawn(FlashFx::Land,p.x,p.y,p.facing,false);
-        reviewedFlashDash_=dash;reviewedFlashSwap_=swap;reviewedFlashAirborne_=airborne;
-        reviewedFlashLandingSerial_=p.landingSerial;
+        reviewedFlashDash_=dash;reviewedFlashSwap_=swap;
         reviewedFlashMove_=p.whiteMove;reviewedFlashMoveAge_=p.whiteAge;
     }
     void drawReviewedFlashEffects(const Combat& g,const Animation&,bool front){
@@ -1356,7 +1349,7 @@ public:
         offset=std::round(camera)-640;SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);SDL_SetRenderDrawColor(renderer,21,35,52,255);SDL_RenderClear(renderer);
         forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.enemyVisualClock);
         const auto& caster=g.player;
-        updateReviewedFlashEffects(g,a);
+        updateReviewedFlashEffects(g);
         const bool verdictFreeze=caster.whiteNight&&caster.whiteMove==WhiteMove::Verdict&&
             caster.whiteAge>=.12f&&caster.whiteAge<.66f;
         if(verdictFreeze){

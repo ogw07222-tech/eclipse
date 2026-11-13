@@ -7,7 +7,7 @@ import argparse, hashlib, json, shutil, math
 from PIL import Image
 
 ACTORS = ['Basic','Skill1','Skill2','Skill3','Ultimate','Idle','Run','Jump','Fall','Land','Dash','Swap']
-EFFECTS = ['Slash','Rush','Command','BlinkOut','BlinkIn','Verdict','Impact','Orb','Lance','SkyLance','LanceHit','Dash','Jump','Land','Swap']
+EFFECTS = ['Slash','Rush','Command','BlinkOut','BlinkIn','Verdict','Impact','Orb','Lance','SkyLance','LanceHit','Dash','Swap']
 ROOT = Path(__file__).resolve().parents[2]
 
 def literal(value):
@@ -91,7 +91,7 @@ def main():
 #include <array>
 namespace eclipse {
 enum class FlashActor { Basic, Skill1, Skill2, Skill3, Ultimate, Idle, Run, Jump, Fall, Land, Dash, Swap, Count };
-enum class FlashFx { Slash, Rush, Command, BlinkOut, BlinkIn, Verdict, Impact, Orb, Lance, SkyLance, LanceHit, Dash, Jump, Land, Swap, Count };
+enum class FlashFx { Slash, Rush, Command, BlinkOut, BlinkIn, Verdict, Impact, Orb, Lance, SkyLance, LanceHit, Dash, Swap, Count };
 struct FlashSheet {
     const char* file=nullptr;
     int cellW=0,cellH=0,columns=0,rows=0,count=0;
