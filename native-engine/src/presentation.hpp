@@ -496,7 +496,7 @@ class Presentation {
                 const int w=surface?surface->w:0,h=surface?surface->h:0;
                 const std::string error="ECLIPSE ASSET ERROR: "+path+" expected "+std::to_string(expectedW)+"x"+std::to_string(expectedH)+" actual "+std::to_string(w)+"x"+std::to_string(h)+" "+SDL_GetError();
                 if(surface)SDL_DestroySurface(surface);
-                SDL_SetError("%s",error.c_str());SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",error.c_str());SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"ECLIPSE ASSET ERROR",error.c_str(),nullptr);return false;
+                SDL_SetError("%s",error.c_str());SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",error.c_str());return false;
             }
             texture=SDL_CreateTextureFromSurface(renderer,surface);SDL_DestroySurface(surface);
             if(!texture){const std::string error="ECLIPSE ASSET ERROR: "+path+" "+SDL_GetError();SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"ECLIPSE ASSET ERROR",error.c_str(),nullptr);return false;}
