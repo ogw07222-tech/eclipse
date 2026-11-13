@@ -1,6 +1,6 @@
 # Demon Castle Background Pixel Standard
 
-Status: **mandatory visual and export standard for new and revised A1–A5 backgrounds**.
+Status: **mandatory visual and export standard for A1–A5 backgrounds**. The current five runtime backgrounds use the standard canvas and are authored toward the 371 × 127 pixel-density benchmark.
 
 ## Canvas and pixel detail
 
@@ -45,4 +45,8 @@ These descriptions guide art only. They do not assert that every area is activat
 
 - A1 `Assets/Resources/Eclipse/demon_castle/areas/a1_ashen_approach.png`: 2172 × 724 runtime PNG, authored to the 371 × 127 visual detail benchmark.
 - A2 `Assets/Resources/Eclipse/demon_castle/areas/a2_broken_gate.png`: 2172 × 724 runtime PNG, authored to the 371 × 127 visual detail benchmark.
-- A3–A5 remain subject to the standard above when revised. Their existing files are not declared converted or newly art-reviewed by this document.
+- A3 `Assets/Resources/Eclipse/demon_castle/areas/a3_void_corridor.png`: 2172 × 724 runtime PNG, authored to the 371 × 127 visual detail benchmark.
+- A4 `Assets/Resources/Eclipse/demon_castle/areas/a4_throne_stairway.png`: 2172 × 724 runtime PNG, authored to the 371 × 127 visual detail benchmark.
+- A5 `Assets/Resources/Eclipse/demon_castle/areas/a5_night_throne.png`: 2172 × 724 runtime PNG, authored to the 371 × 127 visual detail benchmark.
+
+All five areas currently have authored route terrain and portal anchors. See `Assets/Resources/Eclipse/demon_castle/README.md` for the portal route. Art approval and owner-run gameplay validation remain separate acceptance steps.

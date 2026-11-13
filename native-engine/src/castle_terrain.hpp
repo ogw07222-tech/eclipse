@@ -1,6 +1,6 @@
 #pragma once
-// ECLIPSE handcrafted castle terrain A1-A5, v32; v33 pit recovery is integrated by the runtime adapter.
-// Coordinate space: 1280x720 viewport, world widths 1800/2160. No procedural generation.
+// ECLIPSE handcrafted castle terrain A1-A5, v34; aligned to the current merged backgrounds.
+// Coordinate space: 1280x720 viewport, 2160 world units. No procedural generation.
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -8,24 +8,28 @@ namespace eclipse::CastleTerrain {
 struct Node { float x,y; };
 struct Platform { float left,right,y; };
 struct Profile { const Node* nodes; int nodeCount; const Platform* platforms; int platformCount; float width,spawnX,spawnY,gapL,gapR; };
-// A1 2172x724 original art maps to 2160x720 world units. Ground traced
-// against the visible footpath; small gradual rise toward the entry gate.
-inline constexpr Node a1Nodes[]={{0,526},{580,527},{1150,524},{1450,522},{1550,515},{1650,501},{1740,486},{2160,486}};
-inline constexpr Node a2Nodes[]={{0,640},{1710,640},{1840,500},{1970,340},{2160,340}};
-inline constexpr Platform a2Platforms[]={{0,305,458},{565,965,450}};
-inline constexpr Node a3Nodes[]={{0,575},{460,575},{680,445},{900,445},{980,480},{1120,480},{1140,575},{1250,575},{1510,535},{1660,535},{1900,340},{2160,340}};
-inline constexpr Platform a3Platforms[]={{950,1130,480},{1240,1640,535}};
-inline constexpr Node a4Nodes[]={{0,625},{510,625},{690,535},{1060,535},{1230,455},{1530,455},{1720,320},{2160,320}};
-inline constexpr Node a5Nodes[]={{0,580},{2160,580}};
-inline constexpr Platform a5Platforms[]={{1880,2160,415}};
+inline constexpr Node a1Nodes[]={{0,650},{350,650},{760,646},{1200,650},{1620,646},{2160,646}};
+inline constexpr Node a2Nodes[]={{0,644},{2160,644}};
+inline constexpr Node a3Nodes[]={{0,632},{460,632},{600,520},{900,520},{980,632},{1120,632},{1140,632},{1250,632},{1500,620},{1660,560},{1900,540},{2160,540}};
+inline constexpr Node a4Nodes[]={{0,590},{480,590},{680,520},{1050,520},{1470,420},{1680,420},{1900,300},{2160,300}};
+inline constexpr Node a5Nodes[]={{0,560},{2160,560}};
+inline constexpr Platform a5Platforms[]={{1880,2160,445}};
 inline constexpr Profile profiles[]={
- {a1Nodes,8,nullptr,0,2160,130,526,-1,-1},
- {a2Nodes,5,a2Platforms,2,2160,120,458,-1,-1},
- {a3Nodes,12,a3Platforms,2,2160,115,575,1150,1220},
- {a4Nodes,8,nullptr,0,2160,140,625,-1,-1},
- {a5Nodes,2,a5Platforms,1,2160,135,580,-1,-1}
+ {a1Nodes,6,nullptr,0,2160,130,650,-1,-1},
+ {a2Nodes,2,nullptr,0,2160,120,644,-1,-1},
+ {a3Nodes,12,nullptr,0,2160,110,632,1150,1220},
+ {a4Nodes,8,nullptr,0,2160,140,590,-1,-1},
+ {a5Nodes,2,a5Platforms,1,2160,135,560,-1,-1}
 };
 inline const Profile& profile(int area){ return profiles[std::clamp(area,1,5)-1]; }
+inline float portalX(int area,bool right){
+ static constexpr float positions[][2]={{72,1810},{250,2080},{72,2080},{72,2080},{72,2080}};
+ return positions[std::clamp(area,1,5)-1][right?1:0];
+}
+inline int linkedArea(int area,bool right){
+ area=std::clamp(area,1,5);
+ return right?(area==5?1:area+1):(area==1?5:area-1);
+}
 inline float groundAt(int area,float x){
  const auto& p=profile(area);
  if(x<0||x>p.width||(x>p.gapL&&x<p.gapR))return std::numeric_limits<float>::infinity();

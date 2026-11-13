@@ -277,7 +277,7 @@ class Presentation {
         }
     }
     void forest(const Combat& g,float camera) {
-        if(castleEntranceActive_ && castleEntrance_.ready()) {castleEntrance_.draw(camera);return;}
+        if(castleEntranceActive_ && castleEntrance_.ready()) {castleEntrance_.draw(camera,g.clock);return;}
         if(forestV3Ready_) {
             // Layer art only: no scene randomization or NPC occupancy changes.
             // Every asset's native dimensions and world-ground height are fixed.
@@ -588,7 +588,7 @@ class Presentation {
         rect(x-3,y-2,16,15,0x121922,enabled?215:135);
         number(slot,x,y,2,enabled?0xe6ddd0:0x89909a);
     }
-    void hud(const Combat& g,Actions held,const ControlLayout& layout,std::array<float,2> stick){
+    void hud(const Combat& g,Actions held,const ControlLayout& layout,std::array<float,2> stick,bool interactionAvailable){
         const auto& p=g.player;
         playerHealthBar(p);
         for(int i=0;i<4;++i){rect(765+i*74,21,66,61,0x080d17);rect(771+i*74,27,54,49,0x667482);rect(777+i*74,33,42,37,0x222c3d);}
@@ -611,7 +611,12 @@ class Presentation {
         thumbLayer(thumb+4,0x101923,165);
         thumbLayer(thumb,stickActive?0xb8c8cf:0x91a8b4,stickActive?191:153);
         thumbLayer(thumb*.58f,0x304353,174);
-        icon(1,held.attack?1:0,0,c[ControlLayout::Attack].x,c[ControlLayout::Attack].y,c[ControlLayout::Attack].size,held.attack);
+        const auto& attack=c[ControlLayout::Attack];
+        icon(1,held.attack?1:0,0,attack.x,attack.y,attack.size,held.attack);
+        if(interactionAvailable){
+            rect(attack.x+attack.size*.34f,attack.y+attack.size*.22f,attack.size*.32f,attack.size*.48f,0x102348,245);
+            text("!",attack.x+attack.size*.425f,attack.y+attack.size*.20f,5,0x63dfff);
+        }
         icon(2,held.dash?1:0,0,c[ControlLayout::Dash].x,c[ControlLayout::Dash].y,c[ControlLayout::Dash].size,held.dash);
         // Character swap remains available in every class, including White Night.
         icon(3,0,0,c[ControlLayout::Swap].x,c[ControlLayout::Swap].y,c[ControlLayout::Swap].size,held.swap);
@@ -1345,7 +1350,7 @@ public:
             }
         }
     }
-    void draw(const Combat& g,const Animation& a,float camera,Actions held,const char* capture=nullptr,const char* reviewLabel=nullptr,const ControlLayout* customLayout=nullptr,std::array<float,2> stick={}){
+    void draw(const Combat& g,const Animation& a,float camera,Actions held,const char* capture=nullptr,const char* reviewLabel=nullptr,const ControlLayout* customLayout=nullptr,std::array<float,2> stick={},bool interactionAvailable=false){
         offset=std::round(camera)-640;SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);SDL_SetRenderDrawColor(renderer,21,35,52,255);SDL_RenderClear(renderer);
         forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.enemyVisualClock);
         const auto& caster=g.player;
@@ -1426,7 +1431,7 @@ public:
         static const ControlLayout defaultLayout{};
         const ControlLayout& layout=customLayout?*customLayout:defaultLayout;
         if(layout.showNumbers)for(const auto& popup:g.popups)number(popup.amount,popup.x-offset-12,popup.y,3,popup.kind==DamageKind::Fire?0xff9155:(popup.kind==DamageKind::Bleed||popup.kind==DamageKind::Execute)?0xe76878:0xf2d48c);
-        hud(g,held,layout,stick);
+        hud(g,held,layout,stick,interactionAvailable);
         if(layout.editing)settings(layout);
         // PNG-backed gothic gear and vertical menu. All actions use ControlLayout hitboxes.
         if(!layout.reposition&&settingsGear_){

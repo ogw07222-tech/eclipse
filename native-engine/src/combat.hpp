@@ -17,7 +17,7 @@ constexpr float viewWidth=1280,viewHeight=720,floorY=ForestLayerScene::floorY,wo
 struct Actions {
     bool left=false,right=false,jump=false,attack=false,dash=false,skill=false,swap=false,ultimate=false;
     bool restart=false,inventory=false,weapon=false,armor=false,charm=false;
-    bool jumpHeld=false,skillSweep=false,skillBuff=false;
+    bool jumpHeld=false,skillSweep=false,skillBuff=false,interact=false;
 };
 struct Equipment {
     std::array<int,3> selected{};
@@ -773,6 +773,16 @@ public:
             platforms.push_back({item.left,item.right,item.y});
         }
         restart();
+    }
+    void transitionCastleArea(int area,float entryX){
+        castleArea=std::clamp(area,1,5);platforms.clear();const auto& layout=CastleTerrain::profile(castleArea);
+        for(int i=0;i<layout.platformCount;++i){const auto& item=layout.platforms[i];platforms.push_back({item.left,item.right,item.y});}
+        auto& p=player;p.x=std::clamp(entryX,25.f,layout.width-35.f);const float floor=CastleTerrain::groundAt(castleArea,p.x);
+        p.y=std::isfinite(floor)?floor:layout.spawnY;p.vx=p.vy=0.f;p.grounded=true;p.facing=entryX<layout.width*.5f?1:-1;
+        p.meleeLeft=0.f;p.mageCastLeft=0.f;p.whiteMove=WhiteMove::None;p.spaceMove=0;p.dashLeft=0.f;p.attackFlash=0.f;p.invulnerable=std::max(p.invulnerable,.65f);
+        enemies={Enemy(0,575),Enemy(1,800),Enemy(0,1020),Enemy(2,1285)};
+        for(auto& enemy:enemies){const float foot=CastleTerrain::groundAt(castleArea,enemy.x);if(std::isfinite(foot))enemy.y=foot;}
+        projectiles.clear();lightLances.clear();lightBursts.clear();riftScars.clear();spaceEffects.clear();popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=enemyVisualClock=0;cameraCenter=viewWidth*.5f;
     }
     std::array<Enemy,4> enemies;
     std::vector<SpaceEffect> spaceEffects;

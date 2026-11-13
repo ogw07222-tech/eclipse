@@ -55,7 +55,7 @@ void requestVacodeLogin(){
 std::array<bool,SDL_SCANCODE_COUNT> keyState{};
 void updateKeyboard(){const auto& k=keyState;eclipse::Actions a;
         a.left=k[SDL_SCANCODE_A]||k[SDL_SCANCODE_LEFT];a.right=k[SDL_SCANCODE_D]||k[SDL_SCANCODE_RIGHT];a.jump=k[SDL_SCANCODE_SPACE]||k[SDL_SCANCODE_W]||k[SDL_SCANCODE_UP];
-        a.attack=k[SDL_SCANCODE_J]||k[SDL_SCANCODE_Z];a.skill=k[SDL_SCANCODE_K]||k[SDL_SCANCODE_X];a.swap=k[SDL_SCANCODE_L]||k[SDL_SCANCODE_C]||k[SDL_SCANCODE_TAB];
+        a.attack=k[SDL_SCANCODE_J]||k[SDL_SCANCODE_Z];a.interact=k[SDL_SCANCODE_E];a.skill=k[SDL_SCANCODE_K]||k[SDL_SCANCODE_X];a.swap=k[SDL_SCANCODE_L]||k[SDL_SCANCODE_C]||k[SDL_SCANCODE_TAB];
         a.skillSweep=k[SDL_SCANCODE_U];a.skillBuff=k[SDL_SCANCODE_O];a.ultimate=k[SDL_SCANCODE_P];
         a.dash=k[SDL_SCANCODE_LSHIFT]||k[SDL_SCANCODE_RSHIFT];a.restart=k[SDL_SCANCODE_R];a.inventory=k[SDL_SCANCODE_I];a.weapon=k[SDL_SCANCODE_1];a.armor=k[SDL_SCANCODE_2];a.charm=k[SDL_SCANCODE_3];
         if(game.player.form==1&&!game.player.whiteNight&&!game.inventory){
@@ -199,8 +199,31 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
     }
 
 }
-void tick(eclipse::Actions action){
+int activeCastlePortalSide(const eclipse::Presentation& view){
+    const int side=view.castlePortalSide(game.player.x);
+    if(side<0||!game.player.grounded)return -1;
+    const float portalX=eclipse::CastleTerrain::portalX(game.castleArea,side==1);
+    const float floor=eclipse::CastleTerrain::groundAt(game.castleArea,portalX);
+    return std::isfinite(floor)&&std::abs(game.player.y-floor)<=22.f?side:-1;
+}
+void tick(eclipse::Actions action,eclipse::Presentation& view){
     if(action.restart){input.reset();keyState.fill(false);animation.reset();camera=640;}
+    if(game.castleArea>0){
+        int side=activeCastlePortalSide(view);
+        input.setInteractionMode(side>=0);
+        if(side>=0&&action.attack){action.attack=false;action.interact=true;}
+        if(side>=0&&action.interact){
+            const bool fromRight=side==1;
+            const int destination=eclipse::CastleTerrain::linkedArea(game.castleArea,fromRight);
+            const bool destinationRight=!fromRight;
+            const float portalX=eclipse::CastleTerrain::portalX(destination,destinationRight);
+            const float entryX=destinationRight?portalX-86.f:portalX+86.f;
+            game.transitionCastleArea(destination,entryX);
+            view.setDemonCastleArea(destination);
+            camera=std::clamp(game.player.x,640.f,std::max(640.f,game.castleWorldWidth()-640.f));
+            animation.reset();input.reset();keyState.fill(false);action={};
+        }
+    }
     const int previousMotion=animation.state;
     game.cameraCenter=camera;
     const unsigned respawnBefore=game.pitRespawnSerial;
@@ -212,6 +235,7 @@ void tick(eclipse::Actions action){
     if(action.inventory||action.swap||action.restart||action.weapon||action.armor||action.charm)
         SDL_Log("ECLIPSE state form=%d inventory=%d hp=%d foes=%d restart=%d weapon=%d armor=%d charm=%d",game.player.form,game.inventory,game.player.health,game.foes(),action.restart,game.player.gear.selected[0],game.player.gear.selected[1],game.player.gear.selected[2]);
     camera+=(std::clamp(game.player.x,640.f,std::max(640.f,game.castleWorldWidth()-640.f))-camera)*(1-std::exp(-5*static_cast<float>(eclipse::fixedStep)));
+    input.setInteractionMode(activeCastlePortalSide(view)>=0);
 }
 void cleanup(){if(renderer)SDL_DestroyRenderer(renderer);if(window)SDL_DestroyWindow(window);SDL_Quit();}
 }
@@ -348,6 +372,7 @@ int main(int argc,char** argv){
     }
     view->setDemonCastleEntrance(true);
     game.configureCastleArea(1); // Side-view A1 art and fixed collision share the same area.
+    view->setDemonCastleArea(1);
     SDL_Log("ECLIPSE first playable scene: demon castle entrance (combat playtest; tutorial later)");
     float titleSeconds=0;
     Uint64 last=SDL_GetTicksNS();double accumulator=0;
@@ -367,8 +392,8 @@ int main(int argc,char** argv){
             view->drawTitle(titleSeconds,static_cast<int>(titlePage),waitingForVacode,qaFirstJob);
         }else{
             accumulator+=elapsed;
-            while(accumulator>=eclipse::fixedStep){if(!layout.editing)tick(input.sample());accumulator-=eclipse::fixedStep;}
-            view->draw(game,animation,camera,input.held(),nullptr,nullptr,&layout,input.stickOffset());
+            while(accumulator>=eclipse::fixedStep){if(!layout.editing)tick(input.sample(),*view);accumulator-=eclipse::fixedStep;}
+            view->draw(game,animation,camera,input.held(),nullptr,nullptr,&layout,input.stickOffset(),activeCastlePortalSide(*view)>=0);
         }
         double remaining=eclipse::fixedStep-(SDL_GetTicksNS()-start)/1e9;if(remaining>0)SDL_DelayNS(static_cast<Uint64>(remaining*1e9));
     }
