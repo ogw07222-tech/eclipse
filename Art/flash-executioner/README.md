@@ -20,9 +20,9 @@ Ultimate, idle, run, jump and fall now use the owner-reviewed motion sheets. Idl
 
 Actor sheets have192×192 cells, pivot70/133, scale1.4. `reviewed/manifest.json` records dimensions, frame counts, hashes and provenance. `review-approval.json` records the owner-reviewed additions and exact hashes. Clip rates are motion-specific: Idle 18.9 poses/s, Run 36.3 nominal poses/s, Jump 36.3 nominal poses/s, Fall 15 poses/s and Ultimate 22.3 poses/s. The runtime maps Ultimate contact to frame 16 and retains its unchanged .728s gameplay contact. All actor cells are 192×192 RGBA at pivot70/133 and scale1.4.
 
-The v2 mappings and options are in `pixelfx/manifest.json`. Original effect recipes and dependencies are byte-identical to the pinned upstream; source leaf hashes, MIT license and verification evidence are retained under `pixelfx/source-original/`. Variations use palette, exposed options, actual approved actor masks, uniform runtime scale, canvas registration and source-frame timing/selection. No new geometry recipes or hand-painted shapes were used. Each `pixelfx/variants/<Role>/` preserves a same-fps original baseline and exact frame map.
+The v2 mappings and options are in `pixelfx/manifest.json`. Original effect recipes and dependencies are byte-identical to the pinned upstream; source leaf hashes, MIT license and verification evidence are retained under `pixelfx/source-original/`. Most variations use palette, exposed options, actual approved actor masks, uniform runtime scale, canvas registration and source-frame timing/selection. The owner-requested hand-pixel Lance/SkyLance silhouette edit is documented below; their original source recipes remain unchanged. Each `pixelfx/variants/<Role>/` preserves a same-fps original baseline and exact frame map.
 
-Effects retain straight RGBA pixels. Export packing corrects upstream atlas double-premultiplication through direct RGBA byte copies; limited alpha-only entrance/exit fades and frame selections are documented. No RGB painting, body pose synthesis or geometry replacement occurs.
+Effects retain straight RGBA pixels. Export packing corrects upstream atlas double-premultiplication through direct RGBA byte copies; limited alpha-only entrance/exit fades and frame selections are documented. Owner-requested direct pixel edits now reshape all 48 Lance/SkyLance frames into a long, thin shaft and tapered spear point while keeping the projectile-tip pivot, runtime scale, timing and attack behavior. The upstream recipes remain preserved byte-for-byte as the baseline.
 
 | Event | v2 source-frame registration |
 | --- | --- |
@@ -34,7 +34,7 @@ Effects retain straight RGBA pixels. Export packing corrects upstream atlas doub
 | Generic impact | Start at collision with source age1/60s, centered on actual hit |
 | Verdict impact | Smite source tail starts after original hit; register to target feet |
 | Orbs | Complete original2.4s loop; focal offset0,+15.6 |
-| Normal/sky lances | Complete original.8s loop until collision; both natively face right, rotate by actual projectile angle |
+| Normal/sky lances | Complete original.8s loop until collision; long thin hand-edited spear pixels, both natively face right and rotate by actual projectile angle |
 
 Effect frame selection uses metadata fps directly, including endpoint samples, instead of stretching N+1 frames across the nominal duration. Extremely fast basic attacks skip only unavailable source prelude so the original visual peak still registers to gameplay contact. Effects have independent visual lifetimes, rather than clipping their tails to the combat burst's .24s. A verdict collision's simultaneous generic impact is deduplicated visually into one large verdict hit without changing either combat record. Projectile effects continue after class swap. Charge/swap effects replace their old arrival decoration intentionally.
 

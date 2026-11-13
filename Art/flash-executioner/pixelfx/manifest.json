@@ -658,20 +658,21 @@
         "light": 0.85
       },
       "postprocess": {
-        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+        "operation": "direct per-pixel correction in all 48 cells: remove opaque blade/guard pixels in the bounded weapon region, hand-draw 3px shaft and 5px tapered head; existing trail/glow retained; no regeneration"
       },
       "frameMap": "Art/flash-executioner/pixelfx/variants/Lance/frame-map.json",
-      "sha256": "47ca56f3e7c11e7d46d69f0688021bfe69543dd3ec6763404a6bd4a58ab8b489",
+      "sha256": "4248e6194d8eb4a29f70118482becca79d6b617218854fca598d354124549897",
       "baselinePng": "Art/flash-executioner/pixelfx/variants/Lance/original-60fps.png",
       "baselineFps": 60,
-      "status": "main-review-approved",
+      "status": "owner-requested manual pixel revision; source recipe preserved as historical baseline",
       "flightFrameFps": 60,
       "firstAlphaEmpty": false,
       "lastAlphaEmpty": false,
       "uniquePixelFrames": 48,
       "edgePixels": 0,
       "peakCoverageFrame": 39,
-      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/ice/ice-lance.js"
+      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/ice/ice-lance.js",
+      "manualPixelEdit": "Art/flash-executioner/pixelfx/manual-corrections/lance/pixel-edit-audit.json"
     },
     {
       "role": "SkyLance",
@@ -732,20 +733,21 @@
         "light": 0.85
       },
       "postprocess": {
-        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+        "operation": "direct per-pixel correction in all 48 cells: remove opaque blade/guard pixels in the bounded weapon region, hand-draw 3px shaft and 5px tapered head; existing trail/glow retained; no regeneration"
       },
       "frameMap": "Art/flash-executioner/pixelfx/variants/SkyLance/frame-map.json",
-      "sha256": "47ca56f3e7c11e7d46d69f0688021bfe69543dd3ec6763404a6bd4a58ab8b489",
+      "sha256": "4248e6194d8eb4a29f70118482becca79d6b617218854fca598d354124549897",
       "baselinePng": "Art/flash-executioner/pixelfx/variants/SkyLance/original-60fps.png",
       "baselineFps": 60,
-      "status": "main-review-approved",
+      "status": "owner-requested manual pixel revision; source recipe preserved as historical baseline",
       "flightFrameFps": 60,
       "firstAlphaEmpty": false,
       "lastAlphaEmpty": false,
       "uniquePixelFrames": 48,
       "edgePixels": 0,
       "peakCoverageFrame": 39,
-      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/ice/ice-lance.js"
+      "upstream_source_path": "Art/flash-executioner/pixelfx/source-original/fx/ice/ice-lance.js",
+      "manualPixelEdit": "Art/flash-executioner/pixelfx/manual-corrections/lance/pixel-edit-audit.json"
     },
     {
       "role": "LanceHit",

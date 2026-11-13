@@ -162,3 +162,15 @@ Status: IMPLEMENTED — actor sheets and existing state/button bindings are conn
 - Static PNG dimension, alpha mode, runtime/source byte hash and manifest-count checks passed: 27 runtime sheets (12 actors + 15 effects).
 - No tests, builds, game/device playback or GitHub Actions were run in this integration turn. Owner previously reported trying the motions and finding playback acceptable; both-facing/device verification remains outstanding.
 - GitHub main head at integration start: `74a224e4f832075a19a9dca14a2f001e55166ea2`.
+
+
+## 2026-11-13 — Owner-requested light spear effect revision
+
+Status: IMPLEMENTED — all existing effect roles remain in runtime; Lance/SkyLance now use the manually revised spear silhouette.
+
+- Verified all15 active Flash Executioner effect roles already had runtime PNGs and `FlashFx` descriptors from the preceding main update; no extra unbound effect candidates were present.
+- Manually edited each of the48 frames in both Lance and SkyLance atlases. Removed the old blade/guard pixels, softened the round tip halo, painted a3px-long shaft and a tapered point, and kept the existing tip pivot, scale, loop, angle and combat timing. Both roles share the same edited PNG bytes.
+- Preserved pre-edit atlases and created a reproducible guarded pixel-edit script at `Art/flash-executioner/pixelfx/manual-corrections/lance/`. Upstream JS recipes and original source hashes remain unchanged.
+- Updated runtime PNGs, reviewed sources, approval hashes, PixelFX manifest, project documentation and audit record.
+- Static review at 1x and 4x confirms the long shaft and pointed tip; all15 effects remain active. The script reproduces the runtime atlas SHA exactly.
+- No tests, builds, game/device playback or GitHub Actions were run.

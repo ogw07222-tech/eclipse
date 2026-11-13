@@ -1,0 +1,174 @@
+{
+  "roles": [
+    "Lance",
+    "SkyLance"
+  ],
+  "frames_per_role": 48,
+  "frame_size": [
+    208,
+    96
+  ],
+  "source_sha256": {
+    "effect_lance": "47ca56f3e7c11e7d46d69f0688021bfe69543dd3ec6763404a6bd4a58ab8b489",
+    "effect_skylance": "47ca56f3e7c11e7d46d69f0688021bfe69543dd3ec6763404a6bd4a58ab8b489"
+  },
+  "output_sha256": {
+    "effect_lance": "4248e6194d8eb4a29f70118482becca79d6b617218854fca598d354124549897",
+    "effect_skylance": "4248e6194d8eb4a29f70118482becca79d6b617218854fca598d354124549897"
+  },
+  "changed_pixel_assignments": 79614,
+  "edit_method": "direct RGBA pixel assignments; no AI, code rendering, regeneration, interpolation, or frame duplication",
+  "old_core_removal": {
+    "frames": "all 48",
+    "region_in_frame": [
+      112,
+      39,
+      173,
+      57
+    ],
+    "rule": "erase original pixels in bounded blade and crossguard region; fill a low-alpha warm aura, then hand draw the spear"
+  },
+  "new_spear_pixels": {
+    "pivot_tip": [
+      170,
+      48
+    ],
+    "shaft_rows": {
+      "47": {
+        "x": [
+          53,
+          143
+        ],
+        "color": "#d49d38ff"
+      },
+      "48": {
+        "x": [
+          53,
+          143
+        ],
+        "color": "#fff6d9ff"
+      },
+      "49": {
+        "x": [
+          53,
+          143
+        ],
+        "color": "#f4c75eff"
+      }
+    },
+    "head_rows": {
+      "44": {
+        "x": [
+          160,
+          164
+        ],
+        "color": "#d49d38ff"
+      },
+      "45": {
+        "x": [
+          155,
+          169
+        ],
+        "color": "#d49d38ff"
+      },
+      "46": {
+        "x": [
+          149,
+          171
+        ],
+        "color": "#f4c75eff"
+      },
+      "47": {
+        "x": [
+          142,
+          172
+        ],
+        "color": "#ffe8abff"
+      },
+      "48": {
+        "x": [
+          139,
+          173
+        ],
+        "color": "#fff6d9ff"
+      },
+      "49": {
+        "x": [
+          142,
+          172
+        ],
+        "color": "#ffe8abff"
+      },
+      "50": {
+        "x": [
+          149,
+          171
+        ],
+        "color": "#f4c75eff"
+      },
+      "51": {
+        "x": [
+          155,
+          169
+        ],
+        "color": "#d49d38ff"
+      },
+      "52": {
+        "x": [
+          160,
+          164
+        ],
+        "color": "#d49d38ff"
+      }
+    }
+  },
+  "runtime_assets": [
+    "Assets/Resources/Eclipse/flash_executioner/effect_lance.png",
+    "Assets/Resources/Eclipse/flash_executioner/effect_skylance.png"
+  ],
+  "old_core_edit": {
+    "frames": "all 48",
+    "region_in_frame": [
+      112,
+      39,
+      173,
+      57
+    ],
+    "rule": "erase existing RGBA core pixels in the bounded blade and crossguard region; preserve glow outside it"
+  },
+  "head_halo_alpha_adjustment": {
+    "cells": "all 48",
+    "region_in_frame": [
+      145,
+      32,
+      187,
+      64
+    ],
+    "shape": "ellipse centered [166,48], radii [20,15]",
+    "rule": "multiply source alpha for 0<alpha<240 by 0.20"
+  },
+  "head_halo_total_alpha_factor": 0.2,
+  "changed_pixel_assignments_per_atlas": 79614,
+  "changed_pixel_assignments_total_both_roles": 159228,
+  "lance_and_skylance_pixel_identical": true,
+  "background_glow_fill": {
+    "rows": {
+      "43": 6,
+      "44": 10,
+      "45": 16,
+      "46": 24,
+      "47": 32,
+      "48": 36,
+      "49": 32,
+      "50": 24,
+      "51": 16,
+      "52": 10,
+      "53": 6
+    },
+    "x": [
+      112,
+      173
+    ],
+    "rgba_rgb": "#ffe8ab"
+  }
+}

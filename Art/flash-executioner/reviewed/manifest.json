@@ -1812,7 +1812,7 @@
         "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
       },
       "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Lance/frame-map.json",
-      "sha256": "47ca56f3e7c11e7d46d69f0688021bfe69543dd3ec6763404a6bd4a58ab8b489",
+      "sha256": "4248e6194d8eb4a29f70118482becca79d6b617218854fca598d354124549897",
       "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Lance/original-60fps.png",
       "baselineFps": 60,
       "status": "reviewed; runtime binding prepared; owner device verification pending",
@@ -1824,7 +1824,7 @@
       "peakCoverageFrame": 39,
       "approved": true,
       "front": true,
-      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run.",
+      "review": "Owner-requested long, thin light spear; hand-pixel corrected all 48 frames; same projectile-tip pivot and gameplay timing.",
       "source_path": "Art/flash-executioner/reviewed/effect_lance.png",
       "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_lance.png",
       "library_status": "not synced: no ChatGPT Library file capability available"
@@ -1891,7 +1891,7 @@
         "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
       },
       "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/SkyLance/frame-map.json",
-      "sha256": "47ca56f3e7c11e7d46d69f0688021bfe69543dd3ec6763404a6bd4a58ab8b489",
+      "sha256": "4248e6194d8eb4a29f70118482becca79d6b617218854fca598d354124549897",
       "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/SkyLance/original-60fps.png",
       "baselineFps": 60,
       "status": "reviewed; runtime binding prepared; owner device verification pending",
@@ -1903,7 +1903,7 @@
       "peakCoverageFrame": 39,
       "approved": true,
       "front": true,
-      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run.",
+      "review": "Owner-requested long, thin light spear; hand-pixel corrected all 48 frames; same projectile-tip pivot and gameplay timing.",
       "source_path": "Art/flash-executioner/reviewed/effect_skylance.png",
       "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_skylance.png",
       "library_status": "not synced: no ChatGPT Library file capability available"
