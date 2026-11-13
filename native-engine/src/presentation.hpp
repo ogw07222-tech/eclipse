@@ -810,7 +810,7 @@ public:
         // Studio extracts ZIP entries under Android internal storage/game_assets.
         // Relative paths are resolved against the process working directory,
         // which is not the Studio import directory.
-        const char* storage=SDL_AndroidGetInternalStoragePath();
+        const char* storage=SDL_GetAndroidInternalStoragePath();
         if(storage&&*storage)return std::string(storage)+"/game_assets/"+packed;
         return packed;
 #else
