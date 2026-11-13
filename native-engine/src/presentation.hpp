@@ -803,11 +803,16 @@ public:
         const std::string logical(name);
         const auto slash=logical.find('/');
         const std::string root=logical.substr(0,slash);
-        if(root=="ui"||root=="title"||root=="monsters"||
+        const bool direct=(root=="ui"||root=="title"||root=="monsters"||
            root=="forest"||root=="forest_v2"||root=="forest_v3"||
-           root=="forest_entrance")return logical;
-        if(logical=="knight_motion.png")return logical;
-        return "ui/__studio_all__/"+logical;
+           root=="forest_entrance"||logical=="knight_motion.png");
+        const std::string packed=direct?logical:"ui/__studio_all__/"+logical;
+        // Studio extracts ZIP entries under Android internal storage/game_assets.
+        // Relative paths are resolved against the process working directory,
+        // which is not the Studio import directory.
+        const char* storage=SDL_AndroidGetInternalStoragePath();
+        if(storage&&*storage)return std::string(storage)+"/game_assets/"+packed;
+        return packed;
 #else
         const char* base=SDL_GetBasePath();return std::string(base?base:"")+"assets/"+name;
 #endif
