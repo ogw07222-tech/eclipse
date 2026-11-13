@@ -499,7 +499,7 @@ class Presentation {
                 SDL_SetError("%s",error.c_str());SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",error.c_str());return false;
             }
             texture=SDL_CreateTextureFromSurface(renderer,surface);SDL_DestroySurface(surface);
-            if(!texture){const std::string error="ECLIPSE ASSET ERROR: "+path+" "+SDL_GetError();SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"ECLIPSE ASSET ERROR",error.c_str(),nullptr);return false;}
+            if(!texture){const std::string error="ECLIPSE ASSET ERROR: "+path+" "+SDL_GetError();SDL_SetError("%s",error.c_str());SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",error.c_str());return false;}
             SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(texture,SDL_BLENDMODE_BLEND);return true;
         };
         for(size_t i=0;i<spaceActorTextures_.size();++i)if(!load(spaceActors[i],spaceActorTextures_[i]))return false;
