@@ -96,10 +96,8 @@ public:
     int area() const{return active_+1;}
     int portalSide(float x,float radius=92.f) const{
         if(!ready())return -1;
-        const float left=std::abs(x-CastleTerrain::portalX(area(),false));
-        const float right=std::abs(x-CastleTerrain::portalX(area(),true));
-        if(left>radius&&right>radius)return -1;
-        return left<=right?0:1;
+        const float exit=CastleTerrain::portalX(area(),true);
+        return exit>=0.f&&std::abs(x-exit)<=radius?1:-1;
     }
     void draw(float camera,float time=0.f) const{
         if(!ready())return;
@@ -113,12 +111,13 @@ public:
         SDL_RenderTexture(renderer_,images_[active_],nullptr,&destination);
         const Uint8 alpha=static_cast<Uint8>(214.f+28.f*(.5f+.5f*std::sin(time*2.2f)));
         SDL_SetTextureAlphaMod(portal_,alpha);
-        for(int side=0;side<2;++side){
-            const float x=CastleTerrain::portalX(area(),side==1);
+        const float x=CastleTerrain::portalX(area(),true);
+        if(x>=0.f){
             const float y=CastleTerrain::groundAt(area(),x);
-            if(!std::isfinite(y))continue;
-            const SDL_FRect portalRect{x-shift-48.f,y-128.f,96.f,128.f};
-            SDL_RenderTexture(renderer_,portal_,nullptr,&portalRect);
+            if(std::isfinite(y)){
+                const SDL_FRect portalRect{x-shift-48.f,y-128.f,96.f,128.f};
+                SDL_RenderTexture(renderer_,portal_,nullptr,&portalRect);
+            }
         }
         SDL_SetTextureAlphaMod(portal_,255);
     }

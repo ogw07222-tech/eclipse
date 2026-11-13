@@ -212,16 +212,15 @@ void tick(eclipse::Actions action,eclipse::Presentation& view){
         int side=activeCastlePortalSide(view);
         input.setInteractionMode(side>=0);
         if(side>=0&&action.attack){action.attack=false;action.interact=true;}
-        if(side>=0&&action.interact){
-            const bool fromRight=side==1;
-            const int destination=eclipse::CastleTerrain::linkedArea(game.castleArea,fromRight);
-            const bool destinationRight=!fromRight;
-            const float portalX=eclipse::CastleTerrain::portalX(destination,destinationRight);
-            const float entryX=destinationRight?portalX-86.f:portalX+86.f;
-            game.transitionCastleArea(destination,entryX);
-            view.setDemonCastleArea(destination);
-            camera=std::clamp(game.player.x,640.f,std::max(640.f,game.castleWorldWidth()-640.f));
-            animation.reset();input.reset();keyState.fill(false);action={};
+        if(side==1&&action.interact){
+            const int destination=eclipse::CastleTerrain::nextArea(game.castleArea);
+            if(destination>0){
+                const float entryX=eclipse::CastleTerrain::arrivalX(destination);
+                game.transitionCastleArea(destination,entryX);
+                view.setDemonCastleArea(destination);
+                camera=std::clamp(game.player.x,640.f,std::max(640.f,game.castleWorldWidth()-640.f));
+                animation.reset();input.reset();keyState.fill(false);action={};
+            }
         }
     }
     const int previousMotion=animation.state;

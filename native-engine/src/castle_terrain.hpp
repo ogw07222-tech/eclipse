@@ -1,5 +1,5 @@
 #pragma once
-// ECLIPSE handcrafted castle terrain A1-A5, v34; aligned to the current merged backgrounds.
+// ECLIPSE handcrafted castle terrain A1-A5, v35; aligned to the current merged backgrounds.
 // Coordinate space: 1280x720 viewport, 2160 world units. No procedural generation.
 #include <algorithm>
 #include <cmath>
@@ -23,12 +23,13 @@ inline constexpr Profile profiles[]={
 };
 inline const Profile& profile(int area){ return profiles[std::clamp(area,1,5)-1]; }
 inline float portalX(int area,bool right){
- static constexpr float positions[][2]={{72,1810},{250,2080},{72,2080},{72,2080},{72,2080}};
- return positions[std::clamp(area,1,5)-1][right?1:0];
+ static constexpr float exits[]={1810,2080,2080,2080};
+ return right&&area>=1&&area<=4?exits[area-1]:-1.f;
 }
-inline int linkedArea(int area,bool right){
- area=std::clamp(area,1,5);
- return right?(area==5?1:area+1):(area==1?5:area-1);
+inline int nextArea(int area){return area>=1&&area<5?area+1:0;}
+inline float arrivalX(int area){
+ static constexpr float positions[]={0,336,158,158,158};
+ return area>=1&&area<=5?positions[area-1]:0.f;
 }
 inline float groundAt(int area,float x){
  const auto& p=profile(area);
