@@ -984,7 +984,7 @@ public:
                 case WhiteMove::Rush:role=FlashFx::Rush;trigger=.125f;break;
                 case WhiteMove::Command:role=FlashFx::Command;trigger=.23f;break;
                 case WhiteMove::Blink:role=FlashFx::BlinkOut;trigger=0;break;
-                case WhiteMove::Verdict:role=FlashFx::Verdict;trigger=0;break;
+                case WhiteMove::Verdict:role=FlashFx::Verdict;trigger=.30f;break;
                 default:break;
             }
             const float speed=p.whiteMove==WhiteMove::Slash?std::max(.001f,p.whiteSlashSpeed):1.f;
@@ -999,9 +999,11 @@ public:
                 skippedPrelude=std::max(0.f,-trigger/speed);
                 trigger=std::max(0.f,trigger);
             }
-            if((newMove&&trigger==0)||(before<trigger&&p.whiteAge>=trigger))
-                spawn(role,p.x,p.y,p.facing,p.whiteMove!=WhiteMove::Blink,
-                      std::max(0.f,p.whiteAge-trigger)/speed+skippedPrelude);
+            if((newMove&&trigger==0)||(before<trigger&&p.whiteAge>=trigger)){
+                const float sourceAge=std::max(0.f,p.whiteAge-trigger)/speed+skippedPrelude+
+                    (p.whiteMove==WhiteMove::Verdict?.20f:0.f);
+                spawn(role,p.x,p.y,p.facing,p.whiteMove!=WhiteMove::Blink,sourceAge);
+            }
         }
         for(const auto& burst:g.lightBursts){
             if(burst.visualSerial<=reviewedFlashBurstSerial_)continue;
@@ -1813,31 +1815,31 @@ public:
                         static_cast<Uint8>(160*strength));
                 }
             }
-            if(p.whiteMove==WhiteMove::Verdict&&p.whiteAge>=.23f&&p.whiteAge<.91f&&(goldOrb_||whiteFxTextures_[3])&&!hasReviewedFlashFx(FlashFx::Verdict)){
-                // PNG glow layer at the opposite (left) hand. The spherical light contracts
-                // when the fist closes, then flares as every marked target is struck.
-                const float t=std::clamp((p.whiteAge-.23f)/.68f,0.f,1.f);
-                const float size=t<.70f?48.f-12.f*t:39.f+28.f*(t-.70f)/.30f;
+            if(p.whiteMove==WhiteMove::Verdict&&p.whiteAge>=.04f&&p.whiteAge<.91f&&(goldOrb_||whiteFxTextures_[3])){
+                // Gather a compact sphere at the off-hand before the sky volley.
+                const auto clip=whiteClips[static_cast<int>(WhiteMove::Verdict)];
+                const float t=std::clamp(p.whiteAge/clip.contact,0.f,1.f);
+                const float release=std::clamp((p.whiteAge-clip.contact)/.14f,0.f,1.f);
+                const float pulse=1.f+.055f*std::sin(g.clock*14.f);
+                const float size=(37.f+14.f*(1.f-t)+25.f*release)*pulse;
+                const float handX=p.x-p.facing*24.f-offset;
+                const float handY=p.y-57.f;
                 const SDL_FRect glowSrc{0,0,96,96};
                 SDL_Texture* orb=goldOrb_?goldOrb_:whiteFxTextures_[3];
-                const SDL_FRect glowDst{std::round(p.x-p.facing*24.f-offset-size*.5f),
-                    std::round(p.y-57.f-size*.5f),size,size};
-                SDL_SetTextureAlphaMod(orb,static_cast<Uint8>(190+65*t));
+                const SDL_FRect glowDst{std::round(handX-size*.5f),
+                    std::round(handY-size*.5f),size,size};
+                SDL_SetTextureAlphaMod(orb,static_cast<Uint8>(190+65*release));
                 SDL_RenderTexture(renderer,orb,goldOrb_?nullptr:&glowSrc,&glowDst);
                 SDL_SetTextureAlphaMod(orb,255);
-                // Golden spear fragments spiral into the clenched off-hand;
-                // on release they radiate outwards from the white orb.
-                for(int i=0;i<10;++i){
-                    const float a=i*.62831853f+p.whiteAge*7.5f;
-                    const float radius=t<.72f?43.f-t*23.f:27.f+(t-.72f)*160.f;
-                    const float x=p.x-p.facing*24.f-offset+std::cos(a)*radius;
-                    const float y=p.y-57.f+std::sin(a)*radius*.78f;
-                    goldenSprite(goldOrb_,x,y,11.f+4.f*(1.f-t),11.f+4.f*(1.f-t),
-                        0,static_cast<Uint8>(210*(1.f-t*.65f)));
-                    if(t>.55f){
-                        goldenSprite(goldTrail_,x,y,36.f+25.f*t,8.f,a*57.29578f,
-                            static_cast<Uint8>(150*(1.f-t*.65f)));
-                    }
+                // Round motes orbit while gathering, then burst outward on release.
+                for(int i=0;i<9;++i){
+                    const float angle=i*.6981317f-p.whiteAge*(5.2f+(i%3)*.55f);
+                    const float radius=(1.f-t)*50.f+10.f+release*(38.f+i%3*8.f);
+                    const float x=handX+std::cos(angle)*radius;
+                    const float y=handY+std::sin(angle)*radius*.76f;
+                    const float mote=5.f+2.f*(1.f-t)+2.f*release;
+                    goldenSprite(goldOrb_,x,y,mote,mote,0,
+                        static_cast<Uint8>(215*(1.f-.45f*release)));
                 }
             }
             if(p.whiteBoost>0 && whiteFxTextures_[3]){

@@ -212,16 +212,23 @@ class Combat {
             for(int j=0;j<count;++j)assignments.push_back(marked[i]);
         }
         std::shuffle(assignments.begin(),assignments.end(),random);
+        std::array<float,volley> delays{};
+        std::uniform_real_distribution<float> delayJitter{-.045f,.075f};
+        for(int i=1;i<volley;++i)
+            delays[i]=std::max(.025f,i*.072f+delayJitter(random));
+        std::shuffle(delays.begin()+1,delays.end(),random);
+        const float viewLeft=cameraCenter-viewWidth*.5f;
+        std::uniform_real_distribution<float> startX{viewLeft-viewWidth*.12f,
+                                                       viewLeft+viewWidth*1.12f};
+        std::uniform_real_distribution<float> skyDepth{300.f,520.f};
         for(int i=0;i<volley;++i){
             const size_t target=assignments[i];
             const auto& e=enemies[target];
-            // The first two impacts are isolated; the remaining 18 accelerate
-            // into a dense rain. Each spear originates beyond the top of view.
-            const float delay=i==0?0.f:i==1?.24f:i==2?.44f:.57f+(i-3)*.055f;
-            const float jitter=std::uniform_real_distribution<float>{-22.f,22.f}(random);
-            const float skyY=std::min(-135.f,enemyBounds(e).top-420.f);
-            lightLances.push_back({target,e.x+jitter,skyY,3.5f,0.f,90.f,
-                                   true,true,false,delay});
+            // Scatter origins across and above the view, then let each lance
+            // steer to its balanced marked-enemy assignment on an uneven beat.
+            const float skyY=std::min(-135.f,enemyBounds(e).top-skyDepth(random));
+            lightLances.push_back({target,startX(random),skyY,3.5f,0.f,90.f,
+                                   true,true,false,delays[i]});
         }
     }
     void melee(int damage,int bleed,float reach){
