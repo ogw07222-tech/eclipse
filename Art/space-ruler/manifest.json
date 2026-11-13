@@ -295,7 +295,7 @@
     ],
     "duration": 0.8,
     "loop": true,
-    "scale": 0.7,
+    "scale": 1.0,
     "status": "integrated-owner-device-review-pending"
   },
   {
@@ -318,7 +318,7 @@
     ],
     "duration": 2.4,
     "loop": true,
-    "scale": 1.7,
+    "scale": 2.6,
     "status": "integrated-owner-device-review-pending"
   },
   {
@@ -341,7 +341,7 @@
     ],
     "duration": 3.033333333333333,
     "loop": false,
-    "scale": 1.1,
+    "scale": 1.8,
     "status": "integrated-owner-device-review-pending"
   },
   {
@@ -364,7 +364,7 @@
     ],
     "duration": 3.2333333333333334,
     "loop": false,
-    "scale": 1.15,
+    "scale": 1.75,
     "status": "integrated-owner-device-review-pending"
   },
   {
@@ -387,7 +387,7 @@
     ],
     "duration": 2.0,
     "loop": false,
-    "scale": 1.65,
+    "scale": 2.4,
     "status": "integrated-owner-device-review-pending"
   },
   {
@@ -410,7 +410,7 @@
     ],
     "duration": 1.2,
     "loop": true,
-    "scale": 1.6,
+    "scale": 2.2,
     "status": "integrated-owner-device-review-pending"
   }
 ]

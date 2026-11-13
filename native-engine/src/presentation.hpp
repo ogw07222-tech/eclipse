@@ -475,7 +475,7 @@ class Presentation {
         else if(std::abs(p.vx)>1)role=1;
         if(role!=spaceRole_||g.clock<spaceRoleBorn_){spaceRole_=role;spaceRoleBorn_=g.clock;}
         if(!p.spaceMove&&p.health>0&&p.hurtTint<=0)age=g.clock-spaceRoleBorn_;
-        const float y=p.y-10+(p.health>0?std::sin(g.clock*3)*1.8f:0);
+        const float y=p.y-10+(!p.grounded&&p.health>0?std::sin(g.clock*3)*1.8f:0);
         spaceSprite(spaceActorTextures_[role],spaceActors[role],age,p.x,y,p.facing);
     }
     void drawSpaceEffects(const Combat& g){

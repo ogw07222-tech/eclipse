@@ -180,3 +180,28 @@ Status: IMPLEMENTED — all existing effect roles remain in runtime; Lance/SkyLa
 Implemented from main 5b82db1 and rebased onto e04c4a7 (preserving obsolete White Night dependency cleanup): imported 12 actor sheets and 6 Pixelfx sheets with source/runtime hashes, generated `space_ruler_assets.hpp`, connected ranged job hover/flight/fuel, casting and combat effects, numeric skill controls, renderer and Android/desktop asset packaging. Sources: native-engine/src/combat.hpp, presentation.hpp, main.cpp, new space_ruler_assets.hpp, native-engine/CMakeLists.txt, native-engine/android/app/build.gradle, scripts/import_space_ruler.py, Art/space-ruler, Assets/Resources/Eclipse/space_ruler. Details and owner acceptance steps: Docs/SPACE_RULER_INTEGRATION.md.
 
 Static asset metadata/hash inspection and source diff inspection completed. No builds/tests/device checks/Actions run. Owner device acceptance remains outstanding; no runtime success claimed.
+
+
+## 2026-11-13 — Space Ruler effect enlargement and movement follow-up
+
+Status: PARTIAL — enlarged effects and grounded anchoring updated; a suitable PixelLab walk animation could not be produced in this pass.
+
+### Completed
+- Increased all six Pixelfx render scales in `native-engine/src/space_ruler_assets.hpp` and synchronized `Art/space-ruler/manifest.json` and `scripts/import_space_ruler.py`: void bolt 1.0x, gravity field 2.6x, dimensional spikes 1.8x, repulsion 1.75x, singularity 2.4x, flight trail 2.2x.
+- Removed the idle bob while the actor is grounded; air-only bob remains. Existing role selection chooses flight rise/hold/descend only while not grounded. Up input and flight fuel behavior were inspected in `native-engine/src/combat.hpp`.
+- Generated and visually reviewed PixelLab candidates. Image-animation jobs `ac12c1a6-40bb-4176-a219-ba867c4c7705` and `07b83921-6716-4d80-9bb2-64fe6e2506c8` had insufficient alternating leg poses and foot contacts. A character-template job `5d8f92a7-dde0-485b-9cdf-f09a8ba4fce8` had a more upright gait but changed the character identity and omitted the glowing book. None was integrated or mislabeled as a walk. Review-only outputs are in the workspace root as `space-ruler-walk-*.png`, `space-ruler-walk2-*.png`, and `space-ruler-pixellab-walk-*.png`.
+- Re-read effective `.github/workflows/`: only `workflow_dispatch` triggers are configured. No workflow was run.
+
+### Files changed
+- `native-engine/src/space_ruler_assets.hpp`
+- `native-engine/src/presentation.hpp`
+- `Art/space-ruler/manifest.json`
+- `scripts/import_space_ruler.py`
+- `Docs/SPACE_RULER_INTEGRATION.md`
+- `TASK_PROGRESS.md`
+
+### Remaining / precise next actions
+1. Generate from the exact game source character (retain the purple mage, book, robe silhouette) and achieve clearly alternating legs, visible foot lifts and planted contacts, and a closed walk loop; do not reuse rejected candidates as a final atlas.
+2. Pack the approved frames into `Art/space-ruler/walk.png` and `Assets/Resources/Eclipse/space_ruler/walk.png`, update manifest/hash/geometry and map the grounded movement role in `native-engine/src/space_ruler_assets.hpp`; preserve `hover_move.png` in Git history.
+3. Inspect all walk frames at native scale and playback timing. Owner runs game/device tests; no builds/tests were run in this pass.
+4. Review oversized effect clipping and on-screen balance in owner-run gameplay.
