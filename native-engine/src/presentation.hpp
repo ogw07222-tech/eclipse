@@ -800,6 +800,8 @@ public:
     void setForestSettings(ForestSettings settings) {forestGenerator_.regenerate(settings);}
     void setDemonCastleEntrance(bool enabled) {castleEntranceActive_=enabled && castleEntrance_.ready();}
     bool demonCastleEntranceReady() const {return castleEntrance_.ready();}
+    bool setDemonCastleArea(int area) {return castleEntrance_.setArea(area);}
+    int castlePortalSide(float playerX) const {return castleEntrance_.portalSide(playerX);}
     const ForestGenerator& forestGenerator() const {return forestGenerator_;}
     static std::string asset(const char* name){
 #ifdef SDL_PLATFORM_ANDROID
