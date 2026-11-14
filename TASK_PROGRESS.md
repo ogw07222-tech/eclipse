@@ -205,3 +205,14 @@ Status: PARTIAL — enlarged effects and grounded anchoring updated; a suitable 
 2. Pack the approved frames into `Art/space-ruler/walk.png` and `Assets/Resources/Eclipse/space_ruler/walk.png`, update manifest/hash/geometry and map the grounded movement role in `native-engine/src/space_ruler_assets.hpp`; preserve `hover_move.png` in Git history.
 3. Inspect all walk frames at native scale and playback timing. Owner runs game/device tests; no builds/tests were run in this pass.
 4. Review oversized effect clipping and on-screen balance in owner-run gameplay.
+
+
+## 2026-11-14 — Space Ruler original-based grounded walk
+
+Status: IMPLEMENTED LOCALLY — original-reference PixelLab walk is integrated; owner gameplay review pending.
+
+- Replaced the incorrect walk atlas that used another character template. PixelLab job `79a752b1-834f-4452-8438-767fac4c5661` generated eight east-facing 96x96 poses from the exact original `space_ruler_96_30colors.png` input. The animation keeps the purple mage, robe/hair silhouette, and glowing open book, with a clear alternating stride and planted/lifted foot phases.
+- Packed each source frame at native 96x96 pixel scale, offset `(48,48)` in a 192x192 cell. Atlas is 1536x192, eight frames, pivot `(96,132)`, 0.72-second loop; identical atlas bytes are installed in Art and runtime Resources.
+- Retained all source poses and the original reference image under `Art/space-ruler/walk-source/pixellab-skeleton-east/`. Updated manifest and importer metadata to remove the old wrong-character IDs and point to the original-reference PixelLab job. Updated integration documentation.
+- Visually reviewed the native-size frames and loop/contact sheet. Source animation used 27 colors from the original 29-color palette; source alpha bounds remain stable around `(6,16)-(92,85)`, keeping the floor anchor consistent.
+- No tests, builds, or gameplay checks were run. Owner should verify the grounded gait in-game, including west-facing flip and transition to flight.
