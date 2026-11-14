@@ -50,7 +50,7 @@
     "kind": "actor",
     "source_path": "Art/space-ruler/walk.png",
     "runtime_path": "Assets/Resources/Eclipse/space_ruler/walk.png",
-    "sha256": "a56d9cd2f60c60d335331431c4cb155107e37b2d874ed5d3869183e26e5671ee",
+    "sha256": "ccef3da4b900513b1629ad0c37dec0020b3973d49872aadc85a97e2f53b2b5f3",
     "width": 1536,
     "height": 192,
     "cell": [
@@ -66,45 +66,102 @@
     "duration": 0.72,
     "loop": true,
     "scale": 1.6,
-    "status": "Pixellab grounded-walk east export; runtime flips horizontally for west",
-    "source_animation": "Pixellab grounded-walk",
-    "source_character_id": "7385bc1d-2cae-426c-a7b5-ca37866d825a",
-    "source_group_id": "47502d73-f659-4618-a9c8-d9322a5f217d",
+    "status": "PixelLab original-reference walk; reviewed pose sheet; owner device verification pending",
+    "source_animation": "PixelLab animate_with_skeleton_v3",
+    "source_character_id": null,
+    "source_group_id": null,
     "source_direction": "east",
     "source_frames": [
       {
-        "path": "Art/space-ruler/walk-source/east/frame_000.png",
-        "sha256": "c812575be9a89b549230b179a9589d695f92161f944f65f9fb2303fa936651aa"
+        "path": "Art/space-ruler/walk-source/pixellab-skeleton-east/frame_000.png",
+        "sha256": "d0d650c83b040c64ef0806ae9a45e205462ee7eb4c4be0bc59eed5996210d258",
+        "size": [
+          96,
+          96
+        ]
       },
       {
-        "path": "Art/space-ruler/walk-source/east/frame_001.png",
-        "sha256": "b487a8c46e92abb0a13b0da6831e8d908a9ebe1c0c390ea191a736fc8886a8ba"
+        "path": "Art/space-ruler/walk-source/pixellab-skeleton-east/frame_001.png",
+        "sha256": "4571aa835384936dee74bad89390b74520f7255ff669f9bd1ebcdaee801cc53d",
+        "size": [
+          96,
+          96
+        ]
       },
       {
-        "path": "Art/space-ruler/walk-source/east/frame_002.png",
-        "sha256": "1c5a6abd20132b3a1958007d7bb29cdb7a2a359c78a73903be63ccfa07dfa832"
+        "path": "Art/space-ruler/walk-source/pixellab-skeleton-east/frame_002.png",
+        "sha256": "3734201d939d9deaded96a789d875674aa0274e503302a750bfca3f63bde3f3d",
+        "size": [
+          96,
+          96
+        ]
       },
       {
-        "path": "Art/space-ruler/walk-source/east/frame_003.png",
-        "sha256": "6a403f61b5a731c7eb8d5348ca0e581bf78c6629bbc33389a6384ae4db923472"
+        "path": "Art/space-ruler/walk-source/pixellab-skeleton-east/frame_003.png",
+        "sha256": "49eab9533cdf565f436a838fad5fac84ccfdd04f5516d5550f25cc5bf87d5c37",
+        "size": [
+          96,
+          96
+        ]
       },
       {
-        "path": "Art/space-ruler/walk-source/east/frame_004.png",
-        "sha256": "9f72f19a656971403f227ff1dcf0c519437ce512f6ad04baefe6c22eb0b07257"
+        "path": "Art/space-ruler/walk-source/pixellab-skeleton-east/frame_004.png",
+        "sha256": "8807e7a23a1de70596cf7f15fefc3703ce22467a29fbf9c28e326e29e3ad6cee",
+        "size": [
+          96,
+          96
+        ]
       },
       {
-        "path": "Art/space-ruler/walk-source/east/frame_005.png",
-        "sha256": "43eb1a97b8f2776fac260b54984b51d02154ff8801eefb88007eef41cdaea211"
+        "path": "Art/space-ruler/walk-source/pixellab-skeleton-east/frame_005.png",
+        "sha256": "b6f3582e3692a1f522148cd56fcdfc18f76752e6f28843f47ad07fa64b537f72",
+        "size": [
+          96,
+          96
+        ]
       },
       {
-        "path": "Art/space-ruler/walk-source/east/frame_006.png",
-        "sha256": "8fc618b6c59266a093c378b50ca135c5ad521035ef3ae28772a372c945e8ccb3"
+        "path": "Art/space-ruler/walk-source/pixellab-skeleton-east/frame_006.png",
+        "sha256": "a295ab08f9851c4628efea5d9e73f3180860c577f4656efdef3b9b7fb63f3867",
+        "size": [
+          96,
+          96
+        ]
       },
       {
-        "path": "Art/space-ruler/walk-source/east/frame_007.png",
-        "sha256": "f3e1035e3d2c394c78629e17bb9fce12740da91f53d2a7361c9610d8f58cdb93"
+        "path": "Art/space-ruler/walk-source/pixellab-skeleton-east/frame_007.png",
+        "sha256": "e08cf64a918e8d7b2918fc49e1dc8c946e910172e7402e3ca1bf75bff5c19821",
+        "size": [
+          96,
+          96
+        ]
       }
-    ]
+    ],
+    "source_job_id": "79a752b1-834f-4452-8438-767fac4c5661",
+    "source_asset_id": "52c806f5-c9cf-558a-b21b-5a867cc25d7e",
+    "source_frame_size": [
+      96,
+      96
+    ],
+    "source_input": {
+      "path": "Art/space-ruler/walk-source/pixellab-skeleton-east/reference_96x96.png",
+      "sha256": "7fffca2919b0a6528f4961477f1dd507cb8becbaf1b4ee924e62310cd0d03156",
+      "colors": 29
+    },
+    "atlas_registration": {
+      "source_pixels_per_cell_pixel": 1,
+      "source_offset": [
+        48,
+        48
+      ],
+      "ground_line_y": 133,
+      "notes": "Preserves the original 96x96 pixel scale centered inside each 192x192 runtime cell; no nearest-neighbor enlargement."
+    },
+    "colors_in_source_frames": 27,
+    "superseded_source": {
+      "reason": "Wrong PixelLab character template; did not depict the original space mage/book. Retained for Git history only.",
+      "source_character_id": "7385bc1d-2cae-426c-a7b5-ca37866d825a"
+    }
   },
   {
     "name": "flight_rise",
