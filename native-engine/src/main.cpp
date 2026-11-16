@@ -58,7 +58,7 @@ void updateKeyboard(){const auto& k=keyState;eclipse::Actions a;
         a.attack=k[SDL_SCANCODE_J]||k[SDL_SCANCODE_Z];a.interact=k[SDL_SCANCODE_E];a.skill=k[SDL_SCANCODE_K]||k[SDL_SCANCODE_X];a.swap=k[SDL_SCANCODE_L]||k[SDL_SCANCODE_C]||k[SDL_SCANCODE_TAB];
         a.skillSweep=k[SDL_SCANCODE_U];a.skillBuff=k[SDL_SCANCODE_O];a.ultimate=k[SDL_SCANCODE_P];
         a.dash=k[SDL_SCANCODE_LSHIFT]||k[SDL_SCANCODE_RSHIFT];a.restart=k[SDL_SCANCODE_R];a.inventory=k[SDL_SCANCODE_I];a.weapon=k[SDL_SCANCODE_1];a.armor=k[SDL_SCANCODE_2];a.charm=k[SDL_SCANCODE_3];
-        if(game.player.form==1&&!game.player.whiteNight&&!game.inventory){
+        if(game.player.form==1&&!game.player.flashExecutioner&&!game.inventory){
             a.jumpHeld=a.jump;
             a.skill|=k[SDL_SCANCODE_1];a.skillSweep|=k[SDL_SCANCODE_2];a.skillBuff|=k[SDL_SCANCODE_3];a.ultimate|=k[SDL_SCANCODE_4];
             a.weapon=a.armor=a.charm=false;
@@ -69,7 +69,7 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
     const bool wasTitle=titleActive;
     auto beginGame=[&](int first,int second)->bool{
         if(first==second||first<1||first>2||second<1||second>2)return false;
-        if((first==2||second==2)&&!view.loadWhiteNight()){
+        if((first==2||second==2)&&!view.loadFlashExecutioner()){
             const std::string reason=SDL_GetError();
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",reason.c_str());
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"ECLIPSE ASSET ERROR",reason.c_str(),window);

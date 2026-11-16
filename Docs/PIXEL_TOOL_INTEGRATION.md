@@ -6,7 +6,7 @@
 - **PixelFX:** code-based effects, sprite sheets and Aseprite-style frame timing JSON.
 - Both are third-party MIT projects. Review their LICENSE/NOTICE files before redistribution; PixelFX's Patch Pixel font is excluded from its code/effects license.
 - These tools are **not** installed as ChatGPT plugins. A shell-capable agent or developer must execute the CLI in a local environment. GitHub file access alone cannot run these tools.
-- Generated motion is **reference or draft art**, not approved character animation. Follow `AGENTS.md`: manual key poses, continuous anatomy, 24 standard knight / 32 White Night Executioner run poses, pixel-level correction and owner acceptance.
+- Generated motion is **reference or draft art**, not approved character animation. Follow `AGENTS.md`: manual key poses, continuous anatomy, 24 standard knight / 29 Flash Executioner run poses, pixel-level correction and owner acceptance.
 - **Never** start GitHub Actions. This adapter neither adds workflows nor triggers them.
 - No release sprites or original character PNGs are replaced automatically.
 

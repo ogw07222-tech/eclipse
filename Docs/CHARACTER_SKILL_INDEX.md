@@ -21,7 +21,7 @@
 | --- | --- | --- | --- |
 | 기사 | 세게 찌르기, 크게 베기, 전투 준비, 출혈 | [전투 설계](COMBAT_SKILLS_AND_STATUS_DESIGN.md) | 설계 수치와 실제 런타임을 별도로 확인 |
 | 공허의 군주(공허 마법사) | 공허탄, 중력 해방, 중력 영역, 차원 가시, 중력 척력, 특이점 붕괴 | [현재 직업 설계](CURRENT_CLASS_DESIGN.md) | V3는 미구현 설계 초안 |
-| 섬광의 집행자(집행관/백야 관련 자료) | 기본 베기, 돌진, 지휘, 순간이동, 궁극기 등 동작·효과 매핑 | [집행자 아트 README](../Art/flash-executioner/README.md), [버튼 감사](EXECUTOR_INCANDESCENT_FX_BUTTON_AUDIT.md) | 승인된 런타임 아트와 별도 미반영 FX 팩을 구분 |
+| 섬광의 집행자 | 기본 베기, 돌진, 지휘, 순간이동, 궁극기 등 동작·효과 매핑 | [집행자 아트 README](../Art/flash-executioner/README.md), [버튼 감사](EXECUTOR_INCANDESCENT_FX_BUTTON_AUDIT.md) | 승인된 런타임 아트와 별도 미반영 FX 팩을 구분 |
 | 마법사 | 투사체, 화상, 출혈 소비 반응 | [네이티브 엔진 README](../native-engine/README.md), [전투 설계](COMBAT_SKILLS_AND_STATUS_DESIGN.md) | 과거 포팅 설명이 포함되어 현재 구현은 코드 확인 필요 |
 
 ## 조작 및 스프라이트 연결

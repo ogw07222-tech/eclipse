@@ -12,7 +12,7 @@ C++17 + SDL3 3.2.22 + SDL3_image 3.2.4. The native runtime now contains ECLIPSE'
 - Sword three-hit combo12/15/23, 0.8s combo window, third-hit bleed; sword skill; mage basic/empowered projectiles, burn, +22 reaction consuming bleed.
 - Both form-swap entry attacks, dash immunity/cooldowns, hit stop, recoil, floating damage and pixel status effects.
 - Nine original equipment stat sets across weapon/armor/charm; max-health adjustment; inventory, clear, defeat and retry.
-- Two selectable jobs only: Space Ruler (reviewed actor and effect sheets) and White Night / Flash Executioner (reviewed actor and effect sheets). The retired Knight art loaders and selection entry are removed; monsters fall back to procedural pixel art when no atlas is packaged.
+- Two selectable jobs only: Space Ruler and Flash Executioner, each with reviewed actor and effect sheets. Retired Knight and Mage art loaders are removed. Demon Castle enemy move and attack sheets are packaged and loaded by the combat renderer for the Castle roster.
 - Keyboard and independently owned touch pointers; upward joystick jump, simultaneous actions, fast press-edge buffering, focus release and restart cleanup.
 
 | Action | Keyboard | Touch |
@@ -56,7 +56,7 @@ PNG decoding only, no image encoders; fixed-size touch storage; fixed60Hz simula
 
 ## Reviewed combat art
 
-Space Ruler and Flash Executioner actor/effect sheets are loaded from `Assets/Resources/Eclipse/space_ruler/` and `Assets/Resources/Eclipse/flash_executioner/`. Combat startup no longer requires retired Knight, Mage, White Night, or custom gold-effect PNG atlases. The QA job picker exposes Space Ruler and White Night only; all controls and missing optional sprite fallbacks continue to render procedurally.
+Space Ruler and Flash Executioner actor/effect sheets are loaded from `Assets/Resources/Eclipse/space_ruler/` and `Assets/Resources/Eclipse/flash_executioner/`. Combat startup no longer requires retired Knight, Mage, or custom gold-effect PNG atlases. The QA job picker exposes Space Ruler and Flash Executioner only; all controls and missing optional sprite fallbacks continue to render procedurally.
 
 ## Seed-based forest placement engine
 

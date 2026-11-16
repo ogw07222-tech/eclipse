@@ -40,23 +40,23 @@ constexpr int bleedMaxStacks=10,bleedSlowStacks=5;
 constexpr float bleedDuration=3.f,bleedTickInterval=.75f;
 enum class SwordStrike {Basic,Thrust,Sweep};
 
-enum class WhiteMove { None, Slash, Rush, Command, Blink, Verdict };
-struct WhiteClip {int start,count;float duration,contact;};
-constexpr WhiteClip whiteClips[]={{0,1,1,0},{16,15,.46f,.184f},{31,12,.50f,.125f},
+enum class FlashMove { None, Slash, Rush, Command, Blink, Verdict };
+struct FlashClip {int start,count;float duration,contact;};
+constexpr FlashClip flashClips[]={{0,1,1,0},{16,15,.46f,.184f},{31,12,.50f,.125f},
     {43,12,.46f,.23f},{55,12,.36f,.15f},{67,20,1.12f,.728f}};
 struct Player {
     Equipment gear;
     float x=140,y=floorY,vx=0,vy=0;
     int health=100,form=0,facing=1,combo=0,attackSerial=0,hurtSerial=0,landingSerial=0;
     int storedLightLances=0;
-    bool grounded=true,whiteNight=false;
+    bool grounded=true,flashExecutioner=false;
     // Only these two QA-selected jobs are available to the swap button.
     std::array<int,2> equippedJobs{{1,2}};
     int activeJob=0;
-    WhiteMove whiteMove=WhiteMove::None;
-    float whiteAge=0,whiteBoost=0,whiteSlashSpeed=1.f;
-    size_t whiteTarget=0;
-    unsigned whiteRushHits=0;
+    FlashMove flashMove=FlashMove::None;
+    float flashAge=0,flashBoost=0,flashSlashSpeed=1.f;
+    size_t flashTarget=0;
+    unsigned flashRushHits=0;
     float takeoffLock=0;
     float dashLeft=0,dashCooldown=0,attackCooldown=0,skillCooldown=0,swapCooldown=0,verdictCooldown=0;
     float invulnerable=0,coyote=0,jumpBuffer=0,attackFlash=0,comboWindow=0,hitStop=0,swapFlash=0;
@@ -76,11 +76,11 @@ struct Player {
     float sweepReady=0,buffReady=0,mageSkillCooldown=0,preparation=0;
     // Class archetypes: ranged 80%, melee 100%, assassin 125% of base run speed.
     // Keep this separate from attack speed and dash/skill movement.
-    float movementMultiplier() const {return whiteNight?1.25f:form==1?.80f:1.f;}
+    float movementMultiplier() const {return flashExecutioner?1.25f:form==1?.80f:1.f;}
     // Each stored light orb empowers basic sword attacks, creating a choice
     // between retaining up to +40% attack speed and spending the orbs on marks.
     float basicSpeed() const {return gear.speed()*(preparation>0?1.20f:1.f)*
-        (whiteNight?1.f+.08f*std::clamp(storedLightLances,0,5):1.f);}
+        (flashExecutioner?1.f+.08f*std::clamp(storedLightLances,0,5):1.f);}
     int maxHealth()const{return 100+gear.hp();}
     void equip(int slot){
         const int before=maxHealth();
@@ -177,7 +177,7 @@ class Combat {
     }
     // Basic hits build a visible stock of light lances instead of firing automatically.
     void chargeLightLance(){
-        if(player.whiteNight)player.storedLightLances=std::min(5,player.storedLightLances+1);
+        if(player.flashExecutioner)player.storedLightLances=std::min(5,player.storedLightLances+1);
     }
     void releaseStoredLances(){
         auto& p=player;
@@ -368,75 +368,75 @@ class Combat {
         }
         return target;
     }
-    void whiteEffect(LightFx kind,float x,float y){
+    void flashEffect(LightFx kind,float x,float y){
         lightBursts.push_back({x,y,.24f,kind,player.facing,++lightBurstVisualSerial});
     }
-    bool stepWhiteMove(float dt,const Actions& a){
+    bool stepFlashMove(float dt,const Actions& a){
         auto& p=player;
-        if(p.whiteMove==WhiteMove::None){
+        if(p.flashMove==FlashMove::None){
             if(!p.grounded||p.dashLeft>0||p.slamRecover>0||!canAttack())return false;
-            if(a.skill&&p.skillCooldown<=0){p.whiteMove=WhiteMove::Rush;p.skillCooldown=3.f;}
-            else if(a.skillSweep&&p.sweepReady<=0&&p.storedLightLances>0){p.whiteMove=WhiteMove::Command;p.sweepReady=1.f;}
+            if(a.skill&&p.skillCooldown<=0){p.flashMove=FlashMove::Rush;p.skillCooldown=3.f;}
+            else if(a.skillSweep&&p.sweepReady<=0&&p.storedLightLances>0){p.flashMove=FlashMove::Command;p.sweepReady=1.f;}
             else if((a.skillBuff&&p.buffReady<=0)||(a.ultimate&&p.verdictCooldown<=0)){
-                p.whiteTarget=farthestLightMark();
-                if(p.whiteTarget==enemies.size())return false;
-                if(a.ultimate&&p.verdictCooldown<=0){p.whiteMove=WhiteMove::Verdict;p.verdictCooldown=9.f;}
-                else {p.whiteMove=WhiteMove::Blink;p.buffReady=1.5f;}
-            }else if(a.attack&&p.attackCooldown<=0){p.whiteMove=WhiteMove::Slash;p.attackCooldown=.46f/p.basicSpeed();}
+                p.flashTarget=farthestLightMark();
+                if(p.flashTarget==enemies.size())return false;
+                if(a.ultimate&&p.verdictCooldown<=0){p.flashMove=FlashMove::Verdict;p.verdictCooldown=9.f;}
+                else {p.flashMove=FlashMove::Blink;p.buffReady=1.5f;}
+            }else if(a.attack&&p.attackCooldown<=0){p.flashMove=FlashMove::Slash;p.attackCooldown=.46f/p.basicSpeed();}
             else return false;
-            p.whiteAge=0;p.whiteRushHits=0;p.vx=0;p.vy=0;
-            if(p.whiteMove==WhiteMove::Slash)p.whiteSlashSpeed=p.basicSpeed();
+            p.flashAge=0;p.flashRushHits=0;p.vx=0;p.vy=0;
+            if(p.flashMove==FlashMove::Slash)p.flashSlashSpeed=p.basicSpeed();
         }
-        const auto move=p.whiteMove;
-        const auto clip=whiteClips[static_cast<int>(move)];
-        const float speed=move==WhiteMove::Slash?p.whiteSlashSpeed:1.f;
-        const float old=p.whiteAge;
-        p.whiteAge=std::min(clip.duration,old+dt*speed);
-        if(old<clip.contact&&p.whiteAge>=clip.contact){
-            if(move==WhiteMove::Slash){
+        const auto move=p.flashMove;
+        const auto clip=flashClips[static_cast<int>(move)];
+        const float speed=move==FlashMove::Slash?p.flashSlashSpeed:1.f;
+        const float old=p.flashAge;
+        p.flashAge=std::min(clip.duration,old+dt*speed);
+        if(old<clip.contact&&p.flashAge>=clip.contact){
+            if(move==FlashMove::Slash){
                 // The authored slash clip drives the PNG sword arc in Presentation.
                 // Keep the hit on its original contact frame; do not create
                 // a second stationary world-space slash or rift on top of it.
                 melee(15+p.gear.attack(),0,105*p.gear.range());
-            }else if(move==WhiteMove::Command){
+            }else if(move==FlashMove::Command){
                 // The forward-pointing sword pose is the shared release frame for the entire volley.
-                releaseStoredLances();whiteEffect(LightFx::Command,p.x+p.facing*52.f,p.y-55.f);
-            }else if(move==WhiteMove::Blink&&!enemies[p.whiteTarget].dead()){
-                auto& e=enemies[p.whiteTarget];
-                whiteEffect(LightFx::Depart,p.x,p.y-48);
+                releaseStoredLances();flashEffect(LightFx::Command,p.x+p.facing*52.f,p.y-55.f);
+            }else if(move==FlashMove::Blink&&!enemies[p.flashTarget].dead()){
+                auto& e=enemies[p.flashTarget];
+                flashEffect(LightFx::Depart,p.x,p.y-48);
                 const float side=e.x>=p.x?1.f:-1.f;
                 p.x=std::clamp(e.x+side*58,25.f,castleArea?castleWorldWidth()-35.f:1550.f);p.y=castleArea?CastleTerrain::groundAt(castleArea,p.x):floorY;
                 p.facing=e.x>=p.x?1:-1;
-                whiteEffect(LightFx::Arrive,p.x,p.y-48);
-            }else if(move==WhiteMove::Verdict){
+                flashEffect(LightFx::Arrive,p.x,p.y-48);
+            }else if(move==FlashMove::Verdict){
                 // The off-hand signals the sky volley; target impact flashes
                 // occur only as individual lances actually land.
-                whiteEffect(LightFx::Arrive,p.x-p.facing*24.f,p.y-57.f);
+                flashEffect(LightFx::Arrive,p.x-p.facing*24.f,p.y-57.f);
                 launchVerdictLances();
             }
         }
-        if(move==WhiteMove::Rush){
-            const float travel=std::max(0.f,std::min(.36f,p.whiteAge)-std::max(clip.contact,old));
+        if(move==FlashMove::Rush){
+            const float travel=std::max(0.f,std::min(.36f,p.flashAge)-std::max(clip.contact,old));
             if(travel>0){
                 const float from=p.x;
                 p.x=std::clamp(from+p.facing*1080*travel,25.f,castleArea?castleWorldWidth()-35.f:1550.f);
-                if(static_cast<int>(old*60)%2==0)whiteEffect(LightFx::Rush,p.x,p.y-47);
+                if(static_cast<int>(old*60)%2==0)flashEffect(LightFx::Rush,p.x,p.y-47);
                 const BodyRect strike{std::min(from,p.x)-18,p.y-83,std::max(from,p.x)+18,p.y+2};
                 for(size_t i=0;i<enemies.size();++i){
                     auto& e=enemies[i];
-                    if(e.dead()||(p.whiteRushHits&(1u<<i))||!enemyOverlaps(e,strike))continue;
-                    p.whiteRushHits|=1u<<i;
+                    if(e.dead()||(p.flashRushHits&(1u<<i))||!enemyOverlaps(e,strike))continue;
+                    p.flashRushHits|=1u<<i;
                     hit(e,18+p.gear.attack(),false);
-                    whiteEffect(LightFx::Impact,e.x,e.y-38);
+                    flashEffect(LightFx::Impact,e.x,e.y-38);
                 }
             }
         }
-        if(p.whiteAge>=clip.duration)p.whiteMove=WhiteMove::None;
+        if(p.flashAge>=clip.duration)p.flashMove=FlashMove::None;
         return true;
     }
     void stepSpace(float dt,Actions& a){
         auto& p=player;
-        if(p.form!=1||p.whiteNight)return;
+        if(p.form!=1||p.flashExecutioner)return;
         constexpr float durations[]={0,.55f,.65f,.75f,.6f,2.f};
         constexpr float contacts[]={0,.18f,.22f,.24f,.15f,1.68f};
         if(p.spaceMove==0&&p.hurtTint<=0&&p.dashLeft<=0){
@@ -488,31 +488,31 @@ class Combat {
         p.buffReady=down(p.buffReady,dt);
         p.preparation=down(p.preparation,dt);p.swapCooldown=down(p.swapCooldown,dt);p.verdictCooldown=down(p.verdictCooldown,dt);p.invulnerable=down(p.invulnerable,dt);
         p.attackFlash=down(p.attackFlash,dt);p.comboWindow=down(p.comboWindow,dt);p.swapFlash=down(p.swapFlash,dt);
-        p.whiteBoost=down(p.whiteBoost,dt);
+        p.flashBoost=down(p.flashBoost,dt);
         if(p.hitStop>0){p.hitStop=down(p.hitStop,dt);return;}
         // Swap only toggles the two equipped jobs. Verdict is a separate action.
         if(a.swap&&p.swapCooldown<=0&&p.slamRecover<=0&&
-           (!p.whiteNight||p.whiteMove==WhiteMove::None)){
+           (!p.flashExecutioner||p.flashMove==FlashMove::None)){
             const bool mayEntryAttack=canAttack();
             cancelAirSlam();cancelMageCast();p.meleeLeft=0;
             p.activeJob=1-p.activeJob;
             const int next=p.equippedJobs[p.activeJob];
-            p.whiteNight=next==2;
+            p.flashExecutioner=next==2;
             p.form=next==1?1:0;
-            p.whiteMove=WhiteMove::None;p.whiteAge=0;p.spaceMove=0;p.spaceField=0;p.spaceFlightBase=p.y;
+            p.flashMove=FlashMove::None;p.flashAge=0;p.spaceMove=0;p.spaceField=0;p.spaceFlightBase=p.y;
             p.swapCooldown=1.f;p.attackFlash=.22f;p.combo=0;
             p.comboWindow=0;p.attackPose=0;p.swapFlash=.24f;
             if(mayEntryAttack){
                 ++p.attackSerial;
-                if(p.whiteNight)whiteEffect(LightFx::Arrive,p.x,p.y-48);
+                if(p.flashExecutioner)flashEffect(LightFx::Arrive,p.x,p.y-48);
                 else if(p.form==0)melee(13,false,112);
                 else {p.spaceMove=1;p.spaceAge=0;p.spaceReleased=false;}
             }
             return;
         }
         stepSpace(dt,a);
-        if(p.whiteNight&&stepWhiteMove(dt,a))return;
-        if(p.whiteNight){
+        if(p.flashExecutioner&&stepFlashMove(dt,a))return;
+        if(p.flashExecutioner){
             a.skill=a.skillSweep=a.skillBuff=a.ultimate=false;
             if(p.grounded)a.attack=false;
         }
@@ -526,7 +526,7 @@ class Combat {
         if(p.dashLeft>0){p.vx=780*p.facing*p.gear.speed();p.vy=0;}
         else {
             p.vx=axis*280*p.gear.speed()*p.movementMultiplier();
-            if(p.form==1&&!p.whiteNight){
+            if(p.form==1&&!p.flashExecutioner){
                 if(p.grounded)p.spaceFlightBase=p.y;
                 if(!a.jumpHeld&&p.grounded)p.spaceExhausted=false;
                 const bool flying=a.jumpHeld&&p.spaceFuel>0&&!p.spaceExhausted;
@@ -694,7 +694,7 @@ class Combat {
                 e.attackToX=e.x+e.facing*std::clamp(std::abs(dx),60.f,240.f);
             }
         }
-        if(player.form==1&&!player.whiteNight&&player.spaceField>0&&std::hypot(e.x-player.x,e.y-player.y)<150)vx*=.7f;
+        if(player.form==1&&!player.flashExecutioner&&player.spaceField>0&&std::hypot(e.x-player.x,e.y-player.y)<150)vx*=.7f;
         e.travelPhase=std::fmod(e.travelPhase+std::abs(vx)*dt/64.f,1.f);
         e.x+=(vx+e.knockback)*dt;
         if(castleArea>0){
@@ -729,8 +729,8 @@ class Combat {
                 if(distance<=movement+12.f){
                     damageEnemy(enemies[lance.target],(lance.verdict?8:10)+player.gear.attack(),DamageKind::Normal,false);
                     if(lance.markOnHit&&!enemies[lance.target].dead())enemies[lance.target].lightMark=5.f;
-                    if(lance.verdict)whiteEffect(LightFx::Verdict,tx,ty);
-                    whiteEffect(LightFx::Impact,tx,ty);
+                    if(lance.verdict)flashEffect(LightFx::Verdict,tx,ty);
+                    flashEffect(LightFx::Impact,tx,ty);
                     return true;
                 }
                 const float traveled=std::min(movement,distance);
@@ -788,7 +788,7 @@ public:
         for(int i=0;i<layout.platformCount;++i){const auto& item=layout.platforms[i];platforms.push_back({item.left,item.right,item.y});}
         auto& p=player;p.x=std::clamp(entryX,25.f,layout.width-35.f);const float floor=CastleTerrain::groundAt(castleArea,p.x);
         p.y=std::isfinite(floor)?floor:layout.spawnY;p.vx=p.vy=0.f;p.grounded=true;p.facing=entryX<layout.width*.5f?1:-1;
-        p.meleeLeft=0.f;p.mageCastLeft=0.f;p.whiteMove=WhiteMove::None;p.spaceMove=0;p.dashLeft=0.f;p.attackFlash=0.f;p.invulnerable=std::max(p.invulnerable,.65f);
+        p.meleeLeft=0.f;p.mageCastLeft=0.f;p.flashMove=FlashMove::None;p.spaceMove=0;p.dashLeft=0.f;p.attackFlash=0.f;p.invulnerable=std::max(p.invulnerable,.65f);
         populateCastleEnemies();
         projectiles.clear();lightLances.clear();lightBursts.clear();riftScars.clear();spaceEffects.clear();popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=enemyVisualClock=0;cameraCenter=viewWidth*.5f;
     }
@@ -818,7 +818,7 @@ public:
     bool ended=false,won=false,inventory=false;
     float clock=0,enemyVisualClock=0;
     Combat(){projectiles.reserve(16);popups.reserve(32);restart();}
-    void restart(){const auto jobs=player.equippedJobs;player={};if(castleArea){const auto& area=CastleTerrain::profile(castleArea);player.x=area.spawnX;player.y=area.spawnY;}player.equippedJobs=jobs;player.activeJob=0;player.form=jobs[0]==1?1:0;player.whiteNight=jobs[0]==2;populateCastleEnemies();
+    void restart(){const auto jobs=player.equippedJobs;player={};if(castleArea){const auto& area=CastleTerrain::profile(castleArea);player.x=area.spawnX;player.y=area.spawnY;}player.equippedJobs=jobs;player.activeJob=0;player.form=jobs[0]==1?1:0;player.flashExecutioner=jobs[0]==2;populateCastleEnemies();
         spaceEffects.clear();projectiles.clear();lightLances.clear();lightBursts.clear();riftScars.clear();cameraCenter=viewWidth*.5f;popups.clear();bleedSpreads.clear();ended=won=inventory=false;clock=enemyVisualClock=0;}
     int foes()const{int count=0;for(const auto& e:enemies)if(!e.dead())++count;return count;}
     void hit(Enemy& e,int amount,bool fire,int bleed=0,bool slam=false){
@@ -865,8 +865,8 @@ public:
         stepPlayer(dt,a);
         // A short cinematic time-stop freezes enemy motion and existing projectiles,
         // while the executioner's own animation continues to the release frame.
-        const bool verdictFreeze=player.whiteNight&&player.whiteMove==WhiteMove::Verdict&&
-            player.whiteAge>=.12f&&player.whiteAge<.66f;
+        const bool verdictFreeze=player.flashExecutioner&&player.flashMove==FlashMove::Verdict&&
+            player.flashAge>=.12f&&player.flashAge<.66f;
         if(!verdictFreeze){
             enemyVisualClock+=dt;
             for(auto& enemy:enemies){stepEnemy(enemy,dt);if(ended)break;}
@@ -905,14 +905,14 @@ struct Animation {
         // Freeze visual action during a gameplay hit-stop, except death/hurt feedback.
         float visualDt=p.hitStop>0&&p.health>0&&hurtTime<=0?0:dt;
         attackTime=std::max(0.f,attackTime-visualDt);hurtTime=std::max(0.f,hurtTime-dt);if(!landed)landTime=std::max(0.f,landTime-visualDt);
-        int next=p.health<=0?9:p.dashLeft>0?7:(p.airSlam||p.slamRecover>0)?12:attackTime>0?attackState:!p.grounded?(p.vy<0?2:3):landTime>0?10:std::abs(p.vx)>20?(!p.whiteNight&&std::abs(p.vx)<180?11:1):0;
+        int next=p.health<=0?9:p.dashLeft>0?7:(p.airSlam||p.slamRecover>0)?12:attackTime>0?attackState:!p.grounded?(p.vy<0?2:3):landTime>0?10:std::abs(p.vx)>20?(!p.flashExecutioner&&std::abs(p.vx)<180?11:1):0;
         if(next!=state||retrigger){state=next;time=0;}else time+=visualDt;
         const auto clip=motionClips[next];
         const bool loop=next==0||next==1||next==11;
         float phase=0;
         if(next==0)phase=std::fmod(time/clip.duration*clip.count,static_cast<float>(clip.count));
         else if(next==1||next==11){
-            const float stride=p.whiteNight?whiteNightRunStride:clip.stride;
+            const float stride=p.flashExecutioner?flashExecutionerRunStride:clip.stride;
             travelPhase=std::fmod(travelPhase+distance/stride,1.f);
             phase=travelPhase*clip.count;
         }

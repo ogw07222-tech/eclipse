@@ -25,7 +25,7 @@ Status: **architecture + asset recipes, NOT a verified game-art generator**. Upd
 
 1. **Locate and fingerprint** the exact canonical PNG and required runtime mappings. Get actual binary bytes (GitHub text API alone is insufficient), check SHA-256, atlas cell geometry and index semantics. Do not treat Library as automatically synced.
 2. **Create working revision** under `Art/<subject>/` with a `manifest.json`: source-ref/SHA, cell size, frame indices, pose provenance, pivot, timing and `status: draft`. Preserve original.
-3. **Character lane:** choose 6–8 coherent authored key poses and create/revise *distinct* in-between pixel poses. Use side-projected Motion Library joint coordinates to audit only; track left/right contacts and cycle seam. For knight run use 24 poses at ~0.7 seconds; White Night run use 32 distinct displayed poses with the **runtime distance-driven cycle**, not a fabricated fixed FPS.
+3. **Character lane:** choose 6–8 coherent authored key poses and create/revise *distinct* in-between pixel poses. Use side-projected Motion Library joint coordinates to audit only; track left/right contacts and cycle seam. The approved knight run uses 24 poses at ~0.7 seconds. The current Flash Executioner run uses 29 poses in a nominal 0.8-second distance-driven cycle.
 4. **Effects lane:** generate Pixelbolt/PixelFX drafts via their supported native input/tool IDs; optional follow-up Sprite Fusion adapter after licensing and CLI investigation. Review alpha-only effects separated from demo characters, intrinsic frame durations, origin/pivot, blend and alpha.
 5. **Revision lane:** apply *local frame-level, hand-reviewed pixel edits* in an image editor or explicitly authored pixel patches. Pillow may handle masks, exact palette replacement and lossless copy/packing, never pass limb-translation/warping off as new authored pose art.
 6. **Inspect read-only:** use `eclipse_sprite_tool.py` with explicit `--start` and `--end` (end **exclusive**), native cell dimensions, `--strict` and review output path. Inspect native size + nearest-neighbor contact sheet at intended playback speed; automatic bbox/pixel-diff metrics cannot decide motion quality.
@@ -40,12 +40,12 @@ bash tools/pixel-tools.sh versions
 bash tools/pixel-tools.sh bolt-inspect /absolute/path/to/native.pixel.json
 bash tools/pixel-tools.sh fx-check melee/sword-slash
 
-# read-only atlas review, example for WHITE NIGHT (88..119 inclusive):
+# read-only atlas review, current Flash Executioner run (29 poses):
 python3 native-engine/tools/eclipse_sprite_tool.py \
-  Assets/Resources/Eclipse/ui/white_night_motion.png \
-  --width 64 --height 96 --start 88 --end 120 \
-  --fps 24 --format report --strict \
-  --output Art/tool-previews/review-white-night
+  Assets/Resources/Eclipse/flash_executioner/actor_run.png \
+  --width 192 --height 192 --start 0 --end 29 \
+  --fps 36.25 --format report --strict \
+  --output Art/tool-previews/review-flash-executioner-run
 
 # Knight run indices 432..455 inclusive:
 python3 native-engine/tools/eclipse_sprite_tool.py \
@@ -55,7 +55,7 @@ python3 native-engine/tools/eclipse_sprite_tool.py \
   --output Art/tool-previews/review-knight
 ```
 
-Note: `--fps 24` for White Night is a **preview sampling value**, not validated in-game timing. Existing display rate is distance-driven. The tool writes reports and contact images; nothing is imported automatically.
+The `--fps 36.25` value matches 29 poses over 0.8 seconds; runtime advances the run cycle by distance traveled. The tool writes reports and contact images; nothing is imported automatically.
 
 ## CLI roadmap (not implemented)
 - `tools/art_pipeline.py inspect --recipe ...`: read immutable source and check metadata/source hashes.
