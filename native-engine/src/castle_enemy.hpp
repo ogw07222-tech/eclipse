@@ -32,6 +32,9 @@ inline constexpr EnemySpec castleEnemySpecs[]={
     {"허무의_잔영",760,34,68,1.25f,1.65f,1.55f,.58f,110,245,.88f,96,122,104,82,EnemyRanged}
 };
 inline constexpr int castleEnemyCount=static_cast<int>(sizeof(castleEnemySpecs)/sizeof(castleEnemySpecs[0]));
+// First attack-frame for each reviewed PixelFX overlay, in CastleEnemyKind order.
+// Values are copied from each enemy's 공격_vfx_sheet.json effectFrameStart.
+inline constexpr int castleEnemyEffectStartFrames[]={7,6,5,6,0,9,5,7};
 inline EnemySpec enemySpec(int kind){
     if(kind>=AshInfantry&&kind<=VoidShade)return castleEnemySpecs[kind-AshInfantry];
     const auto& s=slimeSpec(kind);

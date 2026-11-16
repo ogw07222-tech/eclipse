@@ -15,3 +15,9 @@ The current visual design uses one static side-view PNG per area (A1 through A5)
 The transparent 96x128 blue portal sprite appears only at the outgoing right edge of A1–A4. There are no visible or interactable portals at the entry side of A2–A5, and A5 has no outgoing portal. While grounded near an exit portal, the attack control shows `!`; attack or `E` advances one way: A1→A2→A3→A4→A5. A2's exit portal sits along the connected castle wall. Transitions place the player inside the next area and carry current equipment and health across.
 
 The updated collision floors and portal anchors are authored in `native-engine/src/castle_terrain.hpp` against the current art estimates. Review alignment and route behavior in the game before treating gameplay acceptance as complete; no build, test, or GitHub Actions run was performed for this update.
+
+## Enemy animation sheets
+
+The eight Castle enemy folders under `monsters/demon_castle/` match the source package in `Download/ECLIPSE/ENEMY/` byte-for-byte. The runtime draws each move and attack atlas and overlays its transparent `공격_vfx_layer.png` during the attack frames listed by that enemy's `공격_vfx_sheet.json`. The metadata's attack-effect start frame, 416×256 canvas and `[112, 32]` character offset are kept in sync with `native-engine/src/castle_enemy.hpp` and `presentation.hpp`.
+
+`죽음_sheet.png` remains packaged as reviewed source art, but the combat model currently removes dead enemies from rendering immediately, so the death clips are not played.

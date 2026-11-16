@@ -12,7 +12,7 @@ C++17 + SDL3 3.2.22 + SDL3_image 3.2.4. The native runtime now contains ECLIPSE'
 - Sword three-hit combo12/15/23, 0.8s combo window, third-hit bleed; sword skill; mage basic/empowered projectiles, burn, +22 reaction consuming bleed.
 - Both form-swap entry attacks, dash immunity/cooldowns, hit stop, recoil, floating damage and pixel status effects.
 - Nine original equipment stat sets across weapon/armor/charm; max-health adjustment; inventory, clear, defeat and retry.
-- Two selectable jobs only: Space Ruler and Flash Executioner, each with reviewed actor and effect sheets. Retired Knight and Mage art loaders are removed. Demon Castle enemy move and attack sheets are packaged and loaded by the combat renderer for the Castle roster.
+- Two selectable jobs only: Space Ruler and Flash Executioner, each with reviewed actor and effect sheets. Retired Knight and Mage art loaders are removed. Demon Castle move, attack and attack-effect layers are loaded by the combat renderer for the Castle roster.
 - Keyboard and independently owned touch pointers; upward joystick jump, simultaneous actions, fast press-edge buffering, focus release and restart cleanup.
 
 | Action | Keyboard | Touch |
@@ -46,11 +46,11 @@ ctest --test-dir native-engine/build --output-on-failure
 
 Core checks also run without SDL: `c++ -std=c++17 native-engine/tests/core_tests.cpp -o /tmp/eclipse-tests && /tmp/eclipse-tests`.
 
-Desktop CMake packages only PNGs present in the canonical resource tree, plus the reviewed Space Ruler and Flash Executioner sheets. Retired Knight, Mage atlas, and custom legacy FX paths are not build inputs. UI sheets are reduced once at startup to 128px per state for compact GPU textures. SDL shared libraries must remain available for a standalone desktop distribution.
+Desktop CMake packages only PNGs present in the canonical resource tree, including the reviewed Space Ruler, Flash Executioner, and Demon Castle enemy sheets. Retired Knight, Mage atlas, and custom legacy FX paths are not build inputs. UI sheets are reduced once at startup to 128px per state for compact GPU textures. SDL shared libraries must remain available for a standalone desktop distribution.
 
 ## Resource and validation boundary
 
-PNG decoding only, no image encoders; fixed-size touch storage; fixed60Hz simulation, approximately60fps presentation cap; suspend in background. During active combat the procedural forest, enemies, projectiles and UI require redraws. This extends the earlier foundation's static-scene redraw rule deliberately.
+PNG decoding only, no image encoders; fixed-size touch storage; fixed60Hz simulation, approximately60fps presentation cap; suspend in background. During active combat the forest, remaining procedural fallback enemies, projectiles and UI require redraws. Demon Castle enemies use sprite atlases with attack VFX overlays.
 
 [Combat port validation](COMBAT_PORT.md) documents model and render checks, APK/Android results and remaining real-device QA. [SCOPE.md](SCOPE.md) keeps engine responsibilities limited to actual game requirements. The prior foundation size snapshot in VALIDATION.md is historical and must not be used as the new APK size.
 

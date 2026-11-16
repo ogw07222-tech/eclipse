@@ -22,12 +22,13 @@ class Presentation {
     std::array<SDL_Texture*,static_cast<int>(FlashFx::Count)> flashFxTextures_{};
     std::array<SDL_Texture*,castleEnemyCount> castleEnemyMoveTextures_{};
     std::array<SDL_Texture*,castleEnemyCount> castleEnemyAttackTextures_{};
+    std::array<SDL_Texture*,castleEnemyCount> castleEnemyAttackVfxTextures_{};
     struct ReviewedFlashEvent {FlashFx role;float x,y,born;int facing;bool follow;float playbackDuration=0;};
     std::vector<ReviewedFlashEvent> reviewedFlashEvents_;
     float reviewedFlashClock_=-1,reviewedFlashMoveAge_=0;
     FlashMove reviewedFlashMove_=FlashMove::None;
     unsigned long long reviewedFlashBurstSerial_=0;
-    bool reviewedFlashDash_=false,reviewedFlashSwap_=false;
+    bool reviewedFlashDash_=false,reviewedFlashSwap_=false,reviewedFlashGrounded_=true;
     SDL_Texture* goldLance_=nullptr;
     SDL_Texture* goldTrail_=nullptr;
     SDL_Texture* goldOrb_=nullptr;
@@ -350,6 +351,14 @@ class Presentation {
             SDL_RenderTextureRotated(renderer,texture,&source,&target,0,nullptr,
                 e.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
             SDL_SetTextureColorMod(texture,255,255,255);
+            if(attacking&&frame>=castleEnemyEffectStartFrames[index]){
+                SDL_Texture* vfx=castleEnemyAttackVfxTextures_[index];
+                const SDL_FRect vfxSource{float(frame*416),0.f,416.f,256.f};
+                const SDL_FRect vfxTarget{std::round(target.x-112.f*scale),
+                    std::round(target.y-32.f*scale),416.f*scale,256.f*scale};
+                SDL_RenderTextureRotated(renderer,vfx,&vfxSource,&vfxTarget,0,nullptr,
+                    e.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
+            }
         }else{
             const int frame=enemyFrame(e);
             SDL_FRect source{float(frame%4*slimeCell),float(frame/4*slimeCell),slimeCell,slimeCell};
@@ -807,7 +816,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){for(auto* image:spaceActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:spaceFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:castleEnemyMoveTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:castleEnemyAttackTextures_)if(image)SDL_DestroyTexture(image);for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_,riftSlash_,riftTrace_})if(fx)SDL_DestroyTexture(fx);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){for(auto* image:spaceActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:spaceFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:castleEnemyMoveTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:castleEnemyAttackTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:castleEnemyAttackVfxTextures_)if(image)SDL_DestroyTexture(image);for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_,riftSlash_,riftTrace_})if(fx)SDL_DestroyTexture(fx);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestV3Textures_)if(texture)SDL_DestroyTexture(texture);}
@@ -881,6 +890,18 @@ public:
                 SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST);
                 SDL_SetTextureBlendMode(texture,SDL_BLENDMODE_BLEND);
             }
+            const std::string vfxFile=asset((base+"공격_vfx_layer.png").c_str());
+            auto*& vfx=castleEnemyAttackVfxTextures_[i];
+            vfx=IMG_LoadTexture(renderer,vfxFile.c_str());
+            if(!vfx){SDL_SetError("ECLIPSE ENEMY ASSET ERROR: %s: %s",vfxFile.c_str(),SDL_GetError());return false;}
+            float vfxW=0,vfxH=0;
+            if(!SDL_GetTextureSize(vfx,&vfxW,&vfxH)||vfxW!=castleEnemyAttackFrames*416||vfxH!=256){
+                SDL_SetError("ECLIPSE ENEMY ASSET ERROR: %s expected %dx256, got %.0fx%.0f",
+                    vfxFile.c_str(),castleEnemyAttackFrames*416,vfxW,vfxH);
+                SDL_DestroyTexture(vfx);vfx=nullptr;return false;
+            }
+            SDL_SetTextureScaleMode(vfx,SDL_SCALEMODE_NEAREST);
+            SDL_SetTextureBlendMode(vfx,SDL_BLENDMODE_BLEND);
         }
         return true;
     }
@@ -966,6 +987,7 @@ public:
             reviewedFlashEvents_.clear();reviewedFlashBurstSerial_=0;
             reviewedFlashMove_=FlashMove::None;reviewedFlashMoveAge_=0;
             reviewedFlashDash_=reviewedFlashSwap_=false;
+            reviewedFlashGrounded_=p.grounded;
         }
         reviewedFlashClock_=g.clock;
         reviewedFlashEvents_.erase(std::remove_if(reviewedFlashEvents_.begin(),reviewedFlashEvents_.end(),
@@ -1038,7 +1060,12 @@ public:
         const bool swap=p.flashExecutioner&&p.swapFlash>0;
         if(dash&&!reviewedFlashDash_)spawn(FlashFx::Dash,p.x,p.y,p.facing,true,.15f-p.dashLeft);
         if(swap&&!reviewedFlashSwap_)spawn(FlashFx::Swap,p.x,p.y,p.facing,true,.24f-p.swapFlash);
+        const bool jumpStart=reviewedFlashGrounded_&&!p.grounded;
+        const bool landed=!reviewedFlashGrounded_&&p.grounded;
+        if(p.flashExecutioner&&jumpStart)spawn(FlashFx::Jump,p.x,p.y,p.facing,false);
+        if(p.flashExecutioner&&landed)spawn(FlashFx::Land,p.x,p.y,p.facing,false);
         reviewedFlashDash_=dash;reviewedFlashSwap_=swap;
+        reviewedFlashGrounded_=p.grounded;
         reviewedFlashMove_=p.flashMove;reviewedFlashMoveAge_=p.flashAge;
     }
     void drawReviewedFlashEffects(const Combat& g,const Animation&,bool front){

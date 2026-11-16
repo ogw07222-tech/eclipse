@@ -12,4 +12,5 @@ ok    status/haste
 ok    impacts/heavy-landing
 ok    arcane/mana-burst
 
-13 effects: 13 pass, 0 fail, 0 with warnings
+13 upstream source recipes checked: 13 pass, 0 fail, 0 with warnings.
+The active runtime has 15 effect roles; Jump and Land are separate timing/canvas variants of the checked `impacts/heavy-landing` source.
