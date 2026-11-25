@@ -39,7 +39,7 @@ inline constexpr std::array<FlashSheet,static_cast<int>(FlashFx::Count)> flashEf
     {"flash_executioner/effect_blinkout.png", 288, 224, 4, 5, 20, 144.0f, 174.0f, 1.4f, 0.32f, -1, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, 0.033333333333333326f}, // BlinkOut
     {"flash_executioner/effect_blinkin.png", 288, 224, 5, 5, 23, 144.0f, 174.0f, 1.4f, 0.36f, -1, false, true, -1, -1, 0.0f, 0.13333333333333333f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // BlinkIn
     {"flash_executioner/effect_verdict.png", 256, 280, 8, 6, 45, 128.0f, 230.0f, 1.7f, 0.728f, -1, false, false, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Verdict
-    {"flash_executioner/effect_impact.png", 320, 224, 5, 7, 31, 130.0f, 112.0f, 1.7f, 0.5f, -1, false, true, -1, -1, 0.0f, 0.016666666666666666f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Impact
+    {"flash_executioner/effect_impact.png", 208, 160, 6, 6, 35, 72.0f, 128.0f, 1.5f, 1.134f, -1, false, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 20.0f, 11.0f, 0, 30.0f, 0.0f}, // Impact
     {"flash_executioner/effect_orb.png", 136, 112, 11, 14, 144, 68.0f, 104.0f, 0.3f, 2.4f, -1, true, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 15.6f, 0, 60.0f, -1.0f}, // Orb
     {"flash_executioner/effect_lance.png", 208, 96, 5, 10, 48, 170.0f, 48.0f, 1.3f, 0.8f, -1, true, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // Lance
     {"flash_executioner/effect_skylance.png", 208, 96, 5, 10, 48, 170.0f, 48.0f, 1.8f, 0.8f, -1, true, true, -1, -1, 0.0f, 0.0f, 0.0f, 60.0f, 0.0f, 0.0f, 0, 60.0f, -1.0f}, // SkyLance

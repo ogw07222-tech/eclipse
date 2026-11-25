@@ -1485,78 +1485,40 @@
     },
     {
       "role": "Impact",
-      "file": "Art/flash-executioner/reviewed/effect_impact.png",
+      "approved": true,
+      "custom": true,
+      "file": "Art/flash-executioner/candidates/basic-v3/effect_flash_hit.png",
+      "sha256": "00c8d2c6ebe170a644cefceedd132845aaa7b72ab4a2598fac5b1a31d279a111",
       "cell": [
-        320,
-        224
+        208,
+        160
       ],
+      "columns": 6,
+      "rows": 6,
+      "count": 35,
       "pivot": [
-        130,
-        112
+        72,
+        128
       ],
-      "scale": 1.7,
-      "count": 31,
-      "columns": 5,
-      "rows": 7,
-      "duration": 0.5,
-      "fps": 60,
+      "scale": 1.5,
+      "duration": 1.134,
+      "fps": 30,
       "loop": false,
       "layer": "front",
       "nativeDirectionDegrees": 0,
-      "sourceFocalOffset": [
-        0,
-        0
-      ],
-      "effectfocalOffset": [
-        0,
-        0
-      ],
-      "alignmentMode": "impact-center",
-      "anchorMode": "impact-center",
       "offset": [
-        0,
-        0
+        20,
+        11
       ],
-      "visualPeakSeconds": 0.016666666666666666,
+      "anchorMode": "actor-feet",
+      "alignmentMode": "actor-feet",
       "triggerLeadSeconds": 0,
-      "spawnAgeSeconds": 0.016666666666666666,
-      "sourceId": "impacts/crit-hit",
-      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
-      "sourceSha256": "c6af9303f0e463051696796a5886236d91182594e1d4fadee2067b9cf82ba857",
-      "sourceTimeWindow": [
-        0,
-        0.9
-      ],
-      "optionsDiff": {
-        "palette": [
-          "#2b1b38",
-          "#594047",
-          "#95652e",
-          "#d49d38",
-          "#f4c75e",
-          "#ffe8ab",
-          "#fff6d9",
-          "#ffffff"
-        ],
-        "height": 0,
-        "light": 0.85
-      },
-      "postprocess": {
-        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
-      },
-      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Impact/frame-map.json",
-      "sha256": "838c12558b20ea4be34b01fd395758ac38f83c0c2d4817f8cc4dd8c8c5f2c309",
-      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Impact/original-60fps.png",
-      "baselineFps": 60,
-      "status": "main-approved original-resource derivative v2",
-      "firstAlphaEmpty": false,
-      "lastAlphaEmpty": true,
-      "uniquePixelFrames": 27,
-      "edgePixels": 0,
-      "peakCoverageFrame": 4,
-      "approved": true,
-      "front": true,
-      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run."
+      "spawnAgeSeconds": 0,
+      "triggerStartAgeSeconds": 0,
+      "sourceId": "custom:melee/flash-hit",
+      "recipe": "Art/flash-executioner/candidates/basic-v3/recipe_flash_hit.js",
+      "recipeSha256": "b0e7babc5181f9ce6267eae1a61f8796657126c0203fec37c58ac8c32bb45393",
+      "note": "owner-approved custom PixelFX burst (hit flash) cut from the sweep recipe; sparks and glow only"
     },
     {
       "role": "Orb",
