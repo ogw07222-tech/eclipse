@@ -10,7 +10,7 @@
     70,
     133
   ],
-  "contact_frame": 14,
+  "contact_frame": 13,
   "frames": [
     {
       "index": 0,
@@ -94,7 +94,7 @@
     },
     {
       "index": 8,
-      "source": "fix8/frame8_candidate.png",
+      "source": "full/b09.png",
       "frame": {
         "x": 0,
         "y": 192,
@@ -134,7 +134,7 @@
     },
     {
       "index": 12,
-      "source": "full/b09.png",
+      "source": "full/b10.png",
       "frame": {
         "x": 768,
         "y": 192,
@@ -144,7 +144,7 @@
     },
     {
       "index": 13,
-      "source": "full/b10.png",
+      "source": "full/b13.png",
       "frame": {
         "x": 960,
         "y": 192,
@@ -154,7 +154,7 @@
     },
     {
       "index": 14,
-      "source": "full/b13.png",
+      "source": "pullback3/r0.png",
       "frame": {
         "x": 1152,
         "y": 192,
@@ -184,7 +184,7 @@
     },
     {
       "index": 17,
-      "source": "pullback3/r0.png",
+      "source": "full/b30.png",
       "frame": {
         "x": 192,
         "y": 384,
@@ -194,7 +194,7 @@
     },
     {
       "index": 18,
-      "source": "full/b30.png",
+      "source": "full/b31.png",
       "frame": {
         "x": 384,
         "y": 384,
@@ -204,24 +204,14 @@
     },
     {
       "index": 19,
-      "source": "full/b31.png",
+      "source": "full/b32.png",
       "frame": {
         "x": 576,
         "y": 384,
         "w": 192,
         "h": 192
       }
-    },
-    {
-      "index": 20,
-      "source": "full/b32.png",
-      "frame": {
-        "x": 768,
-        "y": 384,
-        "w": 192,
-        "h": 192
-      }
     }
   ],
-  "notes": "motion only, no effect; frame 8 is an unapproved candidate; 1-based drops from the 22-frame motion: 12,13,21,22; cut frame 1 x3; 10th frame x4"
+  "notes": "motion only, no effect; original approved frames plus cut frames; no AI candidate frame included"
 }
