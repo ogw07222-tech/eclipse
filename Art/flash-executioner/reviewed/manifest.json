@@ -9,9 +9,9 @@
         192,
         192
       ],
-      "columns": 4,
-      "rows": 4,
-      "count": 13,
+      "columns": 3,
+      "rows": 3,
+      "count": 9,
       "pivot": [
         70,
         133
@@ -22,37 +22,13 @@
       "loop": false,
       "sourceFile": "dash_raw.png",
       "rawColumns": 3,
-      "uniquePixelFrames": 13,
+      "uniquePixelFrames": 9,
       "emptyFrames": [],
       "bounds": [
         [
           26,
           59,
           109,
-          133
-        ],
-        [
-          30,
-          62,
-          121,
-          133
-        ],
-        [
-          34,
-          63,
-          136,
-          133
-        ],
-        [
-          40,
-          65,
-          150,
-          133
-        ],
-        [
-          46,
-          68,
-          164,
           133
         ],
         [
@@ -104,17 +80,13 @@
           133
         ]
       ],
-      "sha256": "19cd10969ef234a96308da284e52c73449341f25d171b79571f356af4feb4f68",
+      "sha256": "fb2f6c21ceb24655355163bc1233f97e343800c2dd4b73d0c858aece073b870c",
       "status": "reviewed; runtime binding prepared; owner device verification pending",
       "model": "PixMiniMax H3",
       "timing": "fixed duration",
       "approved": true,
       "sourceFrameMap": [
         0,
-        "ai-mid:D:1",
-        "ai-mid:D:2",
-        "ai-mid:D:3",
-        "ai-mid:D:4",
         1,
         2,
         3,
@@ -124,21 +96,7 @@
         7,
         8
       ],
-      "review": "Main agent inspected every numbered pose: coherent physical body/sword, no baked light effects, stable grounded baseline, count=round(duration*60). Static visual approval; device playback remains owner validation. | 2026-11-22: owner approved 4 AI mid frames between F1 and F2 and in-game use; no baked effects; not device tested.",
-      "midFrames": {
-        "inserted": "0-based frames 1-4, between original F1 and F2",
-        "method": "PixelLab animate_image, F1/F2 pinned, 4 frames, seed 7, 3 generations",
-        "hand_authored": false,
-        "bakedEffects": false,
-        "timing": "duration 0.15s unchanged; contactFrame -1 -> -1"
-      },
-      "superseded_v2": {
-        "columns": 3,
-        "rows": 3,
-        "count": 9,
-        "contactFrame": -1,
-        "sha256": "fb2f6c21ceb24655355163bc1233f97e343800c2dd4b73d0c858aece073b870c"
-      },
+      "review": "Main agent inspected every numbered pose: coherent physical body/sword, no baked light effects, stable grounded baseline, count=round(duration*60). Static visual approval; device playback remains owner validation.",
       "source_path": "Art/flash-executioner/reviewed/actor_dash.png",
       "runtime_path": "Assets/Resources/Eclipse/flash_executioner/actor_dash.png",
       "library_status": "not synced: no ChatGPT Library file capability available",
@@ -555,14 +513,16 @@
     },
     {
       "role": "Basic",
+      "approved": true,
       "file": "flash_executioner/actor_basic.png",
+      "sha256": "5e58d7aa50e75d70cad846e1025d2de7bebe591f2abe709002a0639403d14fa0",
       "cell": [
         192,
         192
       ],
-      "columns": 6,
-      "rows": 6,
-      "count": 35,
+      "columns": 8,
+      "rows": 3,
+      "count": 20,
       "pivot": [
         70,
         133
@@ -571,282 +531,17 @@
       "duration": 0.46,
       "contactFrame": 13,
       "loop": false,
-      "sourceFile": "basic_raw.png",
-      "rawColumns": 6,
-      "uniquePixelFrames": 35,
-      "emptyFrames": [],
-      "bounds": [
-        [
-          26,
-          59,
-          109,
-          133
-        ],
-        [
-          28,
-          61,
-          119,
-          133
-        ],
-        [
-          31,
-          54,
-          104,
-          133
-        ],
-        [
-          33,
-          56,
-          105,
-          133
-        ],
-        [
-          34,
-          56,
-          106,
-          133
-        ],
-        [
-          36,
-          56,
-          106,
-          133
-        ],
-        [
-          32,
-          56,
-          106,
-          133
-        ],
-        [
-          31,
-          58,
-          112,
-          133
-        ],
-        [
-          28,
-          64,
-          129,
-          133
-        ],
-        [
-          32,
-          65,
-          156,
-          134
-        ],
-        [
-          33,
-          64,
-          159,
-          133
-        ],
-        [
-          36,
-          64,
-          159,
-          134
-        ],
-        [
-          30,
-          66,
-          158,
-          133
-        ],
-        [
-          33,
-          65,
-          158,
-          134
-        ],
-        [
-          32,
-          64,
-          154,
-          134
-        ],
-        [
-          34,
-          64,
-          154,
-          134
-        ],
-        [
-          37,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          36,
-          64,
-          154,
-          134
-        ],
-        [
-          36,
-          64,
-          154,
-          134
-        ],
-        [
-          36,
-          64,
-          154,
-          134
-        ],
-        [
-          39,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          37,
-          64,
-          154,
-          134
-        ],
-        [
-          33,
-          62,
-          146,
-          134
-        ],
-        [
-          30,
-          60,
-          129,
-          133
-        ],
-        [
-          29,
-          59,
-          116,
-          133
-        ],
-        [
-          26,
-          59,
-          110,
-          133
-        ],
-        [
-          26,
-          59,
-          110,
-          133
-        ],
-        [
-          26,
-          59,
-          110,
-          133
-        ],
-        [
-          26,
-          59,
-          110,
-          133
-        ]
-      ],
-      "sha256": "e5edaf1f269f209d928962284491a5c605bcc203f079f02d1da0e1dbdaa9f771",
-      "status": "reviewed; runtime binding prepared; owner device verification pending",
-      "model": "PixMiniMax H3",
-      "timing": "fixed duration",
-      "approved": true,
-      "sourceFrameMap": [
+      "layer": "front",
+      "offset": [
         0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        "ai-mid:A1",
-        "ai-mid:A2",
-        "ai-mid:A3",
-        "ai-mid:A4",
-        "ai-mid:A5",
-        "ai-mid:A6",
-        "ai-mid:A7",
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18,
-        19,
-        20,
-        21,
-        22,
-        23,
-        24,
-        25,
-        26,
-        27,
-        28
+        0
       ],
-      "review": "All sequential numbered poses inspected. Attached physical sword, consistent armor and grounded recovery; contactFrame6 must map to unchanged gameplay contact. Basic excludes source6 baked FX; Skill1 includes a newly AI-generated bridge pose, never a duplicate. Static art approval; device verification pending. | 2026-11-22: owner approved the 7 inserted AI mid frames and in-game use; the sheet has no baked effects; not device tested.",
-      "midFrames": {
-        "inserted": "0-based frames 6-12, between original F6 and F7",
-        "method": "PixelLab animate_image, F6/F7 pinned, 8 frames, seed 31, 5 generations; A3 blade redrawn in the PixelLab pixel workbench",
-        "hand_authored": false,
-        "bakedEffects": false,
-        "timing": "duration 0.46s and contact 0.184s unchanged; contactFrame 6 -> 13 so the inserted frames play inside the same wind-up time"
-      },
-      "superseded_v2": {
-        "count": 28,
-        "rows": 5,
-        "contactFrame": 6,
-        "sha256": "19022ccec1ab305c8789791d9f2377124a3146c38bd05c5a8ef62b01de8745e7"
-      },
+      "anchorMode": "actor-feet",
+      "note": "v3 motion candidate: approved frames only, no AI candidate frame; 12/13/21/22 (1-based) of the 22-frame motion removed; cut frame 1 x3; frame 10 x4",
       "source_path": "Art/flash-executioner/reviewed/actor_basic.png",
       "runtime_path": "Assets/Resources/Eclipse/flash_executioner/actor_basic.png",
-      "library_status": "not synced: no ChatGPT Library file capability available",
-      "source_path_raw": "Art/flash-executioner/pixellab/basic_raw.png"
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "library_status": "not synced: no ChatGPT Library file capability available"
     },
     {
       "role": "Skill1",
@@ -856,272 +551,174 @@
         192
       ],
       "columns": 6,
-      "rows": 6,
-      "count": 33,
+      "rows": 5,
+      "count": 30,
       "pivot": [
         70,
         133
       ],
       "scale": 1.4,
       "duration": 0.5,
-      "contactFrame": 9,
+      "contactFrame": 6,
       "loop": false,
       "sourceFrameMap": [
-        0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        "ai-mid:S1:1",
-        "ai-mid:S1:2",
-        "ai-mid:S1:3",
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18,
-        19,
-        20,
-        21,
-        22,
-        23,
-        24,
-        25,
-        26,
-        27,
-        28,
-        29
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 0,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 1,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 2,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 3,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 4,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 5,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 6,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 7,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 8,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_bridge_raw.png",
+          "index": 1,
+          "columns": 3
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 9,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 10,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 11,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 12,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 13,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 14,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 15,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 16,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 17,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 18,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 19,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 20,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 21,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 22,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 23,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 24,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 25,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 26,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 27,
+          "columns": 6
+        },
+        {
+          "file": "Art/flash-executioner/pixellab/skill1_original_29.png",
+          "index": 28,
+          "columns": 6
+        }
       ],
-      "uniquePixelFrames": 33,
-      "sha256": "1923a5a6da2bea56e01fb211377b51bccb7a8600322372c1e11bbbc69cfa09cb",
+      "uniquePixelFrames": 30,
+      "sha256": "be42b691a3258aea3c426d83beca7085856cdd1a036275c76ff100653cf4825b",
       "status": "reviewed; runtime binding prepared; owner device verification pending",
       "notes": "One newly AI-generated intermediate pose inserted after original8. No duplicated/warped poses. Contact6 must map to original gameplay .125s via piecewise phase.",
       "approved": true,
-      "review": "All sequential numbered poses inspected. Attached physical sword, consistent armor and grounded recovery; contactFrame6 must map to unchanged gameplay contact. Basic excludes source6 baked FX; Skill1 includes a newly AI-generated bridge pose, never a duplicate. Static art approval; device verification pending. | 2026-11-22: owner approved 3 AI mid frames between F6 and F7 and in-game use; no baked effects; not device tested.",
-      "bounds": [
-        [
-          26,
-          59,
-          109,
-          133
-        ],
-        [
-          25,
-          60,
-          119,
-          133
-        ],
-        [
-          25,
-          65,
-          115,
-          133
-        ],
-        [
-          29,
-          58,
-          104,
-          133
-        ],
-        [
-          32,
-          58,
-          104,
-          133
-        ],
-        [
-          28,
-          57,
-          107,
-          133
-        ],
-        [
-          15,
-          69,
-          111,
-          133
-        ],
-        [
-          34,
-          66,
-          139,
-          133
-        ],
-        [
-          36,
-          70,
-          153,
-          133
-        ],
-        [
-          34,
-          74,
-          168,
-          133
-        ],
-        [
-          33,
-          73,
-          167,
-          133
-        ],
-        [
-          35,
-          74,
-          166,
-          133
-        ],
-        [
-          36,
-          71,
-          166,
-          133
-        ],
-        [
-          35,
-          73,
-          166,
-          133
-        ],
-        [
-          35,
-          74,
-          166,
-          133
-        ],
-        [
-          31,
-          73,
-          166,
-          133
-        ],
-        [
-          33,
-          73,
-          166,
-          133
-        ],
-        [
-          34,
-          73,
-          166,
-          133
-        ],
-        [
-          35,
-          73,
-          166,
-          133
-        ],
-        [
-          35,
-          74,
-          166,
-          133
-        ],
-        [
-          31,
-          74,
-          166,
-          133
-        ],
-        [
-          33,
-          74,
-          166,
-          133
-        ],
-        [
-          33,
-          74,
-          166,
-          133
-        ],
-        [
-          34,
-          74,
-          166,
-          133
-        ],
-        [
-          34,
-          74,
-          166,
-          133
-        ],
-        [
-          35,
-          73,
-          166,
-          133
-        ],
-        [
-          32,
-          72,
-          152,
-          133
-        ],
-        [
-          26,
-          65,
-          128,
-          133
-        ],
-        [
-          28,
-          60,
-          110,
-          133
-        ],
-        [
-          27,
-          59,
-          109,
-          133
-        ],
-        [
-          26,
-          59,
-          109,
-          133
-        ],
-        [
-          26,
-          59,
-          109,
-          133
-        ],
-        [
-          25,
-          59,
-          109,
-          133
-        ]
-      ],
-      "emptyFrames": [],
-      "midFrames": {
-        "inserted": "0-based frames 6-8, between original F6 and F7",
-        "method": "PixelLab animate_image, F6/F7 pinned, 4 frames (4th dropped as a near copy of F7), seed 41, 3 generations. The generated burst/arrowhead shapes on mid frames 2 and 3 were removed and replaced with partial original F7 blade pixels, and floating tick fragments were deleted, so no effect is baked into the sheet",
-        "hand_authored": false,
-        "bakedEffects": false,
-        "timing": "duration 0.5s unchanged; contactFrame 6 -> 9"
-      },
-      "superseded_v2": {
-        "columns": 6,
-        "rows": 5,
-        "count": 30,
-        "contactFrame": 6,
-        "sha256": "be42b691a3258aea3c426d83beca7085856cdd1a036275c76ff100653cf4825b"
-      },
+      "review": "All sequential numbered poses inspected. Attached physical sword, consistent armor and grounded recovery; contactFrame6 must map to unchanged gameplay contact. Basic excludes source6 baked FX; Skill1 includes a newly AI-generated bridge pose, never a duplicate. Static art approval; device verification pending.",
       "source_path": "Art/flash-executioner/reviewed/actor_skill1.png",
       "runtime_path": "Assets/Resources/Eclipse/flash_executioner/actor_skill1.png",
       "library_status": "not synced: no ChatGPT Library file capability available"
@@ -1516,88 +1113,43 @@
     },
     {
       "role": "Slash",
+      "approved": true,
       "file": "flash_executioner/effect_slash.png",
+      "sha256": "8855ade4ae1a5d8e8f971cc71947e783b5a9be0fa23f29a54063bef840227a03",
       "cell": [
-        320,
-        240
+        208,
+        160
       ],
+      "columns": 6,
+      "rows": 6,
+      "count": 35,
       "pivot": [
-        120,
-        140
+        72,
+        128
       ],
-      "scale": 1.4,
-      "count": 33,
-      "columns": 5,
-      "rows": 7,
-      "duration": 1.1,
+      "scale": 1.5,
+      "duration": 1.134,
       "fps": 30,
       "loop": false,
       "layer": "front",
       "nativeDirectionDegrees": 0,
-      "sourceFocalOffset": [
-        0,
-        0
-      ],
-      "effectfocalOffset": [
-        6,
-        -13
-      ],
-      "alignmentMode": "actor-feet",
-      "anchorMode": "actor-feet",
       "offset": [
-        6,
-        -13
+        20,
+        11
       ],
-      "visualPeakSeconds": 0.28,
-      "triggerLeadSeconds": 0.159,
+      "anchorMode": "actor-feet",
+      "alignmentMode": "actor-feet",
+      "triggerLeadSeconds": 0.18,
       "spawnAgeSeconds": 0,
-      "sourceId": "melee/blade-light-crescent (ECLIPSE custom; derived from melee/sword-slash)",
-      "sourceCommit": "pixelfx plugin 0.3.1 local copy + custom effect file (not an upstream commit)",
-      "sourceSha256": "1e194b8a1aec4693d07c5510d448695ba345a8da7bb940f378be1965647c908b",
-      "sourceTimeWindow": [
-        0,
-        0.75
-      ],
-      "optionsDiff": {
-        "radius": 78,
-        "seed": 17,
-        "palette": [
-          "#5a3a14",
-          "#9a6a1c",
-          "#d9a030",
-          "#f6cf62",
-          "#ffe9a0",
-          "#fff7d8",
-          "#ffffff"
-        ]
-      },
-      "postprocess": {
-        "operation": "pixelfx tools/render.mjs --sheet straight RGBA export; no painted pixels, no baked actor"
-      },
-      "frameMap": "Art/flash-executioner/pixelfx/blade-light-crescent-sheet.json",
-      "sha256": "eb95ddab8d3639f735dfb6635c043e2cb9895d0a20335b48bcaa82ba828219e4",
-      "baselinePng": "Art/flash-executioner/reviewed/effect_slash.png",
-      "baselineFps": 30,
-      "status": "reviewed; runtime binding prepared; owner device verification pending",
-      "firstAlphaEmpty": false,
-      "lastAlphaEmpty": true,
-      "uniquePixelFrames": 30,
-      "edgePixels": 0,
-      "peakCoverageFrame": 9,
-      "approved": true,
-      "front": true,
-      "review": "2026-11-22: owner chose this larger light-crescent effect (recipe remixed from melee/sword-slash, scythe-reap, divine-shield) over the unmodified resource; this deviates from the earlier 'unmodified PixelFX resource only' rule by the owner's explicit decision. Not device tested. | previous: Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run.",
-      "superseded_v2": {
-        "cell": [
-          256,
-          216
-        ],
-        "count": 25,
-        "sha256": "7bf115c7862f15749bd0513320260cb0a286bd252a044c3dc85c9f321dd420a3",
-        "sourceId": "melee/sword-slash"
-      },
+      "triggerStartAgeSeconds": 0.064,
+      "sourceId": "custom:melee/flash-sweep",
+      "recipe": "Art/flash-executioner/candidates/basic-v3/recipe_flash_sweep.js",
+      "recipeSha256": "dd0e3023f7b5d5a70c9f74326b23cf020cc7543c77b6adc558e135999a95d2dc",
+      "note": "owner-approved custom PixelFX remix (recipe in candidates folder); burst at original size; drag removed; down 11 px; thick 48",
+      "custom": true,
       "source_path": "Art/flash-executioner/reviewed/effect_slash.png",
       "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_slash.png",
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
       "library_status": "not synced: no ChatGPT Library file capability available"
     },
     {
@@ -2004,19 +1556,19 @@
       "role": "Impact",
       "file": "flash_executioner/effect_impact.png",
       "cell": [
-        240,
-        240
+        320,
+        224
       ],
       "pivot": [
-        120,
-        120
+        130,
+        112
       ],
-      "scale": 0.7,
-      "count": 16,
+      "scale": 1.7,
+      "count": 31,
       "columns": 5,
-      "rows": 4,
-      "duration": 0.5333333333333333,
-      "fps": 30,
+      "rows": 7,
+      "duration": 0.5,
+      "fps": 60,
       "loop": false,
       "layer": "front",
       "nativeDirectionDegrees": 0,
@@ -2034,51 +1586,46 @@
         0,
         0
       ],
-      "visualPeakSeconds": 0.1,
+      "visualPeakSeconds": 0.016666666666666666,
       "triggerLeadSeconds": 0,
-      "spawnAgeSeconds": 0,
-      "sourceId": "impacts/air-hit (ECLIPSE custom; derived from impacts/crit-hit)",
-      "sourceCommit": "pixelfx plugin 0.3.1 local copy + custom effect file (not an upstream commit)",
-      "sourceSha256": "bce0afbd14bcf03e7c31df6e7e5cefa02344c91ec627dd279da6b8a9c25506b9",
+      "spawnAgeSeconds": 0.016666666666666666,
+      "sourceId": "impacts/crit-hit",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "c6af9303f0e463051696796a5886236d91182594e1d4fadee2067b9cf82ba857",
       "sourceTimeWindow": [
         0,
         0.9
       ],
       "optionsDiff": {
-        "seed": 5,
-        "palette": "crit-hit palette unchanged"
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "height": 0,
+        "light": 0.85
       },
       "postprocess": {
-        "operation": "pixelfx tools/render.mjs --sheet straight RGBA export; no painted pixels"
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
       },
-      "frameMap": "Art/flash-executioner/pixelfx/air-hit-sheet.json",
-      "sha256": "65b0561e5465ff9a96d7d6646a963fda5b8411b4a57610b62db809711a9fabc2",
-      "baselinePng": "Art/flash-executioner/reviewed/effect_impact.png",
-      "baselineFps": 30,
+      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Impact/frame-map.json",
+      "sha256": "838c12558b20ea4be34b01fd395758ac38f83c0c2d4817f8cc4dd8c8c5f2c309",
+      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Impact/original-60fps.png",
+      "baselineFps": 60,
       "status": "reviewed; runtime binding prepared; owner device verification pending",
       "firstAlphaEmpty": false,
       "lastAlphaEmpty": true,
-      "uniquePixelFrames": 16,
+      "uniquePixelFrames": 27,
       "edgePixels": 0,
-      "peakCoverageFrame": 3,
+      "peakCoverageFrame": 4,
       "approved": true,
       "front": true,
-      "review": "2026-11-22: the unmodified crit-hit assumes a floor (upward spark kick, gravity shards that bounce). Owner asked for effects that burst in mid-air, so this custom effect scatters everything in all directions with drag and no gravity. Not device tested. | previous: Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run. | 2026-11-22 (revision): owner said the spark-streak version looked like fireworks and wanted light bursting; rebuilt with a bloom flash, luminous ring(s), wide soft rays, glints and drifting light motes in the gold-white palette, no spark streaks, no gravity or floor, smaller footprint. | 2026-11-22: now the effect of the basic attack hit (weakest tier, scale 0.7). | 2026-11-22 (readability): the nearly transparent tail was cut (18 -> 16 frames) and scale set to 0.7.",
-      "superseded_v2": {
-        "cell": [
-          320,
-          224
-        ],
-        "count": 31,
-        "scale": 1.7,
-        "sha256": "838c12558b20ea4be34b01fd395758ac38f83c0c2d4817f8cc4dd8c8c5f2c309",
-        "sourceId": "impacts/crit-hit"
-      },
-      "scaleHistory": {
-        "previous": 1.0,
-        "reason": "owner: effects must not get in the way of the game; trimmed tails and smaller scale (2026-11-22)"
-      },
-      "trimmedFrom": 18,
+      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run.",
       "source_path": "Art/flash-executioner/reviewed/effect_impact.png",
       "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_impact.png",
       "library_status": "not synced: no ChatGPT Library file capability available"
@@ -2322,19 +1869,19 @@
       "role": "LanceHit",
       "file": "flash_executioner/effect_lancehit.png",
       "cell": [
-        320,
-        320
+        288,
+        232
       ],
       "pivot": [
-        160,
-        160
+        144,
+        188
       ],
-      "scale": 0.85,
-      "count": 23,
+      "scale": 1.5,
+      "count": 40,
       "columns": 6,
-      "rows": 4,
-      "duration": 0.7666666666666667,
-      "fps": 30,
+      "rows": 7,
+      "duration": 0.65,
+      "fps": 60,
       "loop": false,
       "layer": "front",
       "nativeDirectionDegrees": 0,
@@ -2346,58 +1893,52 @@
         0,
         0
       ],
-      "alignmentMode": "impact-center",
-      "anchorMode": "impact-center",
+      "alignmentMode": "target-ground",
+      "anchorMode": "target-feet",
       "offset": [
         0,
         0
       ],
-      "visualPeakSeconds": 0.1,
+      "visualPeakSeconds": 0,
       "triggerLeadSeconds": 0,
       "spawnAgeSeconds": 0,
-      "sourceId": "holy/air-burst (ECLIPSE custom; derived from holy/smite)",
-      "sourceCommit": "pixelfx plugin 0.3.1 local copy + custom effect file (not an upstream commit)",
-      "sourceSha256": "cfa63822993371216db448cad6a654440a970b2cc4bf0e2b29a9642ea9d98775",
+      "sourceId": "holy/smite",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "f0958ff226cb9114de31722b917c50867f715b9029f210c251186565895ea69b",
       "sourceTimeWindow": [
         0.55,
         2.8
       ],
       "optionsDiff": {
-        "seed": 21,
-        "palette": "holy GOLD unchanged"
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "stone": "#796449",
+        "light": 0.85
       },
       "postprocess": {
-        "operation": "pixelfx tools/render.mjs --sheet straight RGBA export; no painted pixels"
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
       },
-      "frameMap": "Art/flash-executioner/pixelfx/air-burst-sheet.json",
-      "sha256": "c7203a7097d41cbd3b17bebc0e770936cbf38770f60bcb482e9387a61b92328b",
-      "baselinePng": "Art/flash-executioner/reviewed/effect_lancehit.png",
-      "baselineFps": 30,
+      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/LanceHit/frame-map.json",
+      "sha256": "120945cda573789d388a0e6b324afb0902c77b16392c668e0715f8d221a4d32f",
+      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/LanceHit/original-60fps.png",
+      "baselineFps": 60,
       "status": "reviewed; runtime binding prepared; owner device verification pending",
       "firstAlphaEmpty": false,
       "lastAlphaEmpty": true,
-      "uniquePixelFrames": 23,
+      "uniquePixelFrames": 36,
       "edgePixels": 0,
-      "peakCoverageFrame": 4,
+      "peakCoverageFrame": 2,
       "approved": true,
       "front": true,
-      "review": "2026-11-22: holy/smite is a ground effect (floor shockwave, stone chips, cracks, dust along the floor) anchored at the target's feet. Owner asked for effects that burst in mid-air, so this custom effect is a round flash, shock rings, rays and glints flying out in all directions, anchored at the hit point. Not device tested. | previous: Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run. | 2026-11-22 (revision): owner said the spark-streak version looked like fireworks and wanted light bursting; rebuilt with a bloom flash, luminous ring(s), wide soft rays, glints and drifting light motes in the gold-white palette, no spark streaks, no gravity or floor, smaller footprint. | 2026-11-22 (readability): the nearly transparent tail was cut (27 -> 23 frames) and scale set to 0.85.",
-      "superseded_v2": {
-        "cell": [
-          288,
-          232
-        ],
-        "count": 40,
-        "scale": 1.5,
-        "sha256": "120945cda573789d388a0e6b324afb0902c77b16392c668e0715f8d221a4d32f",
-        "sourceId": "holy/smite",
-        "anchorMode": "target-feet"
-      },
-      "scaleHistory": {
-        "previous": 1.0,
-        "reason": "owner: effects must not get in the way of the game; trimmed tails and smaller scale (2026-11-22)"
-      },
-      "trimmedFrom": 27,
+      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run.",
       "source_path": "Art/flash-executioner/reviewed/effect_lancehit.png",
       "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_lancehit.png",
       "library_status": "not synced: no ChatGPT Library file capability available"
@@ -2720,152 +2261,6 @@
       "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run.",
       "source_path": "Art/flash-executioner/reviewed/effect_land.png",
       "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_land.png",
-      "library_status": "not synced: no ChatGPT Library file capability available"
-    },
-    {
-      "role": "ImpactLance",
-      "file": "flash_executioner/effect_impactlance.png",
-      "cell": [
-        240,
-        240
-      ],
-      "pivot": [
-        120,
-        120
-      ],
-      "scale": 0.8,
-      "count": 12,
-      "columns": 5,
-      "rows": 3,
-      "duration": 0.4,
-      "fps": 30,
-      "loop": false,
-      "layer": "front",
-      "nativeDirectionDegrees": 0,
-      "sourceFocalOffset": [
-        0,
-        0
-      ],
-      "effectfocalOffset": [
-        0,
-        0
-      ],
-      "alignmentMode": "impact-center",
-      "anchorMode": "impact-center",
-      "offset": [
-        0,
-        0
-      ],
-      "visualPeakSeconds": 0.1,
-      "triggerLeadSeconds": 0,
-      "spawnAgeSeconds": 0,
-      "sourceId": "impacts/air-hit-cross (ECLIPSE custom hit; derived from impacts/crit-hit)",
-      "sourceCommit": "pixelfx plugin 0.3.1 local copy + custom effect file (not an upstream commit)",
-      "sourceSha256": "34a1cbd01ad7922304fed71fe72414be6932e3e7fb42ac51d4ecc43fc5a4f90c",
-      "sourceTimeWindow": [
-        0,
-        0.9
-      ],
-      "optionsDiff": {
-        "seed": 5,
-        "palette": "crit-hit palette unchanged"
-      },
-      "postprocess": {
-        "operation": "pixelfx tools/render.mjs --sheet straight RGBA export; no painted pixels"
-      },
-      "frameMap": "Art/flash-executioner/pixelfx/air-hit-cross-sheet.json",
-      "sha256": "da7c16dd309d315ece6339aa596815596c468a0967fabf3d639318553663255e",
-      "baselinePng": "Art/flash-executioner/reviewed/effect_impactlance.png",
-      "baselineFps": 30,
-      "status": "reviewed; runtime binding prepared; owner device verification pending",
-      "firstAlphaEmpty": false,
-      "lastAlphaEmpty": true,
-      "uniquePixelFrames": 12,
-      "edgePixels": 0,
-      "peakCoverageFrame": 3,
-      "approved": true,
-      "front": true,
-      "review": "2026-11-22: the hit effect is fixed per action (the same action always shows the same effect) and stronger actions look stronger. hit of the Command skill's stored lances: two crossing blades of light, medium power. Not device tested. | 2026-11-22 (readability): the nearly transparent tail was cut (18 -> 12 frames) and scale set to 0.8.",
-      "scaleHistory": {
-        "previous": 0.9,
-        "reason": "owner: effects must not get in the way of the game; trimmed tails and smaller scale (2026-11-22)"
-      },
-      "trimmedFrom": 18,
-      "source_path": "Art/flash-executioner/reviewed/effect_impactlance.png",
-      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_impactlance.png",
-      "library_status": "not synced: no ChatGPT Library file capability available"
-    },
-    {
-      "role": "ImpactRush",
-      "file": "flash_executioner/effect_impactrush.png",
-      "cell": [
-        280,
-        280
-      ],
-      "pivot": [
-        140,
-        140
-      ],
-      "scale": 0.8,
-      "count": 16,
-      "columns": 5,
-      "rows": 4,
-      "duration": 0.5333333333333333,
-      "fps": 30,
-      "loop": false,
-      "layer": "front",
-      "nativeDirectionDegrees": 0,
-      "sourceFocalOffset": [
-        0,
-        0
-      ],
-      "effectfocalOffset": [
-        0,
-        0
-      ],
-      "alignmentMode": "impact-center",
-      "anchorMode": "impact-center",
-      "offset": [
-        0,
-        0
-      ],
-      "visualPeakSeconds": 0.1,
-      "triggerLeadSeconds": 0,
-      "spawnAgeSeconds": 0,
-      "sourceId": "impacts/air-hit-rush (ECLIPSE custom hit; derived from impacts/crit-hit)",
-      "sourceCommit": "pixelfx plugin 0.3.1 local copy + custom effect file (not an upstream commit)",
-      "sourceSha256": "bfc126ed22c18176eff95a6b0cf46b5a3a8aa96d2a0b1c7ef519fb1502c950e6",
-      "sourceTimeWindow": [
-        0,
-        0.9
-      ],
-      "optionsDiff": {
-        "seed": 5,
-        "palette": "crit-hit palette unchanged"
-      },
-      "postprocess": {
-        "operation": "pixelfx tools/render.mjs --sheet straight RGBA export; no painted pixels"
-      },
-      "frameMap": "Art/flash-executioner/pixelfx/air-hit-rush-sheet.json",
-      "sha256": "582ca3678bb3ac2682b614e37bd972bf44d7427329643c580fa2b18e88788d60",
-      "baselinePng": "Art/flash-executioner/reviewed/effect_impactrush.png",
-      "baselineFps": 30,
-      "status": "reviewed; runtime binding prepared; owner device verification pending",
-      "firstAlphaEmpty": false,
-      "lastAlphaEmpty": true,
-      "uniquePixelFrames": 16,
-      "edgePixels": 0,
-      "peakCoverageFrame": 3,
-      "approved": true,
-      "front": true,
-      "review": "2026-11-22: the hit effect is fixed per action (the same action always shows the same effect) and stronger actions look stronger. hit of the Rush skill: heavy eight-point star with a big bloom and two shock rings, strong power. Not device tested. | 2026-11-22 (readability): the nearly transparent tail was cut (21 -> 16 frames) and scale set to 0.8.",
-      "scaleHistory": {
-        "previous": 1.2,
-        "reason": "owner: effects must not get in the way of the game; trimmed tails and smaller scale (2026-11-22)"
-      },
-      "trimmedFrom": 21,
-      "source_path": "Art/flash-executioner/reviewed/effect_impactrush.png",
-      "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_impactrush.png",
       "library_status": "not synced: no ChatGPT Library file capability available"
     }
   ],
