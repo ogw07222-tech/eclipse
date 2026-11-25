@@ -48,3 +48,6 @@ __pycache__/
 *.keystore
 *.p12
 *.pfx
+
+# Personal Claude Code settings
+.claude/settings.local.json

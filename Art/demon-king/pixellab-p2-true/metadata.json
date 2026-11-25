@@ -1,0 +1,450 @@
+{
+  "group_id": "6c2b5b3b-b8c4-45a0-abbd-6dd5d6585408",
+  "states": [
+    {
+      "character": {
+        "id": "b1fb579b-ec35-4099-9207-e334c72e49f4",
+        "name": "Idle",
+        "prompt": "Demon King phase 2 true form, slender agile sword mage, long flowing silver-lilac hair, small crown of horns, sleek black armor with gold trim and violet cracks, short tattered violet cloak only (not oversized), long thin glowing violet longsword in the right hand, left hand open and empty, side view facing right, elegant menacing overwhelming presence",
+        "size": {
+          "width": 128,
+          "height": 128
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-11-23T09:10:47.663455+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "b_dive_24": {
+            "east": [
+              "Idle/animations/b_dive_24/east/frame_000.png",
+              "Idle/animations/b_dive_24/east/frame_001.png",
+              "Idle/animations/b_dive_24/east/frame_002.png",
+              "Idle/animations/b_dive_24/east/frame_003.png"
+            ]
+          },
+          "m_rise_keys": {
+            "east": [
+              "Idle/animations/m_rise_keys/east/frame_000.png",
+              "Idle/animations/m_rise_keys/east/frame_001.png",
+              "Idle/animations/m_rise_keys/east/frame_002.png",
+              "Idle/animations/m_rise_keys/east/frame_003.png",
+              "Idle/animations/m_rise_keys/east/frame_004.png"
+            ]
+          },
+          "m_backflip_keys": {
+            "east": [
+              "Idle/animations/m_backflip_keys/east/frame_000.png",
+              "Idle/animations/m_backflip_keys/east/frame_001.png",
+              "Idle/animations/m_backflip_keys/east/frame_002.png",
+              "Idle/animations/m_backflip_keys/east/frame_003.png",
+              "Idle/animations/m_backflip_keys/east/frame_004.png"
+            ]
+          },
+          "b_burst_3": {
+            "east": [
+              "Idle/animations/b_burst_3/east/frame_000.png",
+              "Idle/animations/b_burst_3/east/frame_001.png",
+              "Idle/animations/b_burst_3/east/frame_002.png",
+              "Idle/animations/b_burst_3/east/frame_003.png"
+            ]
+          },
+          "f_24": {
+            "east": [
+              "Idle/animations/f_24/east/frame_000.png",
+              "Idle/animations/f_24/east/frame_001.png",
+              "Idle/animations/f_24/east/frame_002.png",
+              "Idle/animations/f_24/east/frame_003.png"
+            ]
+          },
+          "m_dive_keys": {
+            "east": [
+              "Idle/animations/m_dive_keys/east/frame_000.png",
+              "Idle/animations/m_dive_keys/east/frame_001.png",
+              "Idle/animations/m_dive_keys/east/frame_002.png",
+              "Idle/animations/m_dive_keys/east/frame_003.png",
+              "Idle/animations/m_dive_keys/east/frame_004.png"
+            ]
+          },
+          "walk_between_34": {
+            "east": [
+              "Idle/animations/walk_between_34/east/frame_000.png",
+              "Idle/animations/walk_between_34/east/frame_001.png",
+              "Idle/animations/walk_between_34/east/frame_002.png",
+              "Idle/animations/walk_between_34/east/frame_003.png"
+            ]
+          },
+          "b_rise_12": {
+            "east": [
+              "Idle/animations/b_rise_12/east/frame_000.png",
+              "Idle/animations/b_rise_12/east/frame_001.png",
+              "Idle/animations/b_rise_12/east/frame_002.png",
+              "Idle/animations/b_rise_12/east/frame_003.png"
+            ]
+          },
+          "inbetween_lunge": {
+            "east": [
+              "Idle/animations/inbetween_lunge/east/frame_000.png",
+              "Idle/animations/inbetween_lunge/east/frame_001.png",
+              "Idle/animations/inbetween_lunge/east/frame_002.png",
+              "Idle/animations/inbetween_lunge/east/frame_003.png"
+            ]
+          },
+          "inbetween_coil": {
+            "east": [
+              "Idle/animations/inbetween_coil/east/frame_000.png",
+              "Idle/animations/inbetween_coil/east/frame_001.png",
+              "Idle/animations/inbetween_coil/east/frame_002.png",
+              "Idle/animations/inbetween_coil/east/frame_003.png"
+            ]
+          },
+          "f_15": {
+            "east": [
+              "Idle/animations/f_15/east/frame_000.png",
+              "Idle/animations/f_15/east/frame_001.png",
+              "Idle/animations/f_15/east/frame_002.png",
+              "Idle/animations/f_15/east/frame_003.png"
+            ]
+          },
+          "m_burst_keys": {
+            "east": [
+              "Idle/animations/m_burst_keys/east/frame_000.png",
+              "Idle/animations/m_burst_keys/east/frame_001.png",
+              "Idle/animations/m_burst_keys/east/frame_002.png",
+              "Idle/animations/m_burst_keys/east/frame_003.png",
+              "Idle/animations/m_burst_keys/east/frame_004.png"
+            ]
+          },
+          "f_23": {
+            "east": [
+              "Idle/animations/f_23/east/frame_000.png",
+              "Idle/animations/f_23/east/frame_001.png",
+              "Idle/animations/f_23/east/frame_002.png",
+              "Idle/animations/f_23/east/frame_003.png"
+            ]
+          },
+          "f_17": {
+            "east": [
+              "Idle/animations/f_17/east/frame_000.png",
+              "Idle/animations/f_17/east/frame_001.png",
+              "Idle/animations/f_17/east/frame_002.png",
+              "Idle/animations/f_17/east/frame_003.png"
+            ]
+          },
+          "f_22": {
+            "east": [
+              "Idle/animations/f_22/east/frame_000.png",
+              "Idle/animations/f_22/east/frame_001.png",
+              "Idle/animations/f_22/east/frame_002.png",
+              "Idle/animations/f_22/east/frame_003.png"
+            ]
+          },
+          "m_sky_keys": {
+            "east": [
+              "Idle/animations/m_sky_keys/east/frame_000.png",
+              "Idle/animations/m_sky_keys/east/frame_001.png",
+              "Idle/animations/m_sky_keys/east/frame_002.png",
+              "Idle/animations/m_sky_keys/east/frame_003.png",
+              "Idle/animations/m_sky_keys/east/frame_004.png"
+            ]
+          },
+          "f_26": {
+            "east": [
+              "Idle/animations/f_26/east/frame_000.png",
+              "Idle/animations/f_26/east/frame_001.png",
+              "Idle/animations/f_26/east/frame_002.png",
+              "Idle/animations/f_26/east/frame_003.png"
+            ]
+          },
+          "m_twist_keys": {
+            "east": [
+              "Idle/animations/m_twist_keys/east/frame_000.png",
+              "Idle/animations/m_twist_keys/east/frame_001.png",
+              "Idle/animations/m_twist_keys/east/frame_002.png",
+              "Idle/animations/m_twist_keys/east/frame_003.png",
+              "Idle/animations/m_twist_keys/east/frame_004.png"
+            ]
+          },
+          "b_rise_23": {
+            "east": [
+              "Idle/animations/b_rise_23/east/frame_000.png",
+              "Idle/animations/b_rise_23/east/frame_001.png",
+              "Idle/animations/b_rise_23/east/frame_002.png",
+              "Idle/animations/b_rise_23/east/frame_003.png"
+            ]
+          },
+          "attack_keys": {
+            "east": [
+              "Idle/animations/attack_keys/east/frame_000.png",
+              "Idle/animations/attack_keys/east/frame_001.png",
+              "Idle/animations/attack_keys/east/frame_002.png",
+              "Idle/animations/attack_keys/east/frame_003.png",
+              "Idle/animations/attack_keys/east/frame_004.png"
+            ]
+          },
+          "f_30": {
+            "east": [
+              "Idle/animations/f_30/east/frame_000.png",
+              "Idle/animations/f_30/east/frame_001.png",
+              "Idle/animations/f_30/east/frame_002.png",
+              "Idle/animations/f_30/east/frame_003.png"
+            ]
+          },
+          "b_dive_01": {
+            "east": [
+              "Idle/animations/b_dive_01/east/frame_000.png",
+              "Idle/animations/b_dive_01/east/frame_001.png",
+              "Idle/animations/b_dive_01/east/frame_002.png",
+              "Idle/animations/b_dive_01/east/frame_003.png"
+            ]
+          },
+          "m_cast_keys": {
+            "east": [
+              "Idle/animations/m_cast_keys/east/frame_000.png",
+              "Idle/animations/m_cast_keys/east/frame_001.png",
+              "Idle/animations/m_cast_keys/east/frame_002.png",
+              "Idle/animations/m_cast_keys/east/frame_003.png",
+              "Idle/animations/m_cast_keys/east/frame_004.png"
+            ]
+          },
+          "m_palm_keys": {
+            "east": [
+              "Idle/animations/m_palm_keys/east/frame_000.png",
+              "Idle/animations/m_palm_keys/east/frame_001.png",
+              "Idle/animations/m_palm_keys/east/frame_002.png",
+              "Idle/animations/m_palm_keys/east/frame_003.png",
+              "Idle/animations/m_palm_keys/east/frame_004.png"
+            ]
+          },
+          "b_burst_1": {
+            "east": [
+              "Idle/animations/b_burst_1/east/frame_000.png",
+              "Idle/animations/b_burst_1/east/frame_001.png",
+              "Idle/animations/b_burst_1/east/frame_002.png",
+              "Idle/animations/b_burst_1/east/frame_003.png"
+            ]
+          },
+          "f_18": {
+            "east": [
+              "Idle/animations/f_18/east/frame_000.png",
+              "Idle/animations/f_18/east/frame_001.png",
+              "Idle/animations/f_18/east/frame_002.png",
+              "Idle/animations/f_18/east/frame_003.png"
+            ]
+          },
+          "b_twist_23": {
+            "east": [
+              "Idle/animations/b_twist_23/east/frame_000.png",
+              "Idle/animations/b_twist_23/east/frame_001.png",
+              "Idle/animations/b_twist_23/east/frame_002.png",
+              "Idle/animations/b_twist_23/east/frame_003.png"
+            ]
+          },
+          "inbetween_recover": {
+            "east": [
+              "Idle/animations/inbetween_recover/east/frame_000.png",
+              "Idle/animations/inbetween_recover/east/frame_001.png",
+              "Idle/animations/inbetween_recover/east/frame_002.png",
+              "Idle/animations/inbetween_recover/east/frame_003.png"
+            ]
+          },
+          "f_19": {
+            "east": [
+              "Idle/animations/f_19/east/frame_000.png",
+              "Idle/animations/f_19/east/frame_001.png",
+              "Idle/animations/f_19/east/frame_002.png",
+              "Idle/animations/f_19/east/frame_003.png"
+            ]
+          },
+          "m_slashU_keys": {
+            "east": [
+              "Idle/animations/m_slashU_keys/east/frame_000.png",
+              "Idle/animations/m_slashU_keys/east/frame_001.png",
+              "Idle/animations/m_slashU_keys/east/frame_002.png",
+              "Idle/animations/m_slashU_keys/east/frame_003.png",
+              "Idle/animations/m_slashU_keys/east/frame_004.png"
+            ]
+          },
+          "walk_between_41": {
+            "east": [
+              "Idle/animations/walk_between_41/east/frame_000.png",
+              "Idle/animations/walk_between_41/east/frame_001.png",
+              "Idle/animations/walk_between_41/east/frame_002.png",
+              "Idle/animations/walk_between_41/east/frame_003.png"
+            ]
+          },
+          "f_27": {
+            "east": [
+              "Idle/animations/f_27/east/frame_000.png",
+              "Idle/animations/f_27/east/frame_001.png",
+              "Idle/animations/f_27/east/frame_002.png",
+              "Idle/animations/f_27/east/frame_003.png"
+            ]
+          },
+          "b_twist_12": {
+            "east": [
+              "Idle/animations/b_twist_12/east/frame_000.png",
+              "Idle/animations/b_twist_12/east/frame_001.png",
+              "Idle/animations/b_twist_12/east/frame_002.png",
+              "Idle/animations/b_twist_12/east/frame_003.png"
+            ]
+          },
+          "f_20": {
+            "east": [
+              "Idle/animations/f_20/east/frame_000.png",
+              "Idle/animations/f_20/east/frame_001.png",
+              "Idle/animations/f_20/east/frame_002.png",
+              "Idle/animations/f_20/east/frame_003.png"
+            ]
+          },
+          "walk_keys": {
+            "east": [
+              "Idle/animations/walk_keys/east/frame_000.png",
+              "Idle/animations/walk_keys/east/frame_001.png",
+              "Idle/animations/walk_keys/east/frame_002.png",
+              "Idle/animations/walk_keys/east/frame_003.png",
+              "Idle/animations/walk_keys/east/frame_004.png"
+            ]
+          },
+          "f_21": {
+            "east": [
+              "Idle/animations/f_21/east/frame_000.png",
+              "Idle/animations/f_21/east/frame_001.png",
+              "Idle/animations/f_21/east/frame_002.png",
+              "Idle/animations/f_21/east/frame_003.png"
+            ]
+          },
+          "f_29": {
+            "east": [
+              "Idle/animations/f_29/east/frame_000.png",
+              "Idle/animations/f_29/east/frame_001.png",
+              "Idle/animations/f_29/east/frame_002.png",
+              "Idle/animations/f_29/east/frame_003.png"
+            ]
+          },
+          "b_flip_23": {
+            "east": [
+              "Idle/animations/b_flip_23/east/frame_000.png",
+              "Idle/animations/b_flip_23/east/frame_001.png",
+              "Idle/animations/b_flip_23/east/frame_002.png",
+              "Idle/animations/b_flip_23/east/frame_003.png"
+            ]
+          },
+          "walk_between_23": {
+            "east": [
+              "Idle/animations/walk_between_23/east/frame_000.png",
+              "Idle/animations/walk_between_23/east/frame_001.png",
+              "Idle/animations/walk_between_23/east/frame_002.png",
+              "Idle/animations/walk_between_23/east/frame_003.png"
+            ]
+          },
+          "b_sky_2": {
+            "east": [
+              "Idle/animations/b_sky_2/east/frame_000.png",
+              "Idle/animations/b_sky_2/east/frame_001.png",
+              "Idle/animations/b_sky_2/east/frame_002.png",
+              "Idle/animations/b_sky_2/east/frame_003.png"
+            ]
+          },
+          "walk_between_12": {
+            "east": [
+              "Idle/animations/walk_between_12/east/frame_000.png",
+              "Idle/animations/walk_between_12/east/frame_001.png",
+              "Idle/animations/walk_between_12/east/frame_002.png",
+              "Idle/animations/walk_between_12/east/frame_003.png"
+            ]
+          },
+          "attack_keys2": {
+            "east": [
+              "Idle/animations/attack_keys2/east/frame_000.png",
+              "Idle/animations/attack_keys2/east/frame_001.png",
+              "Idle/animations/attack_keys2/east/frame_002.png",
+              "Idle/animations/attack_keys2/east/frame_003.png",
+              "Idle/animations/attack_keys2/east/frame_004.png"
+            ]
+          },
+          "f_16": {
+            "east": [
+              "Idle/animations/f_16/east/frame_000.png",
+              "Idle/animations/f_16/east/frame_001.png",
+              "Idle/animations/f_16/east/frame_002.png",
+              "Idle/animations/f_16/east/frame_003.png"
+            ]
+          },
+          "b_burst_2": {
+            "east": [
+              "Idle/animations/b_burst_2/east/frame_000.png",
+              "Idle/animations/b_burst_2/east/frame_001.png",
+              "Idle/animations/b_burst_2/east/frame_002.png",
+              "Idle/animations/b_burst_2/east/frame_003.png"
+            ]
+          },
+          "f_25": {
+            "east": [
+              "Idle/animations/f_25/east/frame_000.png",
+              "Idle/animations/f_25/east/frame_001.png",
+              "Idle/animations/f_25/east/frame_002.png",
+              "Idle/animations/f_25/east/frame_003.png"
+            ]
+          },
+          "b_sky_1": {
+            "east": [
+              "Idle/animations/b_sky_1/east/frame_000.png",
+              "Idle/animations/b_sky_1/east/frame_001.png",
+              "Idle/animations/b_sky_1/east/frame_002.png",
+              "Idle/animations/b_sky_1/east/frame_003.png"
+            ]
+          },
+          "f_28": {
+            "east": [
+              "Idle/animations/f_28/east/frame_000.png",
+              "Idle/animations/f_28/east/frame_001.png",
+              "Idle/animations/f_28/east/frame_002.png",
+              "Idle/animations/f_28/east/frame_003.png"
+            ]
+          },
+          "b_flip_12": {
+            "east": [
+              "Idle/animations/b_flip_12/east/frame_000.png",
+              "Idle/animations/b_flip_12/east/frame_001.png",
+              "Idle/animations/b_flip_12/east/frame_002.png",
+              "Idle/animations/b_flip_12/east/frame_003.png"
+            ]
+          },
+          "m_slashH_keys": {
+            "east": [
+              "Idle/animations/m_slashH_keys/east/frame_000.png",
+              "Idle/animations/m_slashH_keys/east/frame_001.png",
+              "Idle/animations/m_slashH_keys/east/frame_002.png",
+              "Idle/animations/m_slashH_keys/east/frame_003.png",
+              "Idle/animations/m_slashH_keys/east/frame_004.png"
+            ]
+          },
+          "b_flip_34": {
+            "east": [
+              "Idle/animations/b_flip_34/east/frame_000.png",
+              "Idle/animations/b_flip_34/east/frame_001.png",
+              "Idle/animations/b_flip_34/east/frame_002.png",
+              "Idle/animations/b_flip_34/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-11-23T12:07:05.895636"
+}

@@ -6,7 +6,9 @@
 namespace eclipse {
 struct BodyRect {float left,top,right,bottom;};
 inline bool overlaps(BodyRect a,BodyRect b){return a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;}
-template<class E> int enemyFrame(const E& e){return eclipse::enemyFrame(e.kind,e.travelPhase,e.attackAge,enemySpec(e.kind).attackDuration);}
+template<class E> int enemyFrame(const E& e){return eclipse::enemyFrame(e.kind,e.travelPhase,e.attackAge,e.moveDur>0?e.moveDur:enemySpec(e.kind).attackDuration,e.animFrom,
+    e.kind>=DemonKingArmored&&e.motion>0?bossMotionFrames:castleEnemyAttackFrames,
+    e.kind>=DemonKingArmored&&e.motion>0?e.moveContact:-1.f);}
 template<class E> BodyRect enemySourceRect(const E& e,float left,float top,float right,float bottom){
     const float scale=slimeSpec(e.kind).scale;
     const float x0=e.facing<0?left-slimePivotX:slimePivotX-right;

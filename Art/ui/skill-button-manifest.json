@@ -1,0 +1,253 @@
+{
+  "schema": 3,
+  "design": "Dark fantasy pixel HUD; circular black-iron touch controls with restrained silver bevels; unique class glyph silhouettes; blood-red health.",
+  "logical_viewport": [
+    1280,
+    720
+  ],
+  "generation": "ImageGen cohesive high-resolution circular atlases revised for fast mechanic recognition; PixelLab pixelart_workbench split, repair, and exact state edits. Native-size checks at existing mobile button dimensions.",
+  "assets": [
+    {
+      "runtime_path": "Assets/Resources/Eclipse/ui/attack_states.png",
+      "art_path": "Art/ui/attack_states-blackiron.png",
+      "dimensions": [
+        224,
+        112
+      ],
+      "pixel_tool": "PixelLab pixelart_workbench",
+      "drawing_id": "81215f87-d209-49ca-90b7-3d16dc1bbd43",
+      "sha256": "63a7d9d08b31a13c8f31adc3e72aa0f876e42408817a470ae655a9c97c43836b",
+      "runtime_sha256": "63a7d9d08b31a13c8f31adc3e72aa0f876e42408817a470ae655a9c97c43836b",
+      "alpha": "transparent",
+      "sampling": "nearest-neighbour; native HUD size",
+      "preserved_original": "Art/ui/source-original/attack_states-original.png",
+      "original_sha256": "04f54f535d3a7a5d58f83240f6edb00de1ca759da0e8dc96bcca6bfc77d63eed"
+    },
+    {
+      "runtime_path": "Assets/Resources/Eclipse/ui/dash_states.png",
+      "art_path": "Art/ui/dash_states-blackiron.png",
+      "dimensions": [
+        152,
+        76
+      ],
+      "pixel_tool": "PixelLab pixelart_workbench",
+      "drawing_id": "524a5f99-f4be-459f-8261-c7ad21c85588",
+      "sha256": "af825755376fcbfb30acc652790db019287115e706df85db0bbd6247c6b40963",
+      "runtime_sha256": "af825755376fcbfb30acc652790db019287115e706df85db0bbd6247c6b40963",
+      "alpha": "transparent",
+      "sampling": "nearest-neighbour; native HUD size",
+      "preserved_original": "Art/ui/source-original/dash_states-original.png",
+      "original_sha256": "a848df4b8ea0d3fc8dcd634f80b0c7e7096bcf42f4f0a3736704cded55337c35"
+    },
+    {
+      "runtime_path": "Assets/Resources/Eclipse/ui/swap_skill_states.png",
+      "art_path": "Art/ui/swap_skill_states-blackiron.png",
+      "dimensions": [
+        136,
+        136
+      ],
+      "pixel_tool": "PixelLab pixelart_workbench",
+      "drawing_id": "b4bc8156-6e2c-44e2-8fda-d9897365025e",
+      "sha256": "d05ff9be72aa8e8de9d51522d7f9e2086608cb44d279a84aea26b41eefd5eb57",
+      "runtime_sha256": "d05ff9be72aa8e8de9d51522d7f9e2086608cb44d279a84aea26b41eefd5eb57",
+      "alpha": "transparent",
+      "sampling": "nearest-neighbour; native HUD size",
+      "preserved_original": "Art/ui/source-original/swap_skill_states-original.png",
+      "original_sha256": "cf5f6b9008990279523d1f9a937e44b20bd2e7466ca586575025f7d8419281ec"
+    },
+    {
+      "runtime_path": "Assets/Resources/Eclipse/ui/joystick_arrows_new.png",
+      "art_path": "Art/ui/joystick_arrows-blackiron.png",
+      "dimensions": [
+        126,
+        126
+      ],
+      "pixel_tool": "PixelLab pixelart_workbench",
+      "drawing_id": "59244b0c-4586-4d7e-b435-32c202c9ada7",
+      "sha256": "28924386967cb7a95f49f2b1b4f2e390f393900db2a33af877acc7ac47dac646",
+      "runtime_sha256": "28924386967cb7a95f49f2b1b4f2e390f393900db2a33af877acc7ac47dac646",
+      "alpha": "transparent; center flood-filled to alpha 0 in PixelLab workbench",
+      "sampling": "nearest-neighbour; native HUD size",
+      "preserved_original": "Art/ui/source-original/joystick_arrows-original.png",
+      "original_sha256": "b00c53c8b55943a9d99b102d205b72ac6e4271fff55057d50b186970665e0cff",
+      "derived_from_drawing_id": "5e3a28bf-9390-4b01-8a7f-7d7874f9c732"
+    },
+    {
+      "runtime_path": "Assets/Resources/Eclipse/ui/skill_button_frame.png",
+      "art_path": "Art/ui/skill_button_frame-blackiron.png",
+      "dimensions": [
+        68,
+        68
+      ],
+      "pixel_tool": "PixelLab pixelart_workbench",
+      "drawing_id": "fd4c0d84-1fea-4cf0-8d4b-7d00ed0831e5",
+      "sha256": "a654b9c201ec4b20cfe31bd675183ef3cabc92d272b5a69d76094a936e8ed30f",
+      "runtime_sha256": "a654b9c201ec4b20cfe31bd675183ef3cabc92d272b5a69d76094a936e8ed30f",
+      "alpha": "transparent",
+      "sampling": "nearest-neighbour; native HUD size",
+      "preserved_original": "Art/ui/source-original/skill_button_frame-original.png",
+      "original_sha256": "b8fc27d664c3aac10a92544f8206198ae2027daa22b9697100e76d2bc09c81ae"
+    },
+    {
+      "runtime_path": "Assets/Resources/Eclipse/ui/player_health_frame.png",
+      "art_path": "Art/ui/player_health_frame-blackiron.png",
+      "dimensions": [
+        288,
+        46
+      ],
+      "pixel_tool": "PixelLab pixelart_workbench",
+      "drawing_id": "2c9e90de-6dc4-4898-b229-3b4bdf5e04d0",
+      "sha256": "76095cd0d340ab664c9791d5bbd202abb4c7ac0802f42c1725844052e4c83719",
+      "runtime_sha256": "76095cd0d340ab664c9791d5bbd202abb4c7ac0802f42c1725844052e4c83719",
+      "alpha": "transparent",
+      "sampling": "nearest-neighbour; native HUD size"
+    },
+    {
+      "runtime_path": "Assets/Resources/Eclipse/ui/enemy_bar_frame.png",
+      "art_path": "Art/ui/enemy_bar_frame-blackiron.png",
+      "dimensions": [
+        88,
+        18
+      ],
+      "pixel_tool": "PixelLab pixelart_workbench",
+      "drawing_id": "20d804c7-76a9-4ab5-ace4-82b594ed1781",
+      "sha256": "cd38200a5d2df07e1ed0bdce1b62b05edc874f0ea7e3a92381107aa2eaa59dfa",
+      "runtime_sha256": "cd38200a5d2df07e1ed0bdce1b62b05edc874f0ea7e3a92381107aa2eaa59dfa",
+      "alpha": "transparent",
+      "sampling": "nearest-neighbour; native HUD size",
+      "preserved_original": "Art/ui/source-original/enemy_bar_frame-original.png",
+      "original_sha256": "f009fb83927b9b75e92605464fd67d6cf1cd38a72281a07df463b76fe26d1740"
+    },
+    {
+      "runtime_path": "Assets/Resources/Eclipse/ui/boss_bar_frame.png",
+      "art_path": "Art/ui/boss_bar_frame-blackiron.png",
+      "dimensions": [
+        108,
+        18
+      ],
+      "pixel_tool": "PixelLab pixelart_workbench",
+      "drawing_id": "e938c562-3370-417c-a237-ded2e95442ad",
+      "sha256": "0b0553c68732a296c6c025b96f193919c88c9c92815aa0b4fbac17a0af720c78",
+      "runtime_sha256": "0b0553c68732a296c6c025b96f193919c88c9c92815aa0b4fbac17a0af720c78",
+      "alpha": "transparent",
+      "sampling": "nearest-neighbour; native HUD size"
+    },
+    {
+      "runtime_path": "Assets/Resources/Eclipse/ui/space_ruler_skill_icons.png",
+      "art_path": "Art/ui/space_ruler_skill_icons.png",
+      "dimensions": [
+        128,
+        32
+      ],
+      "pixel_tool": "PixelLab pixelart_workbench",
+      "drawing_id": "9cf2d571-e0fb-4c1d-a7e5-44929f5c23ec",
+      "sha256": "6ed4a2ea8a9cb1657b7d46cc9a328a06392327336d06769c7fe66a62c57406b1",
+      "runtime_sha256": "6ed4a2ea8a9cb1657b7d46cc9a328a06392327336d06769c7fe66a62c57406b1",
+      "alpha": "transparent",
+      "sampling": "nearest-neighbour; native HUD size"
+    },
+    {
+      "runtime_path": "Assets/Resources/Eclipse/ui/blade_skill_icons.png",
+      "art_path": "Art/ui/blade_skill_icons.png",
+      "dimensions": [
+        96,
+        32
+      ],
+      "pixel_tool": "PixelLab pixelart_workbench",
+      "drawing_id": "ad7392cc-b8c0-45d1-ba9e-1b9e3326dff0",
+      "sha256": "88b3451815e1db7b4c0605092d4130ba96771ff64ef26993ec1a9832bf3135af",
+      "runtime_sha256": "88b3451815e1db7b4c0605092d4130ba96771ff64ef26993ec1a9832bf3135af",
+      "alpha": "transparent",
+      "sampling": "nearest-neighbour; native HUD size"
+    },
+    {
+      "runtime_path": "Assets/Resources/Eclipse/ui/circular_control_states.png",
+      "art_path": "Art/ui/circular_control_states-imagegen-pixellab-v2.png",
+      "dimensions": [
+        768,
+        768
+      ],
+      "pixel_tool": "OpenAI ImageGen + PixelLab pixelart_workbench",
+      "source_image": "Art/ui/imagegen/circular-controls-imagegen-master-v2.png",
+      "workbench": "split 4x2; repair; targeted press/idle legibility revisions; native-size silhouette check",
+      "workbench_ids": [
+        "aa15f6fc-87d7-47d6-9f67-e97fe2549e4e",
+        "b4f695c0-8538-4c8e-a859-20a0cbb3fe2f"
+      ],
+      "sha256": "af557ea64d969355c53f34f63228ba5e6b531edae7d25549d258b4ffdbdb1eaa",
+      "alpha": "transparent background, binary alpha",
+      "sampling": "nearest-neighbour; 3x3 frame sheet; 8 x 256x256 frames, final cell transparent",
+      "cell_order": [
+        "attack idle: sword strike",
+        "attack pressed",
+        "dodge idle: lunging boot",
+        "dodge pressed",
+        "swap idle: two silhouettes and exchange arrows",
+        "swap pressed",
+        "joystick idle: four cardinal arrows",
+        "joystick active"
+      ],
+      "runtime_sha256": "af557ea64d969355c53f34f63228ba5e6b531edae7d25549d258b4ffdbdb1eaa",
+      "source_sha256": "214ba6856b85d9de4b4729ff069954e3f213e0c6d7c22ef1ee5a5ebf547f2728"
+    },
+    {
+      "runtime_path": "Assets/Resources/Eclipse/ui/circular_skill_buttons.png",
+      "art_path": "Art/ui/circular_skill_buttons-imagegen-pixellab-v4.png",
+      "dimensions": [
+        1024,
+        768
+      ],
+      "pixel_tool": "OpenAI ImageGen + PixelLab pixelart_workbench",
+      "source_image": "Art/ui/imagegen/circular-skills-mechanics-master-v4.png",
+      "workbench": "4x3 split; 12 frames quantized together to 64 colors in PixelLab; frames joined; repair (defringe/snap/stray/holes/deflicker); PixelLab nearest scale 2x; alpha normalized to binary for runtime export.",
+      "workbench_ids": [
+        "71369668-392a-4181-855c-1eaeb5adc8a8",
+        "b6eac333-3bb5-4b7a-9b0f-0053db8003b6",
+        "b5159f34-0fdc-4b71-9a04-634947e9c6e5",
+        "c8a918eb-d629-4613-a1d1-f15f84d26511",
+        "228ebc88-8be5-4913-ab3e-ed351f4ac073"
+      ],
+      "sha256": "e2fe582dc668f9dc844530a69a4d04703389b9d6df42882f921f7592db049e4e",
+      "alpha": "transparent exterior; binary alpha 0/255",
+      "sampling": "nearest-neighbour; 4x3 frame sheet; 12 x 256x256 frames",
+      "cell_order": [
+        "Blade thrust",
+        "Blade sweep",
+        "Blade attack preparation / attack-speed increase",
+        "Unused Blade slot plate",
+        "Space Ruler persistent gravity field (slows, damages, no forced pull)",
+        "Space Ruler dimensional ground spikes",
+        "Space Ruler outward repulsion wave",
+        "Space Ruler singularity: attracts then collapses",
+        "Flash Executioner Rush + mark",
+        "Flash Executioner orb-to-light-lance volley",
+        "Flash Executioner blink to farthest marked target",
+        "Flash Executioner 20 lances onto marked targets"
+      ],
+      "runtime_sha256": "e2fe582dc668f9dc844530a69a4d04703389b9d6df42882f921f7592db049e4e",
+      "source_sha256": "c1d31e487ef9a2b6760d88980146f77c69fa1b5586a3453d51634b71a2166007"
+    }
+  ],
+  "state_design": {
+    "controls": "Eight circular cells: attack idle/pressed, dodge idle/pressed, swap idle/pressed, joystick idle/active. Pressed states use a darker recessed metal palette.",
+    "skills": "Twelve circular class-specific buttons in one 4x3 atlas (Blade, Space Ruler, Flash Executioner); existing cooldown fill, pressed shift, unavailable tint and slot numbers remain code-driven.",
+    "health": "Black-iron frame; current deep red fill; desaturated red trailing damage segment with clear leading edge."
+  },
+  "review_artifacts": [
+    {
+      "path": "Art/ui/review-before-after/intuitive-icons-before-after-final.png",
+      "sha256": "51067d49b1d4b7c415f436f5fbba4b93c81c673394024f33175ffc12a61f4ebc",
+      "description": "Previous vs revised gameplay silhouettes, rendered at actual control/skill target sizes; not a gameplay screenshot."
+    },
+    {
+      "path": "Art/ui/review-before-after/intuitive-icons-native-size-final.png",
+      "sha256": "39ffce263b890b5539d380327467c8753b799de9e4d3151854d8c542e470be95",
+      "description": "All current controls and class skills at target HUD dimensions; not a gameplay screenshot."
+    },
+    {
+      "path": "Art/ui/review-before-after/skill-effects-mechanics-before-after.png",
+      "sha256": "33a1a663133cdbcf9c52c33fdafdc3021bf213b6c2a1732861d4f3d3908dd5ac",
+      "description": "Previous glyphs vs mechanics-matched glyphs; icons rendered using actual runtime 224px source crop at 64px target size; not a gameplay screenshot."
+    }
+  ]
+}

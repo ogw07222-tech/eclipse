@@ -1,5 +1,5 @@
 # ECLIPSE — Tutorial / Prologue Flow (9 stages)
-Status: **approved narrative flow; design specification, NOT implemented**.
+Status: **approved narrative flow. Runtime code for all 9 stages was written on 2026-11-23 (see "Implementation status" at the end); it is statically reviewed and headless-core-tested only. NOT owner-verified on a device; Demon King art is pending integration.**
 Scope: ECLIPSE game only. Do not conflate with ECLIPSE Studio.
 No GitHub Actions or unattended tests/builds. Owner performs runtime validation.
 
@@ -16,8 +16,8 @@ No GitHub Actions or unattended tests/builds. Owner performs runtime validation.
 5. **Castle core:** framing, scale, throne placement, silhouettes and enemy withdrawal imply the final opponent's authority.
 6. **Phase 1 victory:** boss staggers, falls or kneels; attacks cease; brief quiet lets player believe victory.
 7. **Phase 2:** unnatural stillness, armored cracks, energy leaking, changed posture, throne/arena reaction, subdued transformation. Escalating attacks visually communicate an unwinnable disparity without explaining it.
-8. **Death + regression:** legendary class silhouettes/effects flicker and extinguish; time reverses using repeated environmental fragments or animations; no explanatory text. Contrast previously dominant protagonist with powerless figure.
-9. **Forest awakening:** matching pose/visual motif from death to rebirth, missing signature weapons/effects, weak tentative movement; an accessible visual cue introduces progression through reclaimed power.
+8. **Death + infinite regression (owner direction 2026-11-24):** legendary class silhouettes/effects flicker and extinguish; then the same time-reversal plays again and again, faster each time, one tally mark added per loop. Nothing is explained in text. In the last, slow loop the world thins out and **one memory of the earlier regressions stays lit** while everything else fades.
+9. **Forest awakening + memory tutorial:** matching pose/visual motif from death to rebirth, missing signature weapons/effects, weak tentative movement. The surviving memory is eaten at the **memory altar on the awakening spot** (altar glow, interact button pulse, the attack row pulses in the menu); then light leads to the next foe, whose fall leaves another memory flowing into the protagonist. That implies the protagonist grows stronger by finding memories, and the tutorial ends.
 
 ### Readability safeguards
 - Never gate progression on reading language. UI may retain essential accessibility/settings labels, save/error messages and optional control bindings; these are **interface affordances, not story dialogue**. Prefer universal glyphs and allow remapping/accessibility alternatives where needed.
@@ -39,8 +39,8 @@ The tutorial is a playable prologue showing the protagonist's legendary peak usi
 | 5 | Castle core / throne approach | More fodder and final boss intro/encounter. Establish throne staging. | Boss fight begins. |
 | 6 | Demon King Phase 1 | **Genuinely beatable** boss combat. Player actually depletes phase-1 HP. | Phase-1 defeat triggers phase-2 reveal. |
 | 7 | Demon King Phase 2 | Playable confrontation and overwhelming transformation; **narratively unavoidable defeat**, even if player is highly skilled. Keep agency until transition; avoid softlocks if no damage is taken. | Scripted loss / death into story sequence, **not normal Game Over**. |
-| 8 | Death and reincarnation | Death, silence/blackout, time-reversal motif, class/power loss. Show that death triggers a loop; brief visual echoes of both legendary classes can dissolve. | Reincarnation sequence completes. |
-| 9 | Starting forest (**not yet created**) | New game loop starts with weakened baseline protagonist, class/power recovery and progression systems. | Transition into main game. |
+| 8 | Death and infinite regression | Death, silence/blackout, class/power loss, then the **same regression loop repeats** (A5..A1 rewind, faster each time, tally marks), the last slow loop keeps **one memory**. | Last loop ends in a whiteout. |
+| 9 | Starting forest + memory tutorial | New game loop starts with the weakened baseline protagonist. **Upgrade tutorial:** the memory that survived is eaten at the memory altar (first stat upgrade), then the next foe's memory is hinted; beating it also returns the first skill. | Tutorial ends once a memory was eaten and a foe beaten; later new games start here without it. |
 
 ## Encounter roster (design candidates, not yet authored/runtime integrated)
 - **흑철 보병**: ground sword/shield soldier, baseline crowd target.
@@ -110,3 +110,28 @@ Use the character's canonical English class ID, not the animation's source name,
 | Ultimate | `executor.ultimate.mp4` | `verdict.mp4` |
 
 Use the same stem for motion descriptions and skill descriptions. Preserve extension and class spelling consistently. Do not number basic attacks or ultimates as normal skills. This is an authoring/export convention; existing runtime identifiers, binary PNG paths, CMake packaging, and game logic are not renamed without an atomic migration of all references and verification. No GitHub Actions were run.
+
+
+## Implementation status (2026-11-23)
+
+Honest split between design, art, code and verification (do not conflate them):
+
+| # | Stage | Code | Notes |
+|---|---|---|---|
+| 1 | Combat tutorial | `story_director.hpp` `Practice` | **Rewritten 2026-11-25: one continuous fight, no resets, no text.** Opens and ends as the Flash Executioner. 16 beats (`StoryDirector::beats`): walk to a beacon, jump, **dodge** (a soldier's wind-up stops time, chevrons show the dash path through the blow, only Dash resumes it), strike until 3 orbs, Command on reinforcements + a caster (lances mark everyone), **Blink** (the caster starts casting: time stops, a dotted line points at the farthest mark), finish the caster, **Rush** (the soldiers charge: time stops, the charge path is shown, the charge kills them), mark a wave from both sides, **Verdict** (time stops, 20 lances clear the wave), **Swap** when a gatekeeper knight rises, then as the Ruler: bolt, spikes, **repulsion** when surrounded (reach ring), field, **singularity** finale (reach ring, clears the field). Soft beats pulse the button while the fight goes on; reaction beats freeze the world (`Combat::timeScale=0`, tinted and framed) until the prompted button, which fires straight into the moment. Foes are real AI with a 30 % health floor (`Enemy::dummy`+`fights`) until the beat lets them fall; a failed reaction (hit anyway, nothing reached) brings the moment back. Skip and R (replay this beat) remain. **Not playtested.** |
+| 2 | Castle threshold | `Threshold` | Path-light chevrons, a 1.8 s pause + camera look-ahead near x=1100, combat trigger at x=1480. Uses existing A1 art (the practice also runs on A1; there is no separate practice background). |
+| 3 | First foes | `FirstFoes` (A1, A2) | A1: 4 infantry + 2 gargoyles. A2: 3 infantry + 4 hounds. Enemies rise from the floor (`Enemy::wake`). Weakened presets via `Combat::enemyPower/enemyDamageScale`. |
+| 4 | Interior + mid-boss | `Interior` (A3, A4) | A3: 2 knights, 3 priests, 5 infantry. A4: Executioner flagged `boss` + 4 infantry. |
+| 5 | Core | `Core` (A5) | Gargoyle + fodder, then the king intro (slow wake, camera reveal, 2.4 s input pause). |
+| 6 | King phase 1 | `KingPhase1` | New enemy kind `DemonKingArmored` with six telegraphed one-shot moves (smash, quake waves, leap slam, judgement pillars, iron sweep, juggernaut rush). Genuinely beatable. Player has a 1 HP safety floor until phase 2. |
+| 7 | King phase 2 | `KingPhase2` | At 0 HP the armor breaks (`phaseShift` 2.8 s, shards, shake, flash) and the same body becomes `DemonKingTrue` (agile; eight chained combos with their own body motions and pixelfx layers, see `Docs/DEMON_KING_ASSETS.md`). Damage stops at a 35 % health floor (`kingUnbeatable`). Safety floor is lifted; defeat is guaranteed by lethal damage, 38 s timer, or 6 s at the floor (no deadlock for evasion). |
+| 8 | Death + infinite regression | `Death` | Scripted `Combat::defeatPlayer()` (never GAME OVER): death pose, class echoes flicker out with desaturation, blackout, then **5 regression loops** of the A5..A1 rewind (`StoryDirector::loopRoomSeconds` .6/.4/.25/.15 s per room, then a slow .8 s loop; ~11 s total), a tally mark per loop (`view.loopPips`), a flash and shake when a loop snaps back, and in the last loop the world dims while one memory stays lit (`view.memoryGlint`); whiteout, then forest. R does not skip it. |
+| 9 | Starting forest + memory tutorial | `Forest` / `Free` | Open-air forest, blade baseline only (`Combat::handicap`: no swap, no dash, 0 skills, 50 % damage, 72 % speed), 45 HP, protagonist rises by playing the death clip in reverse. **Memory tutorial** (first reincarnation only, `memoryTutorialDone` saved in `story.cfg` v2): one memory is granted, the altar glows and the interact button pulses (`view.altarGlow`, `view.highlight`), the menu pulses the attack row (`view.menuRow`), the menu closes after the first upgrade, then a glint marks the nearest foe (`view.hintX`). The tutorial ends (`Free`) once a memory was eaten and a foe beaten; the first kill also returns Skill 1 (ring cue). `story.cfg` (`ECLIPSE_STORY 2 reincarnated 1 memory 1`; v1 files count as already played) makes later new games start in the forest. Details: `Docs/STAT_PROGRESSION.md`. |
+
+2026-11-24 flow change: the death is now an infinite regression and the forest teaches eating memories at the altar (written, statically syntax-checked only; not built, run, playtested or device-tested; the loop timings are untuned and the visuals are code-drawn placeholders).
+
+2026-11-24 review: R can no longer revive the scripted death, R in the forest keeps the weakened baseline, finishing practice returns the player to the start, and the tutorial gatekeeper knight is eased (x0.65 health). Balance figures are static estimates; not playtested or build-tested.
+
+Not done / open: separate practice background, training dummy for Flash marks, replay-practice control (only skip + R), real forest layout beyond the existing forest art, skill 2-4 recovery progression, audio cues, tuning of every number, and all owner device tests. R inside the tutorial replays only the current beat.
+
+Art: the Demon King is a new pair of sheets (see Docs/DEMON_KING_ASSETS.md). Until they are imported the loader reports `ECLIPSE ENEMY ASSET ERROR` if the king is requested; Presentation currently needs the sheets in `Assets/Resources/Eclipse/monsters/demon_castle/마왕_갑주` and `마왕_본체`.

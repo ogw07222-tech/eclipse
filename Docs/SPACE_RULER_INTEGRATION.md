@@ -4,11 +4,11 @@ The ranged job (job 1 / former Fire Mage) now uses the approved Download `space 
 
 - Movement: the grounded role uses `walk.png`, an eight-frame, 0.72-second PixelLab `animate_with_skeleton_v3` loop generated from the exact original `space_ruler_96_30colors.png` sprite. The purple mage, robe silhouette, and glowing open book are retained while the feet alternate through visible contact and lift poses. The east-facing frames are flipped horizontally when facing west. The actor stays anchored to the floor while grounded; jump/flight input uses the existing flight_rise / flight_hold / flight_descend sheets only while airborne. The sprite is drawn 10 world units above the collision foot; existing collision dimensions remain unchanged.
 - Hold jump (W / up arrow / space, or touch joystick upward): fly up to 160 world units, then hold altitude. Fuel lasts four seconds; release or empty fuel descends at 110 units/s. Grounded fuel regenerates at 20%/second. Exhaustion requires landing and releasing jump before another flight.
-- Basic attack J/Z: attack.png, void-bolt Pixelfx projectile at .18 seconds, .55-second cooldown. Void damage has no fire/burn; direct impact gives weak resistance-aware attraction.
+- Basic attack J/Z: attack.png, void-bolt Pixelfx projectile at .18 seconds, 15 base damage (was 11; 2026-11-24 balance), .55-second cooldown. Void damage has no fire/burn; direct impact gives weak resistance-aware attraction.
 - Button/key 1 (K/X): skill1.png; gravity-field follows the caster for three seconds, 150-unit radius, 30% movement slow, 6 damage every .5 seconds, seven-second cooldown. No forced pull.
-- Button/key 2 (U): skill2.png and dimensional-spikes; contact .24 seconds, directional rectangle 245 units long / 130 high, 24 base damage, seven-second cooldown.
+- Button/key 2 (U): skill2.png and dimensional-spikes; contact .24 seconds, directional rectangle 245 units long / 130 high, 36 base damage (was 24; 2026-11-24 balance), seven-second cooldown.
 - Button/key 3 (O): skill3.png and repulsion-wave; contact .15 seconds, 180-unit radius, 12 base damage, resistance-aware knockback, five-second cooldown. Does not cancel enemy attacks.
-- Button/key 4 (P): ultimate.png and singularity-collapse; two-second actor/FX timeline, 340-unit attraction radius, collapse damage 65 at 1.68 seconds, twenty-second cooldown. Movement is horizontal-locked during the cast. Taking damage or swapping can interrupt the cast before collapse.
+- Button/key 4 (P): ultimate.png and singularity-collapse; two-second actor/FX timeline, 340-unit attraction radius, collapse damage 105 at 1.68 seconds (was 65; 2026-11-24 balance), twenty-second cooldown. Movement is horizontal-locked during the cast. Taking damage or swapping can interrupt the cast before collapse.
 - In flight: flight_rise / flight_hold / flight_descend, with flight-trail behind the feet. Basic and skill casting remain possible in air.
 - Hurt/death use the corresponding imported sheets. Existing knight and executioner assets and combat paths remain separate.
 
@@ -17,3 +17,7 @@ All six FX roles use `space ruler/pixelfx` exports, with enlarged in-game render
 Android Gradle and desktop CMake packaging include the new directory. Atlas loading checks exact dimensions and raises an ECLIPSE ASSET ERROR dialog rather than silently substituting old mage art.
 
 Validation performed: static source/diff inspection, PNG RGBA decoding, frame-grid bounds, source/runtime SHA-256 equality, review contact sheet. No game build, owner-owned tests, device execution, or GitHub Actions run was performed. Device acceptance remains pending: select the job, move/flip, fly until exhausted, release/land/recover, use basic/1/2/3/4 in both facing directions and in air, verify collisions and each cooldown, interrupt casts by hurt/swap, verify missing-asset errors and packaging on device.
+
+
+## Balance note (2026-11-24, static estimate, not playtested)
+Single-target DPS from the constants in `combat.hpp`: Flash Executioner ~80, blade ~56, Space Ruler 34 before and ~45 after (void bolt 11->15, spikes 24->36, singularity 65->105; field 6/tick, repulsion 12, all cooldowns, radii and timings unchanged). Space Ruler keeps its range and area advantage; one singularity now clears any tutorial soldier. The documented 30% slow of the gravity field is NOT implemented (only the damage ticks are). Constants: `spaceBoltDamage`, `spaceSpikesDamage`, `spaceSingularityDamage`.

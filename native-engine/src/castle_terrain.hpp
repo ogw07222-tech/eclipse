@@ -1,5 +1,5 @@
 #pragma once
-// ECLIPSE handcrafted castle terrain A1-A5, v36; aligned to current background walkways.
+// ECLIPSE handcrafted castle terrain A1-A5, v37; foot baselines sit 3 px below art surface edges.
 // Coordinate space: 1280x720 viewport, 2160 world units. No procedural generation.
 #include <algorithm>
 #include <cmath>
@@ -8,17 +8,17 @@ namespace eclipse::CastleTerrain {
 struct Node { float x,y; };
 struct Platform { float left,right,y; };
 struct Profile { const Node* nodes; int nodeCount; const Platform* platforms; int platformCount; float width,spawnX,spawnY,gapL,gapR; };
-inline constexpr Node a1Nodes[]={{0,620},{350,624},{760,616},{1200,614},{1620,612},{2160,604}};
-inline constexpr Node a2Nodes[]={{0,628},{2160,628}};
-inline constexpr Node a3Nodes[]={{0,626},{460,626},{600,540},{900,540},{980,626},{1120,626},{1140,626},{1250,626},{1500,620},{1660,582},{1900,540},{2160,540}};
-inline constexpr Node a4Nodes[]={{0,628},{480,588},{680,548},{1050,540},{1470,508},{1680,484},{1900,460},{2160,440}};
-inline constexpr Node a5Nodes[]={{0,550},{1750,550},{1880,535},{2010,500},{2160,480}};
+inline constexpr Node a1Nodes[]={{0,623},{350,627},{760,619},{1200,617},{1620,615},{2160,607}};
+inline constexpr Node a2Nodes[]={{0,631},{2160,631}};
+inline constexpr Node a3Nodes[]={{0,629},{460,629},{600,543},{900,543},{980,629},{1120,629},{1140,629},{1250,629},{1500,623},{1660,585},{1900,543},{2160,543}};
+inline constexpr Node a4Nodes[]={{0,631},{480,591},{680,551},{1050,543},{1470,511},{1680,487},{1900,463},{2160,443}};
+inline constexpr Node a5Nodes[]={{0,553},{1750,553},{1880,538},{2010,503},{2160,483}};
 inline constexpr Profile profiles[]={
- {a1Nodes,6,nullptr,0,2160,130,650,-1,-1},
- {a2Nodes,2,nullptr,0,2160,120,644,-1,-1},
- {a3Nodes,12,nullptr,0,2160,110,632,1150,1220},
- {a4Nodes,8,nullptr,0,2160,140,590,-1,-1},
- {a5Nodes,5,nullptr,0,2160,135,550,-1,-1}
+ {a1Nodes,6,nullptr,0,2160,130,624.5f,-1,-1},
+ {a2Nodes,2,nullptr,0,2160,120,631,-1,-1},
+ {a3Nodes,12,nullptr,0,2160,110,629,1150,1220},
+ {a4Nodes,8,nullptr,0,2160,140,619.333f,-1,-1},
+ {a5Nodes,5,nullptr,0,2160,135,553,-1,-1}
 };
 inline const Profile& profile(int area){ return profiles[std::clamp(area,1,5)-1]; }
 inline float portalX(int area,bool right){

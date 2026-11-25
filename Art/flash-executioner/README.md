@@ -45,3 +45,77 @@ Static inspection confirms27 runtime PNG files (12 actor roles,15 effect roles),
 GitHub main is the sole canonical project source.
 
 Only static source/PNG/hash checks and main agent visual review were performed. Game tests, builds, APK, device playback and GitHub Actions were **not run**. Owner verification remains required for action timing, both facing directions, skill2 hands, teleport registration, effect occlusion and performance.
+
+## Mid-frame and light-crescent update (2026-11-22)
+
+- Basic, Skill1 and Dash actor sheets gained AI-generated mid-frames to reduce large pose jumps; Skill2, Skill3, Swap and Land are unchanged on purpose (Skill3 position jumps are intentional blink frames).
+- Basic attack keeps its gameplay duration (0.46s) and contact time (0.184s); the inserted frames play inside the same wind-up. `contactFrame` moved to the matching contact pose.
+- Dash `contactFrame` stays -1 (no contact frame).
+- Mid-frames were generated with PixelLab `animate_image` with the original neighbouring frames pinned. The redrawn Basic blade frame (0-based 8) was edited in the PixelLab pixel workbench. Nothing is hand-authored, and no effects are baked into any actor sheet.
+- Slash effect is now the custom `melee/blade-light-crescent` (33 frames, 5x7 grid of 320x240 cells, fps 30, duration 1.1s, pivot 120,140, scale 1.4, offset 6,-13, triggerLeadSeconds 0.159, layer front). It is remixed from PixelFX recipes `melee/sword-slash`, `melee/scythe-reap` and `holy/divine-shield`, so it is NOT an unmodified upstream resource. This deviates from the earlier "unmodified PixelFX resource only" rule by the owner's explicit decision; the policy exception is recorded here. Source: `pixelfx/blade-light-crescent.js` and `pixelfx/blade-light-crescent-sheet.json`.
+- Engine: for `FlashMove::Slash`, `playbackDuration = fxSheet.duration / speed` (no longer stretched to the attack clip's remaining time) in `native-engine/src/presentation.hpp`.
+- `Tools/art/import_flash_executioner.py` was run on `review-approval.json`, accepting all 27 sheets; `native-engine/src/flash_executioner_assets.hpp` was regenerated (only the Basic, Skill1, Dash and Slash lines changed).
+- Backups of the previous sheets, approval JSON and header are in `pre-midframe-originals/`. Generation totals: 17 PixelLab generations, 11 of which are in shipped assets (Basic 5, Dash 3, Skill1 3).
+
+| Asset | Frames (old -> new) | contactFrame (old -> new) | Source |
+| --- | --- | --- | --- |
+| `reviewed/actor_basic.png` (6x6, 192px cells, 1152x1152) | 28 -> 35 (7 inserted after original F6, 0-based 6-12) | 6 -> 13 | PixelLab `animate_image`, F6 and F7 pinned, seed 31, 5 generations; blade of 0-based frame 8 redrawn in pixel workbench |
+| `reviewed/actor_dash.png` (4x4, 192px cells, 768x768) | 9 -> 13 (4 inserted after F1) | -1 -> -1 | PixelLab `animate_image`, F1 and F2 pinned, seed 7, 3 generations |
+| `reviewed/actor_skill1.png` (6x6, 192px cells) | 30 -> 33 (3 inserted after original F6) | 6 -> 9 | PixelLab `animate_image`, F6 and F7 pinned, seed 41, 3 generations; a 4th near-duplicate of F7 was dropped Burst/arrowhead shapes the AI drew on mid-frames 2 and 3 were removed and replaced with partial original F7 blade pixels (no baked effects). |
+| `reviewed/effect_slash.png` (5x7, 320x240 cells) | replaced by 33-frame custom effect (1.1 s) | n/a | Custom `melee/blade-light-crescent` remixed from `melee/sword-slash`, `melee/scythe-reap`, `holy/divine-shield` (owner-approved exception) |
+
+Runtime copies in `Assets/Resources/Eclipse/flash_executioner/` match the reviewed files pixel for pixel.
+
+Not built, tested or device-checked. No GitHub Actions were run. Owner device verification is pending for the mid-frame timing, the Slash playback duration and the custom crescent effect.
+
+### Mid-air burst effects (2026-11-22)
+
+The Impact and LanceHit hit effects and the Slash light crescent now burst in mid-air instead of assuming a floor. The upstream PixelFX recipes are floor-based (crit-hit kicks sparks upward with bouncing gravity shards; smite is a floor shockwave with stone chips and dust), so these are custom effects, not unmodified upstream resources. This is the owner's explicit decision (2026-11-22), recorded in `review-approval.json`.
+
+| Effect | Old source | New source | Grid / frames | Anchor |
+| --- | --- | --- | --- | --- |
+| Impact (`effect_impact.png`) | `impacts/crit-hit` | `impacts/air-hit` (`pixelfx/air-hit.js`) | 5x4, 240x240 cells, 16 frames, pivot 120,120, scale 0.7, fps 30, 0.53 s | impact centre |
+| LanceHit (`effect_lancehit.png`) | `holy/smite` | `holy/air-burst` (`pixelfx/air-burst.js`) | 6x4, 320x320 cells, 23 frames, pivot 160,160, scale 0.85, fps 30, 0.77 s | impact centre (targetFeet 0) |
+| Slash (`effect_slash.png`) | `melee/blade-light-crescent` with gravity-based particles | same sheet; sparks and motes scatter with drag, no gravity or floor (`pixelfx/blade-light-crescent.js`) | 5x7, 320x240 cells, 33 frames, scale 1.4, 1.1 s, layer front (drawn in front of the fighter) | unchanged |
+
+- Impact and LanceHit are symmetric. Impact is a burst of light in the gold-white palette: a soft white bloom flash, one luminous ring, a lens cross, a few wide soft rays, glints and drifting light motes, all spreading in every direction with no spark streaks, no gravity and no floor. LanceHit uses the same light-burst language, larger: a bloom flash, two luminous rings, rays, glints and motes in every direction.
+- 2026-11-22 revision: rebuilt as soft light bursts (no spark streaks) and reduced in size at the owner's request; current scales are Impact 0.7 and LanceHit 0.85 (earlier versions used 1.7 and 1.5).
+- Previous sheets are kept in `pre-midframe-originals/` (`effect_impact.png`, `effect_lancehit.png`, `effect_slash_crescent_v1.png`).
+- `Tools/art/import_flash_executioner.py` was re-run and accepted all 27 sheets. `native-engine/src/flash_executioner_assets.hpp` now points Impact and LanceHit at the new sheets and dimensions.
+- 2026-11-22 scale update: the basic attack Impact is scale 0.7 and LanceHit is scale 0.85. Command and Rush hits use the new ImpactLance and ImpactRush sheets (see Hit effect variants).
+- Jump and Land (`impacts/heavy-landing`) are ground effects by nature and are unchanged. Rush, Command, BlinkOut/BlinkIn, Swap, Dash, Orb, Lance and SkyLance were not changed and were not re-checked for floor assumptions.
+
+Not built, tested or device-checked. No GitHub Actions were run. Owner device verification is pending.
+
+### Hit effect variants (2026-11-22)
+
+The hit effect is fixed per action: the same action always shows the same effect, different actions show different effects, and stronger actions look stronger (bigger and heavier). All are custom mid-air bursts of light in the gold-white palette, with no floor, no gravity and no spark streaks, derived from `impacts/crit-hit` and `holy/smite`. They are not unmodified upstream PixelFX resources, as recorded in `review-approval.json`. The earlier rotating variant set was replaced by this design.
+
+| Tier (weakest to strongest) | Action | File | Source | Frames / grid | Scale | Duration | Look |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Basic attack | Impact | `effect_impact.png` | `impacts/air-hit` (`pixelfx/air-hit.js`) | 16 / 5x4, 240x240, pivot 120,120 | 0.7 | 0.53 s | Small round bloom flash, one ring, lens cross, soft rays, glints |
+| Command skill (stored light lances) | ImpactLance | `effect_impactlance.png` | `impacts/air-hit-cross` (`pixelfx/air-hit-cross.js`) | 12 / 5x3, 240x240, pivot 120,120 | 0.8 | 0.40 s | Two crossing blades of light |
+| Rush skill | ImpactRush | `effect_impactrush.png` | `impacts/air-hit-rush` (`pixelfx/air-hit-rush.js`) | 16 / 5x4, 280x280, pivot 140,140 | 0.8 | 0.53 s | Heavy long eight-point star, big bloom, two shock rings, ring of glints |
+| Verdict (ultimate) lance | LanceHit | `effect_lancehit.png` | `holy/air-burst` (`pixelfx/air-burst.js`) | 23 / 6x4, 320x320, pivot 160,160 | 0.85 | 0.77 s | Tails cut (27 -> 23 frames) and scale reduced from 1.0 to 0.85 (2026-11-22 readability pass); 20 lances each burst, plus the Verdict pillar |
+
+- Engine, `native-engine/src/combat.hpp`: `enum LightFx` gained `SlashHit` and `RushHit` at the end. The basic attack publishes `LightFx::SlashHit` for each enemy hit when `player.flashExecutioner` is set (before this change the basic attack published no hit burst). The Rush skill hit publishes `LightFx::RushHit` instead of `LightFx::Impact`. Lance landings still publish `LightFx::Impact`.
+- Mapping, `native-engine/src/presentation.hpp`: Impact -> `FlashFx::ImpactLance`, SlashHit -> `FlashFx::Impact`, RushHit -> `FlashFx::ImpactRush`, Verdict -> `FlashFx::LanceHit`. The plain Impact is still suppressed when a verdict pair exists. The legacy "replaced" check was extended for the new kinds so the old procedural burst is not drawn on top.
+- Importer: `Tools/art/import_flash_executioner.py` EFFECTS list and FlashFx header template end with `..., Land, ImpactLance, ImpactRush`, in that order. The tool accepted 29 sheets and `native-engine/src/flash_executioner_assets.hpp` was regenerated. The obsolete variant PNGs were removed from Art and runtime by the tool.
+- Packaging: CMake and Android Gradle package `flash_executioner/*.png` by glob, so no build-file change was needed.
+- Not compiled: the C++ edits are static only. No build or test was run, and no GitHub Actions were run. Owner device verification is pending.
+- Open: Command lances and Verdict lances share the Impact burst kind (the Verdict case is handled by the pair rule). Blink arrival and Dash, Swap, Jump and Land effects were not reviewed for this tiering.
+
+### Readability check (2026-11-22)
+
+Measured with `occlusion_metric.py` on the same takes, rendered with and without effects. Only the four hit effects (Impact, ImpactLance, ImpactRush, LanceHit) changed; the Slash crescent is unchanged.
+
+| Take | Player silhouette covered, peak (before -> after) | Screen coverage, peak (before -> after) |
+| --- | --- | --- |
+| Basic attack x3 (3.55 s) | 28% -> 28% | not recorded (1.95 s of 3.55 s with any effect on screen) |
+| Rush | 77% -> 58% | 0.9% -> 0.5% |
+| Command | 10% -> 10% | not recorded -> 1.0% |
+| Verdict | 0% -> 0% | 3.2% -> 2.9% |
+
+- What changed: the nearly transparent tails of the four hit effects were cut (Impact 18 -> 16 frames, ImpactLance 18 -> 12, ImpactRush 21 -> 16, LanceHit 27 -> 23) and their scales were lowered (ImpactLance 0.9 -> 0.8, ImpactRush 1.2 -> 0.8, LanceHit 1.0 -> 0.85; Impact stays at 0.7). The Slash crescent (33 frames, 1.1 s, scale 1.4, in front of the fighter) was not changed. A shortened, rear-layer Slash was tried and reverted at the owner's request.
+- Measuring tool: `Art/ui/review-before-after/motion-review/occlusion_metric.py` renders a take with and without effects and reports screen coverage, player silhouette coverage and seconds with an effect on screen. The seconds value did not change for Rush, Command and Verdict, because it is dominated by non-hit effects (orbs, pillar, rush trail).
+- Remaining rush overlap: the fighter rushes through the target, so the Rush hit still covers up to 58% of the player for about 0.1 s at the contact moment. Owner device verification is still pending; nothing was built or tested.

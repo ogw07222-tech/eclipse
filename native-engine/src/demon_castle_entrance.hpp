@@ -1,5 +1,5 @@
 #pragma once
-// ECLIPSE fixed-map demon castle: five single-image backgrounds and paired blue portals.
+// ECLIPSE fixed-map demon castle: five layered backgrounds and one-way exit portals.
 // Portal anchors share the hand-authored CastleTerrain world coordinates.
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
@@ -13,7 +13,7 @@ namespace eclipse {
 class DemonCastleEntrance {
     SDL_Renderer* renderer_=nullptr;
     std::array<SDL_Texture*,5> images_{};
-    std::array<float,5> widths_{};
+    std::array<SDL_Texture*,5> floors_{};
     SDL_Texture* portal_=nullptr;
     int active_=0;
     bool ready_=false;
@@ -31,39 +31,45 @@ public:
     DemonCastleEntrance& operator=(const DemonCastleEntrance&)=delete;
     void clear(){
         for(auto*& p:images_){if(p)SDL_DestroyTexture(p);p=nullptr;}
+        for(auto*& p:floors_){if(p)SDL_DestroyTexture(p);p=nullptr;}
         if(portal_){SDL_DestroyTexture(portal_);portal_=nullptr;}
-        widths_.fill(0.f);ready_=false;active_=0;
+        ready_=false;active_=0;
     }
     template<class Resolve>
     bool load(SDL_Renderer* renderer,Resolve resolve){
         clear();renderer_=renderer;
-        constexpr int expectedW[]={2172,2172,2172,2172,2172};
-        constexpr int expectedH[]={724,724,724,724,724};
-        for(int i=0;i<5;++i){
-            const std::string path=resolve(files_[i]);
+        auto loadLayer=[&](const std::string& path,SDL_Texture*& texture,SDL_BlendMode blend){
             SDL_Surface* surface=IMG_Load(path.c_str());
             if(!surface){
-                const std::string reason=SDL_GetError();clear();
+                const std::string reason=SDL_GetError();
                 SDL_SetError("ECLIPSE ASSET ERROR: cannot load %s: %s",path.c_str(),reason.c_str());
                 return false;
             }
-            const int actualW=surface->w,actualH=surface->h;
-            if(actualW!=expectedW[i]||actualH!=expectedH[i]){
-                SDL_DestroySurface(surface);clear();
-                SDL_SetError("ECLIPSE ASSET ERROR: %s has size %dx%d; expected %dx%d",
-                    path.c_str(),actualW,actualH,expectedW[i],expectedH[i]);
+            if(surface->w!=2172||surface->h!=724){
+                const int w=surface->w,h=surface->h;
+                SDL_DestroySurface(surface);
+                SDL_SetError("ECLIPSE ASSET ERROR: %s has size %dx%d; expected 2172x724",path.c_str(),w,h);
                 return false;
             }
-            images_[i]=SDL_CreateTextureFromSurface(renderer_,surface);
+            texture=SDL_CreateTextureFromSurface(renderer_,surface);
             SDL_DestroySurface(surface);
-            if(!images_[i]){
-                const std::string reason=SDL_GetError();clear();
-                SDL_SetError("ECLIPSE ASSET ERROR: cannot create texture for %s: %s",path.c_str(),reason.c_str());
+            if(!texture||!SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST)||
+               !SDL_SetTextureBlendMode(texture,blend)){
+                const std::string reason=SDL_GetError();
+                SDL_SetError("ECLIPSE ASSET ERROR: cannot prepare %s: %s",path.c_str(),reason.c_str());
                 return false;
             }
-            SDL_SetTextureScaleMode(images_[i],SDL_SCALEMODE_NEAREST);
-            SDL_SetTextureBlendMode(images_[i],SDL_BLENDMODE_NONE);
-            widths_[i]=static_cast<float>(expectedW[i])*720.f/static_cast<float>(expectedH[i]);
+            return true;
+        };
+        for(size_t i=0;i<files_.size();++i){
+            const std::string name=files_[i];
+            const std::string floor=name.substr(0,name.size()-4)+"_floor.png";
+            if(!loadLayer(resolve(files_[i]),images_[i],SDL_BLENDMODE_NONE)||
+               !loadLayer(resolve(floor.c_str()),floors_[i],SDL_BLENDMODE_BLEND)){
+                const std::string reason=SDL_GetError();
+                clear();SDL_SetError("%s",reason.c_str());
+                return false;
+            }
         }
         const std::string portalPath=resolve("demon_castle/blue_portal.png");
         SDL_Surface* portalSurface=IMG_Load(portalPath.c_str());
@@ -101,14 +107,15 @@ public:
     }
     void draw(float camera,float time=0.f) const{
         if(!ready())return;
-        // Preserve the engine's 1280x720 reference viewport and world camera.
-        // No parallax, no background tiling, no procedural scenery.
-        const float travel=std::max(0.f,std::round(camera-640.f));
-        const float width=widths_[active_];
-        const float maxOffset=std::max(0.f,width-1280.f);
-        const float shift=std::min(travel,maxOffset);
-        const SDL_FRect destination{-shift,0.f,width,720.f};
-        SDL_RenderTexture(renderer_,images_[active_],nullptr,&destination);
+        const float width=CastleTerrain::profile(area()).width;
+        const float shift=std::clamp(std::round(camera-640.f),0.f,width-1280.f);
+        // Keep the near lip at the same world X as the collision surface.
+        constexpr float rearSpeed[]={.60f,.81f,.42f,.52f,.65f};
+        const float rearY=area()==5?-112.f:0.f; // expose the throne seat above the arena lip
+        const SDL_FRect rear{-std::round(shift*rearSpeed[active_]),rearY,width,720};
+        SDL_RenderTexture(renderer_,images_[active_],nullptr,&rear);
+        const SDL_FRect floor{-shift,0,width,720};
+        SDL_RenderTexture(renderer_,floors_[active_],nullptr,&floor);
         const Uint8 alpha=static_cast<Uint8>(214.f+28.f*(.5f+.5f*std::sin(time*2.2f)));
         SDL_SetTextureAlphaMod(portal_,alpha);
         const float x=CastleTerrain::portalX(area(),true);

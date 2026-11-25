@@ -24,8 +24,8 @@ Use the approved visual direction in [Tutorial / Prologue Flow](TUTORIAL_PROLOGU
 
 | Area | Canonical name | Background intent |
 | --- | --- | --- |
-| A1 | Ashen Approach | The outer approach near the Demon Castle; communicate ash, an uneven route and the looming presence of the entrance without showing the whole castle. |
-| A2 | Broken Gate | A damaged threshold with broken masonry and traversable ground that signals entry into the castle. |
+| A1 | Ashen Approach | The open road leading to the Demon Castle. Keep sky over the player and a long, low route through ash, broken boundary stones and a torn standard. A fragment of outer wall emerging through the violet haze at the far right promises arrival. Save the gate and its doorway for A2. |
+| A2 | Broken Gate | Arrival directly outside the damaged main gate. Bring the same outer masonry into the foreground; show the full doorway at roughly two player heights beneath its larger gatehouse. Use the violet backlight, layered ruined silhouettes and eclipse-marked gate of the breached-causeway concept here. The approach ends at the threshold; A3 reveals the enclosed corridor. |
 | A3 | Void Corridor | An interior passage shaped by oppressive architecture and void influence; preserve readable ground and authored gaps. |
 | A4 | Throne Stairway | A rising interior route that directs attention toward the castle core through stairs and vertical architecture. |
 | A5 | Night Throne | A focused throne arena with strong framing and a clear combat floor; keep the Demon King staging readable. |

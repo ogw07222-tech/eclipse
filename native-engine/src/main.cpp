@@ -10,6 +10,9 @@
 namespace {
 SDL_Window* window=nullptr;SDL_Renderer* renderer=nullptr;
 eclipse::Combat game;eclipse::Animation animation;eclipse::Input input;eclipse::ControlLayout layout;
+eclipse::StoryDirector story;
+std::string progressPath;unsigned savedProgressRevision=0;float progressSaveTimer=0;
+eclipse::MemoryMenuController menuPointer;   // altar menu: taps, tabs and the tree drag
 bool running=true,foreground=true;
 enum class TitlePage { Main, StartOptions, QaCharacters, Gear, Settings };
 TitlePage titlePage=TitlePage::Main;
@@ -35,6 +38,14 @@ bool vacodeSessionReady(){
 }
 int qaFirstJob=-1;
 float camera=640;
+// Apply the director's scene request (castle area or starting forest) to the renderer and camera.
+void applyScene(eclipse::Presentation& view){
+    eclipse::StoryDirector::SceneChange sc;
+    if(!story.takeScene(sc))return;
+    if(sc.forest)view.setDemonCastleEntrance(false);
+    else{view.setDemonCastleEntrance(true);view.setDemonCastleArea(sc.area);}
+    camera=std::clamp(game.player.x,640.f,std::max(640.f,game.castleWorldWidth()-640.f));
+}
 void requestVacodeLogin(){
 #ifdef SDL_PLATFORM_ANDROID
     auto* env=static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
@@ -53,6 +64,18 @@ void requestVacodeLogin(){
 #endif
 }
 std::array<bool,SDL_SCANCODE_COUNT> keyState{};
+// Stat progression is saved at most every 2 s while it changes, and always on exit.
+void saveProgress(bool force){
+    if(progressPath.empty())return;
+    if(!force&&game.progression.revision==savedProgressRevision)return;
+    if(game.progression.save(progressPath))savedProgressRevision=game.progression.revision;
+    else SDL_Log("ECLIPSE progress save failed: %s",progressPath.c_str());
+}
+// New game: the prologue begins (or, after the first reincarnation, the starting forest).
+void beginStory(eclipse::Presentation& view){
+    story.start(game);animation.reset();input.reset();keyState.fill(false);
+    camera=640;applyScene(view);
+}
 void updateKeyboard(){const auto& k=keyState;eclipse::Actions a;
         a.left=k[SDL_SCANCODE_A]||k[SDL_SCANCODE_LEFT];a.right=k[SDL_SCANCODE_D]||k[SDL_SCANCODE_RIGHT];a.jump=k[SDL_SCANCODE_SPACE]||k[SDL_SCANCODE_W]||k[SDL_SCANCODE_UP];
         a.attack=k[SDL_SCANCODE_J]||k[SDL_SCANCODE_Z];a.interact=k[SDL_SCANCODE_E];a.skill=k[SDL_SCANCODE_K]||k[SDL_SCANCODE_X];a.swap=k[SDL_SCANCODE_L]||k[SDL_SCANCODE_C]||k[SDL_SCANCODE_TAB];
@@ -65,7 +88,7 @@ void updateKeyboard(){const auto& k=keyState;eclipse::Actions a;
         }
         input.keyboard(a);
 }
-void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
+void events(bool& titleActive,float& titleSeconds,eclipse::Presentation& view){
     const bool wasTitle=titleActive;
     auto beginGame=[&](int first,int second)->bool{
         if(first==second||first<1||first>2||second<1||second>2)return false;
@@ -76,8 +99,8 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
             return false;
         }
         game.player.equippedJobs={{first,second}};
-        game.restart();animation.reset();input.reset();keyState.fill(false);
-        camera=640;qaFirstJob=-1;titlePage=TitlePage::Main;titleActive=false;
+        beginStory(view);
+        qaFirstJob=-1;titlePage=TitlePage::Main;titleActive=false;
         SDL_Log("ECLIPSE equipped jobs first=%d second=%d",first,second);
         return true;
     };
@@ -96,7 +119,15 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
                 waitingForVacode=false;
                 continue;
             }
-            if(titleSeconds<eclipse::Presentation::titleReadyTime)continue;
+            const bool finger=e.type==SDL_EVENT_FINGER_DOWN&&e.tfinger.touchID!=SDL_MOUSE_TOUCHID;
+            const bool mouse=e.type==SDL_EVENT_MOUSE_BUTTON_DOWN&&e.button.which!=SDL_TOUCH_MOUSEID&&e.button.button==SDL_BUTTON_LEFT;
+            if(titleSeconds<eclipse::Presentation::titleReadyTime){
+                const bool confirm=e.type==SDL_EVENT_KEY_DOWN&&!e.key.repeat&&
+                    (e.key.scancode==SDL_SCANCODE_RETURN||e.key.scancode==SDL_SCANCODE_KP_ENTER||
+                     e.key.scancode==SDL_SCANCODE_SPACE);
+                if(finger||mouse||confirm)titleSeconds=eclipse::Presentation::titleReadyTime;
+                continue;
+            }
             if(e.type==SDL_EVENT_KEY_DOWN&&!e.key.repeat&&e.key.scancode==SDL_SCANCODE_F9){
                 qaFirstJob=-1;titlePage=TitlePage::QaCharacters;waitingForVacode=false;continue;
             }
@@ -112,8 +143,6 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
                     selection=0;
                 }
             }
-            const bool finger=e.type==SDL_EVENT_FINGER_DOWN&&e.tfinger.touchID!=SDL_MOUSE_TOUCHID;
-            const bool mouse=e.type==SDL_EVENT_MOUSE_BUTTON_DOWN&&e.button.which!=SDL_TOUCH_MOUSEID&&e.button.button==SDL_BUTTON_LEFT;
             if((finger||mouse)&&SDL_ConvertEventToRenderCoordinates(renderer,&e)){
                 const SDL_FPoint pos=finger?SDL_FPoint{e.tfinger.x,e.tfinger.y}:SDL_FPoint{e.button.x,e.button.y};
                 if(titlePage==TitlePage::QaCharacters){
@@ -173,10 +202,24 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
         if(foreground&&(e.type==SDL_EVENT_KEY_DOWN||e.type==SDL_EVENT_KEY_UP)&&e.key.scancode>=0&&e.key.scancode<SDL_SCANCODE_COUNT){
             keyState[e.key.scancode]=e.type==SDL_EVENT_KEY_DOWN;updateKeyboard();
         }
+        if(e.type==SDL_EVENT_KEY_DOWN&&!e.key.repeat&&e.key.scancode==SDL_SCANCODE_RETURN&&story.view.skipVisible)story.requestSkip(game);
+        // Memory altar menu open: keys 1-7 pick a permanent stat, Enter buys the selected tree node; left/right switch tabs; drag scrolls the tree.
+        if(!titleActive&&game.memoryMenu&&e.type==SDL_EVENT_KEY_DOWN&&!e.key.repeat){
+            if(game.memoryTab==0&&e.key.scancode>=SDL_SCANCODE_1&&e.key.scancode<=SDL_SCANCODE_7)
+                game.menuChoose(static_cast<int>(e.key.scancode)-static_cast<int>(SDL_SCANCODE_1));
+            else if(game.memoryTab==1&&e.key.scancode==SDL_SCANCODE_RETURN&&game.memoryTreeSelected>=0)
+                game.buyMasteryNode(game.memoryTreeSelected);
+        }
         if(e.type==SDL_EVENT_KEY_DOWN&&e.key.scancode==SDL_SCANCODE_ESCAPE){if(layout.editing){layout.close();input.reset();}else running=false;continue;}
         if(e.type==SDL_EVENT_FINGER_DOWN||e.type==SDL_EVENT_FINGER_MOTION||e.type==SDL_EVENT_FINGER_UP){
             if(e.tfinger.touchID==SDL_MOUSE_TOUCHID)continue;
             if(SDL_ConvertEventToRenderCoordinates(renderer,&e)){
+                if(e.type==SDL_EVENT_FINGER_DOWN&&story.view.skipVisible&&eclipse::StoryDirector::skipHit(e.tfinger.x,e.tfinger.y)){story.requestSkip(game);continue;}
+                if(game.memoryMenu){
+                    if(e.type==SDL_EVENT_FINGER_DOWN){menuPointer.down(game,e.tfinger.x,e.tfinger.y);continue;}
+                    if(e.type==SDL_EVENT_FINGER_MOTION){menuPointer.move(game,e.tfinger.x,e.tfinger.y);continue;}
+                    if(e.type==SDL_EVENT_FINGER_UP)menuPointer.up(game,e.tfinger.x,e.tfinger.y);   // then on to the input layer: releases the opening finger
+                }
                 bool wasEditing=layout.editing;
                 bool consumed=layout.pointer(e.tfinger.fingerID,e.tfinger.x,e.tfinger.y,e.type!=SDL_EVENT_FINGER_UP,e.type==SDL_EVENT_FINGER_MOTION);
                 if(consumed){if(!wasEditing||!layout.editing)input.reset();}
@@ -185,6 +228,11 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
         }else if(e.type==SDL_EVENT_MOUSE_BUTTON_DOWN||e.type==SDL_EVENT_MOUSE_BUTTON_UP){
             if(e.button.which==SDL_TOUCH_MOUSEID||e.button.button!=SDL_BUTTON_LEFT)continue;
             if(SDL_ConvertEventToRenderCoordinates(renderer,&e)){
+                if(e.type==SDL_EVENT_MOUSE_BUTTON_DOWN&&story.view.skipVisible&&eclipse::StoryDirector::skipHit(e.button.x,e.button.y)){story.requestSkip(game);continue;}
+                if(game.memoryMenu){
+                    if(e.type==SDL_EVENT_MOUSE_BUTTON_DOWN){menuPointer.down(game,e.button.x,e.button.y);continue;}
+                    if(e.type==SDL_EVENT_MOUSE_BUTTON_UP)menuPointer.up(game,e.button.x,e.button.y);
+                }
                 bool wasEditing=layout.editing;
                 bool consumed=layout.pointer(-1,e.button.x,e.button.y,e.type==SDL_EVENT_MOUSE_BUTTON_DOWN);
                 if(consumed){if(!wasEditing||!layout.editing)input.reset();}
@@ -192,6 +240,7 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
             }
         }else if(e.type==SDL_EVENT_MOUSE_MOTION&&e.motion.which!=SDL_TOUCH_MOUSEID&&(e.motion.state&SDL_BUTTON_LMASK)){
             if(SDL_ConvertEventToRenderCoordinates(renderer,&e)){
+                if(game.memoryMenu){menuPointer.move(game,e.motion.x,e.motion.y);continue;}
                 if(!layout.pointer(-1,e.motion.x,e.motion.y,true,true))
                     input.pointer(-1,e.motion.x,e.motion.y,true,game.ended,game.inventory);
             }
@@ -200,12 +249,15 @@ void events(bool& titleActive,float titleSeconds,eclipse::Presentation& view){
 
 }
 int activeCastlePortalSide(const eclipse::Presentation& view){
+    if(story.active()&&!story.portalOpen())return -1; // exit stays sealed until the room is cleared
     const int side=view.castlePortalSide(game.player.x);
     if(side<0||!game.player.grounded)return -1;
     const float portalX=eclipse::CastleTerrain::portalX(game.castleArea,side==1);
     const float floor=eclipse::CastleTerrain::groundAt(game.castleArea,portalX);
     return std::isfinite(floor)&&std::abs(game.player.y-floor)<=22.f?side:-1;
 }
+// Interaction prompt: a castle exit portal, or the memory altar at the forest start.
+bool interactionAvailable(const eclipse::Presentation& view){return activeCastlePortalSide(view)>=0||game.nearMemoryAltar();}
 void tick(eclipse::Actions action,eclipse::Presentation& view){
     if(action.restart){input.reset();keyState.fill(false);animation.reset();camera=640;}
     if(game.castleArea>0){
@@ -218,23 +270,39 @@ void tick(eclipse::Actions action,eclipse::Presentation& view){
                 const float entryX=eclipse::CastleTerrain::arrivalX(destination);
                 game.transitionCastleArea(destination,entryX);
                 view.setDemonCastleArea(destination);
+                story.onAreaChanged(game);
                 camera=std::clamp(game.player.x,640.f,std::max(640.f,game.castleWorldWidth()-640.f));
                 animation.reset();input.reset();keyState.fill(false);action={};
             }
         }
+    }else{
+        const bool nearAltar=game.nearMemoryAltar();
+        input.setInteractionMode(nearAltar);
+        if(nearAltar&&action.attack){action.attack=false;action.interact=true;}
     }
     const int previousMotion=animation.state;
     game.cameraCenter=camera;
     const unsigned respawnBefore=game.pitRespawnSerial;
+    story.preStep(static_cast<float>(eclipse::fixedStep),game,action);
     game.step(static_cast<float>(eclipse::fixedStep),action);
+    story.postStep(static_cast<float>(eclipse::fixedStep),game);
+    progressSaveTimer=std::max(0.f,progressSaveTimer-static_cast<float>(eclipse::fixedStep));
+    if(game.progression.revision!=savedProgressRevision&&progressSaveTimer<=0){saveProgress(false);progressSaveTimer=2.f;}
+    applyScene(view);
     if(game.pitRespawnSerial!=respawnBefore)
         camera=std::clamp(game.player.x,640.f,std::max(640.f,game.castleWorldWidth()-640.f));
-    animation.step(game.player,static_cast<float>(eclipse::fixedStep));
+    if(game.timeScale>0)animation.step(game.player,static_cast<float>(eclipse::fixedStep)*game.timeScale);   // a story time stop freezes the pose too
+    if(story.wakeRemaining()>0){
+        // Awakening mirrors the death pose: the same clip played backwards until upright.
+        const auto& death=eclipse::motionClips[9];
+        animation.state=9;
+        animation.frame=death.start+static_cast<int>((death.count-1)*story.view.wakeFrac);
+    }
     if(animation.state!=previousMotion)SDL_Log("ECLIPSE motion state=%d frame=%d",animation.state,animation.frame);
     if(action.inventory||action.swap||action.restart||action.weapon||action.armor||action.charm)
         SDL_Log("ECLIPSE state form=%d inventory=%d hp=%d foes=%d restart=%d weapon=%d armor=%d charm=%d",game.player.form,game.inventory,game.player.health,game.foes(),action.restart,game.player.gear.selected[0],game.player.gear.selected[1],game.player.gear.selected[2]);
-    camera+=(std::clamp(game.player.x,640.f,std::max(640.f,game.castleWorldWidth()-640.f))-camera)*(1-std::exp(-5*static_cast<float>(eclipse::fixedStep)));
-    input.setInteractionMode(activeCastlePortalSide(view)>=0);
+    camera+=(std::clamp(game.player.x+story.cameraLead,640.f,std::max(640.f,game.castleWorldWidth()-640.f))-camera)*(1-std::exp(-5*static_cast<float>(eclipse::fixedStep)));
+    input.setInteractionMode(interactionAvailable(view));
 }
 void cleanup(){if(renderer)SDL_DestroyRenderer(renderer);if(window)SDL_DestroyWindow(window);SDL_Quit();}
 }
@@ -251,9 +319,11 @@ int main(int argc,char** argv){
     SDL_SetRenderLogicalPresentation(renderer,1280,720,SDL_LOGICAL_PRESENTATION_LETTERBOX);SDL_SetRenderVSync(renderer,1);
     auto view=std::make_unique<eclipse::Presentation>(renderer);
     if(char* pref=SDL_GetPrefPath("ECLIPSE","Native")){
-        layout.storagePath=std::string(pref)+"controls.cfg";SDL_free(pref);
+        layout.storagePath=std::string(pref)+"controls.cfg";story.savePath=std::string(pref)+"story.cfg";progressPath=std::string(pref)+"progress.cfg";SDL_free(pref);
     }
-    layout.load();input.setLayout(&layout);
+    layout.load();input.setLayout(&layout);story.load();
+    if(!progressPath.empty()&&game.progression.load(progressPath))SDL_Log("ECLIPSE progress loaded: %d memories",game.progression.memories);
+    savedProgressRevision=game.progression.revision;game.refreshStats();
     if(!view->load()){
         const std::string reason=SDL_GetError();
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"ECLIPSE ASSET ERROR: %s",reason.c_str());
@@ -384,17 +454,18 @@ int main(int argc,char** argv){
             if(waitingForVacode&&vacodeSessionReady()&&titlePage==TitlePage::StartOptions){
                 waitingForVacode=false;
                 game.player.equippedJobs={{1,2}};
-                game.restart();animation.reset();input.reset();keyState.fill(false);
-                camera=640;titlePage=TitlePage::Main;titleActive=false;
+                beginStory(*view);
+                titlePage=TitlePage::Main;titleActive=false;
                 SDL_Log("VACODE verified: default two-job loadout");
             }
             view->drawTitle(titleSeconds,static_cast<int>(titlePage),waitingForVacode,qaFirstJob);
         }else{
             accumulator+=elapsed;
             while(accumulator>=eclipse::fixedStep){if(!layout.editing)tick(input.sample(),*view);accumulator-=eclipse::fixedStep;}
-            view->draw(game,animation,camera,input.held(),nullptr,nullptr,&layout,input.stickOffset(),activeCastlePortalSide(*view)>=0);
+            view->draw(game,animation,camera,input.held(),nullptr,nullptr,&layout,input.stickOffset(),interactionAvailable(*view),&story.view);
         }
         double remaining=eclipse::fixedStep-(SDL_GetTicksNS()-start)/1e9;if(remaining>0)SDL_DelayNS(static_cast<Uint64>(remaining*1e9));
     }
+    saveProgress(true);
     view.reset();cleanup();return 0;
 }

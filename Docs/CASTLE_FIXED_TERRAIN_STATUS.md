@@ -21,3 +21,10 @@
 
 ## Preserve
 No character, monster, skill FX, UI, forest, or app-signing artifacts were intentionally changed as part of this commit series.
+
+## 2026-11-16 — no-railing background integration and foot alignment
+
+- Replaced the five canonical 2172×724 runtime background PNGs with the reviewed no-railing v2 artwork; preserved each matching editable image in `Art/demon_castle/areas/*-no-railings-v2.png` and left the previous `*-source.png` files intact.
+- Updated `Art/demon_castle/asset-manifest.json` with version 2 source/runtime records and SHA-256 hashes.
+- Rebased all A1–A5 collision foot baselines to sit 3 world pixels below the visible floor or stair surface edge. Corrected initial spawn foot positions to their interpolated terrain at each spawn X. This keeps feet slightly into the floor surface instead of exactly on the wall/floor seam.
+- Static overlay review was made at the runtime 2160×720 world composition. No build, tests, GitHub Actions, or owner gameplay/device validation were run.

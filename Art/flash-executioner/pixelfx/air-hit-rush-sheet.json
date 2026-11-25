@@ -1,0 +1,501 @@
+{
+ "frames": [
+  {
+   "filename": "air-hit-rush 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 1",
+   "frame": {
+    "x": 280,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 2",
+   "frame": {
+    "x": 560,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 3",
+   "frame": {
+    "x": 840,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 4",
+   "frame": {
+    "x": 1120,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 5",
+   "frame": {
+    "x": 0,
+    "y": 280,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 6",
+   "frame": {
+    "x": 280,
+    "y": 280,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 7",
+   "frame": {
+    "x": 560,
+    "y": 280,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 8",
+   "frame": {
+    "x": 840,
+    "y": 280,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 9",
+   "frame": {
+    "x": 1120,
+    "y": 280,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 10",
+   "frame": {
+    "x": 0,
+    "y": 560,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 11",
+   "frame": {
+    "x": 280,
+    "y": 560,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 12",
+   "frame": {
+    "x": 560,
+    "y": 560,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 13",
+   "frame": {
+    "x": 840,
+    "y": 560,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 14",
+   "frame": {
+    "x": 1120,
+    "y": 560,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 15",
+   "frame": {
+    "x": 0,
+    "y": 840,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 16",
+   "frame": {
+    "x": 280,
+    "y": 840,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 17",
+   "frame": {
+    "x": 560,
+    "y": 840,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 18",
+   "frame": {
+    "x": 840,
+    "y": 840,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 19",
+   "frame": {
+    "x": 1120,
+    "y": 840,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  },
+  {
+   "filename": "air-hit-rush 20",
+   "frame": {
+    "x": 0,
+    "y": 1120,
+    "w": 280,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 280,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 280,
+    "h": 280
+   },
+   "duration": 33
+  }
+ ],
+ "meta": {
+  "app": "https://github.com/patch-gg/pixelfx",
+  "version": "1",
+  "image": "air-hit-rush.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1400,
+   "h": 1400
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "air-hit-rush",
+    "from": 0,
+    "to": 20,
+    "direction": "forward"
+   }
+  ],
+  "pixelfx": {
+   "id": "impacts/air-hit-rush",
+   "name": "Air hit (rush, heavy star)",
+   "fps": 30,
+   "loop": false,
+   "frames": 21,
+   "frameSize": [
+    280,
+    280
+   ],
+   "pivot": [
+    140,
+    140
+   ],
+   "columns": 5
+  }
+ }
+}

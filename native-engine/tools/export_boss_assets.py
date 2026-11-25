@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+"""Export the Demon King's effect sheets and lookup tables for the engine.
+
+Reads pixelfx sprite sheets (render with `node tools/render.mjs <id> --sheet --opts ...` in a pixelfx
+checkout), copies them to Assets/Resources/Eclipse/boss_fx/, and writes two generated headers:
+  native-engine/src/boss_fx_assets.hpp    enum BossFx + sheet table (cell size, pivot, fps, peak frame)
+  native-engine/src/boss_motion_data.hpp  sword-tip pixel per boss-sheet frame (for anchoring effects)
+
+Usage: export_boss_assets.py [<pixelfx records dir>]   (default ~/pixelfx/records)
+Effects stay separate layers: nothing here is baked into actor art.
+"""
+import json, os, shutil, sys
+import numpy as np
+from PIL import Image
+
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+RECORDS = sys.argv[1] if len(sys.argv) > 1 else os.path.expanduser("~/pixelfx/records")
+FX_OUT = os.path.join(ROOT, "Assets", "Resources", "Eclipse", "boss_fx")
+CASTLE = os.path.join(ROOT, "Assets", "Resources", "Eclipse", "monsters", "demon_castle")
+
+# enum name, pixelfx record, role
+FX = [
+    ("Hammer", "melee/hammer-smash", "P1 smash impact"),
+    ("Spike", "nature/earth-spike", "P1 quake: stone spike at the sword"),
+    ("Spikes", "ice/ice-spikes", "P1 quake wave: blades erupting along the floor"),
+    ("Slam", "impacts/ground-slam", "P1 leap landing / charge crash"),
+    ("Circle", "arcane/magic-circle-cast", "P1 judgement mark and column"),
+    ("Reap", "melee/scythe-reap", "P1 iron sweep"),
+    ("Spin", "melee/spin-slash", "P2 twist cut"),
+    ("CutUp", "melee/sword-slash", "P2 rising cut (rendered with angle -70)"),
+    ("Thrust", "melee/thrust", "P2 lunge / dash thrust"),
+    ("Burst", "arcane/mana-burst", "P2 void burst"),
+    ("Stars", "arcane/star-fall", "P2 void rain"),
+    ("Lightning", "lightning/lightning-strike", "P2 pillar chain"),
+    ("BlinkOut", "arcane/blink-out", "P2 blink departure"),
+    ("BlinkIn", "arcane/blink-in", "P2 blink arrival"),
+    ("Dirt", "explosions/dirt-explosion", "P2 dive crash"),
+    ("Landing", "impacts/heavy-landing", "P2 backflip landing"),
+    ("VoidBolt", "projectiles/void-bolt", "P2 wave volley"),
+    ("ImpactFrame", "impacts/impact-frame", "screen-wide impact burst on the heaviest hits"),
+    ("SpellCharge", "arcane/spell-charge", "energy gathering on the sword or hand (loop)"),
+    ("RuneCircle", "arcane/rune-circle", "rune ring on the floor under a wind-up or a landing mark (loop)"),
+    ("HexSigil", "shadow/hex-sigil", "cursed sigil drawn above the king"),
+    ("HolyPillar", "holy/holy-pillar", "pillar of light on top of a judgement mark"),
+    ("DarkBlast", "shadow/dark-explosion", "black star blast on crashes and the void burst"),
+    ("Portal", "arcane/portal", "rift for blinks and the dive take-off (loop)"),
+    ("VoidOrb", "shadow/void-orb", "orb condensing before the void burst (loop)"),
+    ("Thunderclap", "lightning/thunderclap", "shock ring with arcs along the floor"),
+    ("Flurry", "melee/dagger-flurry", "burst of small cuts around a combo hit"),
+    ("Cleave", "melee/heavy-cleave", "ember arc slamming the floor"),
+]
+# global motion ids (see BossMotion in castle_enemy.hpp) and which form owns them
+MOTIONS = ["attack", "stab", "leap", "raise", "sweep", "charge", "twist", "rise", "burst", "sky", "cast", "backflip", "dive"]
+FORMS = [("마왕_갑주", ["attack", "stab", "leap", "raise", "sweep", "charge"]),
+         ("마왕_본체", ["attack", "twist", "rise", "burst", "sky", "cast", "backflip", "dive"])]
+
+
+def fx_meta(record):
+    name = record.split("/")[-1]
+    base = os.path.join(RECORDS, record, name)          # records/<category>/<name>/<name>.png|json
+    d = json.load(open(base + ".json", encoding="utf-8"))["meta"]["pixelfx"]
+    im = np.array(Image.open(base + ".png").convert("RGBA"))
+    w, h = d["frameSize"]; cols = d["columns"]
+    bright = []
+    for i in range(d["frames"]):
+        c = im[(i // cols) * h:(i // cols) * h + h, (i % cols) * w:(i % cols) * w + w]
+        bright.append(int(((c[:, :, :3].mean(axis=2) > 225) & (c[:, :, 3] > 200)).sum()))
+    peak = int(np.argmax(bright))
+    c = im[(peak // cols) * h:(peak // cols) * h + h, (peak % cols) * w:(peak % cols) * w + w]
+    ys, xs = np.nonzero((c[:, :, :3].mean(axis=2) > 225) & (c[:, :, 3] > 200))
+    hit_dx = float(xs.mean() - d["pivot"][0]) if len(xs) else 0.0
+    return d, peak, hit_dx, name
+
+
+def main():
+    os.makedirs(FX_OUT, exist_ok=True)
+    rows = []
+    for key, record, role in FX:
+        d, peak, hit_dx, name = fx_meta(record)
+        dst = "boss_fx/%s.png" % key.lower()
+        shutil.copyfile(os.path.join(RECORDS, record, record.split("/")[-1] + ".png"), os.path.join(ROOT, "Assets", "Resources", "Eclipse", dst))
+        rows.append((key, dst, d, peak, hit_dx, role))
+    with open(os.path.join(ROOT, "native-engine", "src", "boss_fx_assets.hpp"), "w", encoding="utf-8") as f:
+        f.write("#pragma once\n// GENERATED by native-engine/tools/export_boss_assets.py from pixelfx sheets. Do not edit.\n")
+        f.write("// Every effect is a separate sprite-sheet layer (never baked into actor art).\nnamespace eclipse {\n")
+        f.write("enum class BossFx : unsigned char {" + ", ".join(r[0] for r in rows) + ", Count};\n")
+        f.write("struct BossFxSheet {const char* file;int cellW,cellH,columns,count;float pivotX,pivotY,fps;int peak;float hitDx;bool loop;};\n")
+        f.write("// peak = brightest (impact) frame; hitDx = impact centre relative to the pivot, in sheet pixels.\n")
+        f.write("inline constexpr BossFxSheet bossFxSheets[]={\n")
+        for key, dst, d, peak, hit_dx, role in rows:
+            f.write('    {"%s",%d,%d,%d,%d,%.1ff,%.1ff,%.1ff,%d,%.2ff,%s}, // %s: %s\n' % (
+                dst, d["frameSize"][0], d["frameSize"][1], d["columns"], d["frames"], d["pivot"][0], d["pivot"][1],
+                d["fps"], peak, hit_dx, "true" if d.get("loop") else "false", key, role))
+        f.write("};\n}\n")
+    # tip tables
+    FRAMES = 20   # BossMotion sheets; the legacy attack sheet keeps its 14 frames
+    tips = [[[(0, 0)] * FRAMES for _ in MOTIONS] for _ in FORMS]
+    for fi, (folder, owned) in enumerate(FORMS):
+        data = json.load(open(os.path.join(CASTLE, folder, "motion_tips.json")))
+        for name in owned:
+            label = "attack" if name == "attack" else "motion " + name
+            t = [tuple(x) for x in data[label]]
+            tips[fi][MOTIONS.index(name)] = t + [(0, 0)] * (FRAMES - len(t))
+    with open(os.path.join(ROOT, "native-engine", "src", "boss_motion_data.hpp"), "w", encoding="utf-8") as f:
+        f.write("#pragma once\n// GENERATED by native-engine/tools/export_boss_assets.py from the assembled boss sheets. Do not edit.\n")
+        f.write("// Sword-tip pixel (x, y in the 256 px cell) per frame: [form][motion][frame]; form 0 armored, 1 true.\n// The legacy attack sheet (motion 0) has 14 frames, every other motion sheet 20.\n")
+        f.write("namespace eclipse {\ninline constexpr short bossTips[2][%d][%d][2]={\n" % (len(MOTIONS), FRAMES))
+        for fi in range(2):
+            f.write("  {\n")
+            for mi, name in enumerate(MOTIONS):
+                f.write("    {" + ",".join("{%d,%d}" % t for t in tips[fi][mi]) + "}, // " + name + "\n")
+            f.write("  },\n")
+        f.write("};\n}\n")
+    print("exported %d effect sheets and tip tables" % len(rows))
+
+
+if __name__ == "__main__":
+    main()

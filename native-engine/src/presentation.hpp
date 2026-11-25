@@ -9,6 +9,8 @@
 #include "forest_generator.hpp"
 #include "forest_layers.hpp"
 #include "demon_castle_entrance.hpp"
+#include "story_director.hpp"
+#include "memory_menu.hpp"
 #include "flash_executioner_assets.hpp"
 #include "space_ruler_assets.hpp"
 
@@ -23,6 +25,9 @@ class Presentation {
     std::array<SDL_Texture*,castleEnemyCount> castleEnemyMoveTextures_{};
     std::array<SDL_Texture*,castleEnemyCount> castleEnemyAttackTextures_{};
     std::array<SDL_Texture*,castleEnemyCount> castleEnemyAttackVfxTextures_{};
+    // Demon King: one 14-frame sheet per body motion, and one sprite sheet per pixelfx layer.
+    std::array<std::array<SDL_Texture*,static_cast<int>(BossMotion::Count)>,2> bossMotionTextures_{};
+    std::array<SDL_Texture*,static_cast<int>(BossFx::Count)> bossFxTextures_{};
     struct ReviewedFlashEvent {FlashFx role;float x,y,born;int facing;bool follow;float playbackDuration=0;};
     std::vector<ReviewedFlashEvent> reviewedFlashEvents_;
     float reviewedFlashClock_=-1,reviewedFlashMoveAge_=0;
@@ -35,8 +40,11 @@ class Presentation {
     SDL_Texture* goldImpact_=nullptr;
     SDL_Texture* riftSlash_=nullptr;
     SDL_Texture* riftTrace_=nullptr;
+    SDL_Texture* playerHealthFrame_=nullptr;
     SDL_Texture* enemyBarFrame_=nullptr;
+    SDL_Texture* bossBarFrame_=nullptr;
     SDL_Texture* executeIcon_=nullptr;
+    SDL_Texture* circularSkillButtons_=nullptr;
     float offset=0;
     int spaceRole_=-1;float spaceRoleBorn_=0;
     std::array<SDL_Texture*,12> spaceActorTextures_{};
@@ -341,16 +349,33 @@ class Presentation {
             const int index=e.kind-AshInfantry;
             const bool attacking=e.attackAge>=0;
             SDL_Texture* texture=attacking?castleEnemyAttackTextures_[index]:castleEnemyMoveTextures_[index];
+            const bool king=e.kind>=DemonKingArmored;
+            if(king&&attacking&&e.motion>0&&bossMotionTextures_[e.kind==DemonKingTrue][e.motion])
+                texture=bossMotionTextures_[e.kind==DemonKingTrue][e.motion];   // the move's own body motion
+            // During a blink the king is gone until the arrival flash opens.
+            const bool blinkGone=king&&e.move!=BossMove::None&&bossStepDef(e.move,e.step).action==BossAction::Blink&&e.attackAge<.16f;
             const int frame=enemyFrame(e);
-            const int columns=attacking?castleEnemyAttackFrames:castleEnemyMoveFrames;
-            const SDL_FRect source{float(frame%columns*192),0.f,192.f,192.f};
-            const float anchorX=e.facing>0?spec.pivotX:192.f-spec.pivotX;
-            const SDL_FRect target{std::round(e.x-offset-anchorX*scale),
-                std::round(e.y-spec.pivotY*scale),192.f*scale,192.f*scale};
-            SDL_SetTextureColorMod(texture,255,e.hitFlash>0?135:255,e.hitFlash>0?135:255);
+            const bool ownMotion=king&&attacking&&e.motion>0;
+            const int columns=attacking?(ownMotion?bossMotionFrames:castleEnemyAttackFrames):castleEnemyMoveFrames;
+            const float cell=static_cast<float>(enemyCell(e.kind));
+            const SDL_FRect source{float(frame%columns)*cell,0.f,cell,cell};
+            const float anchorX=e.facing>0?spec.pivotX:cell-spec.pivotX;
+            // Story: arrival wake-up (rise from the floor) and Demon King armor-break shudder.
+            const float wakeK=e.wake>0?std::clamp(e.wake/1.2f,0.f,1.f):0.f;
+            const float shiftProgress=e.phaseShift>0&&e.phaseShiftTotal>0?1.f-e.phaseShift/e.phaseShiftTotal:0.f;
+            const float jitter=e.phaseShift>0?std::sin(clock*70.f)*4.f*(1.f-shiftProgress*.6f):0.f;
+            const SDL_FRect target{std::round(e.x-offset-anchorX*scale+jitter),
+                std::round(e.y-spec.pivotY*scale+wakeK*34.f*scale),cell*scale,cell*scale};
+            const bool shiftWhite=e.phaseShift>0;
+            const bool eroded=e.darkStacks>=eclipse::stackMax,slowed=e.darkStacks>=3&&!eroded;   // void stacks tint the foe
+            SDL_SetTextureColorMod(texture,(e.hitFlash>0||shiftWhite)?255:eroded?150:slowed?205:255,(e.hitFlash>0||shiftWhite)?135:eroded?110:slowed?190:255,(e.hitFlash>0||shiftWhite)?135:eroded?255:slowed?255:255);
+            SDL_SetTextureAlphaMod(texture,blinkGone?0:static_cast<Uint8>(255.f*(1.f-wakeK)));
             SDL_RenderTextureRotated(renderer,texture,&source,&target,0,nullptr,
                 e.facing>0?SDL_FLIP_NONE:SDL_FLIP_HORIZONTAL);
-            SDL_SetTextureColorMod(texture,255,255,255);
+            SDL_SetTextureColorMod(texture,255,255,255);SDL_SetTextureAlphaMod(texture,255);
+            if(e.phaseShift>0)kingArmorShards(e,spec,scale,shiftProgress,clock);
+            if(e.kind>=DemonKingArmored&&e.attackAge>=0&&e.move!=BossMove::None)kingMoveTelegraph(e,spec);
+            if(e.wake>0)return;
             if(attacking&&frame>=castleEnemyEffectStartFrames[index]){
                 SDL_Texture* vfx=castleEnemyAttackVfxTextures_[index];
                 const SDL_FRect vfxSource{float(frame*416),0.f,416.f,256.f};
@@ -372,12 +397,17 @@ class Presentation {
         // Pixel-art PNG bezel, with independent clipped fills for immediate HP and
         // the delayed white segment. 88x18, more than twice the former height.
         const float barX=std::round(e.x-offset-(e.boss?54.f:44.f)),barY=std::round(e.y-visualHeight-25);
-        if(enemyBarFrame_) {
+        SDL_Texture* healthFrame=e.boss?bossBarFrame_:enemyBarFrame_;
+        if(healthFrame){
             SDL_FRect dest{barX,barY,e.boss?108.f:88.f,18.f};
-            SDL_RenderTexture(renderer,enemyBarFrame_,nullptr,&dest);
+            SDL_RenderTexture(renderer,healthFrame,nullptr,&dest);
         } else {
-            rect(barX,barY,e.boss?108.f:88.f,18,0x0b0b12);
-            rect(barX+2,barY+2,e.boss?104.f:84.f,14,0x61505d);
+            rect(barX,barY,e.boss?108.f:88.f,18,0x07090d);
+            rect(barX+2,barY+2,e.boss?104.f:84.f,14,0x303943);
+        }
+        for(int i=0;i<e.darkStacks;++i){   // dark stacks: violet pips under the health bar
+            const float px=e.x-offset-(e.darkStacks*10.f-2.f)*.5f+i*10.f,py=barY+20.f;
+            rect(px-1,py-1,10,10,0x0b0618);rect(px,py,8,8,0x9b6bff);rect(px+2,py+2,3,3,0xe6d8ff);
         }
         if(e.lightMark>0){
             const float x=e.x-offset,y=barY-12;
@@ -389,8 +419,8 @@ class Presentation {
         const float trailRatio=std::clamp(std::max(float(e.health),e.trailingHealth)/e.maxHealth,0.f,1.f);
         const float fillX=barX+4,fillY=barY+5,fillW=e.boss?100.f:80.f;
         // Never render a minimum one-pixel fill for zero HP.
-        if(trailRatio>0)rect(fillX,fillY,fillW*trailRatio,8,0xf3f0ea);
-        if(hpRatio>0)rect(fillX,fillY,fillW*hpRatio,8,e.boss?0x8b4da8:e.kind==2?0xbb526c:0xc74b53);
+        if(trailRatio>0)rect(fillX,fillY,fillW*trailRatio,8,0x9a5c65);
+        if(hpRatio>0)rect(fillX,fillY,fillW*hpRatio,8,e.boss?0x782b41:e.kind==2?0x873744:0x702731);
         if(e.bleedStacks==bleedMaxStacks&&!e.boss){
             // 10% execution threshold appears only while 10-stack bleed is active.
             rect(fillX+8-1,fillY-2,2,12,0xf0a8b2);
@@ -529,87 +559,536 @@ class Presentation {
         return true;
     }
 
-    void icon(int texture,int col,int row,float x,float y,float size,bool down){
-        SDL_FRect source{col*128.f,row*128.f,128,128},target{x,y,size,size};
-        SDL_SetTextureColorMod(textures[texture],down?180:255,down?180:255,down?180:255);
-        SDL_SetTextureAlphaMod(textures[texture],down?191:153);
-        SDL_RenderTexture(renderer,textures[texture],&source,&target);
-        SDL_SetTextureAlphaMod(textures[texture],255);
+    // One ImageGen + PixelLab Workbench sprite sheet holds all circular touch states.
+    // Its 3x3 grid contains eight cells in frame order; the last cell is transparent.
+    void icon(int frame,float x,float y,float size,bool down){
+        if(frame<0||frame>=8||!textures[1])return;
+        constexpr float frameSize=256.f,sourceInset=16.f,sourceSize=224.f,columns=3.f;
+        SDL_FRect source{std::fmod(float(frame),columns)*frameSize+sourceInset,
+                         std::floor(float(frame)/columns)*frameSize+sourceInset,sourceSize,sourceSize};
+        SDL_FRect target{std::round(x),std::round(y),std::round(size),std::round(size)};
+        SDL_SetTextureColorMod(textures[1],255,255,255);
+        SDL_SetTextureAlphaMod(textures[1],down?255:238);
+        SDL_RenderTexture(renderer,textures[1],&source,&target);
+        SDL_SetTextureAlphaMod(textures[1],255);
     }
-    void skillButton(const ControlRect& b,const char* label,float remaining,float duration,
-                     bool pressed,unsigned accent,bool enabled=true,int art=-1){
+    void drawPixelSkillButton(const ControlRect& b,int slot,int atlasIndex,
+                              float remaining,float duration,
+                              bool pressed,unsigned accent,bool enabled){
+        if(!circularSkillButtons_||atlasIndex<0||atlasIndex>=12)return;
         const float ready=remaining>0&&duration>0
             ?1.f-std::clamp(remaining/duration,0.f,1.f):1.f;
-        (void)art; // Legacy character-specific icon sheets were removed.
+        const Uint8 shade=!enabled?150:remaining>0?204:pressed?232:255;
+        constexpr float frameSize=256.f,sourceInset=16.f,sourceSize=224.f,columns=4.f;
+        SDL_FRect source{std::fmod(float(atlasIndex),columns)*frameSize+sourceInset,
+                         std::floor(float(atlasIndex)/columns)*frameSize+sourceInset,sourceSize,sourceSize};
+        SDL_FRect target{std::round(b.x),std::round(b.y+(pressed?1.f:0.f)),
+                         std::round(b.size),std::round(b.size)};
+        SDL_SetTextureColorMod(circularSkillButtons_,shade,shade,shade);
+        SDL_SetTextureAlphaMod(circularSkillButtons_,enabled?255:190);
+        SDL_RenderTexture(renderer,circularSkillButtons_,&source,&target);
+        SDL_SetTextureColorMod(circularSkillButtons_,255,255,255);
+        SDL_SetTextureAlphaMod(circularSkillButtons_,255);
 
-        // The lower portion brightens as the skill becomes available.
-        const float unit=std::max(2.f,std::floor(b.size/18.f));
-        const float cut=3*unit;
-        const Uint8 alpha=enabled?(pressed?240:206):85;
-        for(float y=0;y<b.size;y+=unit){
-            const float inset=std::max(0.f,std::max(cut-y,y-(b.size-cut)));
-            const float h=std::min(unit,b.size-y);
-            rect(b.x+inset,b.y+y,b.size-inset*2,h,accent,alpha);
-            if(y<unit||y+h>=b.size)continue;
-            const bool cooling=y<b.size*(1.f-ready);
-            rect(b.x+inset+unit,b.y+y,b.size-(inset+unit)*2,h,
-                 cooling?0x12121c:pressed?0x536675:0x354650,alpha);
+        const float barW=std::min(40.f,b.size-24.f),barH=3.f;
+        const float barX=std::round(b.x+(b.size-barW)*.5f),barY=std::round(b.y+b.size-10.f);
+        rect(barX,barY,barW,barH,0x090c11,235);
+        if(enabled&&ready>0.f){
+            const Uint8 barAlpha=pressed?255:235;
+            rect(barX,barY,std::max(1.f,std::round(barW*ready)),barH,accent,barAlpha);
+            if(ready>=1.f)rect(barX,barY,barW,1,0xd2d6d3,barAlpha);
         }
-        const int scale=b.size>=85?3:2;
-        const float width=std::char_traits<char>::length(label)*6.f*scale;
-        text(label,b.x+(b.size-width)/2,b.y+b.size*.25f,scale,enabled?0xe8e1d7:0x6d7079);
-        if(enabled&&ready>=1.f)rect(b.x+b.size*.34f,b.y+b.size*.69f,b.size*.32f,3,accent,alpha);
+        if(slot>0)number(slot,std::round(b.x+b.size*.5f-3.f),std::round(b.y+5.f),2,
+                          enabled?0xe4e7e3:0x70757a);
+    }
+    void skillButton(const ControlRect& b,int slot,int atlasIndex,
+                     float remaining,float duration,bool pressed,unsigned accent,bool enabled=true){
+        drawPixelSkillButton(b,slot,atlasIndex,remaining,duration,pressed,accent,enabled);
     }
     void playerHealthBar(const Player& p){
         constexpr float x=22,y=18,barX=x+49,barY=y+12,barWidth=230;
-        rect(x+4,y+6,284,46,0x090b12,220);
-        rect(x+6,y,276,46,0x17131b);
-        rect(x,y+6,288,34,0x17131b);
-        rect(x+9,y+3,270,40,0x75533b);
-        rect(x+3,y+9,282,28,0x75533b);
-        rect(x+10,y+3,268,3,0xd9a46b);
-        rect(x+10,y+40,268,3,0x4b3130);
-        rect(x+44,y+8,239,30,0x271c24);
-        rect(barX,barY,barWidth,22,0x16131d);
-
+        if(playerHealthFrame_){
+            SDL_FRect frame{std::round(x),std::round(y),288.f,46.f};
+            SDL_RenderTexture(renderer,playerHealthFrame_,nullptr,&frame);
+        }
         const float hp=std::clamp(float(p.health)/p.maxHealth(),0.f,1.f);
         const float trail=std::clamp(p.trailingHealth/p.maxHealth(),hp,1.f);
         const float liveWidth=std::round(barWidth*hp);
         const float trailWidth=std::round(barWidth*trail)-liveWidth;
-        if(liveWidth>0){
-            rect(barX,barY,liveWidth,22,0x96414a);
-            rect(barX,barY,liveWidth,3,0xe28380);
-            rect(barX,barY+19,liveWidth,3,0x672b3d);
-        }
         if(trailWidth>0){
-            rect(barX+liveWidth,barY,trailWidth,22,0xffa441);
-            rect(barX+liveWidth,barY,trailWidth,3,0xffd38a);
+            rect(barX+liveWidth,barY,trailWidth,22,0x71333d);
+            rect(barX+liveWidth,barY,trailWidth,3,0xb26468);
+            rect(barX+liveWidth,barY+19,trailWidth,3,0x48242e);
+            rect(barX+liveWidth-1,barY,1,22,0xd0a4a0);
         }
-
-        // Stepped metal badge with an eclipse at its center.
-        rect(x+10,y+5,29,36,0x30232b);
-        rect(x+7,y+10,35,26,0x30232b);
-        rect(x+13,y+7,23,32,0xb78050);
-        rect(x+10,y+12,29,22,0xb78050);
-        rect(x+15,y+10,19,26,0x201927);
-        rect(x+12,y+15,25,16,0x201927);
-        disk(x+24,y+22,8,0xffbb70,2);
-        disk(x+27,y+19,7,0x201927,2);
-        rect(x+282,y+19,3,8,0xe8ae73);
-        rect(x+279,y+22,9,2,0xe8ae73);
-
+        if(liveWidth>0){
+            rect(barX,barY,liveWidth,22,0x722731);
+            rect(barX,barY,liveWidth,4,0xae515a);
+            rect(barX,barY+19,liveWidth,3,0x4a1925);
+        }
         char label[24];
         std::snprintf(label,sizeof(label),"HP %d / %d",p.health,p.maxHealth());
         const float labelX=barX+(barWidth-12.f*std::char_traits<char>::length(label)+2.f)*.5f;
         text(label,labelX+2,barY+6,2,0x21131c);
         text(label,labelX,barY+4,2,0xffeee1);
     }
-    void skillSlot(const ControlRect& box,int slot,const char* label,float remaining,float duration,
-                   bool pressed,unsigned accent,bool enabled,int art){
-        skillButton(box,label,remaining,duration,pressed,accent,enabled,art);
-        const float x=std::round(box.x+box.size*.14f),y=std::round(box.y+box.size*.12f);
-        rect(x-3,y-2,16,15,0x121922,enabled?215:135);
-        number(slot,x,y,2,enabled?0xe6ddd0:0x89909a);
+    void flashSkillButton(const ControlRect& b,int iconIndex,float remaining,float duration,
+                          bool pressed,unsigned accent){
+        if(iconIndex<0||iconIndex>=4)return;
+        drawPixelSkillButton(b,0,8+iconIndex,remaining,duration,pressed,accent,true);
+    }
+    void flashSkillSlot(const ControlRect& box,int slot,int iconIndex,float remaining,float duration,
+                        bool pressed,unsigned accent){
+        if(iconIndex<0||iconIndex>=4)return;
+        drawPixelSkillButton(box,slot,8+iconIndex,remaining,duration,pressed,accent,true);
+    }
+    void skillSlot(const ControlRect& box,int slot,int atlasIndex,
+                   float remaining,float duration,bool pressed,unsigned accent,bool enabled){
+        skillButton(box,slot,atlasIndex,remaining,duration,pressed,accent,enabled);
+    }
+    // ---- Demon King effects: code-drawn effect layers, never baked into the actor art ----
+    void kingArmorShards(const Enemy& e,const EnemySpec& spec,float scale,float progress,float clock){
+        const float cx=e.x-offset,cy=e.y-spec.bodyHeight*scale*.55f;
+        for(int i=0;i<18;++i){
+            const float angle=i*0.349f+((i*37)%11)*.07f;
+            const float speed=150.f+(i%5)*55.f;
+            const float x=cx+std::cos(angle)*speed*progress;
+            const float y=cy+std::sin(angle)*speed*.55f*progress+300.f*progress*progress;
+            const Uint8 alpha=static_cast<Uint8>(255.f*std::clamp(1.4f-progress,0.f,1.f));
+            const unsigned colors[3]={0xd8a85a,0x2a1a3a,0x7a3aa8};
+            const float size=6.f+(i%4)*3.f;
+            rect(x,y,size,size*(i%2?1.6f:.8f),colors[i%3],alpha);
+        }
+        (void)clock;
+    }
+    // Readable warnings for every Demon King move. Colour language: crimson = melee reach,
+    // violet = void magic. Warnings fade out at the moment of contact.
+    void kingMoveTelegraph(const Enemy& e,const EnemySpec& spec){
+        (void)spec;
+        const BossStepDef d=bossStepDef(e.move,e.step);
+        const float contactTime=d.duration*d.contact;
+        const float since=e.attackAge-contactTime;
+        const float prog=std::clamp(e.attackAge/std::max(.01f,contactTime),0.f,1.f);
+        const float gy=e.y;
+        auto strip=[&](float x0,float x1,float h,unsigned rgb,Uint8 alpha){
+            rect(std::min(x0,x1)-offset,gy-h,std::abs(x1-x0),h+4,rgb,alpha);
+        };
+        if(d.action==BossAction::Burst){
+            const float radius=kingBurstRadius*prog,cx=e.x-offset,cy=gy-6.f;
+            if(since<0){ringAlpha(cx,cy,radius,0xb06bff,150,.28f);ringAlpha(cx,cy,kingBurstRadius,0x6a3aa0,60,.28f);}
+            return;
+        }
+        if(since>=0)return;
+        const Uint8 alpha=static_cast<Uint8>(40+110*prog);
+        switch(d.action){
+        case BossAction::Melee:case BossAction::DashSlash:{
+            const auto b=enemyAttackBounds(e);
+            strip(b.left,b.right,34,0xd04a6a,alpha);
+            if(d.action==BossAction::DashSlash)strip(e.x,e.attackToX,6,0xff8aa0,static_cast<Uint8>(120+100*prog));
+            break;}
+        case BossAction::Sweep:
+            strip(e.facing>0?e.x-40:e.x-300,e.facing>0?e.x+300:e.x+40,60,0xd04a6a,alpha);break;
+        case BossAction::Leap:
+            ringAlpha(e.attackToX-offset,gy-4,170,0xd04a6a,static_cast<Uint8>(60+150*prog),.28f);
+            ringAlpha(e.attackToX-offset,gy-4,170*prog,0xff8aa0,200,.28f);break;
+        case BossAction::Quake:
+            strip(e.x-900*prog,e.x+900*prog,5,0xb06bff,static_cast<Uint8>(90+110*prog));break;
+        case BossAction::Charge:
+            strip(e.x,e.attackToX,48,0xd04a6a,static_cast<Uint8>(30+70*(.5f+.5f*std::sin(e.attackAge*24.f))));break;
+        case BossAction::Wave:
+            strip(e.x,e.x+e.facing*800.f*prog,5,0xb06bff,150);break;
+        default:break;
+        }
+    }
+    // One frame of a pixelfx sheet. `x` is the world position of the sheet's pivot (or of its impact
+    // point when `anchorHit` is set); sheets face right and are mirrored for a left-facing caster.
+    void drawBossFxFrame(BossFx kind,float age,float x,float y,float scale,bool flip,bool anchorHit=false,bool loop=false){
+        const auto& sheet=bossFxSheets[static_cast<int>(kind)];
+        auto* texture=bossFxTextures_[static_cast<int>(kind)];
+        if(!texture||age<0)return;
+        int i=static_cast<int>(age*sheet.fps);
+        if(loop)i%=sheet.count;
+        if(i>=sheet.count)return;
+        const SDL_FRect source{float(i%sheet.columns*sheet.cellW),float(i/sheet.columns*sheet.cellH),float(sheet.cellW),float(sheet.cellH)};
+        if(kind==BossFx::ImpactFrame){            // screen-wide: stretched over the whole view, a little translucent
+            if(i>=6)return;                    // only the opening burst; the rest would hide the strike
+            const SDL_FRect whole{0,0,viewWidth,viewHeight};
+            SDL_SetTextureAlphaMod(texture,static_cast<Uint8>(95-i*10));SDL_RenderTexture(renderer,texture,&source,&whole);SDL_SetTextureAlphaMod(texture,255);
+            return;
+        }
+        const float w=sheet.cellW*scale,h=sheet.cellH*scale,pivot=sheet.pivotX*scale;
+        if(anchorHit)x-=sheet.hitDx*scale*(flip?-1.f:1.f);
+        const SDL_FRect target{std::round(x-offset-(flip?w-pivot:pivot)),std::round(y-sheet.pivotY*scale),w,h};
+        SDL_RenderTextureRotated(renderer,texture,&source,&target,0,nullptr,flip?SDL_FLIP_HORIZONTAL:SDL_FLIP_NONE);
+    }
+    // While the king attacks, the world behind him is dimmed so the (purple on purple) silhouette and the
+    // effect layers stay readable. Drawn between the background and the king; the player is drawn later.
+    float bossFocus_=0.f;
+    void drawBossFocus(const Combat& g){
+        bool attacking=false;
+        for(const auto& e:g.enemies)if(!e.dead()&&e.kind>=DemonKingArmored&&e.attackAge>=0&&e.move!=BossMove::None)attacking=true;
+        bossFocus_+=((attacking?1.f:0.f)-bossFocus_)*.18f;
+        if(bossFocus_>.02f)rect(0,0,1280,720,0x090312,static_cast<Uint8>(120.f*bossFocus_));
+    }
+    // Layers that sit on the floor or behind the king are drawn before him; strikes and bursts on top.
+    static bool fxBehind(BossFx k){return k==BossFx::RuneCircle||k==BossFx::Portal||k==BossFx::Circle||k==BossFx::HexSigil;}
+    // Every Demon King effect is a separate pixelfx layer, drawn from Combat's event and hazard lists.
+    void drawBossLayers(const Combat& g,bool back){
+        for(const auto& h:g.hazards){
+            if(fxBehind(h.fx)!=back)continue;
+            const auto& sheet=bossFxSheets[static_cast<int>(h.fx)];
+            const float peak=sheet.peak/sheet.fps;
+            if(h.kind==HazardKind::Pillar){
+                // The effect is timed so its impact frame lands exactly when the pillar erupts.
+                const float age=h.age+peak-h.delay;
+                if(h.age<h.delay&&h.fx!=BossFx::Circle&&h.fx!=BossFx::Lightning){
+                    const float prog=h.age/h.delay;
+                    ringAlpha(h.x-offset,h.y-4,h.radius,0xb06bff,static_cast<Uint8>(60+170*prog),.28f);
+                }
+                drawBossFxFrame(h.fx,age,h.x,h.y,h.fx==BossFx::Stars?1.6f:2.f,false);
+            }else if(h.fx==BossFx::Spikes){
+                // Blade bursts chained along the floor, one 264 px segment after another.
+                const float step=264.f,segTime=step/h.speed;
+                for(int k=0;k*step<h.range+step;++k)
+                    drawBossFxFrame(BossFx::Spikes,h.age-k*segTime,h.startX+h.dir*k*step,h.y,1.f,h.dir<0);
+            }else{
+                drawBossFxFrame(h.fx,h.age,h.x,h.y-10,1.6f,h.dir<0,false,true);
+            }
+        }
+        for(const auto& fx:g.bossFx){
+            if(fxBehind(fx.kind)!=back)continue;
+            const bool anchored=fx.kind==BossFx::Hammer||fx.kind==BossFx::CutUp||fx.kind==BossFx::Thrust||fx.kind==BossFx::Reap;
+            drawBossFxFrame(fx.kind,fx.age,fx.x,fx.y,fx.scale,fx.facing<0,anchored,fx.life>0);
+        }
+    }
+    // Sword-tip ribbon: the tip table gives the blade's position on every sheet frame, so a fading
+    // three-tone streak can follow the real motion. It is its own layer; the actor art stays clean.
+    struct TipPoint{float x,y,t;};
+    std::vector<TipPoint> tipTrail_;
+    void drawSwordTrail(const Combat& g){
+        const Enemy* king=nullptr;
+        for(const auto& e:g.enemies)if(!e.dead()&&e.kind>=DemonKingArmored&&e.wake<=0&&e.phaseShift<=0)king=&e;
+        // The tip table holds the right-most pixel of each frame, which is the blade only for the armored
+        // king and for the true form's lunge; elsewhere it would follow hair or cloak, so no ribbon there.
+        if(!king||king->attackAge<0||(king->motion==0&&king->move==BossMove::None)||(king->kind==DemonKingTrue&&king->motion!=0)){tipTrail_.clear();return;}
+        const int form=king->kind==DemonKingArmored?0:1,frame=std::clamp(enemyFrame(*king),0,king->motion>0?bossMotionFrames-1:castleEnemyAttackFrames-1);
+        const auto* tip=bossTips[form][king->motion][frame];
+        if(tip[0]>0){
+            const float scale=enemySpec(king->kind).scale;
+            const float x=king->x+king->facing*(tip[0]-128)*scale,y=king->y+(tip[1]-236)*scale;
+            if(tipTrail_.empty()||std::hypot(x-tipTrail_.back().x,y-tipTrail_.back().y)>3.f)tipTrail_.push_back({x,y,g.clock});
+        }
+        const float life=.26f;
+        tipTrail_.erase(std::remove_if(tipTrail_.begin(),tipTrail_.end(),[&](const TipPoint& p){return g.clock-p.t>life||g.clock<p.t;}),tipTrail_.end());
+        for(size_t i=1;i<tipTrail_.size();++i){
+            const auto& a=tipTrail_[i-1];const auto& b=tipTrail_[i];
+            const float len=std::hypot(b.x-a.x,b.y-a.y);
+            if(len<4.f||len>260.f)continue;                       // skip teleports and standing still
+            const float fade=1.f-(g.clock-b.t)/life;
+            const int steps=std::max(1,static_cast<int>(len/4.f));
+            for(int k=0;k<=steps;++k){
+                const float u=static_cast<float>(k)/steps,x=a.x+(b.x-a.x)*u-offset,y=a.y+(b.y-a.y)*u;
+                const float w=2.f+14.f*fade*(.4f+.6f*u);
+                rect(x-w*.5f,y-w*.5f,w,w,0x6b2cc0,static_cast<Uint8>(150*fade));
+                rect(x-w*.32f,y-w*.32f,w*.64f,w*.64f,0xc684ff,static_cast<Uint8>(200*fade));
+                rect(x-w*.14f,y-w*.14f,w*.28f,w*.28f,0xffffff,static_cast<Uint8>(255*fade));
+            }
+        }
+    }
+    // Dotted ground-plane ellipse, used for telegraphs and cues.
+    void ringAlpha(float x,float y,float radius,unsigned rgb,Uint8 alpha,float flatten=1.f){
+        const int points=std::max(16,static_cast<int>(radius/5));
+        for(int k=0;k<points;++k){
+            const float a=k*6.2831853f/points;
+            rect(x+std::cos(a)*radius,y+std::sin(a)*radius*flatten,5,5,rgb,alpha);
+        }
+    }
+    void chevron(float x,float y,float s,int dir,unsigned rgb,Uint8 alpha){
+        for(int i=0;i<4;++i){
+            if(dir==1){rect(x+i*s,y+i*s,s,s,rgb,alpha);rect(x+i*s,y+(6-i)*s,s,s,rgb,alpha);}
+            else if(dir==-1){rect(x+(3-i)*s,y+i*s,s,s,rgb,alpha);rect(x+(3-i)*s,y+(6-i)*s,s,s,rgb,alpha);}
+            else {rect(x+i*s,y+(3-i)*s,s,s,rgb,alpha);rect(x+(6-i)*s,y+(3-i)*s,s,s,rgb,alpha);}
+        }
+    }
+    // Memory altar: the spot where the protagonist awoke. Light and motion only, no sentences.
+    // (Code-drawn placeholder cue; authored art for it is still to be made.)
+    void drawMemoryAltar(const Combat& g){
+        if(g.castleArea!=0)return;
+        const float t=g.clock;
+        const float x=memoryAltarX-offset,y=floorY;
+        const float pulse=.5f+.5f*std::sin(t*2.4f);
+        ringAlpha(x,y-4,34+pulse*6,0xbfa8ff,static_cast<Uint8>(120+60*pulse),.28f);
+        ringAlpha(x,y-4,58+pulse*8,0x8f78e0,static_cast<Uint8>(70+40*pulse),.28f);
+        const float bob=std::sin(t*2.f)*4.f;
+        rect(x-8,y-61+bob,16,16,0xbfa8ff,90);rect(x-5,y-58+bob,10,10,0xe6dcff,230);
+        for(int k=0;k<6;++k){
+            const float phase=std::fmod(t*.45f+k*.17f,1.f);
+            rect(x+std::sin(k*2.1f+t)*22.f,y-14-phase*70.f,3,3,0xcfc2ff,static_cast<Uint8>(200*(1.f-phase)));
+        }
+        if(g.nearMemoryAltar())ringAlpha(x,y-4,46+pulse*10,0xffffff,200,.28f);
+    }
+    // Fallen enemies' memories streaming into the protagonist, and the pulse when one is eaten.
+    void drawMemoryMotes(const Combat& g){
+        const float px=g.player.x-offset,py=g.player.y-62;
+        for(const auto& m:g.memoryMotes){
+            const float u=std::clamp(m.age/.9f,0.f,1.f),k=u*u*(3.f-2.f*u);
+            const float sx=m.x-offset;
+            const float x=sx+(px-sx)*k,y=m.y+(py-m.y)*k-std::sin(u*3.1416f)*34.f;
+            rect(x-6,y-6,12,12,0xbfa8ff,static_cast<Uint8>(90*(1.f-u)));
+            rect(x-3,y-3,6,6,0xe6dcff,static_cast<Uint8>(255*(1.f-u*.4f)));
+        }
+        if(g.memoryFlash>0){
+            const float k=1.f-g.memoryFlash/.9f;
+            ringAlpha(px,py,18+k*70,0xe6dcff,static_cast<Uint8>(220*(1.f-k)));
+            ringAlpha(px,py,10+k*46,0xbfa8ff,static_cast<Uint8>(180*(1.f-k)));
+        }
+    }
+    void drawMemoryMenu(const Combat& g,const StoryView* story){
+        namespace M=MemoryMenu;
+        const int job=g.activeJob();
+        rect(0,0,1280,720,0x05070d,170);
+        rect(M::panelX-4,M::panelY-4,M::panelW+8,M::panelH+8,0xbfa8ff);
+        rect(M::panelX,M::panelY,M::panelW,M::panelH,0x141a2b);
+        text("MEMORY",M::panelX+28,M::panelY+26,3,0xe6dcff);
+        number(g.progression.memories,M::panelX+235,M::panelY+30,3,0xe6dcff);
+        text("MASTERY",M::panelX+300,M::panelY+26,2,0x9fd0ff);
+        number(g.mastery.points(job),M::panelX+440,M::panelY+26,2,0x9fd0ff);
+        rect(M::panelX+M::panelW-58,M::panelY+14,38,38,0x2a3150);text("X",M::panelX+M::panelW-47,M::panelY+22,3,0xe6dcff);
+        // Two tabs: permanent stats (memories, kept) and the job's skill tree (mastery points, lost on death).
+        const bool runTab=g.memoryTab==1;
+        rect(M::panelX+28,M::panelY+66,220,32,runTab?0x1a2038:0x3a2f66);text("FOREVER",M::panelX+60,M::panelY+74,2,runTab?0x8f89aa:0xffffff);
+        rect(M::panelX+260,M::panelY+66,220,32,runTab?0x2a4a66:0x1a2038);text("THIS RUN",M::panelX+290,M::panelY+74,2,runTab?0xffffff:0x8f89aa);
+        if(!runTab){
+            static constexpr const char* names[statCount]={"1 ATK","2 VIT","3 GRD","4 CRT","5 CDM","6 SPD","7 HST"};
+            for(int i=0;i<statCount;++i){
+                const auto stat=static_cast<Stat>(i);
+                const int level=g.progression.level(job,stat),cost=g.progression.nextCost(job,stat);
+                const bool can=g.progression.canUpgrade(job,stat);
+                const float y=M::rowY+i*M::rowH;
+                rect(M::panelX+16,y+2,M::panelW-32,M::rowH-6,can?0x232c4a:0x1a2038);
+                text(names[i],M::panelX+30,y+12,2,0xe6dcff);
+                for(int k=0;k<maxStatLevel;++k)rect(M::panelX+130+k*11,y+14,8,14,k<level?0xbfa8ff:0x2a3150);
+                if(cost>0)number(cost,M::panelX+385,y+12,2,can?0xa6f0b0:0x7f7a96);
+                else text("MAX",M::panelX+385,y+12,2,0xa6f0b0);
+            }
+        }else{
+            // The job's skill tree: free positions, parent links, drag to scroll, tap to select, tap again to buy.
+            const auto& tree=masteryTree(job);
+            const int count=static_cast<int>(tree.size());
+            rect(M::treeX,M::treeY,M::treeW,M::treeH,0x0e1220);
+            const SDL_Rect clip{static_cast<int>(M::treeX),static_cast<int>(M::treeY),static_cast<int>(M::treeW),static_cast<int>(M::treeH)};
+            SDL_SetRenderClipRect(renderer,&clip);
+            for(int n=0;n<count;++n){                               // links first, so nodes sit on top of them
+                float nx=0,ny=0;M::nodeRect(tree[n],g.memoryTreeScrollX,g.memoryTreeScrollY,nx,ny);
+                for(int i=0;i<tree[n].parentCount;++i){
+                    const int parent=tree[n].parents[i];if(parent<0||parent>=count)continue;
+                    float px=0,py=0;M::nodeRect(tree[parent],g.memoryTreeScrollX,g.memoryTreeScrollY,px,py);
+                    const float x0=px+M::nodeW*.5f,y0=py+M::nodeH*.5f,x1=nx+M::nodeW*.5f,y1=ny+M::nodeH*.5f;
+                    const unsigned color=g.mastery.has(job,parent)?(g.mastery.unlocked(job,n)?0xffffff:0x6fb4ff):0x2a3150;
+                    const int steps=std::max(10,static_cast<int>(std::hypot(x1-x0,y1-y0)/9.f));
+                    for(int k=1;k<steps;++k){const float u=static_cast<float>(k)/steps;rect(x0+(x1-x0)*u-2,y0+(y1-y0)*u-2,4,4,color);}
+                }
+            }
+            for(int n=0;n<count;++n){
+                float nx=0,ny=0;M::nodeRect(tree[n],g.memoryTreeScrollX,g.memoryTreeScrollY,nx,ny);
+                if(nx>M::treeX+M::treeW||nx+M::nodeW<M::treeX||ny>M::treeY+M::treeH||ny+M::nodeH<M::treeY)continue;   // off screen
+                const bool own=g.mastery.has(job,n),open=g.mastery.unlocked(job,n),can=g.mastery.canBuy(job,n);
+                rect(nx,ny,M::nodeW,M::nodeH,own?0x2f6aa8:can?0x1f4a3a:open?0x1f2a45:0x161b2c);
+                if(can){const float pulse=.5f+.5f*std::sin(g.clock*6.f);   // buyable: a pulsing frame
+                    const Uint8 a=static_cast<Uint8>(120+120*pulse);
+                    rect(nx,ny,M::nodeW,2,0xa6f0b0,a);rect(nx,ny+M::nodeH-2,M::nodeW,2,0xa6f0b0,a);
+                    rect(nx,ny,2,M::nodeH,0xa6f0b0,a);rect(nx+M::nodeW-2,ny,2,M::nodeH,0xa6f0b0,a);}
+                if(n==g.memoryTreeSelected){   // selected: a white frame
+                    rect(nx-2,ny-2,M::nodeW+4,2,0xffffff);rect(nx-2,ny+M::nodeH,M::nodeW+4,2,0xffffff);
+                    rect(nx-2,ny-2,2,M::nodeH+4,0xffffff);rect(nx+M::nodeW,ny-2,2,M::nodeH+4,0xffffff);}
+                text(tree[n].name,nx+6,ny+6,1,own?0xffffff:open?0xcfe6ff:0x5f6678);
+                text(tree[n].tag,nx+6,ny+19,1,own?0xd8f0ff:open?0x9fb4cc:0x4a5062);
+                // Corner marker: raw stat node = a solid square, signature/special node = a diamond of four dots.
+                const unsigned mark=own?0xffffff:open?0x9fd0ff:0x4a5062;
+                if(tree[n].raw)rect(nx+M::nodeW-16,ny+5,9,9,mark);
+                else{rect(nx+M::nodeW-16,ny+8,3,3,mark);rect(nx+M::nodeW-11,ny+4,3,3,mark);rect(nx+M::nodeW-11,ny+12,3,3,mark);rect(nx+M::nodeW-6,ny+8,3,3,mark);}
+                if(own)text("OWNED",nx+6,ny+40,2,0xa6f0b0);
+                else if(open){number(tree[n].cost,nx+6,ny+40,2,can?0xa6f0b0:0x7f7a96);text("P",nx+30,ny+40,2,can?0xa6f0b0:0x7f7a96);}
+                else{   // locked: how many parents are still missing
+                    text("-",nx+6,ny+40,2,0x5f6678);number(tree[n].need-g.mastery.parentsOwned(job,n),nx+30,ny+40,2,0x5f6678);
+                }
+            }
+            SDL_SetRenderClipRect(renderer,nullptr);
+            rect(M::treeX,M::treeY,M::treeW,2,0x3a4366);rect(M::treeX,M::treeY+M::treeH-2,M::treeW,2,0x3a4366);
+            rect(M::treeX,M::treeY,2,M::treeH,0x3a4366);rect(M::treeX+M::treeW-2,M::treeY,2,M::treeH,0x3a4366);
+            // Detail box: the selected node's name, value and one-line effect, its price and the BUY button.
+            rect(M::panelX+14,M::detailY,M::panelW-28,M::detailH,0x10162a);
+            const int sel=g.memoryTreeSelected;
+            if(sel>=0&&sel<count){
+                const auto& d=tree[sel];
+                const bool own=g.mastery.has(job,sel),can=g.mastery.canBuy(job,sel),open=g.mastery.unlocked(job,sel);
+                text(d.name,M::panelX+26,M::detailY+8,2,0xffffff);
+                text(d.tag,M::panelX+26,M::detailY+28,1,0x9fd0ff);
+                text(d.desc,M::panelX+26,M::detailY+42,1,0xcfe6ff);
+                if(own)text("OWNED",M::panelX+26,M::detailY+62,2,0xa6f0b0);
+                else if(!open){text("NEED",M::panelX+26,M::detailY+62,2,0xc0a070);number(d.need-g.mastery.parentsOwned(job,sel),M::panelX+88,M::detailY+62,2,0xc0a070);}
+                else{number(d.cost,M::panelX+26,M::detailY+62,2,can?0xa6f0b0:0x7f7a96);text("P",M::panelX+48,M::detailY+62,2,can?0xa6f0b0:0x7f7a96);}
+                rect(M::buyX,M::buyY,M::buyW,M::buyH,can?0x2f8f5a:own?0x2a3150:0x1f2438);
+                text("BUY",M::buyX+34,M::buyY+10,2,can?0xffffff:0x5f6678);
+            }else{
+                text("XP",M::panelX+26,M::detailY+18,1,0x9fd0ff);number(g.mastery.xpOf(job),M::panelX+26,M::detailY+30,2,0xffffff);
+                text("NEXT",M::panelX+130,M::detailY+18,1,0x9fd0ff);number(g.mastery.xpToNext(job),M::panelX+130,M::detailY+30,2,0xffffff);
+                text("POINTS",M::panelX+240,M::detailY+18,1,0x9fd0ff);number(g.mastery.points(job),M::panelX+240,M::detailY+30,2,0xffffff);
+            }
+        }
+        // Tutorial: pulse a frame around the row to eat first (permanent tab only).
+        if(!runTab&&story&&story->menuRow>=0&&story->menuRow<statCount){
+            const float y=M::rowY+story->menuRow*M::rowH,pulse=.5f+.5f*std::sin(g.clock*6.f);
+            const Uint8 a=static_cast<Uint8>(150+100*pulse);
+            rect(M::panelX+12,y,M::panelW-24,3,0xf2d48c,a);rect(M::panelX+12,y+M::rowH-5,M::panelW-24,3,0xf2d48c,a);
+            rect(M::panelX+12,y,3,M::rowH-2,0xf2d48c,a);rect(M::panelX+M::panelW-15,y,3,M::rowH-2,0xf2d48c,a);
+        }
+    }
+    // Special-effect cues of tree nodes: an expanding ring where a blast or pulse happened (placeholder visuals).
+    void drawProcCues(const Combat& g){
+        for(const auto& c:g.procCues){
+            const float u=std::clamp(c.age/.5f,0.f,1.f);
+            const int action=c.action;
+            const unsigned color=action==static_cast<int>(ProcAction::Pulse)?0x9fd0ff:0xffc27a;
+            const float radius=std::max(18.f,c.radius)*(.25f+.75f*u);
+            ringAlpha(c.x-offset,c.y,radius,color,static_cast<Uint8>(230*(1.f-u)),.6f);
+            ringAlpha(c.x-offset,c.y,radius*.6f,0xffffff,static_cast<Uint8>(160*(1.f-u)),.6f);
+        }
+    }
+    // Story overlays are glyphs, rings, fades and light only: no sentences, so nothing needs reading.
+    void drawStory(const Combat& g,const StoryView& v,const ControlLayout& layout){
+        const float t=g.clock;
+        const float pulse=.5f+.5f*std::sin(t*6.f);
+        // Time stop: the fight is tinted and framed, and a preview shows what the prompted move will do.
+        if(v.freeze>0){
+            const Uint8 k=static_cast<Uint8>(std::min(1.f,v.freeze)*255);
+            rect(0,0,1280,720,0x0a1430,static_cast<Uint8>(k*.38f));
+            rect(0,0,1280,5,0x9ed7ff,static_cast<Uint8>(k*.7f));rect(0,715,1280,5,0x9ed7ff,static_cast<Uint8>(k*.7f));
+            rect(0,0,5,720,0x9ed7ff,static_cast<Uint8>(k*.7f));rect(1275,0,5,720,0x9ed7ff,static_cast<Uint8>(k*.7f));
+            const float px=g.player.x-offset,py=g.player.y-50;
+            if(v.previewR>0){
+                ringAlpha(px,py,v.previewR,0x9ed7ff,static_cast<Uint8>(150+80*pulse),.45f);
+                ringAlpha(px,py,v.previewR*(.3f+.7f*std::fmod(t*1.2f,1.f)),0xe6f2ff,120,.45f);
+            }
+            if(v.hintX>=0){   // dotted line to the foe the move will reach
+                const float hx=v.hintX-offset,steps=std::max(1.f,std::abs(hx-px)/22.f);
+                const float flow=std::fmod(t*2.f,1.f);
+                for(int i=0;i<static_cast<int>(steps);++i){
+                    const float u=(i+flow)/steps,x=px+(hx-px)*u,y=py-std::sin(u*3.14159f)*40.f;
+                    rect(x-3,y-3,6,6,0xf2d48c,200);
+                }
+            }
+        }
+        if(v.chevrons){
+            for(float x=v.chevronX0;x<v.chevronX1;x+=84.f){
+                const float ground=g.castleArea>0?CastleTerrain::groundAt(g.castleArea,x):floorY;
+                if(!std::isfinite(ground))continue;
+                const float travel=std::fmod((x-v.chevronX0)/84.f-t*3.2f,5.f);
+                const float lit=std::clamp(1.f-std::fabs(travel<0?travel+5.f:travel)*.45f,.12f,1.f);
+                chevron(x-offset,ground-34,4,1,0xe6c8ff,static_cast<Uint8>(40+190*lit));
+            }
+        }
+        if(v.gateGlow>0){
+            const float ground=g.castleArea>0?CastleTerrain::groundAt(g.castleArea,v.gateX):floorY;
+            const float gy=std::isfinite(ground)?ground-52:560;
+            for(int k=0;k<3;++k)ringAlpha(v.gateX-offset,gy,46+k*14+pulse*10,0x78b9ff,static_cast<Uint8>(210-k*55),1.35f);
+        }
+        // Infinite regression: one tally mark per loop, and the single memory that survives the last one.
+        if(v.loopPips>0){
+            const float startX=640.f-(v.loopPips*16.f-6.f)*.5f;
+            for(int k=0;k<v.loopPips;++k){
+                const bool newest=k==v.loopPips-1;
+                rect(startX+k*16.f-2,34,12,16,0xe6dcff,newest?90:30);
+                rect(startX+k*16.f,36,8,12,newest?0xffffff:0xbfa8ff,newest?255:190);
+            }
+        }
+        if(v.memoryGlint>0){
+            const float px=g.player.x-offset,py=g.player.y-62.f-v.memoryGlint*14.f;
+            const Uint8 a=static_cast<Uint8>(60+190*v.memoryGlint);
+            ringAlpha(px,py,14+pulse*6+v.memoryGlint*14,0xbfa8ff,static_cast<Uint8>(a*.6f));
+            rect(px-9,py-9,18,18,0xbfa8ff,static_cast<Uint8>(a*.5f));rect(px-5,py-5,10,10,0xffffff,a);
+        }
+        // Memory tutorial: the altar, then the foe whose memory is next.
+        if(v.altarGlow>0){
+            const float ax=memoryAltarX-offset;
+            for(int k=0;k<3;++k)ringAlpha(ax,floorY-4,40+k*16+pulse*10,0xe6dcff,static_cast<Uint8>(210-k*55),.28f);
+        }
+        if(v.hintX>=0){
+            const float hx=v.hintX-offset,hy=floorY-100+std::sin(t*3.f)*6.f;
+            rect(hx-9,hy-9,18,18,0xbfa8ff,110);rect(hx-4,hy-4,8,8,0xffffff,235);
+            ringAlpha(hx,hy,18+pulse*6,0xbfa8ff,190);
+        }
+        // Control practice goals: a beacon to walk to, targets to hit, orbs to collect, a ghost run to watch.
+        if(v.goalX>=0){
+            const float ground=g.castleArea>0?CastleTerrain::groundAt(g.castleArea,v.goalX):floorY;
+            const float gy=std::isfinite(ground)?ground:floorY,gx=v.goalX-offset;
+            rect(gx-3,gy-190,6,190,0xf2d48c,static_cast<Uint8>(70+60*pulse));
+            rect(gx-1,gy-190,2,190,0xffffff,static_cast<Uint8>(120+100*pulse));
+            for(int k=0;k<3;++k)ringAlpha(gx,gy-4,26+k*14+pulse*8,0xf2d48c,static_cast<Uint8>(230-k*60),.28f);
+        }
+        if(v.targetsHint){
+            for(const auto& e:g.enemies){
+                if(!e.dummy)continue;
+                const float hx=e.x-offset,hy=e.y-150+std::sin(t*3.f+e.x)*6.f;
+                rect(hx-9,hy-9,18,18,0xf2d48c,110);rect(hx-4,hy-4,8,8,0xffffff,235);
+                ringAlpha(hx,hy,18+pulse*6,0xf2d48c,190);
+            }
+        }
+        if(v.goalCount>0){
+            const float w=v.goalCount*34.f,x0=(1280.f-w)*.5f;
+            for(int i=0;i<v.goalCount;++i){
+                const bool got=i<v.goalDone;
+                rect(x0+i*34,118,26,26,0x080d17,200);
+                rect(x0+i*34+4,122,18,18,got?0xfff0b0:0x354354,255);
+                if(got)ringAlpha(x0+i*34+13,131,18+pulse*4,0xfff0b0,160);
+            }
+        }
+        if(v.highlight>=0&&v.highlight<ControlLayout::Count){
+            const auto& b=layout.buttons[v.highlight];
+            const float cx=b.x+b.size*.5f,cy=b.y+b.size*.5f;
+            ringAlpha(cx,cy,b.size*.5f+8+pulse*8,0xf2d48c,230);
+            ringAlpha(cx,cy,b.size*.5f+22+pulse*10,0xf2d48c,110);
+            const float tap=std::fmod(t*1.3f,1.f);
+            ringAlpha(cx,cy,b.size*.18f+b.size*.32f*tap,0xffffff,static_cast<Uint8>(200*(1.f-tap)));
+            if(v.highlight==ControlLayout::Stick&&v.arrow){
+                const float slide=std::fmod(t*60.f,28.f);
+                if(v.arrow==1)chevron(cx+b.size*.5f+10+slide,cy-14,4,1,0xf2d48c,static_cast<Uint8>(255-slide*7));
+                else if(v.arrow==-1)chevron(cx-b.size*.5f-38-slide,cy-14,4,-1,0xf2d48c,static_cast<Uint8>(255-slide*7));
+                else chevron(cx-14,cy-b.size*.5f-34-slide,4,2,0xf2d48c,static_cast<Uint8>(255-slide*7));
+            }
+        }
+        if(v.pipsTotal>0){
+            const float w=v.pipsTotal*16.f,x0=(1280.f-w)*.5f;
+            for(int i=0;i<v.pipsTotal;++i){
+                const bool done=i<v.pips;
+                rect(x0+i*16,92,12,12,0x080d17,200);
+                rect(x0+i*16+2,94,8,8,done?0xf2d48c:i==v.pips?0x9ed7ff:0x354354,255);
+            }
+        }
+        if(v.skipVisible){
+            rect(StoryDirector::skipX,StoryDirector::skipY,StoryDirector::skipW,StoryDirector::skipH,0x121b29,210);
+            rect(StoryDirector::skipX+2,StoryDirector::skipY+2,StoryDirector::skipW-4,StoryDirector::skipH-4,0x28384a,210);
+            chevron(StoryDirector::skipX+16,StoryDirector::skipY+11,3,1,0xe3bd72,255);
+            chevron(StoryDirector::skipX+44,StoryDirector::skipY+11,3,1,0xe3bd72,255);
+        }
+        if(v.unlockBurst>0){
+            const auto& b=layout.buttons[ControlLayout::Skill];
+            const float k=1.f-v.unlockBurst/2.4f;
+            ringAlpha(b.x+b.size*.5f,b.y+b.size*.5f,b.size*.4f+k*140.f,0xfff0b0,static_cast<Uint8>(255*(1.f-k)));
+        }
+        if(v.desaturate>0)rect(0,0,1280,720,0x2a2a3c,static_cast<Uint8>(std::min(1.f,v.desaturate)*170));
+        if(v.rewind){
+            for(int i=0;i<16;++i){
+                const float y=std::fmod(i*47.f+t*130.f,720.f);
+                const float x=1280.f-std::fmod(t*980.f+i*233.f,1700.f);
+                rect(x,y,360,3,0xaab8ff,80);rect(x+90,y+6,190,2,0xe8eeff,60);
+            }
+            const float flashK=std::pow(std::clamp(1.f-v.rewindPhase,0.f,1.f),3.f);
+            rect(0,0,1280,720,0xbfd0ff,static_cast<Uint8>(flashK*190));
+        }
+        if(v.flash>0)rect(0,0,1280,720,0xffffff,static_cast<Uint8>(std::min(1.f,v.flash)*230));
+        if(v.blackout>0)rect(0,0,1280,720,0x000000,static_cast<Uint8>(std::min(1.f,v.blackout)*255));
+        if(v.whiteout>0)rect(0,0,1280,720,0xffffff,static_cast<Uint8>(std::min(1.f,v.whiteout)*255));
     }
     void hud(const Combat& g,Actions held,const ControlLayout& layout,std::array<float,2> stick,bool interactionAvailable){
         const auto& p=g.player;
@@ -619,7 +1098,7 @@ class Presentation {
         const auto& c=layout.buttons;
         const auto& js=c[ControlLayout::Stick];
         const bool stickActive=held.left||held.right||held.jump;
-        icon(4,0,0,js.x,js.y,js.size,stickActive);
+        icon(stickActive?7:6,js.x,js.y,js.size,stickActive);
         const float thumb=js.size*.29f;
         const float tx=js.x+js.size*.5f+stick[0],ty=js.y+js.size*.5f+stick[1];
         auto thumbLayer=[&](float size,unsigned color,Uint8 alpha){
@@ -635,34 +1114,34 @@ class Presentation {
         thumbLayer(thumb,stickActive?0xb8c8cf:0x91a8b4,stickActive?191:153);
         thumbLayer(thumb*.58f,0x304353,174);
         const auto& attack=c[ControlLayout::Attack];
-        icon(1,held.attack?1:0,0,attack.x,attack.y,attack.size,held.attack);
+        icon(held.attack?1:0,attack.x,attack.y,attack.size,held.attack);
         if(interactionAvailable){
-            rect(attack.x+attack.size*.34f,attack.y+attack.size*.22f,attack.size*.32f,attack.size*.48f,0x102348,245);
-            text("!",attack.x+attack.size*.425f,attack.y+attack.size*.20f,5,0x63dfff);
+            rect(attack.x+attack.size*.34f,attack.y+attack.size*.22f,attack.size*.32f,attack.size*.48f,0x10151b,245);
+            text("!",attack.x+attack.size*.425f,attack.y+attack.size*.20f,5,0xd2d6d3);
         }
-        icon(2,held.dash?1:0,0,c[ControlLayout::Dash].x,c[ControlLayout::Dash].y,c[ControlLayout::Dash].size,held.dash);
+        icon(held.dash?3:2,c[ControlLayout::Dash].x,c[ControlLayout::Dash].y,c[ControlLayout::Dash].size,held.dash);
         // Character swap remains available in every class, including Flash Executioner.
-        icon(3,0,0,c[ControlLayout::Swap].x,c[ControlLayout::Swap].y,c[ControlLayout::Swap].size,held.swap);
+        icon(held.swap?5:4,c[ControlLayout::Swap].x,c[ControlLayout::Swap].y,c[ControlLayout::Swap].size,held.swap);
         if(p.flashExecutioner){
-            skillSlot(c[ControlLayout::Skill],1,"RUSH",p.skillCooldown,3.f,held.skill,0xb4d8ee,true,3);
-            skillSlot(c[ControlLayout::Sweep],2,"RELEASE",p.sweepReady,1.f,held.skillSweep,0x9bb9d6,true,4);
-            skillSlot(c[ControlLayout::Buff],3,"BLINK",p.buffReady,1.5f,held.skillBuff,0xd9ecf5,true,5);
-            skillSlot(c[ControlLayout::Ultimate],4,"VERDICT",p.verdictCooldown,9.f,held.ultimate,0xc4d7ed,true,6);
+            flashSkillSlot(c[ControlLayout::Skill],1,0,p.skillCooldown,3.f,held.skill,0xb4d8ee);
+            flashSkillSlot(c[ControlLayout::Sweep],2,1,p.sweepReady,1.f,held.skillSweep,0x9bb9d6);
+            flashSkillSlot(c[ControlLayout::Buff],3,2,p.buffReady,1.5f,held.skillBuff,0xd9ecf5);
+            flashSkillSlot(c[ControlLayout::Ultimate],4,3,p.verdictCooldown,9.f,held.ultimate,0xc4d7ed);
         }else if(p.form==1){
-            skillButton(c[ControlLayout::Skill],"1",p.mageSkillCooldown,7,held.skill,0xaa66ee);
-            skillButton(c[ControlLayout::Sweep],"2",p.sweepReady,7,held.skillSweep,0xaa66ee);
-            skillButton(c[ControlLayout::Buff],"3",p.buffReady,5,held.skillBuff,0xaa66ee);
-            skillButton(c[ControlLayout::Ultimate],"4",p.verdictCooldown,20,held.ultimate,0xcc88ff);
+            skillButton(c[ControlLayout::Skill],1,4,p.mageSkillCooldown,7,held.skill,0x91c5e2);
+            skillButton(c[ControlLayout::Sweep],2,5,p.sweepReady,7,held.skillSweep,0x91c5e2);
+            skillButton(c[ControlLayout::Buff],3,6,p.buffReady,5,held.skillBuff,0x91c5e2);
+            skillButton(c[ControlLayout::Ultimate],4,7,p.verdictCooldown,20,held.ultimate,0xb69bdf);
             const auto& stick=c[ControlLayout::Stick];
             rect(stick.x,stick.y-10,stick.size,5,0x26163a);
             rect(stick.x,stick.y-10,stick.size*p.spaceFuel,5,0xb36bf0);
         }else{
-            skillSlot(c[ControlLayout::Skill],1,"FIRE",p.mageSkillCooldown,4.1f,
-                held.skill,0xcaa2a4,true,0);
-            skillSlot(c[ControlLayout::Sweep],2,"-",p.sweepReady,sweepCooldown,
-                held.skillSweep,0x92b5ce,false,0);
-            skillSlot(c[ControlLayout::Buff],3,"-",p.buffReady,buffCooldown,
-                held.skillBuff,0xe3bd72,false,0);
+            skillSlot(c[ControlLayout::Skill],1,0,p.mageSkillCooldown,4.1f,
+                held.skill,0xb45d68,true);
+            skillSlot(c[ControlLayout::Sweep],2,1,p.sweepReady,sweepCooldown,
+                held.skillSweep,0xb45d68,false);
+            skillSlot(c[ControlLayout::Buff],3,2,p.buffReady,buffCooldown,
+                held.skillBuff,0xb45d68,false);
             if(p.swapCooldown>0)number(static_cast<int>(std::ceil(p.swapCooldown)),c[ControlLayout::Swap].x+20,c[ControlLayout::Swap].y+25,3,0xffd277);
         }
         if(g.inventory){rect(46,135,460,340,0xe3bd72);rect(50,139,452,332,0x1c2a34);text("EQUIPMENT",66,153,3);
@@ -816,7 +1295,7 @@ class Presentation {
 
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
-    ~Presentation(){for(auto* image:spaceActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:spaceFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:castleEnemyMoveTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:castleEnemyAttackTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:castleEnemyAttackVfxTextures_)if(image)SDL_DestroyTexture(image);for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_,riftSlash_,riftTrace_})if(fx)SDL_DestroyTexture(fx);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+    ~Presentation(){if(playerHealthFrame_)SDL_DestroyTexture(playerHealthFrame_);if(circularSkillButtons_)SDL_DestroyTexture(circularSkillButtons_);for(auto* image:spaceActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:spaceFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:castleEnemyMoveTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:castleEnemyAttackTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:castleEnemyAttackVfxTextures_)if(image)SDL_DestroyTexture(image);for(auto& form:bossMotionTextures_)for(auto* image:form)if(image)SDL_DestroyTexture(image);for(auto* image:bossFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_,riftSlash_,riftTrace_})if(fx)SDL_DestroyTexture(fx);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(bossBarFrame_)SDL_DestroyTexture(bossBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestV3Textures_)if(texture)SDL_DestroyTexture(texture);}
@@ -868,7 +1347,7 @@ public:
     static constexpr SDL_FRect titleGear{1204,24,52,52};
     static constexpr SDL_FRect titleDeveloperQA{500,478,280,54};
     static constexpr SDL_FRect titleBack{26,25,190,50};
-    static constexpr float titleReadyTime=0.85f;
+    static constexpr float titleReadyTime=5.8f;
 
 
     bool loadCastleEnemyAtlases(){
@@ -878,13 +1357,14 @@ public:
             for(int state=0;state<2;++state){
                 auto*& texture=state==0?castleEnemyMoveTextures_[i]:castleEnemyAttackTextures_[i];
                 const char* sheet=state==0?"이동_sheet.png":"공격_sheet.png";
-                const int width=state==0?castleEnemyMoveFrames*192:castleEnemyAttackFrames*192;
+                const int cellSize=enemyCell(AshInfantry+i);
+                const int width=state==0?castleEnemyMoveFrames*cellSize:castleEnemyAttackFrames*cellSize;
                 const std::string file=asset((base+sheet).c_str());
                 texture=IMG_LoadTexture(renderer,file.c_str());
                 if(!texture){SDL_SetError("ECLIPSE ENEMY ASSET ERROR: %s: %s",file.c_str(),SDL_GetError());return false;}
                 float actualW=0,actualH=0;
-                if(!SDL_GetTextureSize(texture,&actualW,&actualH)||actualW!=width||actualH!=192){
-                    SDL_SetError("ECLIPSE ENEMY ASSET ERROR: %s expected %dx192, got %.0fx%.0f",file.c_str(),width,actualW,actualH);
+                if(!SDL_GetTextureSize(texture,&actualW,&actualH)||actualW!=width||actualH!=cellSize){
+                    SDL_SetError("ECLIPSE ENEMY ASSET ERROR: %s expected %dx%d, got %.0fx%.0f",file.c_str(),width,cellSize,actualW,actualH);
                     SDL_DestroyTexture(texture);texture=nullptr;return false;
                 }
                 SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST);
@@ -902,6 +1382,39 @@ public:
             }
             SDL_SetTextureScaleMode(vfx,SDL_SCALEMODE_NEAREST);
             SDL_SetTextureBlendMode(vfx,SDL_BLENDMODE_BLEND);
+        }
+        // Demon King body motions and effect layers. Required: a missing or mis-sized sheet is a loud error.
+        for(int form=0;form<2;++form){
+            const int kind=form?DemonKingTrue:DemonKingArmored;
+            const std::string base=std::string("monsters/demon_castle/")+enemySpec(kind).folder+"/";
+            for(int m=1;m<static_cast<int>(BossMotion::Count);++m){
+                if(!bossMotionOwned(kind,static_cast<BossMotion>(m)))continue;
+                const std::string file=asset((base+"모션_"+bossMotionNames[m]+"_sheet.png").c_str());
+                auto*& texture=bossMotionTextures_[form][m];
+                texture=IMG_LoadTexture(renderer,file.c_str());
+                if(!texture){SDL_SetError("ECLIPSE ENEMY ASSET ERROR: %s: %s",file.c_str(),SDL_GetError());return false;}
+                float w=0,h=0;
+                if(!SDL_GetTextureSize(texture,&w,&h)||w!=bossMotionFrames*enemyCell(kind)||h!=enemyCell(kind)){
+                    SDL_SetError("ECLIPSE ENEMY ASSET ERROR: %s expected %dx%d, got %.0fx%.0f",file.c_str(),
+                        bossMotionFrames*enemyCell(kind),enemyCell(kind),w,h);
+                    SDL_DestroyTexture(texture);texture=nullptr;return false;
+                }
+                SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(texture,SDL_BLENDMODE_BLEND);
+            }
+        }
+        for(int i=0;i<static_cast<int>(BossFx::Count);++i){
+            const auto& sheet=bossFxSheets[i];
+            const std::string file=asset(sheet.file);
+            auto*& texture=bossFxTextures_[i];
+            texture=IMG_LoadTexture(renderer,file.c_str());
+            if(!texture){SDL_SetError("ECLIPSE ASSET ERROR: boss effect %s: %s",file.c_str(),SDL_GetError());return false;}
+            float w=0,h=0;const int rows=(sheet.count+sheet.columns-1)/sheet.columns;
+            if(!SDL_GetTextureSize(texture,&w,&h)||w!=sheet.columns*sheet.cellW||h!=rows*sheet.cellH){
+                SDL_SetError("ECLIPSE ASSET ERROR: boss effect %s expected %dx%d, got %.0fx%.0f",file.c_str(),
+                    sheet.columns*sheet.cellW,rows*sheet.cellH,w,h);
+                SDL_DestroyTexture(texture);texture=nullptr;return false;
+            }
+            SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(texture,SDL_BLENDMODE_BLEND);
         }
         return true;
     }
@@ -1030,8 +1543,11 @@ public:
                     (p.flashMove==FlashMove::Verdict?.20f:0.f);
                 float playbackDuration=0.f;
                 if(p.flashMove==FlashMove::Slash){
-                    const auto& clip=flashClips[static_cast<int>(FlashMove::Slash)];
-                    playbackDuration=(clip.duration-clip.contact)/speed+fxSheet.triggerLeadSeconds;
+                    // The light-crescent slash is a long effect (1.1 s) that keeps playing after the attack
+                    // clip ends, so it is no longer stretched to the clip's remaining time. It plays at its
+                    // authored speed at attack speed 1.0 and speeds up with attack-speed boosts, always
+                    // playing all of its frames before it disappears.
+                    playbackDuration=fxSheet.duration/speed;
                 }
                 spawn(role,p.x,p.y,p.facing,p.flashMove!=FlashMove::Blink,sourceAge,playbackDuration);
             }
@@ -1048,8 +1564,15 @@ public:
                         return other.kind==LightFx::Verdict&&std::abs(other.life-burst.life)<.001f&&
                                std::abs(other.x-burst.x)<1.f&&std::abs(other.y-burst.y)<1.f;
                     });
-                if(!verdictPair)spawn(FlashFx::Impact,burst.x,
-                    reviewedFlashImpactY(g,FlashFx::Impact,burst),burst.facing,false,age);
+                // Stored light lances (Command): two crossing blades of light, medium power.
+                if(!verdictPair)spawn(FlashFx::ImpactLance,burst.x,
+                    reviewedFlashImpactY(g,FlashFx::ImpactLance,burst),burst.facing,false,age);
+            }else if(burst.kind==LightFx::SlashHit){
+                // Basic attack: the weakest hit, a small round flash.
+                spawn(FlashFx::Impact,burst.x,reviewedFlashImpactY(g,FlashFx::Impact,burst),burst.facing,false,age);
+            }else if(burst.kind==LightFx::RushHit){
+                // Rush: a heavy eight-point star with two shock rings, the strongest regular hit.
+                spawn(FlashFx::ImpactRush,burst.x,reviewedFlashImpactY(g,FlashFx::ImpactRush,burst),burst.facing,false,age);
             }else if(burst.kind==LightFx::Verdict){
                 spawn(FlashFx::LanceHit,burst.x,reviewedFlashImpactY(g,FlashFx::LanceHit,burst),
                       burst.facing,false,age);
@@ -1154,29 +1677,66 @@ public:
         {410,374,460,52},{410,436,460,52},{530,562,220,44}
     }};
 
-    void drawTitle(float seconds,int page=0,bool loggingIn=false,int qaFirstJob=-1){
-        constexpr float width=1280, height=720;
-        constexpr float logoBand=195;
-        const SDL_FRect lowerScene{0,logoBand,width,height-logoBand};
-        const SDL_FRect lowerSource{0,logoBand*865/height,1536,865-logoBand*865/height};
-        const float reveal=std::clamp((seconds-0.12f)/0.73f,0.f,1.f);
-        const float eased=reveal*reveal*(3-2*reveal);
-        SDL_SetRenderDrawColor(renderer,11,10,18,255);
-        SDL_RenderClear(renderer);
-        SDL_RenderTexture(renderer,titleTexture_,&lowerSource,&lowerScene);
-
-        // The logo and eclipse share the upper artwork strip. Fade its
-        // lower edge into the fully visible scene while the lettering appears.
-        const SDL_FColor faded{1,1,1,eased}, visible{1,1,1,1};
-        constexpr float fadeStart=logoBand-55;
-        const SDL_Vertex logo[]={
-            {{0,0},faded,{0,0}},{{width,0},faded,{1,0}},
-            {{0,fadeStart},faded,{0,fadeStart/height}},{{width,fadeStart},faded,{1,fadeStart/height}},
-            {{0,logoBand},visible,{0,logoBand/height}},{{width,logoBand},visible,{1,logoBand/height}}
+    void drawTitleOpening(float seconds){
+        const auto progress=[seconds](float begin,float end){
+            const float t=std::clamp((seconds-begin)/(end-begin),0.f,1.f);
+            return t*t*(3.f-2.f*t);
         };
-        const int strip[]={0,1,2,1,3,2,2,3,4,3,5,4};
-        SDL_RenderGeometry(renderer,titleTexture_,logo,6,strip,12);
-        if(seconds>=titleReadyTime&&page==2){
+        const float occultation=progress(.52f,2.65f);
+        const float pullback=progress(2.92f,4.85f);
+        const float reveal=progress(4.12f,titleReadyTime);
+        // End on the painted corona at the center of the ECLIPSE wordmark.
+        const float x=640, y=338-252*pullback, radius=107-40*pullback;
+        for(int i=0;i<62;++i){
+            const float starX=(i*509+37)%1280, starY=(i*i*11+i*41+13)%720;
+            const float glimmer=.74f+.26f*std::sin(i+seconds*1.5f);
+            rect(starX,starY,i%8==0?3:2,2,0xc6beda,
+                 static_cast<Uint8>((65+100*occultation)*glimmer));
+        }
+
+        // Horizontal pixel spans keep the limb stepped at native game resolution.
+        const auto disc=[&](float cx,float cy,float r,unsigned tint,Uint8 alpha){
+            for(int row=-static_cast<int>(r);row<=r;row+=2){
+                const float half=std::sqrt(std::max(0.f,r*r-row*row));
+                rect(cx-half,cy+row,2*half,2,tint,alpha);
+            }
+        };
+        disc(x,y,radius+16,0x8873b6,22);
+        disc(x,y,radius+8,0xae9ad9,55);
+        disc(x,y,radius+3,0xe6dcff,200);
+        disc(x,y,radius,0xffefd4,255);
+        disc(x-2.3f*radius*(1-occultation),y-7*(1-occultation),
+             radius-2,0x08080e,255);
+
+        // The last bead of sunlight flares on the rim, then contracts to a point.
+        const float bead=progress(2.24f,2.55f)*(1-progress(2.62f,3.15f));
+        if(bead>0){
+            const float tip=x+radius;
+            rect(tip-37*bead,y,74*bead,2,0xffeac2);
+            rect(tip,y-15*bead,2,30*bead,0xfff6dc);
+        }
+        if(seconds<.55f)
+            rect(0,0,1280,720,0x08080e,static_cast<Uint8>(255*(1-progress(0,.55f))));
+        if(reveal>0){
+            const SDL_FRect screen{0,0,1280,720};
+            SDL_SetTextureAlphaMod(titleTexture_,static_cast<Uint8>(255*reveal));
+            SDL_RenderTexture(renderer,titleTexture_,nullptr,&screen);
+            SDL_SetTextureAlphaMod(titleTexture_,255);
+        }
+    }
+
+    void drawTitle(float seconds,int page=0,bool loggingIn=false,int qaFirstJob=-1){
+        SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(renderer,8,8,14,255);
+        SDL_RenderClear(renderer);
+        if(seconds<titleReadyTime){
+            drawTitleOpening(seconds);
+            SDL_RenderPresent(renderer);
+            return;
+        }
+        const SDL_FRect screen{0,0,1280,720};
+        SDL_RenderTexture(renderer,titleTexture_,nullptr,&screen);
+        if(page==2){
             rect(386,320,508,304,0x101223);
             rect(386,320,508,3,0xad95c7);
             text(qaFirstJob<0?"QA: PICK FIRST JOB":"QA: PICK SECOND JOB",453,340,3,0xffe2b7);
@@ -1190,9 +1750,9 @@ public:
                     target.y+(target.h-21)*.5f,3,chosen?0xffd17c:0xece3f4);
                 if(chosen)rect(target.x+7,target.y+10,5,target.h-20,0xffd17c);
             }
-        }else if(seconds>=titleReadyTime){
+        }else{
             // Screens: MAIN=0, START_OPTIONS=1, QA=2, GEAR=3, SETTINGS=4.
-            constexpr const char* labels[]={"START","VACODE LOGIN","PLAY AS GUEST","SETTINGS","EXIT","BACK"};
+            constexpr const char* labels[]={"PLAY","VACODE LOGIN","PLAY AS GUEST","SETTINGS","EXIT","BACK"};
             const char* first=page==0?labels[0]:page==1?labels[1]:page==3?labels[3]:labels[5];
             const char* second=page==1?labels[2]:page==3?labels[4]:nullptr;
             const char* menuLabels[]={first,second};
@@ -1223,9 +1783,25 @@ public:
                 text("PRESS BACK TO RETURN",442,442,2,0xbbaccb);
             }
         }
-        if(seconds>=titleReadyTime&&page!=2&&settingsGear_)
+        if(page!=2&&settingsGear_)
             SDL_RenderTexture(renderer,settingsGear_,nullptr,&titleGear);
         SDL_RenderPresent(renderer);
+    }
+
+    bool loadSkillButtonArt(){
+        auto load=[&](const char* name,SDL_Texture*& target,int width,int height)->bool{
+            const std::string path=asset(name);SDL_Surface* surface=IMG_Load(path.c_str());
+            if(!surface){const std::string cause=SDL_GetError();SDL_SetError("ECLIPSE ASSET ERROR: cannot load %s: %s",path.c_str(),cause.c_str());SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",SDL_GetError());return false;}
+            if(surface->w!=width||surface->h!=height){const int w=surface->w,h=surface->h;SDL_DestroySurface(surface);SDL_SetError("ECLIPSE ASSET ERROR: %s expected %dx%d, got %dx%d",path.c_str(),width,height,w,h);SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",SDL_GetError());return false;}
+            target=SDL_CreateTextureFromSurface(renderer,surface);SDL_DestroySurface(surface);
+            if(!target){const std::string cause=SDL_GetError();SDL_SetError("ECLIPSE ASSET ERROR: cannot create texture for %s: %s",path.c_str(),cause.c_str());SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",SDL_GetError());return false;}
+            SDL_SetTextureScaleMode(target,SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(target,SDL_BLENDMODE_BLEND);return true;
+        };
+        if(!load("ui/player_health_frame.png",playerHealthFrame_,288,46))return false;
+        if(!load("ui/enemy_bar_frame.png",enemyBarFrame_,88,18))return false;
+        if(!load("ui/boss_bar_frame.png",bossBarFrame_,108,18))return false;
+        if(!load("ui/circular_skill_buttons.png",circularSkillButtons_,1024,768))return false;
+        return true;
     }
 
     bool load(){
@@ -1238,17 +1814,19 @@ public:
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                 "ECLIPSE castle asset preload failed (castle scene unavailable): %s",SDL_GetError());
         } else SDL_Log("ECLIPSE demon castle entrance assets: ready");
-        // Knight motion and monster atlases were removed from the canonical
-        // resource pack. Load only the still-present combat control sheets.
-        constexpr const char* files[]={nullptr,"ui/attack_states.png","ui/dash_states.png","ui/swap_skill_states.png","ui/joystick_arrows_new.png"};
-        for(int i=1;i<5;++i){const auto path=asset(files[i]);SDL_Surface* image=IMG_Load(path.c_str());
-            if(!image){SDL_Log("Required PNG missing or invalid: %s (%s)",path.c_str(),SDL_GetError());return false;}
-            // Compact oversized button sheets once, keeping only 128px per state on the GPU.
-            if(i>0){int cols=(i==1||i==2||i==3)?2:1,rows=i==3?2:1;auto* scaled=SDL_ScaleSurface(image,128*cols,128*rows,SDL_SCALEMODE_NEAREST);SDL_DestroySurface(image);image=scaled;if(!image)return false;}
-            textures[i]=SDL_CreateTextureFromSurface(renderer,image);SDL_DestroySurface(image);
-            if(!textures[i])return false;
-            SDL_SetTextureScaleMode(textures[i],SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(textures[i],SDL_BLENDMODE_BLEND);
+        // Eight circular control states from the PixelLab-edited 3x3 frame sheet.
+        const std::string controlsPath=asset("ui/circular_control_states.png");
+        SDL_Surface* controlsSurface=IMG_Load(controlsPath.c_str());
+        if(!controlsSurface){const std::string cause=SDL_GetError();SDL_SetError("ECLIPSE ASSET ERROR: cannot load %s: %s",controlsPath.c_str(),cause.c_str());SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",SDL_GetError());return false;}
+        if(controlsSurface->w!=768||controlsSurface->h!=768){
+            const int w=controlsSurface->w,h=controlsSurface->h;SDL_DestroySurface(controlsSurface);
+            SDL_SetError("ECLIPSE ASSET ERROR: %s expected 768x768, got %dx%d",controlsPath.c_str(),w,h);
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",SDL_GetError());return false;
         }
+        textures[1]=SDL_CreateTextureFromSurface(renderer,controlsSurface);SDL_DestroySurface(controlsSurface);
+        if(!textures[1]){const std::string cause=SDL_GetError();SDL_SetError("ECLIPSE ASSET ERROR: cannot create texture for %s: %s",controlsPath.c_str(),cause.c_str());SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"%s",SDL_GetError());return false;}
+        SDL_SetTextureScaleMode(textures[1],SDL_SCALEMODE_NEAREST);SDL_SetTextureBlendMode(textures[1],SDL_BLENDMODE_BLEND);
+        if(!loadSkillButtonArt())return false;
         // Optional UI decorations never block gameplay startup.
         auto loadOptionalTexture=[&](const char* name,int width=0,int height=0)->SDL_Texture* {
             const auto path=asset(name);SDL_Surface* image=IMG_Load(path.c_str());
@@ -1265,7 +1843,6 @@ public:
         if(!settingsGear_)settingsGear_=loadOptionalTexture("ui/settings_gear.png");
         settingsPanel_=loadOptionalTexture("ui/settings_menu_panel.png");
         settingsWindow_=loadOptionalTexture("ui/settings_window.png");
-        enemyBarFrame_=loadOptionalTexture("ui/enemy_bar_frame.png");
         executeIcon_=loadOptionalTexture("ui/execute_skull.png");
         // Optional sprite library: the procedural renderer remains functional without it.
         // Only startup loads textures; no per-frame filesystem work.
@@ -1425,9 +2002,12 @@ public:
             }
         }
     }
-    void draw(const Combat& g,const Animation& a,float camera,Actions held,const char* capture=nullptr,const char* reviewLabel=nullptr,const ControlLayout* customLayout=nullptr,std::array<float,2> stick={},bool interactionAvailable=false){
-        offset=std::round(camera)-640;SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);SDL_SetRenderDrawColor(renderer,21,35,52,255);SDL_RenderClear(renderer);
-        forest(g,camera);for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.enemyVisualClock);
+    void draw(const Combat& g,const Animation& a,float camera,Actions held,const char* capture=nullptr,const char* reviewLabel=nullptr,const ControlLayout* customLayout=nullptr,std::array<float,2> stick={},bool interactionAvailable=false,const StoryView* story=nullptr){
+        offset=std::round(camera)-640;
+        {const float shakeAmp=(story?story->shake*14.f:0.f)+g.shake*12.f;if(shakeAmp>0)offset+=std::round(std::sin(g.clock*95.f)*shakeAmp);}SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);SDL_SetRenderDrawColor(renderer,21,35,52,255);SDL_RenderClear(renderer);
+        forest(g,camera);drawMemoryAltar(g);drawBossFocus(g);drawBossLayers(g,true);
+        for(const auto& e:g.enemies)if(!e.dead())enemy(e,g.enemyVisualClock);
+        drawBossLayers(g,false);drawSwordTrail(g);
         const auto& caster=g.player;
         updateReviewedFlashEffects(g);
         const bool verdictFreeze=caster.flashExecutioner&&caster.flashMove==FlashMove::Verdict&&
@@ -1466,10 +2046,40 @@ public:
                 }
             }
         }
+        for(const auto& fx:g.eclipseFx){   // light x dark reactions (code-drawn placeholder, no authored art yet)
+            const float x=fx.x-offset,y=fx.y;
+            if(fx.kind==0){
+                const float grow=std::min(1.f,fx.age/eclipsePullStart);
+                const float r=(14.f+3.f*fx.marks)*(fx.collapsed?std::max(0.f,1.f-(fx.age-eclipseCollapseAt)*3.f):grow);
+                if(!fx.collapsed){
+                    ringAlpha(x,y,eclipsePullRadius*(1.f-std::min(1.f,fx.age/eclipseCollapseAt)),0x9b6bff,110,.5f);
+                    for(int k=0;k<fx.marks+2;++k){   // the absorbed light streams in
+                        const float u=std::fmod(fx.age*2.2f+k*.23f,1.f),a=k*2.4f;
+                        rect(x+std::cos(a)*eclipsePullRadius*(1.f-u)-3,y+std::sin(a)*70.f*(1.f-u)-3,6,6,0xfff0b0,static_cast<Uint8>(230*(1.f-u*.5f)));
+                    }
+                }
+                ringAlpha(x,y,r+6,0xffd77a,230,.9f);ringAlpha(x,y,r+3,0xffd77a,160,.9f);
+                for(int d=-static_cast<int>(r);d<=static_cast<int>(r);d+=2){
+                    const float h=std::sqrt(std::max(0.f,r*r-float(d*d)));rect(x+d,y-h,2,h*2,0x04020a,245);
+                }
+                if(fx.collapsed){
+                    const float k=std::min(1.f,(fx.age-eclipseCollapseAt)/.3f);
+                    ringAlpha(x,y,eclipseBlastRadius*k,0xfff0b0,static_cast<Uint8>(255*(1.f-k)),.7f);
+                    ringAlpha(x,y,eclipseBlastRadius*k*.7f,0xffffff,static_cast<Uint8>(200*(1.f-k)),.7f);
+                }
+            }else{
+                const float k=std::min(1.f,fx.age/.35f);
+                ringAlpha(x,y,30+120.f*k,0xfff0b0,static_cast<Uint8>(255*(1.f-k)),.8f);
+                ringAlpha(x,y,16+80.f*k,0xc9a8ff,static_cast<Uint8>(230*(1.f-k)),.8f);
+                for(int i=0;i<fx.dark*2;++i){const float a=i*(6.2832f/(fx.dark*2));rect(x+std::cos(a)*(20+90*k)-3,y+std::sin(a)*(14+60*k)-3,6,6,0xfff6bf,static_cast<Uint8>(255*(1.f-k)));}
+            }
+        }
         for(const auto& burst:g.lightBursts){
             // The basic sword slash is now driven by the *current sword pose*
             // below, not by a detached world-space burst with its own clock.
-            const bool replaced=(burst.kind==LightFx::Impact&&hasReviewedFlashFx(FlashFx::Impact))||
+            const bool replaced=(burst.kind==LightFx::Impact&&hasReviewedFlashFx(FlashFx::ImpactLance))||
+                (burst.kind==LightFx::SlashHit&&hasReviewedFlashFx(FlashFx::Impact))||
+                (burst.kind==LightFx::RushHit&&hasReviewedFlashFx(FlashFx::ImpactRush))||
                 (burst.kind==LightFx::Verdict&&hasReviewedFlashFx(FlashFx::LanceHit))||
                 (burst.kind==LightFx::Depart&&hasReviewedFlashFx(FlashFx::BlinkOut))||
                 (burst.kind==LightFx::Arrive&&hasReviewedFlashFx(FlashFx::BlinkIn))||
@@ -1506,7 +2116,11 @@ public:
         static const ControlLayout defaultLayout{};
         const ControlLayout& layout=customLayout?*customLayout:defaultLayout;
         if(layout.showNumbers)for(const auto& popup:g.popups)number(popup.amount,popup.x-offset-12,popup.y,3,popup.kind==DamageKind::Fire?0xff9155:(popup.kind==DamageKind::Bleed||popup.kind==DamageKind::Execute)?0xe76878:0xf2d48c);
+        if(g.flash>0)rect(0,0,1280,720,0xe6c8ff,static_cast<Uint8>(std::min(1.f,g.flash)*140));
+        drawMemoryMotes(g);drawProcCues(g);
         hud(g,held,layout,stick,interactionAvailable);
+        if(story)drawStory(g,*story,layout);
+        if(g.memoryMenu)drawMemoryMenu(g,story);
         if(layout.editing)settings(layout);
         // PNG-backed gothic gear and vertical menu. All actions use ControlLayout hitboxes.
         if(!layout.reposition&&settingsGear_){

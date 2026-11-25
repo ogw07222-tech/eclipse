@@ -13,6 +13,12 @@ public:
     enum {Stick,Attack,Dash,Swap,Skill,Sweep,Buff,Ultimate,Count};
     enum Page { Sound, Controls, Game };
     static constexpr std::array<ControlRect,Count> defaultButtons{{
+        // Keep the action cluster in the lower-right safe area. The four
+        // skills form a compact 2x2 block, leaving the upper combat lane clear.
+        {40,582,126},{1134,604,112},{1038,610,76},{962,528,68},
+        {1038,456,68},{1110,456,68},{1038,530,68},{1110,530,68}
+    }};
+    static constexpr std::array<ControlRect,Count> legacyDefaultButtons{{
         {35,586,128},{1110,540,116},{985,560,100},{995,445,90},{1115,420,94},
         {902,455,82},{1030,347,82},{1150,300,90}
     }};
@@ -54,7 +60,7 @@ public:
     void load(){
         auto file=path();if(file.empty())return;
         FILE* f=std::fopen(file.c_str(),"r");if(!f)return;
-        int version=0;bool valid=std::fscanf(f,"ECLIPSE_CONTROLS %d",&version)==1&&(version>=1&&version<=4);
+        int version=0;bool valid=std::fscanf(f,"ECLIPSE_CONTROLS %d",&version)==1&&(version>=1&&version<=5);
         auto next=defaultButtons;
         // Version 3 had seven controls; append Ultimate without moving saved buttons.
         const int savedCount=version>=4?Count:version>=3?Count-1:5;
@@ -68,12 +74,20 @@ public:
             }
         }
         std::fclose(f);if(!valid)return;
+        bool untouchedLegacy=version<5;
+        for(int i=0;untouchedLegacy&&i<savedCount;++i){
+            const auto& saved=next[i];const auto& legacy=legacyDefaultButtons[i];
+            untouchedLegacy=std::abs(saved.x-legacy.x)<.51f&&
+                std::abs(saved.y-legacy.y)<.51f&&std::abs(saved.size-legacy.size)<.51f;
+        }
+        if(untouchedLegacy)next=defaultButtons;
         buttons=next;for(int i=0;i<Count;++i)clamp(i);
+        if(version<5)save();
     }
     void save() const {
         auto file=path();if(file.empty())return;
         FILE* f=std::fopen(file.c_str(),"w");if(!f)return;
-        std::fprintf(f,"ECLIPSE_CONTROLS 4\n");
+        std::fprintf(f,"ECLIPSE_CONTROLS 5\n");
         for(const auto& b:buttons)std::fprintf(f,"%.2f %.2f %.2f\n",b.x,b.y,b.size);
         std::fprintf(f,"%d %d %d %d\n",bgm,sfx,screenShake?1:0,showNumbers?1:0);
         std::fclose(f);

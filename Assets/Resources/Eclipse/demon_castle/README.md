@@ -21,3 +21,9 @@ The updated collision floors and portal anchors are authored in `native-engine/s
 The eight Castle enemy folders under `monsters/demon_castle/` match the source package in `Download/ECLIPSE/ENEMY/` byte-for-byte. The runtime draws each move and attack atlas and overlays its transparent `공격_vfx_layer.png` during the attack frames listed by that enemy's `공격_vfx_sheet.json`. The metadata's attack-effect start frame, 416×256 canvas and `[112, 32]` character offset are kept in sync with `native-engine/src/castle_enemy.hpp` and `presentation.hpp`.
 
 `죽음_sheet.png` remains packaged as reviewed source art, but the combat model currently removes dead enemies from rendering immediately, so the death clips are not played.
+
+## No-railing v2 backgrounds (2026-11-16)
+
+The five canonical runtime files above now contain the no-railing A1–A5 revision, still at 2172×724. Matching editable ImageGen source PNGs are preserved as `Art/demon_castle/areas/*-no-railings-v2.png`; the original `*-source.png` files remain unchanged. The runtime continues to render the backgrounds at the existing 2160×720 world scale.
+
+`native-engine/src/castle_terrain.hpp` places actor foot baselines 3 world pixels below each visible floor or stair edge, and spawn baselines are set to those same surfaces. This is a static image-to-terrain alignment; owner-run gameplay/device acceptance has not been performed.

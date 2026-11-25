@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "last_updated": "2026-11-14",
-  "notes": "Exact checked-in PNG hashes. Background original images are preserved separately from 2172x724 runtime exports reduced toward 371x127 pixel detail. Portal source is AI-generated; runtime is a transparent 96x128 nearest-neighbor pixel-art sprite. Library IDs are null because no Library upload tool is connected.",
+  "last_updated": "2026-11-25",
+  "notes": "Exact checked-in PNG hashes. Background original images are preserved separately from 2172x724 runtime exports reduced toward 371x127 pixel detail. Portal source is AI-generated; runtime is a transparent 96x128 nearest-neighbor pixel-art sprite. Library IDs are null because no Library upload tool is connected. The 2026-11-16 no-railings v2 source artwork is preserved beside the original source; reviewed 2172x724 outputs replace the five canonical runtime backgrounds. Terrain foot baselines are offset 3 world pixels below the visible floor/stair boundary.",
   "assets": [
     {
       "asset_id": "demon-castle/a1_ashen_approach/generated-original",
@@ -170,6 +170,322 @@
       "width": 96,
       "height": 128,
       "sha256": "7917fa252516099fa85c6701b53a6c306454caf2c56a767965e4f3d7662307ca"
+    },
+    {
+      "asset_id": "demon-castle/a1_ashen_approach/no-railings-v2-source",
+      "source_path": "Art/demon_castle/areas/a1_ashen_approach-no-railings-v2.png",
+      "runtime_path": "Assets/Resources/Eclipse/demon_castle/areas/a1_ashen_approach.png",
+      "library_name": "ECLIPSE__demon-castle-a1-ashen-approach__v02__no-railings-source.png",
+      "library_file_id": null,
+      "github_ref": "main",
+      "version": 2,
+      "status": "source-preserved",
+      "asset_kind": "generated-no-railings-source",
+      "width": 2172,
+      "height": 724,
+      "sha256": "7f01a20a7063f50609913dfb16b5491b54f092001b97747e1f1822abeba9ca73"
+    },
+    {
+      "asset_id": "demon-castle/a1_ashen_approach/no-railings-v2-runtime",
+      "source_path": "Art/demon_castle/areas/a1_ashen_approach-no-railings-v2.png",
+      "runtime_path": "Assets/Resources/Eclipse/demon_castle/areas/a1_ashen_approach.png",
+      "library_name": "ECLIPSE__demon-castle-a1-ashen-approach__v02__no-railings-runtime.png",
+      "library_file_id": null,
+      "github_ref": "main",
+      "version": 2,
+      "status": "integrated",
+      "asset_kind": "runtime-pixel-art",
+      "width": 2172,
+      "height": 724,
+      "sha256": "7f01a20a7063f50609913dfb16b5491b54f092001b97747e1f1822abeba9ca73"
+    },
+    {
+      "asset_id": "demon-castle/a2_broken_gate/no-railings-v2-source",
+      "source_path": "Art/demon_castle/areas/a2_broken_gate-no-railings-v2.png",
+      "runtime_path": "Assets/Resources/Eclipse/demon_castle/areas/a2_broken_gate.png",
+      "library_name": "ECLIPSE__demon-castle-a2-broken-gate__v02__no-railings-source.png",
+      "library_file_id": null,
+      "github_ref": "main",
+      "version": 2,
+      "status": "source-preserved",
+      "asset_kind": "generated-no-railings-source",
+      "width": 2172,
+      "height": 724,
+      "sha256": "f43d895635b1d3cb58af2589cfd4104cbbe53aa1b4b4521d90ae98f7ecef9033"
+    },
+    {
+      "asset_id": "demon-castle/a2_broken_gate/no-railings-v2-runtime",
+      "source_path": "Art/demon_castle/areas/a2_broken_gate-no-railings-v2.png",
+      "runtime_path": "Assets/Resources/Eclipse/demon_castle/areas/a2_broken_gate.png",
+      "library_name": "ECLIPSE__demon-castle-a2-broken-gate__v02__no-railings-runtime.png",
+      "library_file_id": null,
+      "github_ref": "main",
+      "version": 2,
+      "status": "integrated",
+      "asset_kind": "runtime-pixel-art",
+      "width": 2172,
+      "height": 724,
+      "sha256": "f43d895635b1d3cb58af2589cfd4104cbbe53aa1b4b4521d90ae98f7ecef9033"
+    },
+    {
+      "asset_id": "demon-castle/a3_void_corridor/no-railings-v2-source",
+      "source_path": "Art/demon_castle/areas/a3_void_corridor-no-railings-v2.png",
+      "runtime_path": "Assets/Resources/Eclipse/demon_castle/areas/a3_void_corridor.png",
+      "library_name": "ECLIPSE__demon-castle-a3-void-corridor__v02__no-railings-source.png",
+      "library_file_id": null,
+      "github_ref": "main",
+      "version": 2,
+      "status": "source-preserved",
+      "asset_kind": "generated-no-railings-source",
+      "width": 2172,
+      "height": 724,
+      "sha256": "14a9d3a3c05e5713e2057026c4bee15131942debc7c06c68f43549aaecd12f76"
+    },
+    {
+      "asset_id": "demon-castle/a3_void_corridor/no-railings-v2-runtime",
+      "source_path": "Art/demon_castle/areas/a3_void_corridor-no-railings-v2.png",
+      "runtime_path": "Assets/Resources/Eclipse/demon_castle/areas/a3_void_corridor.png",
+      "library_name": "ECLIPSE__demon-castle-a3-void-corridor__v02__no-railings-runtime.png",
+      "library_file_id": null,
+      "github_ref": "main",
+      "version": 2,
+      "status": "integrated",
+      "asset_kind": "runtime-pixel-art",
+      "width": 2172,
+      "height": 724,
+      "sha256": "14a9d3a3c05e5713e2057026c4bee15131942debc7c06c68f43549aaecd12f76"
+    },
+    {
+      "asset_id": "demon-castle/a4_throne_stairway/no-railings-v2-source",
+      "source_path": "Art/demon_castle/areas/a4_throne_stairway-no-railings-v2.png",
+      "runtime_path": "Assets/Resources/Eclipse/demon_castle/areas/a4_throne_stairway.png",
+      "library_name": "ECLIPSE__demon-castle-a4-throne-stairway__v02__no-railings-source.png",
+      "library_file_id": null,
+      "github_ref": "main",
+      "version": 2,
+      "status": "source-preserved",
+      "asset_kind": "generated-no-railings-source",
+      "width": 2172,
+      "height": 724,
+      "sha256": "d2e68d7e9979205f40ed1c4c4491ce09e13e664d62f8c3ca23b6741bd19ae639"
+    },
+    {
+      "asset_id": "demon-castle/a4_throne_stairway/no-railings-v2-runtime",
+      "source_path": "Art/demon_castle/areas/a4_throne_stairway-no-railings-v2.png",
+      "runtime_path": "Assets/Resources/Eclipse/demon_castle/areas/a4_throne_stairway.png",
+      "library_name": "ECLIPSE__demon-castle-a4-throne-stairway__v02__no-railings-runtime.png",
+      "library_file_id": null,
+      "github_ref": "main",
+      "version": 2,
+      "status": "integrated",
+      "asset_kind": "runtime-pixel-art",
+      "width": 2172,
+      "height": 724,
+      "sha256": "d2e68d7e9979205f40ed1c4c4491ce09e13e664d62f8c3ca23b6741bd19ae639"
+    },
+    {
+      "asset_id": "demon-castle/a5_night_throne/no-railings-v2-source",
+      "source_path": "Art/demon_castle/areas/a5_night_throne-no-railings-v2.png",
+      "runtime_path": "Assets/Resources/Eclipse/demon_castle/areas/a5_night_throne.png",
+      "library_name": "ECLIPSE__demon-castle-a5-night-throne__v02__no-railings-source.png",
+      "library_file_id": null,
+      "github_ref": "main",
+      "version": 2,
+      "status": "source-preserved",
+      "asset_kind": "generated-no-railings-source",
+      "width": 2172,
+      "height": 724,
+      "sha256": "b061aeab6fa95f90a5cdb66d5b6a67b845c1d7f2ca4bafa2b2f9b976b642f5b9"
+    },
+    {
+      "asset_id": "demon-castle/a5_night_throne/no-railings-v2-runtime",
+      "source_path": "Art/demon_castle/areas/a5_night_throne-no-railings-v2.png",
+      "runtime_path": "Assets/Resources/Eclipse/demon_castle/areas/a5_night_throne.png",
+      "library_name": "ECLIPSE__demon-castle-a5-night-throne__v02__no-railings-runtime.png",
+      "library_file_id": null,
+      "github_ref": "main",
+      "version": 2,
+      "status": "integrated",
+      "asset_kind": "runtime-pixel-art",
+      "width": 2172,
+      "height": 724,
+      "sha256": "b061aeab6fa95f90a5cdb66d5b6a67b845c1d7f2ca4bafa2b2f9b976b642f5b9"
+    }
+  ],
+  "current_parallax_layers": [
+    {
+      "source": {
+        "path": "Art/demon_castle/areas/a1-ashen-road-violet-source.png",
+        "size": [
+          2172,
+          724
+        ],
+        "sha256": "bcd17f81fcd42557fb6ee582cfdb38603785a096b6d54580abdcd20fb0fd76a0"
+      },
+      "prompt": "Design an original ECLIPSE action RPG A1 ASHEN APPROACH ultrawide 3:1 2D side-scrolling BACK scenery plate, native fine clustered pixel art circa 420 by 140. Attached picture is the NEXT level; match ONLY its dusky lavender light, deep smoky ink-blue palette, delicate dither, ragged silhouette shapes and edge detail. The geography here must be entirely different: this is the OPEN ROAD long BEFORE the gate. Sky freely visible above the traveler, low sweeping causeway through ash-covered moor, spacious blue-violet sky with long streaks of storm cloud and bright lavender light low in gaps on the horizon. An imposing, wind-bent, near-black torn military standard in left third, its faded overlapping-disc motif and trailing cloth point right; a line of half-buried broken boundary markers follows the long low road, foreground slate debris, thinner silhouettes in middle distance. An extremely faint SMALL fragment of distant outer fortress WALL at x70–83% width is the sole architectural hint of destination. NO doors, gates, archways, towers, castles on a hill, hallways, ceilings, bridge arcades, or characters. No UI, no text. Keep all tall objects off-center. Bottom 15% is simple dark ashen earth (playable stone lip overlaid separately). Looming march into danger. Purple light showing between torn cloth, ruined pikes, stone fragments, reeds; high contrast ground silhouettes. Detailed pixel sprites background, not realistic painted landscape, not cute. Three engaging horizontal fields for side-scrolling.",
+      "rear": {
+        "path": "Assets/Resources/Eclipse/demon_castle/areas/a1_ashen_approach.png",
+        "size": [
+          2172,
+          724
+        ],
+        "sha256": "408a02496633d0a8bb03f827ba42dbc7c43b2499b0e8c52d6464f32afcf1702e"
+      },
+      "floor": {
+        "path": "Assets/Resources/Eclipse/demon_castle/areas/a1_ashen_approach_floor.png",
+        "size": [
+          2172,
+          724
+        ],
+        "sha256": "ea5bd584770e819ecd0b31ed72fa25f2201cc9f936a4451226e821e38ba0c038"
+      },
+      "logical_pixels": [
+        432,
+        144
+      ],
+      "palette_colors": 64,
+      "chroma_gain": 1.09,
+      "floor_export": {
+        "source": "Assets/Resources/Eclipse/demon_castle/areas/a1_ashen_approach.png",
+        "logical_width": 432,
+        "logical_height": 144,
+        "first_row": 124,
+        "placement": "top of collision-aligned floor alpha, 5 world texture pixels per source row; extend final row to canvas base"
+      },
+      "pixel_filter": "Lanczos downsample; unsharp mask radius 0.9, strength 110%, threshold 3 before 64-color quantization"
+    },
+    {
+      "source": {
+        "path": "Art/demon_castle/areas/a2-rough-stone-gate-source.png",
+        "size": [
+          2172,
+          724
+        ],
+        "sha256": "b7b1a8b41f73fd5594686e2cd4191c9fd49a7fab3ea58e2367a82ae760b9eb03"
+      },
+      "prompt": "Paint a major architecture replacement on the RIGHT HALF of this exact panoramic side-scroller background. The owner specifically rejects refined, slick, elegant carved masonry. Remove the existing spear buttresses and smooth giant stone facets completely. Rebuild the gatehouse as a battered, hulking fieldstone keep with an ugly stubborn weight: huge rough-hewn uneven blocks interlocked with little chocking stones; visibly projecting blunt stones next to sunken stones; deep black uneven joints, thick rubble-filled core showing through a bite torn from its shoulder. Big structural silhouette changes, not surface noise. Thick squat square pier and a mismatched roundish crumbling pier, broad flat-topped battered parapet, NO pointed buttresses, no sharp fins, bevels or needle caps. One thick splintered dark timber lintel with crude black iron dogs, the open beaten iron gate below, weathered simple eclipse maker's mark incised small. Use clustered near-black shadows and sparse lavender light on the ragged upper lips of individual blocks. Readable large stone clusters at 432x144. Avoid noisy gravel texture everywhere. Sweeping violet sky, A1 road, left milestone, original human-scale doorway opening center about x87%, floor y87%, and 3:1 landscape framing stay consistent. Road into gate, no obstructions, no overhead suspended objects, no humans or UI. Authentic chunky dark pixel game environment, foreboding and timeworn. This should read as a thick fortress built stone by stone even from a distance.",
+      "rear": {
+        "path": "Assets/Resources/Eclipse/demon_castle/areas/a2_broken_gate.png",
+        "size": [
+          2172,
+          724
+        ],
+        "sha256": "0e24bd28d16922398f341f5c9f1d7098795439c75c5301eea726ede14896897b"
+      },
+      "floor": {
+        "path": "Assets/Resources/Eclipse/demon_castle/areas/a2_broken_gate_floor.png",
+        "size": [
+          2172,
+          724
+        ],
+        "sha256": "ffb0f0f48c87d5a578452d7be51e8262b1f20343f7f2e66212fc3eaa4195d750"
+      },
+      "logical_pixels": [
+        432,
+        144
+      ],
+      "palette_colors": 64,
+      "chroma_gain": 1.09,
+      "floor_export": {
+        "source": "Assets/Resources/Eclipse/demon_castle/areas/a2_broken_gate.png",
+        "logical_width": 432,
+        "logical_height": 144,
+        "first_row": 126,
+        "placement": "top of collision-aligned floor alpha, 5 world texture pixels per source row; extend final row to canvas base"
+      },
+      "pixel_filter": "Lanczos downsample; unsharp mask radius 0.9, strength 110%, threshold 3 before 64-color quantization"
+    },
+    {
+      "source": {
+        "path": "Art/demon_castle/areas/a3_void_corridor-layer-source.png",
+        "size": [
+          2172,
+          724
+        ],
+        "sha256": "ac916baaa16f2204047619a0dbf07cee97482d5f9a0e90adf8eb38f243537e0f"
+      },
+      "prompt": "Brand new original ECLIPSE videogame art generated ONLY from this written brief. Ultra-wide 3:1 landscape. Strict orthographic side elevation for a pixel side scroller. Authored-looking low resolution pixel art at roughly 360x120 pixel density: broad deliberate stepped clusters, crisp silhouette, sparse highlights, restrained blue charcoal palette with one accent. Never a painterly illustration. No people, monsters, interface, lettering, logos, framing or borders. Void corridor. Oppressive subterranean nave. Slabs of black masonry pulled apart sideways by an eerie violet seam. Sparse cold reflected light from the impossible fissure, ribbed vaults and deep shadow. Keep the lower band quiet. This is ONLY the rear scenery layer, cropped wall continues to lower edge, no walkable platforms in this plate.",
+      "rear": {
+        "path": "Assets/Resources/Eclipse/demon_castle/areas/a3_void_corridor.png",
+        "size": [
+          2172,
+          724
+        ],
+        "sha256": "15c2fabcde4b366446e0eabaeb7086a2c5c0375c21155b9c9076577a423e85fd"
+      },
+      "floor": {
+        "path": "Assets/Resources/Eclipse/demon_castle/areas/a3_void_corridor_floor.png",
+        "size": [
+          2172,
+          724
+        ],
+        "sha256": "78e346506ce9aea0354948afbba47f4e2eeff593f35943516587111182da7b49"
+      }
+    },
+    {
+      "source": {
+        "path": "Art/demon_castle/areas/a4_throne_stairway-layer-source.png",
+        "size": [
+          2172,
+          724
+        ],
+        "sha256": "a22c9fe0fb771e7e58c3c3d62e1978e364b3856aab1260e15c16e1ecf81d33ac"
+      },
+      "prompt": "Brand new original ECLIPSE videogame art generated ONLY from this written brief. Ultra-wide 3:1 landscape. Strict orthographic side elevation for a pixel side scroller. Authored-looking low resolution pixel art at roughly 360x120 pixel density: broad deliberate stepped clusters, crisp silhouette, sparse highlights, restrained blue charcoal palette with one accent. Never a painterly illustration. No people, monsters, interface, lettering, logos, framing or borders. Throne stairway. Soaring vertical lancets, wind-torn pale standards, one cold blade of light above the right, monumental buttresses climbing left to right like a procession. Rear wall of rising ceremonial route. No foreground stairs or flooring; those will be separate. This is ONLY the rear scenery layer, cropped wall continues to lower edge, no walkable platforms in this plate.",
+      "rear": {
+        "path": "Assets/Resources/Eclipse/demon_castle/areas/a4_throne_stairway.png",
+        "size": [
+          2172,
+          724
+        ],
+        "sha256": "6acfedcd0abf3fba618b2e3ae4959d730208dc95e7d45606ab4a8f04faef5fa2"
+      },
+      "floor": {
+        "path": "Assets/Resources/Eclipse/demon_castle/areas/a4_throne_stairway_floor.png",
+        "size": [
+          2172,
+          724
+        ],
+        "sha256": "8d71693b263c975bdcf00b7798637f3c21a835a62c15227bee5d999242d33b2e"
+      }
+    },
+    {
+      "source": {
+        "path": "Art/demon_castle/areas/a5_night_throne-layer-source.png",
+        "size": [
+          2172,
+          724
+        ],
+        "sha256": "181e65301dafbccc203c80bf5accbdab2bfebbd8f94bcdabe0558a83ee5ea068"
+      },
+      "prompt": "Brand new original ECLIPSE videogame art generated ONLY from this written brief. Ultra-wide 3:1 landscape. Strict orthographic side elevation for a pixel side scroller. Authored-looking low resolution pixel art at roughly 360x120 pixel density: broad deliberate stepped clusters, crisp silhouette, sparse highlights, restrained blue charcoal palette with one accent. Never a painterly illustration. No people, monsters, interface, lettering, logos, framing or borders. Night throne arena. A lonely, vacant iron throne with a crown-like silhouette set right of center against a huge broken oxblood ceremonial tapestry with a thin pale eclipse motif. Dark side galleries and stark restrained lighting frame the seat. No figures or floor. This is ONLY the rear scenery layer, cropped wall continues to lower edge, no walkable platforms in this plate.",
+      "rear": {
+        "path": "Assets/Resources/Eclipse/demon_castle/areas/a5_night_throne.png",
+        "size": [
+          2172,
+          724
+        ],
+        "sha256": "751b2f26647eadcbddb60b58b23163047a602cb1b3a97ec18c910f88d529e0c6"
+      },
+      "floor": {
+        "path": "Assets/Resources/Eclipse/demon_castle/areas/a5_night_throne_floor.png",
+        "size": [
+          2172,
+          724
+        ],
+        "sha256": "bfc71443152bad585289c82d7a7bbed04b7e04cf321c110797801e37a0c0e06b"
+      }
+    },
+    {
+      "source": {
+        "path": "Art/demon_castle/areas/basalt-layer-source.png",
+        "size": [
+          2172,
+          724
+        ],
+        "sha256": "d2fbc17bbd2ecd826189f38c9ee912790d88f91fd4a4a4ec4fd4c2632a808e3f"
+      },
+      "prompt": "Brand new original ECLIPSE videogame art generated ONLY from this written brief. Ultra-wide 3:1 landscape. Strict orthographic side elevation for a pixel side scroller. Authored-looking low resolution pixel art at roughly 360x120 pixel density: broad deliberate stepped clusters, crisp silhouette, sparse highlights, restrained blue charcoal palette with one accent. Never a painterly illustration. No people, monsters, interface, lettering, logos, framing or borders. Material texture plate, full-bleed front elevation of a solid platform's cut stone face for a gothic sidescroller. Entire canvas is filled edge to edge by weathered blue-black basalt masonry, long horizontal courses, small chips, thin silvery edge light, a narrow carved coping course at the very top. Consistent stone scale across this strip. No scenery, no background, no sky, no transparency."
     }
   ]
 }

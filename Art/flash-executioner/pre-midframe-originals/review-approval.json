@@ -1,0 +1,2444 @@
+{
+  "review_status": "approved",
+  "review_scope": "Owner-approved compact 12-pose Basic attack with angled sword follow-through, alongside five reviewed motion roles. No device tests.",
+  "actors": [
+    {
+      "role": "Dash",
+      "file": "Art/flash-executioner/reviewed/actor_dash.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 3,
+      "rows": 3,
+      "count": 9,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.15,
+      "contactFrame": -1,
+      "loop": false,
+      "sourceFile": "dash_raw.png",
+      "rawColumns": 3,
+      "uniquePixelFrames": 9,
+      "emptyFrames": [],
+      "bounds": [
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          46,
+          68,
+          164,
+          133
+        ],
+        [
+          51,
+          69,
+          164,
+          133
+        ],
+        [
+          56,
+          69,
+          160,
+          133
+        ],
+        [
+          48,
+          67,
+          151,
+          133
+        ],
+        [
+          38,
+          64,
+          131,
+          133
+        ],
+        [
+          33,
+          61,
+          117,
+          133
+        ],
+        [
+          28,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ]
+      ],
+      "sha256": "fb2f6c21ceb24655355163bc1233f97e343800c2dd4b73d0c858aece073b870c",
+      "status": "main-review-approved",
+      "model": "PixMiniMax H3",
+      "timing": "fixed duration",
+      "approved": true,
+      "sourceFrameMap": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "review": "Main agent inspected every numbered pose: coherent physical body/sword, no baked light effects, stable grounded baseline, count=round(duration*60). Static visual approval; device playback remains owner validation."
+    },
+    {
+      "role": "Swap",
+      "file": "Art/flash-executioner/reviewed/actor_swap.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 4,
+      "rows": 4,
+      "count": 14,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.24,
+      "contactFrame": -1,
+      "loop": false,
+      "sourceFile": "swap_raw.png",
+      "rawColumns": 5,
+      "uniquePixelFrames": 14,
+      "emptyFrames": [],
+      "bounds": [
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          23,
+          60,
+          120,
+          133
+        ],
+        [
+          24,
+          64,
+          129,
+          133
+        ],
+        [
+          22,
+          69,
+          128,
+          133
+        ],
+        [
+          22,
+          65,
+          117,
+          133
+        ],
+        [
+          26,
+          64,
+          111,
+          133
+        ],
+        [
+          26,
+          62,
+          108,
+          133
+        ],
+        [
+          28,
+          61,
+          108,
+          133
+        ],
+        [
+          29,
+          60,
+          108,
+          133
+        ],
+        [
+          29,
+          60,
+          108,
+          134
+        ],
+        [
+          30,
+          60,
+          108,
+          133
+        ],
+        [
+          29,
+          59,
+          108,
+          133
+        ],
+        [
+          28,
+          59,
+          108,
+          133
+        ],
+        [
+          26,
+          59,
+          108,
+          133
+        ]
+      ],
+      "sha256": "ee201cfdf14641af685ff567614f71523c173a3c86f5e9e081961a769e74ff29",
+      "status": "main-review-approved",
+      "model": "PixMiniMax H3",
+      "timing": "fixed duration",
+      "approved": true,
+      "sourceFrameMap": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        9,
+        10,
+        11,
+        12,
+        14,
+        15,
+        16
+      ],
+      "review": "Main agent inspected every numbered pose: coherent physical body/sword, no baked light effects, stable grounded baseline, count=round(duration*60). Static visual approval; device playback remains owner validation."
+    },
+    {
+      "role": "Land",
+      "file": "Art/flash-executioner/reviewed/actor_land.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 3,
+      "rows": 3,
+      "count": 7,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.12,
+      "contactFrame": -1,
+      "loop": false,
+      "sourceFile": "land_raw.png",
+      "rawColumns": 3,
+      "uniquePixelFrames": 7,
+      "emptyFrames": [],
+      "bounds": [
+        [
+          23,
+          59,
+          119,
+          133
+        ],
+        [
+          22,
+          66,
+          124,
+          133
+        ],
+        [
+          21,
+          70,
+          124,
+          133
+        ],
+        [
+          24,
+          69,
+          124,
+          133
+        ],
+        [
+          27,
+          67,
+          122,
+          133
+        ],
+        [
+          29,
+          62,
+          116,
+          133
+        ],
+        [
+          28,
+          59,
+          109,
+          133
+        ]
+      ],
+      "sha256": "57ce4d9b633a9d1a7b224b2562be4e59a44bcad3790e3c9de0790ea6f2f5699b",
+      "status": "main-review-approved",
+      "model": "PixMiniMax H3",
+      "timing": "fixed duration",
+      "approved": true,
+      "sourceFrameMap": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        8
+      ],
+      "review": "Main agent inspected every numbered pose: coherent physical body/sword, no baked light effects, stable grounded baseline, count=round(duration*60). Static visual approval; device playback remains owner validation."
+    },
+    {
+      "role": "Skill3",
+      "file": "Art/flash-executioner/reviewed/actor_skill3.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 5,
+      "rows": 5,
+      "count": 22,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.36,
+      "contactFrame": 11,
+      "loop": false,
+      "sourceFile": "skill3_raw.png",
+      "rawColumns": 5,
+      "uniquePixelFrames": 22,
+      "emptyFrames": [
+        11
+      ],
+      "bounds": [
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          25,
+          64,
+          119,
+          133
+        ],
+        [
+          23,
+          65,
+          81,
+          133
+        ],
+        [
+          27,
+          65,
+          81,
+          133
+        ],
+        [
+          25,
+          65,
+          89,
+          133
+        ],
+        [
+          25,
+          65,
+          96,
+          133
+        ],
+        [
+          25,
+          65,
+          99,
+          133
+        ],
+        [
+          25,
+          65,
+          98,
+          133
+        ],
+        null,
+        [
+          27,
+          68,
+          135,
+          133
+        ],
+        [
+          27,
+          73,
+          135,
+          133
+        ],
+        [
+          27,
+          72,
+          135,
+          133
+        ],
+        [
+          31,
+          74,
+          135,
+          133
+        ],
+        [
+          36,
+          77,
+          135,
+          133
+        ],
+        [
+          31,
+          68,
+          121,
+          133
+        ],
+        [
+          25,
+          60,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ]
+      ],
+      "sha256": "faae8d1ba9fe2a237b3d578627b26af0c67930a9cc402694e2fca4e3d11851c4",
+      "status": "main-review-approved",
+      "model": "PixMiniMax H3",
+      "timing": "fixed duration",
+      "approved": true,
+      "sourceFrameMap": [
+        0,
+        1,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
+      "review": "All 22 sequential poses inspected. Intentional blank at11 bridges physical tuck into braced arrival; source foot baseline stable. Map contactFrame11 to original gameplay teleport contact .15s. AI-generated artwork, no hand-authorship claim. Runtime/device playback remains owner validation."
+    },
+    {
+      "role": "Basic",
+      "file": "Art/flash-executioner/reviewed/actor_basic.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 6,
+      "rows": 5,
+      "count": 28,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.46,
+      "contactFrame": 6,
+      "loop": false,
+      "sourceFile": "basic_raw.png",
+      "rawColumns": 6,
+      "uniquePixelFrames": 28,
+      "emptyFrames": [],
+      "bounds": [
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          28,
+          61,
+          119,
+          133
+        ],
+        [
+          31,
+          54,
+          104,
+          133
+        ],
+        [
+          33,
+          56,
+          105,
+          133
+        ],
+        [
+          34,
+          56,
+          106,
+          133
+        ],
+        [
+          36,
+          56,
+          106,
+          133
+        ],
+        [
+          33,
+          65,
+          158,
+          134
+        ],
+        [
+          32,
+          64,
+          154,
+          134
+        ],
+        [
+          34,
+          64,
+          154,
+          134
+        ],
+        [
+          37,
+          64,
+          154,
+          134
+        ],
+        [
+          38,
+          64,
+          154,
+          134
+        ],
+        [
+          38,
+          64,
+          154,
+          134
+        ],
+        [
+          38,
+          64,
+          154,
+          134
+        ],
+        [
+          38,
+          64,
+          154,
+          134
+        ],
+        [
+          36,
+          64,
+          154,
+          134
+        ],
+        [
+          36,
+          64,
+          154,
+          134
+        ],
+        [
+          36,
+          64,
+          154,
+          134
+        ],
+        [
+          39,
+          64,
+          154,
+          134
+        ],
+        [
+          38,
+          64,
+          154,
+          134
+        ],
+        [
+          38,
+          64,
+          154,
+          134
+        ],
+        [
+          37,
+          64,
+          154,
+          134
+        ],
+        [
+          33,
+          62,
+          146,
+          134
+        ],
+        [
+          30,
+          60,
+          129,
+          133
+        ],
+        [
+          29,
+          59,
+          116,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ]
+      ],
+      "sha256": "19022ccec1ab305c8789791d9f2377124a3146c38bd05c5a8ef62b01de8745e7",
+      "status": "main-review-approved",
+      "model": "PixMiniMax H3",
+      "timing": "fixed duration",
+      "approved": true,
+      "sourceFrameMap": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ],
+      "review": "All sequential numbered poses inspected. Attached physical sword, consistent armor and grounded recovery; contactFrame6 must map to unchanged gameplay contact. Basic excludes source6 baked FX; Skill1 includes a newly AI-generated bridge pose, never a duplicate. Static art approval; device verification pending."
+    },
+    {
+      "role": "Skill1",
+      "file": "Art/flash-executioner/reviewed/actor_skill1.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 6,
+      "rows": 5,
+      "count": 30,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.5,
+      "contactFrame": 6,
+      "loop": false,
+      "sourceFrameMap": [
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 0,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 1,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 2,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 3,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 4,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 5,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 6,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 7,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 8,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/candidates/pixellab/skill1_bridge_raw.png",
+          "index": 1,
+          "columns": 3
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 9,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 10,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 11,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 12,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 13,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 14,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 15,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 16,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 17,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 18,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 19,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 20,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 21,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 22,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 23,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 24,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 25,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 26,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 27,
+          "columns": 6
+        },
+        {
+          "file": "/storage/emulated/0/Download/flash executioner/source_generations/pre_integration/skill1.png",
+          "index": 28,
+          "columns": 6
+        }
+      ],
+      "uniquePixelFrames": 30,
+      "sha256": "be42b691a3258aea3c426d83beca7085856cdd1a036275c76ff100653cf4825b",
+      "status": "main-review-approved",
+      "notes": "One newly AI-generated intermediate pose inserted after original8. No duplicated/warped poses. Contact6 must map to original gameplay .125s via piecewise phase.",
+      "approved": true,
+      "review": "All sequential numbered poses inspected. Attached physical sword, consistent armor and grounded recovery; contactFrame6 must map to unchanged gameplay contact. Basic excludes source6 baked FX; Skill1 includes a newly AI-generated bridge pose, never a duplicate. Static art approval; device verification pending."
+    },
+    {
+      "role": "Skill2",
+      "file": "Art/flash-executioner/reviewed/actor_skill2.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 6,
+      "rows": 5,
+      "count": 28,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.46,
+      "contactFrame": 14,
+      "loop": false,
+      "sourceFile": "skill2_raw.png",
+      "rawColumns": 6,
+      "uniquePixelFrames": 28,
+      "emptyFrames": [],
+      "bounds": [
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          110,
+          133
+        ],
+        [
+          26,
+          59,
+          109,
+          133
+        ]
+      ],
+      "sha256": "b04e566291e4a6b1eae982aec2aed12c19eefad01de58c5d844f2592cf0ddc1d",
+      "status": "main-review-approved",
+      "model": "PixMiniMax H3",
+      "timing": "fixed duration",
+      "approved": true,
+      "sourceFrameMap": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ],
+      "review": "Main inspected all28 poses and enlarged frame16: sword remains in lowered hand, separate opposite empty fist rises beside helmet and recovers. Both hands visible, no sword transfer or baked effects. ContactFrame14 maps to .23s. Static visual approval; owner runtime verification pending."
+    },
+    {
+      "role": "Idle",
+      "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_idle.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 5,
+      "rows": 4,
+      "count": 17,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.9,
+      "contactFrame": -1,
+      "loop": true,
+      "fps": 18.8889,
+      "approved": true,
+      "sha256": "598595bc3c069116eb7fe19837e38c65a29056a9fab8e88824431f8b0fd65009",
+      "sourceFile": "manual-corrections/atlas/actor_idle.png",
+      "poseSource": "Selected PixelLab frames; hand-corrected pixels recorded separately; no generated inbetweens.",
+      "ownerReview": "Owner approved these motions for play after viewing, requested shorter waits/faster playback, and accepted motion-specific pose cadence.",
+      "reviewNote": "Shortened/reduced repetitive preparation where specified; transparent RGBA, native 192x192 cells."
+    },
+    {
+      "role": "Run",
+      "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_run.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 5,
+      "rows": 6,
+      "count": 29,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.8,
+      "contactFrame": -1,
+      "loop": true,
+      "fps": 36.25,
+      "approved": true,
+      "sha256": "f9f81bc46b7d23ea6631335bdb1925d7f54ff2734c675485618603c97f741746",
+      "sourceFile": "manual-corrections/atlas/actor_run.png",
+      "poseSource": "Selected PixelLab frames; hand-corrected pixels recorded separately; no generated inbetweens.",
+      "ownerReview": "Owner approved these motions for play after viewing, requested shorter waits/faster playback, and accepted motion-specific pose cadence.",
+      "reviewNote": "Shortened/reduced repetitive preparation where specified; transparent RGBA, native 192x192 cells."
+    },
+    {
+      "role": "Jump",
+      "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_jump.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 5,
+      "rows": 6,
+      "count": 29,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.8,
+      "contactFrame": -1,
+      "loop": false,
+      "fps": 36.25,
+      "approved": true,
+      "sha256": "27184853230ebf76119e529b15b8472da561c31f6e3309aa6f1c45b780e4c3f1",
+      "sourceFile": "manual-corrections/atlas/actor_jump.png",
+      "poseSource": "Selected PixelLab frames; hand-corrected pixels recorded separately; no generated inbetweens.",
+      "ownerReview": "Owner approved these motions for play after viewing, requested shorter waits/faster playback, and accepted motion-specific pose cadence.",
+      "reviewNote": "Shortened/reduced repetitive preparation where specified; transparent RGBA, native 192x192 cells."
+    },
+    {
+      "role": "Fall",
+      "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_fall.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 5,
+      "rows": 2,
+      "count": 9,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 0.6,
+      "contactFrame": -1,
+      "loop": false,
+      "fps": 15.0,
+      "approved": true,
+      "sha256": "d3ab0e81d544d9c2f80af3db966845d1ca6db077ed2b330df4da5dcfff805469",
+      "sourceFile": "manual-corrections/atlas/actor_fall.png",
+      "poseSource": "Selected PixelLab frames; hand-corrected pixels recorded separately; no generated inbetweens.",
+      "ownerReview": "Owner approved these motions for play after viewing, requested shorter waits/faster playback, and accepted motion-specific pose cadence.",
+      "reviewNote": "Shortened/reduced repetitive preparation where specified; transparent RGBA, native 192x192 cells."
+    },
+    {
+      "role": "Ultimate",
+      "file": "Art/flash-executioner/pixellab/manual-corrections/atlas/actor_ultimate.png",
+      "cell": [
+        192,
+        192
+      ],
+      "columns": 5,
+      "rows": 5,
+      "count": 25,
+      "pivot": [
+        70,
+        133
+      ],
+      "scale": 1.4,
+      "duration": 1.12,
+      "contactFrame": 16,
+      "loop": false,
+      "fps": 22.3214,
+      "approved": true,
+      "sha256": "570dd07a71625dbe679e78f34e4bed68a67b21d5381cc69b4be62404bc8999eb",
+      "sourceFile": "manual-corrections/atlas/actor_ultimate.png",
+      "poseSource": "Selected PixelLab frames; hand-corrected pixels recorded separately; no generated inbetweens.",
+      "ownerReview": "Owner approved these motions for play after viewing, requested shorter waits/faster playback, and accepted motion-specific pose cadence.",
+      "reviewNote": "Trimmed four repetitive opening wind-up frames; 25 poses play across the existing 1.12s Verdict action. Sword contact remains on the unchanged .728s gameplay timing."
+    }
+  ],
+  "effects": [
+    {
+      "role": "Slash",
+      "file": "Art/flash-executioner/reviewed/effect_slash.png",
+      "cell": [
+        256,
+        216
+      ],
+      "pivot": [
+        105,
+        165
+      ],
+      "scale": 2,
+      "count": 25,
+      "columns": 5,
+      "rows": 5,
+      "duration": 0.4,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        6,
+        -26
+      ],
+      "effectfocalOffset": [
+        6,
+        -26
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.03333333333333333,
+      "triggerLeadSeconds": 0.03333333333333333,
+      "spawnAgeSeconds": 0,
+      "sourceId": "melee/sword-slash",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "3abcde4466df41bddd1da0c9c9824aa2450185de39c61c3b7d156272dcc9327a",
+      "sourceTimeWindow": [
+        0,
+        0.75
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "radius": 60,
+        "sparks": [
+          "#ffffff",
+          "#fff5c4",
+          "#f7d47c",
+          "#b78f46"
+        ],
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Slash/frame-map.json",
+      "sha256": "7bf115c7862f15749bd0513320260cb0a286bd252a044c3dc85c9f321dd420a3",
+      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Slash/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-approved original-resource derivative v2",
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 20,
+      "edgePixels": 0,
+      "peakCoverageFrame": 3,
+      "approved": true,
+      "front": true,
+      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run."
+    },
+    {
+      "role": "Rush",
+      "file": "Art/flash-executioner/reviewed/effect_rush.png",
+      "cell": [
+        320,
+        160
+      ],
+      "pivot": [
+        80,
+        110
+      ],
+      "scale": 2,
+      "count": 22,
+      "columns": 4,
+      "rows": 6,
+      "duration": 0.35,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        9,
+        -20
+      ],
+      "effectfocalOffset": [
+        9,
+        -20
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.05,
+      "triggerLeadSeconds": 0.05,
+      "spawnAgeSeconds": 0,
+      "sourceId": "melee/thrust",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "ac2f2257fafb9dec3bdcb8e75020db952e14810c700eea6b232be7b348eb261d",
+      "sourceTimeWindow": [
+        0,
+        0.75
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "reach": 80,
+        "sparks": [
+          "#ffffff",
+          "#fff5c4",
+          "#f7d47c",
+          "#b78f46"
+        ],
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Rush/frame-map.json",
+      "sha256": "2604f32b9073137a0327251f4af13bf1ab9700a3d2eb35ce8d318d0ad7c88a2b",
+      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Rush/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-approved original-resource derivative v2",
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 19,
+      "edgePixels": 0,
+      "peakCoverageFrame": 3,
+      "approved": true,
+      "front": true,
+      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run."
+    },
+    {
+      "role": "Command",
+      "file": "Art/flash-executioner/reviewed/effect_command.png",
+      "cell": [
+        160,
+        144
+      ],
+      "pivot": [
+        64,
+        124
+      ],
+      "scale": 2.1,
+      "count": 25,
+      "columns": 5,
+      "rows": 5,
+      "duration": 0.4,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        15,
+        -22
+      ],
+      "effectfocalOffset": [
+        15,
+        -22
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        10,
+        -25
+      ],
+      "visualPeakSeconds": 0.2,
+      "triggerLeadSeconds": 0.2,
+      "spawnAgeSeconds": 0,
+      "sourceId": "arcane/spell-charge",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "cc424b77b0b989a8dfc7fae793848c2be0966bde0248a14699ad2733d1e4bec0",
+      "sourceTimeWindow": [
+        0.3,
+        0.7
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "light": 0.85
+      },
+      "postprocess": {
+        "alphaEdgeSeconds": [
+          0.025,
+          0.06
+        ],
+        "operation": "straight RGBA direct-copy atlas packing, alpha edge multiplication only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Command/frame-map.json",
+      "sha256": "1f7062671afcfa31ca0989f2267ea016cd0a530bf0e8eec8d38173b49d06c2e4",
+      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Command/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-approved original-resource derivative v2",
+      "firstAlphaEmpty": true,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 25,
+      "edgePixels": 0,
+      "peakCoverageFrame": 12,
+      "approved": true,
+      "front": true,
+      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run."
+    },
+    {
+      "role": "BlinkOut",
+      "file": "Art/flash-executioner/reviewed/effect_blinkout.png",
+      "cell": [
+        288,
+        224
+      ],
+      "pivot": [
+        144,
+        174
+      ],
+      "scale": 1.4,
+      "count": 20,
+      "columns": 4,
+      "rows": 5,
+      "duration": 0.32,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.06666666666666667,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "arcane/blink-out",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "5554d07dd8e29d912f9bf3a8440d36369f3d6843f73ec59dfd33e4ac3b0c3186",
+      "sourceTimeWindow": [
+        0,
+        1.6
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "actor": "actor-input-BlinkOut.json",
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/BlinkOut/frame-map.json",
+      "sha256": "7eca00f93c6e15d71a43c3aba8c9252eedd5cf79a97d20516c7dad7260e7db50",
+      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/BlinkOut/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-approved original-resource derivative v2",
+      "triggerStartAgeSeconds": 0.033333333333333326,
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 19,
+      "edgePixels": 0,
+      "peakCoverageFrame": 4,
+      "approved": true,
+      "front": true,
+      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run."
+    },
+    {
+      "role": "BlinkIn",
+      "file": "Art/flash-executioner/reviewed/effect_blinkin.png",
+      "cell": [
+        288,
+        224
+      ],
+      "pivot": [
+        144,
+        174
+      ],
+      "scale": 1.4,
+      "count": 23,
+      "columns": 5,
+      "rows": 5,
+      "duration": 0.36,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.13333333333333333,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0.13333333333333333,
+      "sourceId": "arcane/blink-in",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "b5439fbdb31b26b45038164f4f5d129445eaa5b8aa4ec111c28bfbd0c325661e",
+      "sourceTimeWindow": [
+        0,
+        1.4
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "actor": "actor-input-BlinkIn.json",
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/BlinkIn/frame-map.json",
+      "sha256": "0c7a286204a78a00912e334b1e59c61649324c4f2a6c22dd5c61e5911ba55501",
+      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/BlinkIn/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-approved original-resource derivative v2",
+      "firstAlphaEmpty": true,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 21,
+      "edgePixels": 0,
+      "peakCoverageFrame": 8,
+      "approved": true,
+      "front": true,
+      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run."
+    },
+    {
+      "role": "Verdict",
+      "file": "Art/flash-executioner/reviewed/effect_verdict.png",
+      "cell": [
+        256,
+        280
+      ],
+      "pivot": [
+        128,
+        230
+      ],
+      "scale": 1.7,
+      "count": 45,
+      "columns": 8,
+      "rows": 6,
+      "duration": 0.728,
+      "fps": 60,
+      "loop": false,
+      "layer": "back",
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.15,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "holy/holy-pillar",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "d65de3c0a32bf6c0816a5729248efcbb128290d6ce980ed8130eea8016d137e3",
+      "sourceTimeWindow": [
+        0,
+        3.5
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "shafts": 7,
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Verdict/frame-map.json",
+      "sha256": "74c52bdfe446cf8fc87aeb07591c6349c422577ae30772b8b5554f54baedb0da",
+      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Verdict/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-approved original-resource derivative v2",
+      "firstAlphaEmpty": true,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 43,
+      "edgePixels": 0,
+      "peakCoverageFrame": 21,
+      "approved": true,
+      "front": false,
+      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run."
+    },
+    {
+      "role": "Impact",
+      "file": "Art/flash-executioner/reviewed/effect_impact.png",
+      "cell": [
+        320,
+        224
+      ],
+      "pivot": [
+        130,
+        112
+      ],
+      "scale": 1.7,
+      "count": 31,
+      "columns": 5,
+      "rows": 7,
+      "duration": 0.5,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "impact-center",
+      "anchorMode": "impact-center",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.016666666666666666,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0.016666666666666666,
+      "sourceId": "impacts/crit-hit",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "c6af9303f0e463051696796a5886236d91182594e1d4fadee2067b9cf82ba857",
+      "sourceTimeWindow": [
+        0,
+        0.9
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "height": 0,
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Impact/frame-map.json",
+      "sha256": "838c12558b20ea4be34b01fd395758ac38f83c0c2d4817f8cc4dd8c8c5f2c309",
+      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Impact/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-approved original-resource derivative v2",
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 27,
+      "edgePixels": 0,
+      "peakCoverageFrame": 4,
+      "approved": true,
+      "front": true,
+      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run."
+    },
+    {
+      "role": "Orb",
+      "file": "Art/flash-executioner/reviewed/effect_orb.png",
+      "cell": [
+        136,
+        112
+      ],
+      "pivot": [
+        68,
+        104
+      ],
+      "scale": 0.3,
+      "count": 144,
+      "columns": 11,
+      "rows": 14,
+      "duration": 2.4,
+      "fps": 60,
+      "loop": true,
+      "layer": "front",
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        -52
+      ],
+      "effectfocalOffset": [
+        0,
+        -52
+      ],
+      "alignmentMode": "effect-focal",
+      "anchorMode": "effect-focal",
+      "offset": [
+        0,
+        15.6
+      ],
+      "visualPeakSeconds": 0,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "arcane/arcane-orb",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "22e7651d13482d9558b3ade048f86322ae0c116cf88f2834d7dd373499ebde9f",
+      "sourceTimeWindow": [
+        0,
+        2.4
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Orb/frame-map.json",
+      "sha256": "a7756c015a7ca2a3309f2eef50a44fe09993d9c0f9827c8c9003c2f399fe8248",
+      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Orb/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-approved original-resource derivative v2",
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": false,
+      "uniquePixelFrames": 144,
+      "edgePixels": 0,
+      "peakCoverageFrame": 52,
+      "approved": true,
+      "front": true,
+      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run."
+    },
+    {
+      "role": "Lance",
+      "file": "Art/flash-executioner/reviewed/effect_lance.png",
+      "cell": [
+        208,
+        96
+      ],
+      "pivot": [
+        170,
+        48
+      ],
+      "scale": 1.3,
+      "count": 48,
+      "columns": 5,
+      "rows": 10,
+      "duration": 0.8,
+      "fps": 60,
+      "loop": true,
+      "layer": "front",
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "projectile-tip",
+      "anchorMode": "projectile-tip",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "ice/ice-lance",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "4d5168e7ce7a5fc1f37e150c6d8227258962833d47e7b42dcc3da792f2e063a4",
+      "sourceTimeWindow": [
+        0,
+        0.8
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "length": 48,
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Lance/frame-map.json",
+      "sha256": "47ca56f3e7c11e7d46d69f0688021bfe69543dd3ec6763404a6bd4a58ab8b489",
+      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Lance/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-approved original-resource derivative v2",
+      "flightFrameFps": 60,
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": false,
+      "uniquePixelFrames": 48,
+      "edgePixels": 0,
+      "peakCoverageFrame": 39,
+      "approved": true,
+      "front": true,
+      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run."
+    },
+    {
+      "role": "SkyLance",
+      "file": "Art/flash-executioner/reviewed/effect_skylance.png",
+      "cell": [
+        208,
+        96
+      ],
+      "pivot": [
+        170,
+        48
+      ],
+      "scale": 1.8,
+      "count": 48,
+      "columns": 5,
+      "rows": 10,
+      "duration": 0.8,
+      "fps": 60,
+      "loop": true,
+      "layer": "front",
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "projectile-tip",
+      "anchorMode": "projectile-tip",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "ice/ice-lance",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "4d5168e7ce7a5fc1f37e150c6d8227258962833d47e7b42dcc3da792f2e063a4",
+      "sourceTimeWindow": [
+        0,
+        0.8
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "length": 48,
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/SkyLance/frame-map.json",
+      "sha256": "47ca56f3e7c11e7d46d69f0688021bfe69543dd3ec6763404a6bd4a58ab8b489",
+      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/SkyLance/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-approved original-resource derivative v2",
+      "flightFrameFps": 60,
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": false,
+      "uniquePixelFrames": 48,
+      "edgePixels": 0,
+      "peakCoverageFrame": 39,
+      "approved": true,
+      "front": true,
+      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run."
+    },
+    {
+      "role": "LanceHit",
+      "file": "Art/flash-executioner/reviewed/effect_lancehit.png",
+      "cell": [
+        288,
+        232
+      ],
+      "pivot": [
+        144,
+        188
+      ],
+      "scale": 1.5,
+      "count": 40,
+      "columns": 6,
+      "rows": 7,
+      "duration": 0.65,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "target-ground",
+      "anchorMode": "target-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "holy/smite",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "f0958ff226cb9114de31722b917c50867f715b9029f210c251186565895ea69b",
+      "sourceTimeWindow": [
+        0.55,
+        2.8
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "stone": "#796449",
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/LanceHit/frame-map.json",
+      "sha256": "120945cda573789d388a0e6b324afb0902c77b16392c668e0715f8d221a4d32f",
+      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/LanceHit/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-approved original-resource derivative v2",
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 36,
+      "edgePixels": 0,
+      "peakCoverageFrame": 2,
+      "approved": true,
+      "front": true,
+      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run."
+    },
+    {
+      "role": "Dash",
+      "file": "Art/flash-executioner/reviewed/effect_dash.png",
+      "cell": [
+        320,
+        224
+      ],
+      "pivot": [
+        190,
+        174
+      ],
+      "scale": 1.4,
+      "count": 16,
+      "columns": 4,
+      "rows": 4,
+      "duration": 0.25,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "status/haste",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "141fb1c06ebe581afd7d76a2f8ea6f7dd67e4b8babbd1417b5eb787bf4cb1946",
+      "sourceTimeWindow": [
+        0,
+        1.2
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "actor": "actor-input-Dash.json",
+        "dust": "#d9c991",
+        "light": 0.85
+      },
+      "postprocess": {
+        "alphaEdgeSeconds": [
+          0.016,
+          0.04
+        ],
+        "operation": "straight RGBA direct-copy atlas packing, alpha edge multiplication only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Dash/frame-map.json",
+      "sha256": "690088690f87809db9867dce85aaebeff4ac672766d5c6455502fa6e8d0ad192",
+      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Dash/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-approved original-resource derivative v2",
+      "firstAlphaEmpty": true,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 16,
+      "edgePixels": 0,
+      "peakCoverageFrame": 8,
+      "approved": true,
+      "front": true,
+      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run."
+    },
+    {
+      "role": "Swap",
+      "file": "Art/flash-executioner/reviewed/effect_swap.png",
+      "cell": [
+        256,
+        224
+      ],
+      "pivot": [
+        128,
+        174
+      ],
+      "scale": 1.6,
+      "count": 25,
+      "columns": 5,
+      "rows": 5,
+      "duration": 0.4,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        -28
+      ],
+      "effectfocalOffset": [
+        0,
+        -28
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.05,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "arcane/mana-burst",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "5e13cd03df803020cdae40c62b9113548d41ca1a1c268c6221616413840b06ee",
+      "sourceTimeWindow": [
+        0,
+        1.8
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Swap/frame-map.json",
+      "sha256": "97888c5665a1f276a0f9d022f0e986965214be3a46892585c6f788ac0e286d40",
+      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Swap/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-approved original-resource derivative v2",
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 25,
+      "edgePixels": 0,
+      "peakCoverageFrame": 5,
+      "approved": true,
+      "front": true,
+      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run."
+    },
+    {
+      "role": "Jump",
+      "file": "Art/flash-executioner/reviewed/effect_jump.png",
+      "cell": [
+        208,
+        128
+      ],
+      "pivot": [
+        104,
+        88
+      ],
+      "scale": 0.55,
+      "count": 16,
+      "columns": 4,
+      "rows": 4,
+      "duration": 0.25,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.016666666666666666,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "impacts/heavy-landing",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "317027b70876cdbc974d74c982935e698327215fdd98335ec5c98cf984aed6a7",
+      "sourceTimeWindow": [
+        0,
+        0.65
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "stone": "#86745f",
+        "light": 0.85
+      },
+      "postprocess": {
+        "alphaEdgeSeconds": [
+          0.008,
+          0.05
+        ],
+        "operation": "straight RGBA direct-copy atlas packing, alpha edge multiplication only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Jump/frame-map.json",
+      "sha256": "88ab91146ab4dc6c46f771c3e7f3fa31f4c39ad009ccf32ff963e95564115063",
+      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Jump/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-approved original-resource derivative v2",
+      "firstAlphaEmpty": true,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 16,
+      "edgePixels": 0,
+      "peakCoverageFrame": 5,
+      "approved": true,
+      "front": true,
+      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run."
+    },
+    {
+      "role": "Land",
+      "file": "Art/flash-executioner/reviewed/effect_land.png",
+      "cell": [
+        208,
+        128
+      ],
+      "pivot": [
+        104,
+        88
+      ],
+      "scale": 1,
+      "count": 19,
+      "columns": 4,
+      "rows": 5,
+      "duration": 0.3,
+      "fps": 60,
+      "loop": false,
+      "layer": "front",
+      "nativeDirectionDegrees": 0,
+      "sourceFocalOffset": [
+        0,
+        0
+      ],
+      "effectfocalOffset": [
+        0,
+        0
+      ],
+      "alignmentMode": "actor-feet",
+      "anchorMode": "actor-feet",
+      "offset": [
+        0,
+        0
+      ],
+      "visualPeakSeconds": 0.016666666666666666,
+      "triggerLeadSeconds": 0,
+      "spawnAgeSeconds": 0,
+      "sourceId": "impacts/heavy-landing",
+      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
+      "sourceSha256": "317027b70876cdbc974d74c982935e698327215fdd98335ec5c98cf984aed6a7",
+      "sourceTimeWindow": [
+        0,
+        1.6
+      ],
+      "optionsDiff": {
+        "palette": [
+          "#2b1b38",
+          "#594047",
+          "#95652e",
+          "#d49d38",
+          "#f4c75e",
+          "#ffe8ab",
+          "#fff6d9",
+          "#ffffff"
+        ],
+        "stone": "#86745f",
+        "light": 0.85
+      },
+      "postprocess": {
+        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
+      },
+      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Land/frame-map.json",
+      "sha256": "5be28648576c752a508ca9a08d5eca8364d73cce45ed7406e99a5dae07ff6621",
+      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Land/original-60fps.png",
+      "baselineFps": 60,
+      "status": "main-approved original-resource derivative v2",
+      "firstAlphaEmpty": false,
+      "lastAlphaEmpty": true,
+      "uniquePixelFrames": 18,
+      "edgePixels": 0,
+      "peakCoverageFrame": 2,
+      "approved": true,
+      "front": true,
+      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run."
+    }
+  ],
+  "rejected": [
+    {
+      "role": "Jump",
+      "reason": "Local AI vertical translation and unverified physical cadence"
+    },
+    {
+      "role": "Fall",
+      "reason": "Local vertical translation and inadequate60pose/sec reference"
+    },
+    {
+      "role": "Ultimate",
+      "reason": "Sword raising silhouette unclear; only41frames over1.12s"
+    }
+  ],
+  "generation_budget": {
+    "additional_limit": 15,
+    "additional_used": 15,
+    "prior_task_used": 12
+  },
+  "withdrawn_effects": {
+    "reason": "User rejected all15 custom geometric effects; original PixelFX resource derivatives required",
+    "archive": "/storage/emulated/0/Download/flash executioner/source_generations/rejected_custom_fx_v1",
+    "count": 15
+  },
+  "effects_version": "pixelfx-original-resource-derivatives-v2",
+  "source_only": true,
+  "new_geometry_recipes": false,
+  "source_alignment": "Compared with /storage/emulated/0/Download/ECLIPSE/CHARATER/flash-executioner; selected approved assets verified against the source manifest SHA-256."
+}
