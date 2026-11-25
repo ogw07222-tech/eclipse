@@ -513,236 +513,35 @@
     },
     {
       "role": "Basic",
+      "approved": true,
       "file": "flash_executioner/actor_basic.png",
+      "sha256": "5e58d7aa50e75d70cad846e1025d2de7bebe591f2abe709002a0639403d14fa0",
       "cell": [
         192,
         192
       ],
-      "columns": 6,
-      "rows": 5,
-      "count": 28,
+      "columns": 8,
+      "rows": 3,
+      "count": 20,
       "pivot": [
         70,
         133
       ],
       "scale": 1.4,
       "duration": 0.46,
-      "contactFrame": 6,
+      "contactFrame": 13,
       "loop": false,
-      "sourceFile": "basic_raw.png",
-      "rawColumns": 6,
-      "uniquePixelFrames": 28,
-      "emptyFrames": [],
-      "bounds": [
-        [
-          26,
-          59,
-          109,
-          133
-        ],
-        [
-          28,
-          61,
-          119,
-          133
-        ],
-        [
-          31,
-          54,
-          104,
-          133
-        ],
-        [
-          33,
-          56,
-          105,
-          133
-        ],
-        [
-          34,
-          56,
-          106,
-          133
-        ],
-        [
-          36,
-          56,
-          106,
-          133
-        ],
-        [
-          33,
-          65,
-          158,
-          134
-        ],
-        [
-          32,
-          64,
-          154,
-          134
-        ],
-        [
-          34,
-          64,
-          154,
-          134
-        ],
-        [
-          37,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          36,
-          64,
-          154,
-          134
-        ],
-        [
-          36,
-          64,
-          154,
-          134
-        ],
-        [
-          36,
-          64,
-          154,
-          134
-        ],
-        [
-          39,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          38,
-          64,
-          154,
-          134
-        ],
-        [
-          37,
-          64,
-          154,
-          134
-        ],
-        [
-          33,
-          62,
-          146,
-          134
-        ],
-        [
-          30,
-          60,
-          129,
-          133
-        ],
-        [
-          29,
-          59,
-          116,
-          133
-        ],
-        [
-          26,
-          59,
-          110,
-          133
-        ],
-        [
-          26,
-          59,
-          110,
-          133
-        ],
-        [
-          26,
-          59,
-          110,
-          133
-        ],
-        [
-          26,
-          59,
-          110,
-          133
-        ]
-      ],
-      "sha256": "19022ccec1ab305c8789791d9f2377124a3146c38bd05c5a8ef62b01de8745e7",
-      "status": "reviewed; runtime binding prepared; owner device verification pending",
-      "model": "PixMiniMax H3",
-      "timing": "fixed duration",
-      "approved": true,
-      "sourceFrameMap": [
+      "layer": "front",
+      "offset": [
         0,
-        1,
-        2,
-        3,
-        4,
-        5,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18,
-        19,
-        20,
-        21,
-        22,
-        23,
-        24,
-        25,
-        26,
-        27,
-        28
+        0
       ],
-      "review": "All sequential numbered poses inspected. Attached physical sword, consistent armor and grounded recovery; contactFrame6 must map to unchanged gameplay contact. Basic excludes source6 baked FX; Skill1 includes a newly AI-generated bridge pose, never a duplicate. Static art approval; device verification pending.",
+      "anchorMode": "actor-feet",
+      "note": "v3 motion candidate: approved frames only, no AI candidate frame; 12/13/21/22 (1-based) of the 22-frame motion removed; cut frame 1 x3; frame 10 x4",
       "source_path": "Art/flash-executioner/reviewed/actor_basic.png",
       "runtime_path": "Assets/Resources/Eclipse/flash_executioner/actor_basic.png",
-      "library_status": "not synced: no ChatGPT Library file capability available",
-      "source_path_raw": "Art/flash-executioner/pixellab/basic_raw.png"
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
+      "library_status": "not synced: no ChatGPT Library file capability available"
     },
     {
       "role": "Skill1",
@@ -1314,86 +1113,43 @@
     },
     {
       "role": "Slash",
+      "approved": true,
       "file": "flash_executioner/effect_slash.png",
+      "sha256": "8855ade4ae1a5d8e8f971cc71947e783b5a9be0fa23f29a54063bef840227a03",
       "cell": [
-        256,
-        216
+        208,
+        160
       ],
+      "columns": 6,
+      "rows": 6,
+      "count": 35,
       "pivot": [
-        105,
-        165
+        72,
+        128
       ],
-      "scale": 2,
-      "count": 25,
-      "columns": 5,
-      "rows": 5,
-      "duration": 0.4,
-      "fps": 60,
+      "scale": 1.5,
+      "duration": 1.134,
+      "fps": 30,
       "loop": false,
       "layer": "front",
       "nativeDirectionDegrees": 0,
-      "sourceFocalOffset": [
-        6,
-        -26
-      ],
-      "effectfocalOffset": [
-        6,
-        -26
-      ],
-      "alignmentMode": "actor-feet",
-      "anchorMode": "actor-feet",
       "offset": [
-        0,
-        0
+        20,
+        11
       ],
-      "visualPeakSeconds": 0.03333333333333333,
-      "triggerLeadSeconds": 0.03333333333333333,
+      "anchorMode": "actor-feet",
+      "alignmentMode": "actor-feet",
+      "triggerLeadSeconds": 0.18,
       "spawnAgeSeconds": 0,
-      "sourceId": "melee/sword-slash",
-      "sourceCommit": "5294518ce7c72e48b6100a744596e0acf57f2826",
-      "sourceSha256": "3abcde4466df41bddd1da0c9c9824aa2450185de39c61c3b7d156272dcc9327a",
-      "sourceTimeWindow": [
-        0,
-        0.75
-      ],
-      "optionsDiff": {
-        "palette": [
-          "#2b1b38",
-          "#594047",
-          "#95652e",
-          "#d49d38",
-          "#f4c75e",
-          "#ffe8ab",
-          "#fff6d9",
-          "#ffffff"
-        ],
-        "radius": 60,
-        "sparks": [
-          "#ffffff",
-          "#fff5c4",
-          "#f7d47c",
-          "#b78f46"
-        ],
-        "light": 0.85
-      },
-      "postprocess": {
-        "operation": "frame selection, straight RGBA direct-copy atlas packing only; fixes upstream canvas.paste double-premultiply; no painted pixels or new shapes"
-      },
-      "frameMap": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Slash/frame-map.json",
-      "sha256": "7bf115c7862f15749bd0513320260cb0a286bd252a044c3dc85c9f321dd420a3",
-      "baselinePng": "/storage/emulated/0/Download/flash executioner/candidates/pixelfx_v2/variants/Slash/original-60fps.png",
-      "baselineFps": 60,
-      "status": "reviewed; runtime binding prepared; owner device verification pending",
-      "firstAlphaEmpty": false,
-      "lastAlphaEmpty": true,
-      "uniquePixelFrames": 20,
-      "edgePixels": 0,
-      "peakCoverageFrame": 3,
-      "approved": true,
-      "front": true,
-      "review": "Main inspected original resources, before/after15roles and actor composites on dark/light backgrounds. Exact upstream13source files independently compared against Git commit. No new geometry recipes; only options, input masks, sampling, alpha edges and straight-RGBA atlas packing. V1 hashes excluded. Device playback not run.",
+      "triggerStartAgeSeconds": 0.064,
+      "sourceId": "custom:melee/flash-sweep",
+      "recipe": "Art/flash-executioner/candidates/basic-v3/recipe_flash_sweep.js",
+      "recipeSha256": "dd0e3023f7b5d5a70c9f74326b23cf020cc7543c77b6adc558e135999a95d2dc",
+      "note": "owner-approved custom PixelFX remix (recipe in candidates folder); burst at original size; drag removed; down 11 px; thick 48",
+      "custom": true,
       "source_path": "Art/flash-executioner/reviewed/effect_slash.png",
       "runtime_path": "Assets/Resources/Eclipse/flash_executioner/effect_slash.png",
+      "status": "reviewed; runtime binding prepared; owner device verification pending",
       "library_status": "not synced: no ChatGPT Library file capability available"
     },
     {
