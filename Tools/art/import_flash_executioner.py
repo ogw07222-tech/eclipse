@@ -7,7 +7,7 @@ import argparse, hashlib, json, shutil, math
 from PIL import Image
 
 ACTORS = ['Basic','Skill1','Skill2','Skill3','Ultimate','Idle','Run','Jump','Fall','Land','Dash','Swap']
-EFFECTS = ['Slash','Rush','Command','BlinkOut','BlinkIn','Verdict','Impact','Orb','Lance','SkyLance','LanceHit','Dash','Swap','Jump','Land']
+EFFECTS = ['Slash','Rush','Command','BlinkOut','BlinkIn','Verdict','Impact','Orb','Lance','SkyLance','LanceHit','Dash','Swap','Jump','Land','ImpactLance','ImpactRush']
 ROOT = Path(__file__).resolve().parents[2]
 
 def literal(value):
@@ -30,7 +30,14 @@ def main():
             if not row.get('approved'):
                 continue
             role=row['role']
-            if kind=='effects' and not all(row.get(field) for field in ('sourceId','sourceCommit','sourceSha256')):
+            if kind=='effects' and row.get('custom'):
+                # owner-approved custom PixelFX remix: identified by its recipe file and hash, not an upstream commit
+                if not str(row.get('sourceId','')).startswith('custom:') or not row.get('recipe') or not row.get('recipeSha256'):
+                    raise SystemExit('Custom effect needs a custom: sourceId, recipe path and recipeSha256: '+role)
+                recipe=ROOT/row['recipe']
+                if hashlib.sha256(recipe.read_bytes()).hexdigest()!=row['recipeSha256']:
+                    raise SystemExit('Recipe hash mismatch: '+str(recipe))
+            elif kind=='effects' and not all(row.get(field) for field in ('sourceId','sourceCommit','sourceSha256')):
                 raise SystemExit('Effect must identify its reviewed existing PixelFX source: '+role)
             if role not in roles or role in table:
                 raise SystemExit('Unknown or duplicate role: '+role)
@@ -91,7 +98,7 @@ def main():
 #include <array>
 namespace eclipse {
 enum class FlashActor { Basic, Skill1, Skill2, Skill3, Ultimate, Idle, Run, Jump, Fall, Land, Dash, Swap, Count };
-enum class FlashFx { Slash, Rush, Command, BlinkOut, BlinkIn, Verdict, Impact, Orb, Lance, SkyLance, LanceHit, Dash, Swap, Jump, Land, Count };
+enum class FlashFx { Slash, Rush, Command, BlinkOut, BlinkIn, Verdict, Impact, Orb, Lance, SkyLance, LanceHit, Dash, Swap, Jump, Land, ImpactLance, ImpactRush, Count };
 struct FlashSheet {
     const char* file=nullptr;
     int cellW=0,cellH=0,columns=0,rows=0,count=0;
