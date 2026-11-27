@@ -20,6 +20,9 @@ class Presentation {
     std::array<SDL_Texture*,5> textures{};
     SDL_Texture* titleTexture_=nullptr;
     SDL_Texture* titleMenu_=nullptr;
+    SDL_Texture* openingKnight_=nullptr;
+    SDL_Texture* openingGauntlet_=nullptr;
+    SDL_Texture* openingAltar_=nullptr;
     std::array<SDL_Texture*,static_cast<int>(FlashActor::Count)> flashActorTextures_{};
     std::array<SDL_Texture*,static_cast<int>(FlashFx::Count)> flashFxTextures_{};
     std::array<SDL_Texture*,castleEnemyCount> castleEnemyMoveTextures_{};
@@ -1296,6 +1299,8 @@ class Presentation {
 public:
     explicit Presentation(SDL_Renderer* r):renderer(r){}
     ~Presentation(){if(playerHealthFrame_)SDL_DestroyTexture(playerHealthFrame_);if(circularSkillButtons_)SDL_DestroyTexture(circularSkillButtons_);for(auto* image:spaceActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:spaceFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashActorTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:flashFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:castleEnemyMoveTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:castleEnemyAttackTextures_)if(image)SDL_DestroyTexture(image);for(auto* image:castleEnemyAttackVfxTextures_)if(image)SDL_DestroyTexture(image);for(auto& form:bossMotionTextures_)for(auto* image:form)if(image)SDL_DestroyTexture(image);for(auto* image:bossFxTextures_)if(image)SDL_DestroyTexture(image);for(auto* fx:{goldLance_,goldTrail_,goldOrb_,goldImpact_,riftSlash_,riftTrace_})if(fx)SDL_DestroyTexture(fx);if(titleTexture_)SDL_DestroyTexture(titleTexture_);if(titleMenu_)SDL_DestroyTexture(titleMenu_);if(enemyBarFrame_)SDL_DestroyTexture(enemyBarFrame_);if(bossBarFrame_)SDL_DestroyTexture(bossBarFrame_);if(executeIcon_)SDL_DestroyTexture(executeIcon_);if(settingsGear_)SDL_DestroyTexture(settingsGear_);if(settingsPanel_)SDL_DestroyTexture(settingsPanel_);if(settingsWindow_)SDL_DestroyTexture(settingsWindow_);for(auto* texture:textures)if(texture)SDL_DestroyTexture(texture);
+        for(auto* openingLayer:{openingKnight_,openingGauntlet_,openingAltar_})
+            if(openingLayer)SDL_DestroyTexture(openingLayer);
         for(auto* texture:forestTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestLayerTextures_)if(texture)SDL_DestroyTexture(texture);
         for(auto* texture:forestV3Textures_)if(texture)SDL_DestroyTexture(texture);}
@@ -1326,28 +1331,39 @@ public:
 #endif
     }
     bool loadTitle(){
-        // Canonical game title assets use the title/ namespace.
-        titleTexture_=IMG_LoadTexture(renderer,asset("title/eclipse.png").c_str());
-        if(!titleTexture_){SDL_SetError("ECLIPSE ASSET ERROR: title/eclipse.png missing or invalid");return false;}
-        // Use the self-contained title PNG; removed cape/knight overlay paths
-        // belonged to a discarded multi-layer title pack.
-        SDL_SetTextureScaleMode(titleTexture_,SDL_SCALEMODE_NEAREST);
-        SDL_SetTextureBlendMode(titleTexture_,SDL_BLENDMODE_BLEND);
-        titleMenu_=IMG_LoadTexture(renderer,asset("ui/title_menu.png").c_str());
-        if(!titleMenu_){SDL_SetError("ECLIPSE ASSET ERROR: ui/title_menu.png missing or invalid");return false;}
-        SDL_SetTextureScaleMode(titleMenu_,SDL_SCALEMODE_NEAREST);
-        SDL_SetTextureBlendMode(titleMenu_,SDL_BLENDMODE_BLEND);
-        if(!settingsGear_)settingsGear_=IMG_LoadTexture(renderer,asset("ui/settings_gear.png").c_str());
-        if(!settingsGear_){SDL_SetError("ECLIPSE ASSET ERROR: ui/settings_gear.png missing or invalid");return false;}
-        SDL_SetTextureScaleMode(settingsGear_,SDL_SCALEMODE_NEAREST);
-        return true;
+        auto loadLayer=[&](const char* name, SDL_Texture*& texture, int width, int height){
+            const std::string path=asset(name);
+            auto fail=[&]{
+                const std::string reason=SDL_GetError();
+                return SDL_SetError("ECLIPSE ASSET ERROR: %s: %s",path.c_str(),reason.c_str());
+            };
+            SDL_Surface* surface=IMG_Load(path.c_str());
+            if(!surface)return fail();
+            const int actualW=surface->w,actualH=surface->h;
+            if(actualW!=width||actualH!=height){
+                SDL_DestroySurface(surface);
+                return SDL_SetError("ECLIPSE ASSET ERROR: %s expected %dx%d, got %dx%d",
+                                    path.c_str(),width,height,actualW,actualH);
+            }
+            texture=SDL_CreateTextureFromSurface(renderer,surface);
+            SDL_DestroySurface(surface);
+            if(!texture||!SDL_SetTextureScaleMode(texture,SDL_SCALEMODE_NEAREST)||
+               !SDL_SetTextureBlendMode(texture,SDL_BLENDMODE_BLEND))return fail();
+            return true;
+        };
+        return loadLayer("title/eclipse.png",titleTexture_,1536,865)&&
+               loadLayer("title/opening_knight.png",openingKnight_,1536,1408)&&
+               loadLayer("title/opening_gauntlet.png",openingGauntlet_,1280,720)&&
+               loadLayer("title/opening_altar.png",openingAltar_,1280,720)&&
+               loadLayer("ui/title_menu.png",titleMenu_,112,120)&&
+               (settingsGear_||loadLayer("ui/settings_gear.png",settingsGear_,168,170));
     }
 
     static constexpr std::array<SDL_FRect,2> titleOptions{{{404,552,472,62},{404,624,472,62}}};
     static constexpr SDL_FRect titleGear{1204,24,52,52};
     static constexpr SDL_FRect titleDeveloperQA{500,478,280,54};
     static constexpr SDL_FRect titleBack{26,25,190,50};
-    static constexpr float titleReadyTime=5.8f;
+    static constexpr float titleReadyTime=5.65f;
 
 
     bool loadCastleEnemyAtlases(){
@@ -1677,48 +1693,136 @@ public:
         {410,374,460,52},{410,436,460,52},{530,562,220,44}
     }};
 
+    void drawOpeningKnight(float x,float y,float scale,float lean,float wind,float bladeLight){
+        constexpr SDL_FPoint footing{287,936},waist{280,508};
+        auto point=[&](float px,float py){
+            return SDL_FPoint{x+(px-footing.x)*scale,y+(py-footing.y)*scale};
+        };
+        const double angle=lean*3.141592653589793/180;
+        const float sn=static_cast<float>(std::sin(angle)),cs=static_cast<float>(std::cos(angle));
+        auto upperPoint=[&](float px,float py){
+            const float dx=px-waist.x,dy=py-waist.y;
+            return point(waist.x+dx*cs-dy*sn,waist.y+dx*sn+dy*cs);
+        };
+        const auto legOrigin=point(80,450);
+        const SDL_FRect legs{0,884,398,504};
+        const SDL_FRect standing{legOrigin.x,legOrigin.y,legs.w*scale,legs.h*scale};
+        SDL_RenderTexture(renderer,openingKnight_,&legs,&standing);
+
+        // Keep the attachment point on the rotating shoulder while the free edge ripples.
+        constexpr int columns=20,rows=12,stride=columns+1;
+        static constexpr auto triangles=[]{
+            std::array<int,columns*rows*6> result{};
+            for(int row=0;row<rows;++row)for(int col=0;col<columns;++col){
+                const int top=row*stride+col,index=6*(row*columns+col);
+                result[index]=top;          result[index+1]=top+1;        result[index+2]=top+stride;
+                result[index+3]=top+1;      result[index+4]=top+stride+1; result[index+5]=top+stride;
+            }
+            return result;
+        }();
+        const auto shoulder=upperPoint(268,145);
+        std::array<SDL_Vertex,stride*(rows+1)> cloth{};
+        for(int row=0;row<=rows;++row)for(int col=0;col<=columns;++col){
+            const float u=static_cast<float>(col)/columns,v=static_cast<float>(row)/rows;
+            const float loose=(1-u)*(1-u);
+            const float ripple=std::sin(wind-u*6.4f+v*2.2f);
+            const SDL_FPoint position{
+                shoulder.x+scale*((u*870-862)*.75f-loose*(26+15*ripple)),
+                shoulder.y+scale*((v*872-9)*.73f+loose*42*ripple)
+            };
+            cloth[row*stride+col]={position,{1,1,1,1},
+                                 {(620+870*u)/1536.f,872*v/1408.f}};
+        }
+        SDL_RenderGeometry(renderer,openingKnight_,cloth.data(),static_cast<int>(cloth.size()),
+                           triangles.data(),static_cast<int>(triangles.size()));
+
+        const auto torsoOrigin=point(28,8);
+        const SDL_FRect torso{0,0,586,846};
+        const SDL_FRect upper{torsoOrigin.x,torsoOrigin.y,torso.w*scale,torso.h*scale};
+        const SDL_FPoint pivot{(waist.x-28)*scale,(waist.y-8)*scale};
+        SDL_RenderTextureRotated(renderer,openingKnight_,&torso,&upper,lean,&pivot,SDL_FLIP_NONE);
+
+        if(bladeLight>0&&bladeLight<1){
+            const auto glint=upperPoint(418+175*bladeLight,555+267*bladeLight);
+            const float glimmer=std::sin(bladeLight*3.14159265f);
+            rect(glint.x-9*glimmer,glint.y,18*glimmer,1,0xe7d4ff,static_cast<Uint8>(190*glimmer));
+            rect(glint.x,glint.y-4*glimmer,2,8*glimmer,0xfff5ff,static_cast<Uint8>(240*glimmer));
+        }
+    }
+
     void drawTitleOpening(float seconds){
         const auto progress=[seconds](float begin,float end){
-            const float t=std::clamp((seconds-begin)/(end-begin),0.f,1.f);
+            return std::clamp((seconds-begin)/(end-begin),0.f,1.f);
+        };
+        const auto ease=[&](float begin,float end){
+            const float t=progress(begin,end);
             return t*t*(3.f-2.f*t);
         };
-        const float occultation=progress(.52f,2.65f);
-        const float pullback=progress(2.92f,4.85f);
-        const float reveal=progress(4.12f,titleReadyTime);
-        // End on the painted corona at the center of the ECLIPSE wordmark.
-        const float x=640, y=338-252*pullback, radius=107-40*pullback;
-        for(int i=0;i<62;++i){
-            const float starX=(i*509+37)%1280, starY=(i*i*11+i*41+13)%720;
-            const float glimmer=.74f+.26f*std::sin(i+seconds*1.5f);
-            rect(starX,starY,i%8==0?3:2,2,0xc6beda,
-                 static_cast<Uint8>((65+100*occultation)*glimmer));
-        }
-
-        // Horizontal pixel spans keep the limb stepped at native game resolution.
-        const auto disc=[&](float cx,float cy,float r,unsigned tint,Uint8 alpha){
-            for(int row=-static_cast<int>(r);row<=r;row+=2){
-                const float half=std::sqrt(std::max(0.f,r*r-row*row));
-                rect(cx-half,cy+row,2*half,2,tint,alpha);
+        constexpr SDL_FRect screen{0,0,1280,720};
+        if(seconds<1.85f){
+            // The shot begins on the gauntlet. A narrow specular highlight travels up the blade.
+            const float push=ease(0,1.70f);
+            const float zoom=1.02f+.09f*push;
+            const SDL_FRect closeUp{640*(1-zoom),360*(1-zoom),1280*zoom,720*zoom};
+            SDL_RenderTexture(renderer,openingGauntlet_,nullptr,&closeUp);
+            const float glint=progress(.36f,1.42f);
+            if(glint>0&&glint<1){
+                const float luminance=std::sin(glint*3.14159265f);
+                const float x=closeUp.x+703*zoom,y=closeUp.y+(660-190*glint)*zoom;
+                rect(x-2,y-16*luminance,4,32*luminance,0xf0d9ff,static_cast<Uint8>(185*luminance));
+                rect(x-10*luminance,y,20*luminance,1,0xe2bdff,static_cast<Uint8>(135*luminance));
             }
-        };
-        disc(x,y,radius+16,0x8873b6,22);
-        disc(x,y,radius+8,0xae9ad9,55);
-        disc(x,y,radius+3,0xe6dcff,200);
-        disc(x,y,radius,0xffefd4,255);
-        disc(x-2.3f*radius*(1-occultation),y-7*(1-occultation),
-             radius-2,0x08080e,255);
-
-        // The last bead of sunlight flares on the rim, then contracts to a point.
-        const float bead=progress(2.24f,2.55f)*(1-progress(2.62f,3.15f));
-        if(bead>0){
-            const float tip=x+radius;
-            rect(tip-37*bead,y,74*bead,2,0xffeac2);
-            rect(tip,y-15*bead,2,30*bead,0xfff6dc);
+            const float dark=1-ease(0,.55f)+ease(1.56f,1.85f);
+            rect(0,0,1280,720,0x08060b,static_cast<Uint8>(255*dark));
+            return;
         }
-        if(seconds<.55f)
-            rect(0,0,1280,720,0x08080e,static_cast<Uint8>(255*(1-progress(0,.55f))));
+
+        if(seconds<4.79f){
+            const float pullback=ease(1.85f,4.08f);
+            const float zoom=1.18f-.18f*pullback;
+            // The platform holds its screen position while the camera pulls out of the arch.
+            const SDL_FRect wide{640*(1-zoom),567*(1-zoom),1280*zoom,720*zoom};
+            SDL_RenderTexture(renderer,openingAltar_,nullptr,&wide);
+            const float lean=6.5f*(1-ease(2.06f,3.28f))+.65f*std::sin(seconds*3.4f);
+            drawOpeningKnight(724-36*pullback,593-17*pullback,.61f-.14f*pullback,
+                              lean,seconds*7.4f,progress(2.87f,3.74f));
+
+            for(int i=0;i<42;++i){
+                const bool near=i%5==0;
+                const float x=1280-std::fmod((i*217+117)%1280+seconds*(near?111:43),1280.f);
+                const float y=std::fmod(static_cast<float>((i*i*13+211)%720)+720
+                                      -seconds*(near?37:16)+15*std::sin(i+seconds*2.1f),720.f);
+                const float glow=.52f+.48f*std::sin(i*1.7f+seconds*2.25f);
+                rect(x,y,near?6:2,near?2:1,0xcbb3e9,static_cast<Uint8>(glow*(near?133:85)));
+            }
+            rect(0,0,1280,720,0x08060b,static_cast<Uint8>(255*(1-ease(1.85f,2.22f))));
+
+            // Let the dark face of the eclipse fill the frame just before the title emerges.
+            const float iris=ease(4.03f,4.79f);
+            if(iris>0){
+                const float radius=235+850*iris;
+                const SDL_FColor ink{8/255.f,6/255.f,11/255.f,ease(4.03f,4.25f)};
+                constexpr int segments=64;
+                std::array<SDL_Vertex,segments+2> disc{};
+                std::array<int,segments*3> fan{};
+                disc[0]={{640,1},ink,{}};
+                for(int i=0;i<=segments;++i){
+                    const float angle=6.2831853f*i/segments;
+                    disc[i+1]={{640+radius*std::cos(angle),1+radius*std::sin(angle)},ink,{}};
+                }
+                for(int i=0;i<segments;++i){
+                    fan[3*i]=0;
+                    fan[3*i+1]=i+1;
+                    fan[3*i+2]=i+2;
+                }
+                SDL_RenderGeometry(renderer,nullptr,disc.data(),static_cast<int>(disc.size()),
+                                   fan.data(),static_cast<int>(fan.size()));
+            }
+        }
+
+        if(seconds>=4.79f)rect(0,0,1280,720,0x08060b);
+        const float reveal=ease(4.70f,5.56f);
         if(reveal>0){
-            const SDL_FRect screen{0,0,1280,720};
             SDL_SetTextureAlphaMod(titleTexture_,static_cast<Uint8>(255*reveal));
             SDL_RenderTexture(renderer,titleTexture_,nullptr,&screen);
             SDL_SetTextureAlphaMod(titleTexture_,255);

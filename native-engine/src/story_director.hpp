@@ -6,6 +6,7 @@
 #include "combat.hpp"
 #include "control_layout.hpp"
 #include <cstdio>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -77,17 +78,14 @@ inline std::vector<SpawnDef> storyWave(int area){
 
 class StoryDirector {
 public:
-    // Combat tutorial beats, in order. Flash Executioner first, then the swap to the Ruler of Space.
-    enum Beat {Walk,Jump,Dodge,Strike,Command,Blink,Finish,Rush,Mark,Verdict,Swap,Bolt,Spikes,Repulse,Field,Singularity,BeatCount};
+    // Combat tutorial: six beats, one fast run forward. Flash Executioner first, then the swap to the Ruler of Space.
+    enum Beat {Move,Dodge,Strike,Rush,Command,Eclipse,BeatCount};
     // control: button to pulse; arrow: stick hint; freeze: the prompt stops time at a reaction moment.
+    // (The Eclipse beat has two prompts: Swap, then the Ruler's Spikes; see ctl().)
     struct BeatDef {int control;int arrow;bool freeze;};
     static constexpr BeatDef beats[BeatCount]={
-        {ControlLayout::Stick,1,false},{ControlLayout::Stick,2,false},{ControlLayout::Dash,0,true},
-        {ControlLayout::Attack,0,false},{ControlLayout::Sweep,0,false},{ControlLayout::Buff,0,true},
-        {ControlLayout::Attack,0,false},{ControlLayout::Skill,0,true},{ControlLayout::Sweep,0,false},
-        {ControlLayout::Ultimate,0,true},{ControlLayout::Swap,0,true},
-        {ControlLayout::Attack,0,false},{ControlLayout::Sweep,0,false},{ControlLayout::Buff,0,true},
-        {ControlLayout::Skill,0,false},{ControlLayout::Ultimate,0,true}};
+        {ControlLayout::Stick,1,false},{ControlLayout::Dash,0,true},{ControlLayout::Attack,0,false},
+        {ControlLayout::Skill,0,true},{ControlLayout::Sweep,0,false},{ControlLayout::Swap,0,true}};
     static constexpr int stepCount=BeatCount;
     static constexpr float failsafeSeconds=38.f;     // phase 2: guaranteed scripted defeat
     static constexpr float floorFailsafe=6.f;        // king at health floor this long: scripted defeat
@@ -193,7 +191,10 @@ public:
 
 private:
     // practice
-    int beat=0,swapBase=0,hitBase=0;int hurtBase=0;Actions previous;
+    int beat=0,swapBase=0,hitBase=0,phase=0;int hurtBase=0;Actions previous;
+    bool reached=false,restored=false;
+    float slowLeft=0,rewindLeft=0;
+    std::shared_ptr<Combat> checkpoint;   // the whole fight as it stood when the current beat began
     bool prompted=false,frozen=false,tried=false,blinkSeen=false,straggle=false;
     float beatTime=0,resumeTime=0,triedAge=0,holdLeft=0;
     // flow
@@ -211,7 +212,7 @@ private:
     static float down(float v,float dt){return std::max(0.f,v-dt);}
     void reset(){
         stage=StoryStage::Free;view=StoryView{};cameraLead=0;scene=SceneChange{};
-        beat=0;prompted=frozen=tried=blinkSeen=false;beatTime=resumeTime=triedAge=holdLeft=0;area=1;portalUnlocked=waveActive=pauseDone=false;
+        beat=0;phase=0;reached=restored=false;slowLeft=rewindLeft=0;checkpoint.reset();prompted=frozen=tried=blinkSeen=false;beatTime=resumeTime=triedAge=holdLeft=0;area=1;portalUnlocked=waveActive=pauseDone=false;
         time=lockLeft=pauseLeft=cameraTarget=wakeLeft=0;
         seenShift=seenPhase2=0;phase2Time=floorTime=0;deathT=0;rewindSeg=-1;echoSwapped=false;
         forestFoes=0;forestTime=0;giftGiven=false;levelBaseline=0;closeTimer=0;deathSegment=-1;previous=Actions{};
@@ -226,6 +227,7 @@ private:
     // resumes time, so the move fires straight into the situation it answers. Foes are real AI with a
     // health floor (Enemy::dummy) until the beat lets them fall. No text anywhere.
     static constexpr int orbGoal=3;
+    static constexpr float slowScale=.3f,slowSeconds=1.5f,beatRewindSeconds=.6f;   // reaction moments run at 0.3x for 1.5 s, a miss rewinds in 0.6 s
     static void press(Actions& a,int control){
         switch(control){
         case ControlLayout::Dash:a.dash=true;break;
@@ -249,10 +251,10 @@ private:
         case ControlLayout::Swap:return a.swap;
         default:return false;}
     }
-    static float clampX(float x){return std::clamp(x,220.f,1040.f);}
+    static float clampX(float x){return std::clamp(x,160.f,1900.f);}   // the tutorial runs forward along the approach
     static void spawnFoe(Combat& g,int kind,float x,float wake){
         g.spawn(kind,clampX(x),wake,1.f);
-        auto& e=g.enemies.back();e.dummy=true;e.fights=true;
+        auto& e=g.enemies.back();e.dummy=true;e.fights=true;e.speed*=1.8f;   // tutorial pace: foes close in fast
     }
     static int alive(const Combat& g,int kind=-1){
         int n=0;for(const auto& e:g.enemies)if(!e.dead()&&(kind<0||e.kind==kind))++n;return n;
@@ -279,13 +281,15 @@ private:
         p.dashCooldown=p.mageSkillCooldown=p.swapCooldown=0;
     }
 
+    // The button the current prompt asks for (the Eclipse beat asks for Swap, then the Ruler's Spikes).
+    int ctl() const {return beat==Eclipse&&phase==1?ControlLayout::Sweep:beats[beat].control;}
     void initPractice(Combat& g){
         g.enemies.clear();view.skipVisible=true;view.pipsTotal=BeatCount;beat=0;
         enterBeat(g);
     }
     // Sets the scene for the current beat. Foes carry over from beat to beat; only what is missing is added.
     void enterBeat(Combat& g){
-        prompted=frozen=tried=blinkSeen=straggle=false;beatTime=resumeTime=triedAge=holdLeft=0;
+        prompted=frozen=tried=blinkSeen=straggle=reached=false;phase=0;beatTime=resumeTime=triedAge=holdLeft=0;
         g.timeScale=1;
         view.freeze=0;view.previewR=0;view.hintX=-1;view.goalX=-1;view.goalCount=0;view.targetsHint=false;view.chevrons=false;
         view.highlight=-1;view.arrow=0;view.pips=beat;
@@ -293,21 +297,14 @@ private:
         const float x=g.player.x;
         hitBase=hits(g);hurtBase=g.player.hurtSerial;swapBase=g.player.activeJob;
         switch(beat){
-        case Walk:view.goalX=clampX(x+320);break;
-        case Dodge:ensure(g,AshInfantry,1,x+260,0,.9f);break;               // a soldier rises and closes in
-        case Strike:ensure(g,AshInfantry,1,x+160,0,.4f);view.goalCount=orbGoal;break;
-        case Command:                                                         // reinforcements and a caster at range
-            ensure(g,AshInfantry,2,x+300,90,.5f);ensure(g,CastlePriest,1,x+600,0,.9f);break;
-        case Blink:case Finish:ensure(g,CastlePriest,1,x+600,0,.4f);break;
-        case Rush:ensure(g,AshInfantry,2,x-320,-90,.4f);break;
-        case Mark:                                                            // a wave from both sides
-            spawnFoe(g,AshInfantry,x+260,.3f);spawnFoe(g,AshInfantry,x-260,.5f);spawnFoe(g,DemonHound,x+430,.7f);
-            spawnFoe(g,DemonHound,x-430,.9f);spawnFoe(g,AshInfantry,x+520,1.1f);break;
-        case Verdict:ensure(g,AshInfantry,1,x+300,0,.3f);break;
-        case Swap:                                                            // something heavy arrives
-            spawnFoe(g,GatekeeperKnight,x+360,1.2f);spawnFoe(g,AshInfantry,x+520,.6f);spawnFoe(g,AshInfantry,x-300,.9f);break;
-        case Bolt:case Spikes:case Repulse:case Field:case Singularity:ensure(g,AshInfantry,2,x+300,90,.4f);break;
+        case Move:view.goalX=clampX(x+260);break;
+        case Dodge:ensure(g,AshInfantry,1,x+150,0,.3f);break;               // a soldier rises and closes in
+        case Strike:ensure(g,AshInfantry,1,x+150,0,.15f);view.goalCount=orbGoal;break;
+        case Rush:ensure(g,AshInfantry,2,x+200,80,.15f);break;               // a charge head-on, straight ahead
+        case Command:ensure(g,AshInfantry,3,x+300,90,.15f);break;
+        case Eclipse:ensure(g,AshInfantry,3,x+260,90,.15f);break;            // the marked soldiers from Command, or new ones
         default:break;}
+        checkpoint=std::make_shared<Combat>(g);   // a failed reaction rewinds to exactly this moment
     }
     // When the prompt appears. Soft beats prompt at once; reaction beats wait for their moment.
     bool trigger(Combat& g){
@@ -316,58 +313,52 @@ private:
         case Dodge:
             for(const auto& e:g.enemies)if(!e.dead()&&e.fights&&e.attackAge>=.40f&&std::abs(e.x-p.x)<240)return true;
             return false;
-        case Command:case Mark:case Swap:return allAwake(g)&&beatTime>.4f;
-        case Blink:{const Enemy* c=first(g,CastlePriest);return !c||c->attackAge>=0||beatTime>4.f;}
-        case Rush:return within(g,320)>0||beatTime>5.f;
-        case Verdict:return beatTime>.3f;
-        case Repulse:return within(g,190)>=2||beatTime>5.f;
-        case Singularity:return allWithin(g,330)||beatTime>4.f;
+        case Rush:return allAwake(g)&&(within(g,300)>0||beatTime>1.8f);
+        case Command:return allAwake(g)&&beatTime>.1f;
+        case Eclipse:return allAwake(g)&&beatTime>.15f&&(phase==0||within(g,210)>0||beatTime>2.f);
         default:return true;
         }
     }
     void onPrompt(Combat& g){
         auto& p=g.player;
         if(beats[beat].freeze){
-            frozen=true;g.timeScale=0;view.freeze=1;view.flash=std::max(view.flash,.25f);
+            frozen=true;g.timeScale=slowScale;slowLeft=slowSeconds;view.freeze=1;view.flash=std::max(view.flash,.25f);
             clearCooldowns(p);hurtBase=p.hurtSerial;
             if(p.flashMove==FlashMove::Slash){p.flashMove=FlashMove::None;p.flashAge=0;}   // a swing in progress never eats the answer
         }
         Enemy* n=nearest(g);
-        auto faceNearest=[&]{if(n)p.facing=n->x>=p.x?1:-1;};
+        (void)n;
+        auto faceNearest=[&]{p.facing=1;};   // the tutorial runs forward: every prompt faces the way ahead
         switch(beat){
         case Dodge:{faceNearest();const float to=p.x+p.facing*230.f;          // dash straight through the blow
             view.chevrons=true;view.chevronX0=std::min(p.x,to);view.chevronX1=std::max(p.x,to);break;}
-        case Strike:case Bolt:case Spikes:case Field:view.targetsHint=true;break;
-        case Command:if(p.storedLightLances<orbGoal)p.storedLightLances=orbGoal;view.targetsHint=true;break;
-        case Blink:if(Enemy* c=first(g,CastlePriest))view.hintX=c->x;break;   // the farthest marked foe
-        case Finish:if(Enemy* c=first(g,CastlePriest)){c->dummy=false;view.hintX=c->x;}break;
+        case Strike:case Command:view.targetsHint=true;break;
         case Rush:{faceNearest();mortalAll(g,12);const float to=p.x+p.facing*340.f;
             view.chevrons=true;view.chevronX0=std::min(p.x,to);view.chevronX1=std::max(p.x,to);break;}
-        case Mark:p.storedLightLances=std::max(p.storedLightLances,5);view.targetsHint=true;break;
-        case Verdict:markAll(g);mortalAll(g,30);view.targetsHint=true;break;  // 20 lances, about 4 each
-        case Swap:if(Enemy* k=first(g,GatekeeperKnight))view.hintX=k->x;break;
-        case Repulse:view.previewR=180;break;
-        case Singularity:view.previewR=340;mortalAll(g,40);break;
+        case Eclipse:
+            markAll(g);view.targetsHint=true;
+            if(phase==0){if(p.storedLightLances<orbGoal)p.storedLightLances=orbGoal;}            // the swap itself
+            else{faceNearest();view.previewR=245;}                                                  // the spikes' reach
+            break;
         default:break;
         }
     }
-    // Called from preStep: while time is stopped only the prompted button gets through.
     // Only the beat's own button works (plus walking): every other action button is dead, so the player
     // can never answer a moment with the wrong move, spend the orbs early or swap away mid-lesson.
     void practiceInput(Combat& g,Actions& a){
         if(beat>=BeatCount){return;}
-        const Actions raw=a;
+        if(rewindLeft>0){a=Actions{};return;}      // the world is running backwards: no input
         practiceCore(g,a);
-        const int c=beats[beat].control;
+        const int c=ctl();
         const bool open=holdLeft<=0;                       // between beats nothing but walking is live
         const Actions kept=a;
         a.dash=a.attack=a.skill=a.skillSweep=a.skillBuff=a.ultimate=a.swap=false;
         if(c!=ControlLayout::Stick)a.jump=a.jumpHeld=false;
+        else if(beat==Move&&!reached)a.jump=a.jumpHeld=false;   // walk to the beacon first, then jump
         if(open){
             press2(a,kept,c);
-            if(straggle)a.attack=kept.attack;              // the finale's stragglers are finished by hand
+            if(straggle)a.attack=kept.attack;
         }
-        (void)raw;
     }
     static void press2(Actions& out,const Actions& from,int control){
         switch(control){
@@ -382,11 +373,10 @@ private:
     }
     void practiceCore(Combat& g,Actions& a){
         if(beat>=BeatCount||holdLeft>0)return;
-        const int c=beats[beat].control;
+        const int c=ctl();
         const bool now=rising(pressed(a,c),pressed(previous,c));
-        if(frozen){
-            a=Actions{};
-            if(now){press(a,c);frozen=false;g.timeScale=1;view.freeze=0;view.previewR=0;resumeTime=0;tried=true;triedAge=0;
+        if(frozen){   // slow motion: the right button (and walking) still works; pressing it ends the slow-down
+            if(now){frozen=false;g.timeScale=1;view.freeze=0;view.previewR=0;resumeTime=0;tried=true;triedAge=0;
                     if(beat==Dodge||beat==Rush)view.chevrons=false;}
             return;
         }
@@ -395,71 +385,87 @@ private:
     bool success(Combat& g){
         const auto& p=g.player;
         switch(beat){
-        case Walk:return std::abs(p.x-view.goalX)<50.f;
-        case Jump:return tried&&!p.grounded;
+        case Move:if(!reached&&std::abs(p.x-view.goalX)<50.f){reached=true;view.goalX=-1;}
+                  return reached&&tried&&!p.grounded;                      // walked to the beacon, then jumped
         case Dodge:{
             if(!tried||resumeTime<.1f)return false;
             for(const auto& e:g.enemies)if(!e.dead()&&e.attackAge>=0)return false;   // wait for the blow to finish
             return p.hurtSerial==hurtBase;
         }
         case Strike:return p.storedLightLances>=orbGoal;
-        case Command:case Mark:return anyMarked(g);
-        case Blink:return tried&&blinkSeen&&p.flashMove==FlashMove::None;
-        case Finish:return alive(g,CastlePriest)==0;
-        case Rush:case Verdict:case Singularity:return alive(g)==0;
-        case Swap:return p.activeJob!=swapBase;
-        case Bolt:return hits(g)>hitBase;
-        case Spikes:return tried&&(triedAge>2.f||(triedAge>.6f&&hits(g)>hitBase));
-        case Repulse:return tried&&triedAge>.6f;
-        case Field:return tried&&triedAge>.8f;
+        case Rush:return alive(g)==0;
+        case Command:return anyMarked(g);
+        case Eclipse:
+            if(phase==0){
+                if(p.activeJob!=swapBase){phase=1;prompted=false;tried=false;beatTime=0;resumeTime=0;}   // now the second prompt
+                return false;
+            }
+            for(const auto& fx:g.eclipseFx)if(fx.kind==0)return true;
+            return false;
         default:return false;
         }
     }
     void onSuccess(Combat& g){
-        if(beat==Command||beat==Mark)markAll(g);                 // the lances' light spreads to every foe in sight
-        if(beat==Finish)g.player.storedLightLances=0;
+        if(beat==Command)markAll(g);                              // the lances' light spreads to every foe in sight
+        if(beat==Strike)for(auto& e:g.enemies)if(!e.dead()){e.dummy=false;e.health=0;}   // the soldier falls with the third strike
     }
     static float holdFor(int b){
-        switch(b){case Verdict:return 2.4f;case Singularity:return 2.2f;case Rush:return 1.f;case Dodge:return .8f;default:return .5f;}
+        switch(b){case Eclipse:return 1.5f;case Rush:return .35f;case Dodge:return .3f;default:return .12f;}
+    }
+    void startRewind(Combat& g){
+        rewindLeft=beatRewindSeconds;restored=false;frozen=prompted=tried=false;holdLeft=0;
+        g.timeScale=0;
+        view.freeze=0;view.previewR=0;view.highlight=-1;view.arrow=0;view.chevrons=false;view.targetsHint=false;view.hintX=-1;
+        view.rewind=true;view.rewindPhase=1;
     }
     void updatePractice(float dt,Combat& g){
         auto& p=g.player;p.health=p.maxHealth();
         if(beat>=BeatCount){finishPractice(g);return;}
-        if(frozen){view.highlight=beats[beat].control;view.arrow=beats[beat].arrow;return;}   // time stands still
+        if(rewindLeft>0){
+            rewindLeft=std::max(0.f,rewindLeft-dt);
+            if(!restored&&rewindLeft<=beatRewindSeconds*.5f){   // the jump back: the whole fight returns to the start of this beat
+                restored=true;
+                if(checkpoint)g=*checkpoint;
+                g.timeScale=0;view.rewindPhase=0;
+            }else if(restored)view.rewindPhase=1.f-rewindLeft/(beatRewindSeconds*.5f);
+            if(rewindLeft<=0){view.rewind=false;view.rewindPhase=0;enterBeat(g);}
+            return;
+        }
+        if(frozen){   // slow motion window
+            view.highlight=ctl();view.arrow=beats[beat].arrow;
+            slowLeft-=dt;if(slowLeft<=0)startRewind(g);   // too slow: back to the start of the beat
+            return;
+        }
         beatTime+=dt;if(prompted)resumeTime+=dt;if(tried)triedAge+=dt;
-        if(p.flashMove==FlashMove::Blink)blinkSeen=true;
-        if(beat==Blink||beat==Finish||beat==Rush||beat==Verdict)markAll(g);   // marked foes stay marked for Blink and Verdict
+        if(beat==Eclipse&&holdLeft<=0)markAll(g);                 // the light must still be on them when the dark arrives
         if(holdLeft>0){
             holdLeft=std::max(0.f,holdLeft-dt);
             if(holdLeft<=0){++beat;enterBeat(g);}
             return;
         }
-        if(beat==Finish)if(Enemy* c=first(g,CastlePriest))view.hintX=c->x;
         view.goalDone=p.storedLightLances;
-        if(!prompted&&trigger(g)){prompted=true;onPrompt(g);if(frozen){view.highlight=beats[beat].control;return;}}
-        view.highlight=!prompted?-1:straggle?ControlLayout::Attack:beats[beat].control;view.arrow=prompted?beats[beat].arrow:0;
+        if(beat==Move)view.arrow=reached?2:1;
+        if(!prompted&&trigger(g)){prompted=true;onPrompt(g);if(frozen){view.highlight=ctl();return;}}
+        view.highlight=!prompted?-1:ctl();view.arrow=prompted?(beat==Move?(reached?2:1):beats[beat].arrow):0;
         if(!prompted)return;
         if(success(g)){
             onSuccess(g);holdLeft=holdFor(beat);view.pips=beat+1;
             view.highlight=-1;view.arrow=0;view.goalX=-1;view.hintX=-1;view.targetsHint=false;view.chevrons=false;view.previewR=0;
             return;
         }
+        if(!prompted)return;                                       // the phase just changed
         // A reaction that did not answer the moment (hit anyway, missed, nothing left in range): the moment comes again.
         if(beats[beat].freeze&&tried){
             const bool hurt=beat==Dodge&&p.hurtSerial!=hurtBase;
-            const float retry=beat==Verdict?4.f:beat==Singularity?3.f:1.4f;
-            if(hurt||resumeTime>retry){
-                if(beat==Singularity){mortalAll(g,1);straggle=true;}   // finish the stragglers by hand
-                else {prompted=tried=false;beatTime=std::max(beatTime,5.f);}
-            }
+            if(hurt||resumeTime>1.1f)startRewind(g);   // hit anyway, or the move found nothing: rewind to the start of the beat
         }
     }
     void finishPractice(Combat& g){
         view.skipVisible=false;view.highlight=-1;view.arrow=0;view.pips=view.pipsTotal=0;
         view.freeze=0;view.previewR=0;view.hintX=-1;view.goalX=-1;view.goalCount=view.goalDone=0;view.targetsHint=false;view.chevrons=false;
-        frozen=prompted=false;holdLeft=0;g.timeScale=1;
+        frozen=prompted=false;holdLeft=0;rewindLeft=0;view.rewind=false;view.rewindPhase=0;g.timeScale=1;checkpoint.reset();
         stage=StoryStage::Threshold;pauseDone=false;cameraTarget=0;
-        g.enemies.clear();g.lightLances.clear();g.projectiles.clear();
+        g.enemies.clear();g.lightLances.clear();g.projectiles.clear();g.eclipseFx.clear();
         // The prologue always continues as the Flash Executioner, whichever class the tutorial ended on.
         auto& p=g.player;
         p.flashMove=FlashMove::None;p.flashAge=0;p.spaceMove=0;p.spaceField=0;p.dashLeft=0;p.meleeLeft=0;
@@ -467,9 +473,9 @@ private:
         p.activeJob=0;const int job=p.equippedJobs[0];p.flashExecutioner=job==2;p.form=job==1?1:0;
         clearCooldowns(p);g.refreshStats();p.storedLightLances=0;
         if(swapped&&p.flashExecutioner)g.lightBursts.push_back({p.x,p.y-48,.24f,LightFx::Arrive,p.facing,0});
-        // The threshold beat (pause at x=1100, combat trigger at x=1480) must always be played: a player
-        // already past it is brought back to the start, as restartStage() does.
-        if(p.x>=1050.f)p.x=CastleTerrain::profile(1).spawnX;
+        // The tutorial runs forward, so the player may already stand at the threshold.
+        if(p.x>=1100.f)pauseDone=true;                  // already past the look-up pause: keep running
+        if(p.x>=1440.f)p.x=1400.f;                      // never skip the castle gate trigger
         p.vx=0;p.facing=1;
     }
 
@@ -669,7 +675,7 @@ private:
         g.player.health=g.player.maxHealth();g.player.trailingHealth=float(g.player.health);
         switch(stage){
         case StoryStage::Practice:
-            g.timeScale=1;frozen=false;enterBeat(g);break;   // replay the current beat
+            rewindLeft=0;view.rewind=false;if(checkpoint)g=*checkpoint;g.timeScale=1;frozen=false;enterBeat(g);break;   // replay the current beat
         case StoryStage::Threshold:
             g.player.x=CastleTerrain::profile(1).spawnX;pauseDone=false;break;
         case StoryStage::FirstFoes:case StoryStage::Interior:case StoryStage::Core:

@@ -33,6 +33,7 @@ ECLIPSE is a dark-fantasy 2D action roguelite built with **C++17 and SDL3**. Thi
 
 ## Android and development
 
+- [GitHub workspace and private resource archive](Docs/GITHUB_WORKSPACE.md).
 - [Android build instructions](native-engine/android/README.md).
 - [Pixel tool integration](Docs/PIXEL_TOOL_INTEGRATION.md).
 - [Task progress](TASK_PROGRESS.md) — historical and ongoing task notes; verify dates before treating entries as current.

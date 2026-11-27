@@ -497,18 +497,34 @@ int main(){int failed=0,total=0;
         check(!d.view.skipVisible&&g.timeScale==1.f,"Skip control and the time stop must be gone after the tutorial");
         check(g.player.flashExecutioner&&g.enemies.empty(),"The tutorial must hand back the Flash Executioner and a clean field");
     });
-    test("Story time stop freezes the fight until the prompted button, and the dodge goes through the blow",[]{
+    test("Story reaction moment: 0.3x slow motion, only the prompted button ends it, and the dash goes through the blow",[]{
         StoryDirector d;Combat g;d.start(g);
-        g.player.x=d.view.goalX;tickStory(d,g,Actions{},40);                 // walk beat done
-        Actions j;j.jump=true;tickStory(d,g,j,1);tickStory(d,g,Actions{},60); // jump beat done
+        g.player.x=d.view.goalX;tickStory(d,g,Actions{},40);                 // walk to the beacon
+        Actions j;j.jump=true;tickStory(d,g,j,1);tickStory(d,g,Actions{},60); // then jump
         int guard=0;while(d.view.freeze<=0&&guard++<60*20)tickStory(d,g,Actions{},1);
-        check(d.view.freeze>0&&g.timeScale==0.f,"The soldier's wind-up must stop time");
-        const float age=g.enemies[0].attackAge;Actions wrong;wrong.attack=true;tickStory(d,g,wrong,5);
-        check(g.enemies[0].attackAge==age&&d.view.freeze>0,"Only the prompted button resumes time");
+        check(d.view.freeze>0&&g.timeScale>.25f&&g.timeScale<.35f,"The soldier's wind-up must slow time to 0.3x");
+        Actions wrong;wrong.attack=true;tickStory(d,g,wrong,5);
+        check(d.view.freeze>0&&g.timeScale<1.f,"Only the prompted button ends the slow motion");
         Actions dash;dash.dash=true;tickStory(d,g,dash,1);
-        check(g.timeScale==1.f&&g.player.dashLeft>0,"The dash must fire straight out of the time stop");
+        check(g.timeScale==1.f&&g.player.dashLeft>0,"The dash must fire straight out of the slow motion");
         const int hurt=g.player.hurtSerial;tickStory(d,g,Actions{},60);
-        check(g.player.hurtSerial==hurt,"Dashing out of the time stop must dodge the blow");
+        check(g.player.hurtSerial==hurt,"Dashing out of the slow motion must dodge the blow");
+    });
+    test("Story reaction moment: too slow rewinds the whole fight to the start of the beat, then it can be retried",[]{
+        StoryDirector d;Combat g;d.start(g);
+        g.player.x=d.view.goalX;tickStory(d,g,Actions{},40);
+        Actions j;j.jump=true;tickStory(d,g,j,1);tickStory(d,g,Actions{},60);
+        int guard=0;while(d.view.freeze<=0&&guard++<60*20)tickStory(d,g,Actions{},1);
+        check(d.view.freeze>0,"Slow motion must start");
+        const int beatBefore=d.view.pips;
+        bool rewound=false;
+        for(int i=0;i<60*3;++i){tickStory(d,g,Actions{},1);if(d.view.rewind)rewound=true;}
+        check(rewound,"Running out the slow motion must start a rewind");
+        check(!d.view.rewind&&g.timeScale==1.f,"The rewind must end and time must run again");
+        check(d.view.pips==beatBefore,"A rewind retries the same beat");
+        check(g.player.hurtSerial==0&&(g.enemies.empty()||g.enemies[0].attackAge<0),"The fight is back at the start of the beat");
+        guard=0;while(d.view.freeze<=0&&guard++<60*20)tickStory(d,g,Actions{},1);
+        check(d.view.freeze>0,"The same moment comes again");
     });
     test("Story tutorial: only the beat's own button works, every other action is dead",[]{
         StoryDirector d;Combat g;d.start(g);
@@ -985,11 +1001,13 @@ int main(){int failed=0,total=0;
         check(!g.enemies.empty()&&g.enemies[0].maxHealth==weakened,"Restart must re-apply the weakened forest foes");
         check(g.player.health==45,"Restart must keep the 45 HP forest start");
     });
-    test("Finishing practice returns the player to the start so the threshold beat is played",[]{
+    test("Finishing the tutorial keeps the player where the run ended, but never past the castle gate trigger",[]{
         StoryDirector d;Combat g;d.start(g);g.player.x=1700;d.requestSkip(g);
-        near(g.player.x,CastleTerrain::profile(1).spawnX);
+        near(g.player.x,1400.f);
         tickStory(d,g,Actions{},2);
         check(d.stage==StoryStage::Threshold,"A runner must not skip the threshold into combat");
+        StoryDirector e;Combat h;e.start(h);h.player.x=700;e.requestSkip(h);
+        near(h.player.x,700.f);
     });
     test("Tutorial gatekeeper knight is eased but stays tougher than a soldier",[]{
         StoryDirector d;Combat g;d.start(g);d.requestSkip(g);

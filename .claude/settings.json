@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(git branch*)",
+      "Bash(ls*)",
+      "Bash(cat AGENTS.md)",
+      "Bash(cat TASK_PROGRESS.md)",
+      "mcp__pixellab__wait_for_jobs",
+      "mcp__pixellab__get_image",
+      "mcp__pixellab__get_balance",
+      "mcp__pixellab__get_character",
+      "mcp__pixellab__list_jobs",
+      "mcp__pixellab__search_help",
+      "mcp__pixellab__list_characters",
+      "mcp__pixellab__list_images"
+    ],
+    "deny": [
+      "Bash(gh workflow run*)",
+      "Bash(gh workflow enable*)",
+      "Bash(gh run rerun*)",
+      "Bash(gh run watch*)",
+      "Bash(gh api *workflows*dispatches*)",
+      "Read(./**/*.jks)",
+      "Read(./**/*.keystore)",
+      "Read(./**/*.p12)",
+      "Read(./**/*.pfx)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./native-engine/android/local.properties)"
+    ]
+  }
+}

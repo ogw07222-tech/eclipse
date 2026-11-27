@@ -57,7 +57,7 @@ endif()
 # SDL_MAIN_USE_CALLBACKS=0 still enables callbacks, so do not define it at all.
 if(NOT ANDROID)
   set(ECLIPSE_ASSET_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/../Assets/Resources/Eclipse")
-  set(ECLIPSE_GAME_ASSETS title/eclipse.png ui/title_menu.png ui/circular_control_states.png ui/circular_skill_buttons.png ui/attack_states.png ui/dash_states.png ui/swap_skill_states.png ui/joystick_arrows_new.png ui/skill_button_frame.png ui/skill1.png ui/skill2.png ui/skill3.png ui/skill4.png ui/player_health_frame.png ui/boss_bar_frame.png ui/space_ruler_skill_icons.png ui/blade_skill_icons.png ui/settings_gear.png ui/settings_menu_panel.png ui/settings_window.png ui/enemy_bar_frame.png ui/execute_skull.png)
+  set(ECLIPSE_GAME_ASSETS title/eclipse.png title/opening_knight.png title/opening_gauntlet.png title/opening_altar.png ui/title_menu.png ui/circular_control_states.png ui/circular_skill_buttons.png ui/attack_states.png ui/dash_states.png ui/swap_skill_states.png ui/joystick_arrows_new.png ui/skill_button_frame.png ui/skill1.png ui/skill2.png ui/skill3.png ui/skill4.png ui/player_health_frame.png ui/boss_bar_frame.png ui/space_ruler_skill_icons.png ui/blade_skill_icons.png ui/settings_gear.png ui/settings_menu_panel.png ui/settings_window.png ui/enemy_bar_frame.png ui/execute_skull.png)
   file(GLOB ECLIPSE_FLASH_PNGS CONFIGURE_DEPENDS RELATIVE "${ECLIPSE_ASSET_SOURCE}" "${ECLIPSE_ASSET_SOURCE}/flash_executioner/*.png")
   list(APPEND ECLIPSE_GAME_ASSETS ${ECLIPSE_FLASH_PNGS})
   file(GLOB ECLIPSE_SPACE_ASSETS CONFIGURE_DEPENDS RELATIVE "${ECLIPSE_ASSET_SOURCE}" "${ECLIPSE_ASSET_SOURCE}/space_ruler/*.png" "${ECLIPSE_ASSET_SOURCE}/space_ruler/*.json")

@@ -530,3 +530,12 @@ Owner: other jobs will also stack light/dark; make it easy to apply broadly. Ref
 
 ### Addendum 2026-11-25 (g) — void stack effects
 Owner: spikes execute by void stacks (not bosses), repulsion scales with void stacks, 3 stacks slow, 5 stacks erode (stop all movement + DOT). Implemented in `combat.hpp` (voidExecute, knockback scaling, slow, erosion), tinted in `presentation.hpp`, 3 new core tests (suite 99/133, no new failures). Boss is not frozen by erosion (my call, DOT only). Numbers are estimates; no playtest.
+
+### Addendum 2026-11-25 (h) — faster, forward-running tutorial
+Owner: make the tutorial speedy, advancing forward. Foes now spawn ahead (no more behind-the-player waves), tutorial foes move 1.8x, shorter spawn wakes/trigger delays/holds/retry timers, foes can be placed anywhere along the approach (x 160-1900), and the tutorial ends where the run ended (never past the gate trigger at 1480; the look-up pause is skipped if already past x=1100). A perfect bot clears all 16 beats in about 22 s (final x about 900); real players will take longer. Tests: 99/133, no new failures; finishing-position test rewritten. Not playtested.
+
+### Addendum 2026-11-25 (i) — tutorial cut to 6 beats
+Owner: reduce to six beats. Now: move+jump, dodge (time stop), strike (3 orbs), rush (time stop), command (marks), eclipse (swap time stop, then Ruler spikes on marked foes -> eclipse). Removed: blink, finish, mark wave, verdict, Ruler bolt/spikes/repulse/field/singularity beats. Perfect bot finishes in about 10 s (end x about 1000). Core tests 99/133, no new failures. Not playtested.
+
+### Addendum 2026-11-25 (j) — slow motion and beat rewind
+Owner: slow motion + rewind. Reaction beats now run at 0.3x for up to 1.5 s (`Combat::timeScale`); the right button ends it. Time out, a hit in the dodge, or a move that finds nothing rewinds 0.6 s (reusing the regression-loop streaks) to a `Combat` snapshot taken when the beat began (`StoryDirector::checkpoint`), then the beat replays. R also restores that snapshot. Fixed along the way: prompts now always face forward, the Strike beat finishes the soldier, Rush foes start at x+200/x+280 and wait until awake. Tests: time stop test replaced by slow-motion + rewind tests; suite 100/134, no new failures; perfect bot ends in about 9 s. Not playtested.

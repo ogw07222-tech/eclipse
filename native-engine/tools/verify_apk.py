@@ -15,7 +15,7 @@ parser.add_argument('--all-assets', action='store_true',
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[2]
 assets = [
-    'title/eclipse.png', 'ui/title_menu.png',
+    'title/eclipse.png', 'title/opening_knight.png', 'title/opening_gauntlet.png', 'title/opening_altar.png', 'ui/title_menu.png',
     'ui/attack_states.png', 'ui/dash_states.png',
     'ui/swap_skill_states.png', 'ui/joystick_arrows_new.png',
     'ui/settings_gear.png', 'ui/settings_menu_panel.png',

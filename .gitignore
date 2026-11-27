@@ -28,6 +28,7 @@ __pycache__/
 /native-engine/build*/
 /native-engine/android/.gradle/
 /native-engine/android/vendor/
+/native-engine/android/build/
 /native-engine/android/app/build/
 /native-engine/android/app/.cxx/
 /native-engine/android/output/
